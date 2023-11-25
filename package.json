@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "scripts": {
+    "dev:back-end": "pnpm --filter back-end run dev",
+    "dev:front-end": "pnpm --filter front-end run dev",
+    "dev": "git fetch && pnpm install && concurrently \"npm:dev:back-end\" \"npm:dev:front-end\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
