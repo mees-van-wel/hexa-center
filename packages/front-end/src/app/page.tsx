@@ -1,7 +1,24 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+"use client";
+
+import Image from "next/image";
+import styles from "./page.module.css";
+import { useEffect } from "react";
+import { io } from "socket.io-client";
 
 export default function Home() {
+  useEffect(() => {
+    const socket = io("http://localhost:3001", { withCredentials: true });
+
+    socket.on("hello", () => {
+      alert("Hello");
+    });
+
+    return () => {
+      socket.off("hello");
+      socket.close();
+    };
+  }, []);
+
   return (
     <main className={styles.main}>
       <div className={styles.description}>
@@ -15,7 +32,7 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            By{' '}
+            By{" "}
             <Image
               src="/vercel.svg"
               alt="Vercel Logo"
@@ -91,5 +108,5 @@ export default function Home() {
         </a>
       </div>
     </main>
-  )
+  );
 }
