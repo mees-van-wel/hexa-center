@@ -5,7 +5,7 @@ import "@mantine/core/styles.css";
 import { MantineProvider, ColorSchemeScript } from "@mantine/core";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
+import "./globals.scss";
 import RecoilProvider from "@/providers/RecoilProvider";
 
 const inter = Inter({ subsets: ["latin"] });
