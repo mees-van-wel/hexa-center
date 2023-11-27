@@ -1,8 +1,8 @@
 {
   "private": true,
   "scripts": {
-    "dev:back-end": "pnpm --filter back-end run dev",
-    "dev:front-end": "pnpm --filter front-end run dev",
+    "dev:back-end": "pnpm --filter @hexa-center/back-end run dev",
+    "dev:front-end": "pnpm --filter @hexa-center/front-end run dev",
     "dev": "git fetch && pnpm install && concurrently \"npm:dev:back-end\" \"npm:dev:front-end\""
   },
   "devDependencies": {

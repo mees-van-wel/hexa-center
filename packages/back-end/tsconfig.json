@@ -5,12 +5,14 @@
     "moduleResolution": "NodeNext",
     "lib": ["ESNext"],
     "outDir": "dist",
-    "rootDir": "./src",
     "esModuleInterop": true,
     "strict": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "sourceMap": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "ts-node": {
     "esm": true
