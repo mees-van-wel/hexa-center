@@ -1,19 +1,25 @@
 // export const runtime = "edge";
 
+import "modern-normalize/modern-normalize.css";
 import "@mantine/core/styles.css";
+import "./globals.scss";
 
 import { MantineProvider, ColorSchemeScript } from "@mantine/core";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.scss";
+import localFont from "next/font/local";
 import RecoilProvider from "@/providers/RecoilProvider";
 
-const inter = Inter({ subsets: ["latin"] });
+const eurostile = localFont({
+  src: "../assets/fonts/eurostile.woff2",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: "My Mantine app",
-  description: "I have followed setup instructions carefully",
+  title: "Hexa Center",
 };
+
+// TODO variable light dark theme
+const dark = true;
 
 export default async function RootLayout({
   children,
@@ -25,9 +31,18 @@ export default async function RootLayout({
       <head>
         <ColorSchemeScript />
       </head>
-      <body className={inter.className}>
+      <body
+        className={eurostile.className}
+        data-theme={dark ? "dark" : "light"}
+      >
         <RecoilProvider>
-          <MantineProvider defaultColorScheme="auto">
+          <MantineProvider
+            defaultColorScheme={dark ? "dark" : "light"}
+            theme={{
+              fontFamily: eurostile.style.fontFamily,
+              colors: {},
+            }}
+          >
             {children}
           </MantineProvider>
         </RecoilProvider>
