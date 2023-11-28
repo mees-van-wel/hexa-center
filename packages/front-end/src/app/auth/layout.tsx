@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import background from "@/assets/images/bg.jpeg";
@@ -6,13 +8,15 @@ import styles from "./layout.module.scss";
 import { Button, Group, Stack, Title } from "@mantine/core";
 import { useCompanyName } from "@/hooks/useCompanyName";
 import { IconQuestionMark } from "@tabler/icons-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const companyName = useCompanyName();
+  const t = useTranslation();
 
   return (
     <>
@@ -44,9 +48,9 @@ export default async function RootLayout({
               href="https://www.hexa.center/guide/system/login/"
               target="_blank"
             >
-              Help
+              {t("authLayout.help")}
             </Button>
-            <p> Version 1.3.0 (Blue Heron)</p>
+            <p>{t("authLayout.version")} 1.3.0 (Blue Heron)</p>
           </Stack>
         </aside>
         <div className={styles.gradient} />
