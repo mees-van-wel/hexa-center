@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   AnyPgColumn,
   date,
@@ -6,6 +6,7 @@ import {
   pgTable,
   serial,
   text,
+  time,
   timestamp,
   uuid,
 } from "drizzle-orm/pg-core";
@@ -43,3 +44,57 @@ export const users = pgTable("User", {
   sex: text("sex"),
   dateOfBirth: date("dateOfBirth"),
 });
+
+export const usersRelations = relations(users, ({ one, many }) => ({
+  createdBy: one(users, {
+    fields: [users.createdById],
+    references: [users.id],
+  }),
+  updatedBy: one(users, {
+    fields: [users.updatedById],
+    references: [users.id],
+  }),
+  deletedBy: one(users, {
+    fields: [users.deletedById],
+    references: [users.id],
+  }),
+  account: one(accounts, {
+    fields: [users.id],
+    references: [accounts.userId],
+  }),
+}));
+
+export const accounts = pgTable("Account", {
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom(),
+  userId: integer("userId")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
+  locale: text("locale").notNull(),
+  theme: text("theme").notNull(),
+  color: text("color").notNull(),
+  timezone: text("timezone").notNull(),
+});
+
+export const accountsRelations = relations(accounts, ({ many }) => ({
+  workingHours: many(workingHours),
+}));
+
+export const workingHours = pgTable("workingHours", {
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom(),
+  accountId: integer("accountId")
+    .references(() => accounts.id, { onDelete: "cascade" })
+    .notNull(),
+  startDay: integer("startDay").notNull(),
+  endDay: integer("endDay").notNull(),
+  startTime: time("startTime", { withTimezone: true }).notNull(),
+  endTime: time("endTime", { withTimezone: true }).notNull(),
+});
+
+export const workingHoursRelations = relations(workingHours, ({ one }) => ({
+  account: one(accounts, {
+    fields: [workingHours.accountId],
+    references: [accounts.id],
+  }),
+}));
