@@ -7,7 +7,8 @@ import "./globals.scss";
 import { MantineProvider, ColorSchemeScript } from "@mantine/core";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import RecoilProvider from "@/providers/RecoilProvider";
+import { TranslationInitializer } from "@/initializers/TranslationInitializer";
+import Providers from "./providers";
 
 const eurostile = localFont({
   src: "../assets/fonts/eurostile.woff2",
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
 // TODO variable light dark theme
 const dark = true;
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -35,17 +36,19 @@ export default async function RootLayout({
         className={eurostile.className}
         data-theme={dark ? "dark" : "light"}
       >
-        <RecoilProvider>
-          <MantineProvider
-            defaultColorScheme={dark ? "dark" : "light"}
-            theme={{
-              fontFamily: eurostile.style.fontFamily,
-              colors: {},
-            }}
-          >
-            {children}
-          </MantineProvider>
-        </RecoilProvider>
+        <Providers>
+          <TranslationInitializer>
+            <MantineProvider
+              defaultColorScheme={dark ? "dark" : "light"}
+              theme={{
+                fontFamily: eurostile.style.fontFamily,
+                colors: {},
+              }}
+            >
+              {children}
+            </MantineProvider>
+          </TranslationInitializer>
+        </Providers>
       </body>
       {}
     </html>
