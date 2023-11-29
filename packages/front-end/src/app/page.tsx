@@ -1,9 +1,9 @@
-import styles from "./page.module.scss";
+import { Title } from "@mantine/core";
 
 export default function Home() {
   return (
-    <main className={styles.main}>
-      <h2>Next</h2>
+    <main>
+      <Title>Hexa Center</Title>
     </main>
   );
 }

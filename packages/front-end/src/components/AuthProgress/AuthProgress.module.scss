@@ -1,0 +1,12 @@
+.root {
+  position: absolute;
+  left: 4rem;
+  right: 4rem;
+  padding: 0 2rem;
+  bottom: -3px;
+  background-color: rgb(var(--color-foreground));
+}
+
+.progress {
+  background-color: rgb(var(--color-background));
+}

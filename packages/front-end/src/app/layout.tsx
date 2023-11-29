@@ -1,23 +1,28 @@
 // export const runtime = "edge";
 
+import "modern-normalize/modern-normalize.css";
 import "@mantine/core/styles.css";
+import "./globals.scss";
 
 import { MantineProvider, ColorSchemeScript, Group, Paper, Stack, Title, Button, Popover, Avatar, Menu } from "@mantine/core";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.scss";
-import styles from "./page.module.scss";
-import RecoilProvider from "@/providers/RecoilProvider";
-import CustomAvatar from "@/components/CustomAvatar";
+import localFont from "next/font/local";
+import { TranslationInitializer } from "@/initializers/TranslationInitializer";
+import Providers from "./providers";
 
-const inter = Inter({ subsets: ["latin"] });
+const eurostile = localFont({
+  src: "../assets/fonts/eurostile.woff2",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: "My Mantine app",
-  description: "I have followed setup instructions carefully",
+  title: "Hexa Center",
 };
 
-export default async function RootLayout({
+// TODO variable light dark theme
+const dark = true;
+
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -27,12 +32,23 @@ export default async function RootLayout({
       <head>
         <ColorSchemeScript />
       </head>
-      <body className={inter.className} style={{backgroundColor: "black"}}>
-        <RecoilProvider>
-          <MantineProvider defaultColorScheme="auto">
-            {children}
-          </MantineProvider>
-        </RecoilProvider>
+      <body
+        className={eurostile.className}
+        data-theme={dark ? "dark" : "light"}
+      >
+        <Providers>
+          <TranslationInitializer>
+            <MantineProvider
+              defaultColorScheme={dark ? "dark" : "light"}
+              theme={{
+                fontFamily: eurostile.style.fontFamily,
+                colors: {},
+              }}
+            >
+              {children}
+            </MantineProvider>
+          </TranslationInitializer>
+        </Providers>
       </body>
       {}
     </html>
