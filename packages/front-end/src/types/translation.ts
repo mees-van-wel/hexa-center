@@ -1,4 +1,9 @@
 export type Translation = {
+  generic: {
+    create: string;
+    saving: string;
+    saved: string;
+  };
   authLayout: {
     help: string;
     version: string;

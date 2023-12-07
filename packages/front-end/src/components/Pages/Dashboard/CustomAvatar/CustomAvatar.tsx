@@ -3,7 +3,7 @@
 import { ROUTES } from "@/constants/routes";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Avatar, Group, Menu, Stack } from "@mantine/core";
-import { IconChevronRight, IconLogout, IconPalette, IconUser } from "@tabler/icons-react";
+import { IconLogout, IconPalette, IconUser } from "@tabler/icons-react";
 import Link from "next/link";
 
 export default function CustomAvatar() {
@@ -13,7 +13,7 @@ export default function CustomAvatar() {
     <Menu trigger="hover">
       <Menu.Target>
         <Group>
-          <Stack visibleFrom="md" gap={0} style={{textAlign: "right"}}>
+          <Stack ta={"right"} visibleFrom="md" gap={0}>
             {/* TODO: get profile data */}
             <span>Tony Kaufeld</span>
             <span>tony.kaufeld@hexa-it.nl</span>
@@ -29,7 +29,7 @@ export default function CustomAvatar() {
           {t("dashboardLayout.avatar.preferences")}
         </Menu.Item>
         {/* TODO: Add logout logic */}
-        <Menu.Item leftSection={<IconLogout />} onClick={() => {alert("DOES NOT WORK YET");}}>
+        <Menu.Item leftSection={<IconLogout />} onClick={() => {alert("Add logout logic");}}>
           {t("dashboardLayout.avatar.logout")}
         </Menu.Item>
       </Menu.Dropdown>

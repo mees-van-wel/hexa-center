@@ -1,6 +1,11 @@
 import { Translation } from "@/types/translation";
 
 export default {
+  generic: {
+    create: "Aanmaken",
+    saving: "Opslaan",
+    saved: "Opgeslagen",
+  },
   authLayout: {
     help: "Help",
     version: "Versie",
