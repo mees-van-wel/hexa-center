@@ -3,6 +3,23 @@ export type Translation = {
     help: string;
     version: string;
   };
+  dashboardLayout: {
+    titles: {
+      essentials: string;
+      bookings: string;
+    }
+    avatar: {
+      profile: string;
+      preferences: string;
+      logout: string;
+    }
+    home: string;
+    properties: string;
+    roles: string;
+    users: string;
+    reservations: string;
+    rooms: string;
+  }
 };
 
 type Join<K, P> = K extends string | number

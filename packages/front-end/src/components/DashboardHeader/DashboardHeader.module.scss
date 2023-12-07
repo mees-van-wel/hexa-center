@@ -1,0 +1,19 @@
+.dashboardHeader {
+    align-items: stretch;
+    margin-bottom: 1rem;
+
+    .dashboardHeaderTitleRoot {
+        // TODO: eclipse
+        
+        .dashboardHeaderTitle {
+            display: flex;
+            align-items: center;
+
+            a {
+                text-decoration: underline;
+                font-size: x-large;
+                color: var(--color-darkest);
+            }
+        }
+    }
+}
