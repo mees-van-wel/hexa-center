@@ -7,7 +7,7 @@ import "@mantine/core/styles.css";
 import { Group, Stack, Paper, Drawer } from "@mantine/core";
 import Image from "next/image";
 import background from "@/assets/images/bg.jpeg";
-import styles from "./page.module.scss"
+import styles from "./page.module.scss";
 import { useState } from "react";
 import Navigation from "@/components/Pages/Dashboard/Navigation/Navigation";
 import { IconDotsVertical } from "@tabler/icons-react";
@@ -19,7 +19,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [opened, setOpened] = useState(false);
-  
+
   return (
     <>
       <Image
@@ -31,8 +31,13 @@ export default function DashboardLayout({
         sizes="100vw"
         className={styles.background}
       />
-      <Drawer.Root opened={opened} onClose={() => {setOpened(false)}}>
-      <Drawer.Overlay />
+      <Drawer.Root
+        opened={opened}
+        onClose={() => {
+          setOpened(false);
+        }}
+      >
+        <Drawer.Overlay />
         <Drawer.Content>
           <Drawer.Header>
             <Drawer.Title>
@@ -45,9 +50,13 @@ export default function DashboardLayout({
           </Drawer.Body>
         </Drawer.Content>
       </Drawer.Root>
+
       <Group align="stretch" className={styles.layoutContainer}>
         <Group hiddenFrom="md" className={styles.MobileMenuContainer}>
-          <span className={styles.MobileMenu} onClick={() => setOpened(!opened)}>
+          <span
+            className={styles.MobileMenu}
+            onClick={() => setOpened(!opened)}
+          >
             <IconDotsVertical />
           </span>
         </Group>
@@ -57,7 +66,7 @@ export default function DashboardLayout({
             <Navigation />
           </Stack>
         </Paper>
-          {children}
+        {children}
       </Group>
     </>
   );

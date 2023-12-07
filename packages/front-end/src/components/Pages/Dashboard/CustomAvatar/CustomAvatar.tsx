@@ -22,14 +22,27 @@ export default function CustomAvatar() {
         </Group>
       </Menu.Target>
       <Menu.Dropdown>
-        <Menu.Item leftSection={<IconUser />} component={Link} href={ROUTES.PROFILE}>
+        <Menu.Item
+          leftSection={<IconUser />}
+          component={Link}
+          href={ROUTES.PROFILE}
+        >
           {t("dashboardLayout.avatar.profile")}
         </Menu.Item>
-        <Menu.Item leftSection={<IconPalette />} component={Link} href={ROUTES.PREFERENCES}>
+        <Menu.Item
+          leftSection={<IconPalette />}
+          component={Link}
+          href={ROUTES.PREFERENCES}
+        >
           {t("dashboardLayout.avatar.preferences")}
         </Menu.Item>
         {/* TODO: Add logout logic */}
-        <Menu.Item leftSection={<IconLogout />} onClick={() => {alert("Add logout logic");}}>
+        <Menu.Item
+          leftSection={<IconLogout />}
+          onClick={() => {
+            alert("Add logout logic");
+          }}
+        >
           {t("dashboardLayout.avatar.logout")}
         </Menu.Item>
       </Menu.Dropdown>
