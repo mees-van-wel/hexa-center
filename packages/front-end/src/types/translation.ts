@@ -3,6 +3,40 @@ export type Translation = {
     help: string;
     version: string;
   };
+  loginPage: {
+    title: string;
+    email: string;
+    sendEmailCode: string;
+    emailCodeSent: string;
+    emailRequiredError: string;
+    emailFormatError: string;
+    sendAgain: string;
+    code: string;
+    codeInvalidError: string;
+    phoneNumber: string;
+    sendPhoneCode: string;
+    phoneCodeSend: string;
+    phoneNumberRequiredError: string;
+    phoneNumberFormatError: string;
+    rememberMeFor: string;
+    thisSessionOnly: {
+      label: string;
+      description: string;
+    };
+    hours24: {
+      label: string;
+      description: string;
+    };
+    days7: {
+      label: string;
+      description: string;
+    };
+    days30: {
+      label: string;
+      description: string;
+    };
+    loggedInSuccess: string;
+  };
 };
 
 type Join<K, P> = K extends string | number

@@ -8,7 +8,7 @@ type AuthTitleProps = {
 };
 
 export const AuthTitle = ({ children, icon }: AuthTitleProps) => (
-  <Group className={styles.root} gap="xs">
+  <Group className={styles.root} gap="xs" wrap="nowrap">
     <Title order={2} className={styles.title}>
       {children}
     </Title>
