@@ -1,8 +1,17 @@
 export type Translation = {
+  generic: {
+    number: string;
+    create: string;
+    delete: string;
+  }
   authLayout: {
     help: string;
     version: string;
   };
+  rooms: {
+    name: string;
+    price: string;
+  }
 };
 
 type Join<K, P> = K extends string | number

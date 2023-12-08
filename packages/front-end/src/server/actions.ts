@@ -9,3 +9,11 @@ export async function readCountries() {
 
   return data;
 }
+
+export async function readRooms() {
+  const { data } = await axios.get<string[]>(
+    `${process.env.NEXT_PUBLIC_API_URL}/rooms`
+  );
+
+  return data;
+}
