@@ -7,10 +7,10 @@ import { isDev } from "../utils/environment.js";
 import { sendMail } from "../utils/mail.js";
 import { encrypt } from "../utils/encryption.js";
 import { sign } from "../utils/jwt.js";
-import { object, string } from "valibot";
+import { object, string, email } from "valibot";
 
 const SendEmailOtpSchema = object({
-  email: string(),
+  email: string([email()]),
 });
 
 export const POST: Endpoint = async ({ res, validate }) => {

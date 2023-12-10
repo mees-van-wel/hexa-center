@@ -6,14 +6,18 @@
 
 .aside {
   flex-grow: 1;
-  flex-basis: 450px;
+  flex-basis: 350px;
   flex-shrink: 1;
   max-width: 350px;
-  padding: 2rem;
+  gap: 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
+}
+
+.header {
+  padding: 2rem 2rem 0 2rem;
 }
 
 .nameWrapper {
@@ -27,10 +31,14 @@
 
 .content {
   width: 100%;
-  border: solid 1px rgb(var(--color-neutral));
-  padding: 2rem;
-  border-radius: 0.25rem;
+  border-top: solid 1px rgb(var(--color-neutral));
+  border-bottom: solid 1px rgb(var(--color-neutral));
+  padding: 4rem 2rem;
   position: relative;
+}
+
+.footer {
+  padding: 0 1rem 1rem 1rem;
 }
 
 .backgroundWrapper {
@@ -52,17 +60,4 @@
 .gradient {
   position: absolute;
   inset: 0;
-  // background: linear-gradient(
-  //   90deg,
-  //   rgb(var(--color-foreground)) 0%,
-  //   rgb(var(--color-foreground) / 0%) 30%
-  // );
-
-  // background: radial-gradient(
-  //   circle,
-  //   rgb(var(--color-foreground) / 0%) 83.5%,
-  //   rgb(var(--color-foreground)) 84%
-  // );
-
-  // mask-image: linear-gradient(to right, black 50%, transparent 50%);
 }

@@ -21,7 +21,7 @@ export default function AuthLayout({
   return (
     <main className={styles.main}>
       <aside className={styles.aside}>
-        <Group wrap="nowrap" w="100%">
+        <Group className={styles.header} wrap="nowrap">
           <Image alt="Icon" src={icon} width={64} height={64} />
           <Stack gap={0} className={styles.nameWrapper}>
             <Title>Hexa Center</Title>
@@ -29,7 +29,7 @@ export default function AuthLayout({
           </Stack>
         </Group>
         <div className={styles.content}>{children}</div>
-        <Stack align="center">
+        <Stack className={styles.footer} align="center">
           <Button
             component={Link}
             variant="light"

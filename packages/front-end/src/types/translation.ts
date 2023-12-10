@@ -1,4 +1,7 @@
 export type Translation = {
+  common: {
+    back: string;
+  };
   authLayout: {
     help: string;
     version: string;
@@ -6,16 +9,16 @@ export type Translation = {
   loginPage: {
     title: string;
     email: string;
-    sendEmailCode: string;
-    emailCodeSent: string;
+    sendEmailOtp: string;
+    emailOtpSent: string;
     emailRequiredError: string;
     emailFormatError: string;
     sendAgain: string;
-    code: string;
-    codeInvalidError: string;
+    otp: string;
+    invalidOtpError: string;
     phoneNumber: string;
-    sendPhoneCode: string;
-    phoneCodeSend: string;
+    sendPhoneOtp: string;
+    phoneOtpSend: string;
     phoneNumberRequiredError: string;
     phoneNumberFormatError: string;
     rememberMeFor: string;

@@ -1,6 +1,9 @@
 import { Translation } from "@/types/translation";
 
 export default {
+  common: {
+    back: "Terug",
+  },
   authLayout: {
     help: "Help",
     version: "Versie",
@@ -8,17 +11,17 @@ export default {
   loginPage: {
     title: "Inloggen",
     email: "E-mailadres",
-    sendEmailCode: "Verstuur E-mailcode",
-    emailCodeSent:
+    sendEmailOtp: "Verstuur E-mailcode",
+    emailOtpSent:
       "Als het ingevoerde e-mailadres correct is, is er een code verzonden naar",
     emailRequiredError: "E-mailadres is verplicht",
     emailFormatError: "Ongeldig of verkeerd geformatteerd e-mailadres",
     sendAgain: "Opnieuw versturen",
-    code: "Code",
-    codeInvalidError: "De code is ongeldig",
+    otp: "Code",
+    invalidOtpError: "De code is ongeldig",
     phoneNumber: "Telefoonnummer",
-    sendPhoneCode: "Ontvang SMS Code",
-    phoneCodeSend:
+    sendPhoneOtp: "Ontvang SMS Code",
+    phoneOtpSend:
       "Als het ingevoerde telefoonnummer correct is, is er een SMS-code verzonden naar",
     phoneNumberRequiredError: "Telefoonnummer is verplicht",
     phoneNumberFormatError: "Ongeldig of verkeerd geformatteerd telefoonnummer",

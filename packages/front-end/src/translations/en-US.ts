@@ -1,6 +1,9 @@
 import { Translation } from "@/types/translation";
 
 export default {
+  common: {
+    back: "Back",
+  },
   authLayout: {
     help: "Help",
     version: "Version",
@@ -8,16 +11,16 @@ export default {
   loginPage: {
     title: "Login",
     email: "Email",
-    sendEmailCode: "Send Email Code",
-    emailCodeSent: "If the entered email is correct, a code has been sent to",
+    sendEmailOtp: "Send Email Code",
+    emailOtpSent: "If the entered email is correct, a code has been sent to",
     emailRequiredError: "Email is required",
     emailFormatError: "Invalid or badly formatted email",
     sendAgain: "Send Again",
-    code: "Code",
-    codeInvalidError: "The code is invalid",
+    otp: "Code",
+    invalidOtpError: "The code is invalid",
     phoneNumber: "Phone number",
-    sendPhoneCode: "Receive SMS Code",
-    phoneCodeSend:
+    sendPhoneOtp: "Receive SMS Code",
+    phoneOtpSend:
       "If the entered phone number is correct, an SMS code has been sent to",
     phoneNumberRequiredError: "Phone number is required",
     phoneNumberFormatError: "Invalid or badly formatted phone number",
