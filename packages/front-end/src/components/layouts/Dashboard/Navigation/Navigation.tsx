@@ -1,4 +1,3 @@
-import { ROUTES } from "@/constants/routes";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Button, Stack, Title } from "@mantine/core";
 import {
@@ -14,7 +13,7 @@ import { usePathname } from "next/navigation";
 import { useMemo } from "react";
 import styles from "./Navigation.module.scss";
 
-export default function Navigation() {
+export const Navigation = () => {
   const t = useTranslation();
   const url = usePathname();
   const pathname = useMemo(() => `/${url.split("/")[1]}`, [url]);
@@ -25,8 +24,8 @@ export default function Navigation() {
         <Stack>
           <Button
             component={Link}
-            href={ROUTES.HOME}
-            variant={pathname === ROUTES.HOME ? "filled" : "subtle"}
+            href="/"
+            variant={pathname === "/" ? "filled" : "subtle"}
             leftSection={<IconHome />}
             fullWidth
             justify="left"
@@ -34,12 +33,12 @@ export default function Navigation() {
             {t("dashboardLayout.home")}
           </Button>
           <Stack gap="xs">
-            <Title order={4}>{t("dashboardLayout.titles.essentials")}</Title>
+            <Title order={4}>{t("dashboardLayout.modules.essentials")}</Title>
             <Stack gap={0}>
               <Button
                 component={Link}
-                href={ROUTES.PROPERTIES}
-                variant={pathname === ROUTES.PROPERTIES ? "filled" : "subtle"}
+                href="/properties"
+                variant={pathname === "/properties" ? "filled" : "subtle"}
                 leftSection={<IconBuilding />}
                 fullWidth
                 justify="left"
@@ -48,8 +47,8 @@ export default function Navigation() {
               </Button>
               <Button
                 component={Link}
-                href={ROUTES.ROLES}
-                variant={pathname === ROUTES.ROLES ? "filled" : "subtle"}
+                href="/roles"
+                variant={pathname === "/roles" ? "filled" : "subtle"}
                 leftSection={<IconLock />}
                 fullWidth
                 justify="left"
@@ -58,8 +57,8 @@ export default function Navigation() {
               </Button>
               <Button
                 component={Link}
-                href={ROUTES.USERS}
-                variant={pathname === ROUTES.USERS ? "filled" : "subtle"}
+                href="/users"
+                variant={pathname === "/users" ? "filled" : "subtle"}
                 leftSection={<IconUser />}
                 fullWidth
                 justify="left"
@@ -69,12 +68,12 @@ export default function Navigation() {
             </Stack>
           </Stack>
           <Stack gap="xs">
-            <Title order={4}>{t("dashboardLayout.titles.bookings")}</Title>
+            <Title order={4}>{t("dashboardLayout.modules.bookings")}</Title>
             <Stack gap={0}>
               <Button
                 component={Link}
-                href={ROUTES.RESERVATIONS}
-                variant={pathname === ROUTES.RESERVATIONS ? "filled" : "subtle"}
+                href="/reservations"
+                variant={pathname === "/reservations" ? "filled" : "subtle"}
                 leftSection={<IconHotelService />}
                 fullWidth
                 justify="left"
@@ -83,8 +82,8 @@ export default function Navigation() {
               </Button>
               <Button
                 component={Link}
-                href={ROUTES.ROOMS}
-                variant={pathname === ROUTES.ROOMS ? "filled" : "subtle"}
+                href="/rooms"
+                variant={pathname === "/rooms" ? "filled" : "subtle"}
                 leftSection={<IconBed />}
                 fullWidth
                 justify="left"
@@ -98,4 +97,4 @@ export default function Navigation() {
       <div className={styles.version}>V1.3.0 (Blue Heron)</div>
     </Stack>
   );
-}
+};

@@ -5,7 +5,7 @@ import Icon from "@/assets/images/icon-white.svg";
 import Image from "next/image";
 import { useCompanyName } from "@/hooks/useCompanyName";
 
-export default function CompanyTitle() {
+export const CompanyTitle = () => {
   const companyName = useCompanyName();
 
   return (
@@ -17,4 +17,4 @@ export default function CompanyTitle() {
       </Stack>
     </Group>
   );
-}
+};

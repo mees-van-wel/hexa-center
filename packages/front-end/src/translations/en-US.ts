@@ -12,7 +12,7 @@ export default {
     version: "Version",
   },
   dashboardLayout: {
-    titles: {
+    modules: {
       essentials: "Essentials",
       bookings: "Bookings",
     },

@@ -1,24 +1,20 @@
 "use client";
 
-// export const runtime = "edge";
-
-import "@mantine/core/styles.css";
-
 import { Group, Stack, Paper, Drawer } from "@mantine/core";
 import Image from "next/image";
 import background from "@/assets/images/bg.jpeg";
-import styles from "./page.module.scss";
+import styles from "./layout.module.scss";
 import { useState } from "react";
-import Navigation from "@/components/Pages/Dashboard/Navigation/Navigation";
+import { Navigation } from "@/components/layouts/Dashboard/Navigation";
 import { IconDotsVertical } from "@tabler/icons-react";
-import CompanyTitle from "@/components/Pages/Dashboard/CompanyTitle/CompanyTitle";
+import { CompanyTitle } from "@/components/layouts/Dashboard/CompanyTitle";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [opened, setOpened] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <>
@@ -32,9 +28,9 @@ export default function DashboardLayout({
         className={styles.background}
       />
       <Drawer.Root
-        opened={opened}
+        opened={mobileMenuOpen}
         onClose={() => {
-          setOpened(false);
+          setMobileMenuOpen(false);
         }}
       >
         <Drawer.Overlay />
@@ -52,21 +48,25 @@ export default function DashboardLayout({
       </Drawer.Root>
 
       <Group align="stretch" className={styles.layoutContainer}>
-        <Group hiddenFrom="md" className={styles.MobileMenuContainer}>
+        <div className={styles.mobileMenuContainer}>
           <span
-            className={styles.MobileMenu}
-            onClick={() => setOpened(!opened)}
+            className={styles.mobileMenu}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             <IconDotsVertical />
           </span>
-        </Group>
-        <Paper visibleFrom="md" p="md">
-          <Stack pos="relative" h="100%">
-            <CompanyTitle />
-            <Navigation />
-          </Stack>
+        </div>
+        <Paper
+          component={Stack}
+          pos="relative"
+          h="100%"
+          visibleFrom="md"
+          p="md"
+        >
+          <CompanyTitle />
+          <Navigation />
         </Paper>
-        {children}
+        <main className={styles.main}>{children}</main>
       </Group>
     </>
   );

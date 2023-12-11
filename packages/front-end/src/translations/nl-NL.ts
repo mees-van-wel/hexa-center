@@ -12,7 +12,7 @@ export default {
     version: "Versie",
   },
   dashboardLayout: {
-    titles: {
+    modules: {
       essentials: "Essentiële zaken",
       bookings: "Bookingen",
     },

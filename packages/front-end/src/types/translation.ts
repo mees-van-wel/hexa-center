@@ -10,7 +10,7 @@ export type Translation = {
     version: string;
   };
   dashboardLayout: {
-    titles: {
+    modules: {
       essentials: string;
       bookings: string;
     };

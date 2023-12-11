@@ -1,5 +1,6 @@
 .headerChildren {
   display: flex;
+
   @media (max-width: 36em) {
     width: 100%;
   }
@@ -12,9 +13,12 @@
 .dashboardHeaderTitle {
   display: flex;
   align-items: center;
-  a {
-    text-decoration: underline;
-    font-size: x-large;
-    color: var(--color-darkest);
-  }
+}
+
+.dashboardHeaderLink {
+  display: flex;
+  align-items: center;
+  text-decoration: underline;
+  font-size: 26px;
+  color: var(--color-text);
 }

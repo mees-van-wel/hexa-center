@@ -1,19 +1,18 @@
 "use client";
 
-import { ROUTES } from "@/constants/routes";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Avatar, Group, Menu, Stack } from "@mantine/core";
 import { IconLogout, IconPalette, IconUser } from "@tabler/icons-react";
 import Link from "next/link";
 
-export default function CustomAvatar() {
+export const CustomAvatar = () => {
   const t = useTranslation();
 
   return (
-    <Menu trigger="hover">
+    <Menu trigger="hover" position="bottom-end">
       <Menu.Target>
         <Group>
-          <Stack ta={"right"} visibleFrom="md" gap={0}>
+          <Stack ta="right" visibleFrom="md" gap={0}>
             {/* TODO: get profile data */}
             <span>Tony Kaufeld</span>
             <span>tony.kaufeld@hexa-it.nl</span>
@@ -22,17 +21,13 @@ export default function CustomAvatar() {
         </Group>
       </Menu.Target>
       <Menu.Dropdown>
-        <Menu.Item
-          leftSection={<IconUser />}
-          component={Link}
-          href={ROUTES.PROFILE}
-        >
+        <Menu.Item leftSection={<IconUser />} component={Link} href="/profile">
           {t("dashboardLayout.avatar.profile")}
         </Menu.Item>
         <Menu.Item
           leftSection={<IconPalette />}
           component={Link}
-          href={ROUTES.PREFERENCES}
+          href="/preferences"
         >
           {t("dashboardLayout.avatar.preferences")}
         </Menu.Item>
@@ -48,4 +43,4 @@ export default function CustomAvatar() {
       </Menu.Dropdown>
     </Menu>
   );
-}
+};
