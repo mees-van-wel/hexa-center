@@ -11,7 +11,7 @@ const vonage = new Vonage(
   new Auth({
     apiKey,
     apiSecret,
-  })
+  }),
 );
 
 type SendSmsProps = {

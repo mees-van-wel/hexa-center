@@ -26,7 +26,7 @@ app.use(
   helmet({
     // contentSecurityPolicy: isProduction ? undefined : false,
     // crossOriginEmbedderPolicy: isProduction ? undefined : false,
-  })
+  }),
 );
 app.use(compression());
 app.use(cookieParser());

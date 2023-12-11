@@ -59,7 +59,7 @@ export const setupEndpoints = async (endpointsDirectory = "api") => {
           endpointHandler({ req, res, next, validate });
         });
       });
-    })
+    }),
   );
 
   return router;

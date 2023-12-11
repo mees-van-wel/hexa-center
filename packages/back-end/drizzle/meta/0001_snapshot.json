@@ -58,12 +58,8 @@
           "name": "Account_userId_User_id_fk",
           "tableFrom": "Account",
           "tableTo": "User",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -212,12 +208,8 @@
           "name": "User_createdById_User_id_fk",
           "tableFrom": "User",
           "tableTo": "User",
-          "columnsFrom": [
-            "createdById"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["createdById"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -225,12 +217,8 @@
           "name": "User_updatedById_User_id_fk",
           "tableFrom": "User",
           "tableTo": "User",
-          "columnsFrom": [
-            "updatedById"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["updatedById"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -238,12 +226,8 @@
           "name": "User_deletedById_User_id_fk",
           "tableFrom": "User",
           "tableTo": "User",
-          "columnsFrom": [
-            "deletedById"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["deletedById"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -253,16 +237,12 @@
         "User_email_unique": {
           "name": "User_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         },
         "User_phoneNumber_unique": {
           "name": "User_phoneNumber_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "phoneNumber"
-          ]
+          "columns": ["phoneNumber"]
         }
       }
     },
@@ -320,12 +300,8 @@
           "name": "workingHours_accountId_Account_id_fk",
           "tableFrom": "workingHours",
           "tableTo": "Account",
-          "columnsFrom": [
-            "accountId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["accountId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }

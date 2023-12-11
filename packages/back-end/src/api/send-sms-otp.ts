@@ -11,7 +11,7 @@ import { encrypt } from "../utils/encryption.js";
 
 const ValidateOtpSchema = object({
   phoneNumber: string(),
-});  
+});
 
 export const POST: Endpoint = async ({ res, validate }) => {
   const { phoneNumber } = validate(ValidateOtpSchema);
@@ -28,7 +28,7 @@ export const POST: Endpoint = async ({ res, validate }) => {
 
     if (isDev)
       return console.log(
-        user ? otp : `No user found with phone number: '${phoneNumber}'`
+        user ? otp : `No user found with phone number: '${phoneNumber}'`,
       );
 
     if (!user) return;
