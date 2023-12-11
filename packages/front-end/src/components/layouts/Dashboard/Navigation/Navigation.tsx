@@ -32,7 +32,7 @@ export const Navigation = () => {
           >
             {t("dashboardLayout.home")}
           </Button>
-          <Stack gap="xs">
+          {/* <Stack gap="xs">
             <Title order={4}>{t("dashboardLayout.modules.essentials")}</Title>
             <Stack gap={0}>
               <Button
@@ -66,7 +66,7 @@ export const Navigation = () => {
                 {t("dashboardLayout.users")}
               </Button>
             </Stack>
-          </Stack>
+          </Stack> */}
           <Stack gap="xs">
             <Title order={4}>{t("dashboardLayout.modules.bookings")}</Title>
             <Stack gap={0}>
