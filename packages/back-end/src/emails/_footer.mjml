@@ -1,0 +1,5 @@
+<mj-section padding-top="20px">
+  <mj-column>
+    <mj-text align="center">{{children}}</mj-text>
+  </mj-column>
+</mj-section>

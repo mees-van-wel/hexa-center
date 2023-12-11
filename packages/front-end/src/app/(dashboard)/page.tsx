@@ -13,9 +13,9 @@ export default function Home() {
       <Stack h={"100%"}>
         <DashboardHeader title={[{ content: "Home", href: "" }]}>
           <Group>
-            <Button>{t("generic.create")}</Button>
+            <Button>{t("common.create")}</Button>
             <Badge size="lg" color="green">
-              {t("generic.saved")}
+              {t("common.saved")}
             </Badge>
           </Group>
         </DashboardHeader>

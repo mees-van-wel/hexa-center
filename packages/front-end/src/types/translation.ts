@@ -1,5 +1,6 @@
 export type Translation = {
-  generic: {
+  common: {
+    back: string;
     create: string;
     saving: string;
     saved: string;
@@ -25,6 +26,40 @@ export type Translation = {
     reservations: string;
     rooms: string;
   }
+  loginPage: {
+    title: string;
+    email: string;
+    sendEmailOtp: string;
+    emailOtpSent: string;
+    emailRequiredError: string;
+    emailFormatError: string;
+    sendAgain: string;
+    otp: string;
+    invalidOtpError: string;
+    phoneNumber: string;
+    sendPhoneOtp: string;
+    phoneOtpSend: string;
+    phoneNumberRequiredError: string;
+    phoneNumberFormatError: string;
+    rememberMeFor: string;
+    thisSessionOnly: {
+      label: string;
+      description: string;
+    };
+    hours24: {
+      label: string;
+      description: string;
+    };
+    days7: {
+      label: string;
+      description: string;
+    };
+    days30: {
+      label: string;
+      description: string;
+    };
+    loggedInSuccess: string;
+  };
 };
 
 type Join<K, P> = K extends string | number
@@ -46,12 +81,12 @@ type PathValue<T, P extends string> = P extends `${infer K}.${infer R}`
     ? PathValue<T[K], R>
     : never
   : P extends keyof T
-  ? T[P] extends string
-    ? undefined
-    : T[P] extends (params: infer Params) => string
-    ? Params
-    : never
-  : never;
+    ? T[P] extends string
+      ? undefined
+      : T[P] extends (params: infer Params) => string
+        ? Params
+        : never
+    : never;
 
 type PathTypes<T> = {
   [P in Leaves<T>]: PathValue<T, P>;

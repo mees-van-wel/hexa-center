@@ -42,7 +42,7 @@ export default function RootLayout({
               defaultColorScheme={dark ? "dark" : "light"}
               theme={{
                 fontFamily: eurostile.style.fontFamily,
-                colors: {},
+                cursorType: "pointer",
               }}
             >
               {children}
