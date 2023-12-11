@@ -1,12 +1,47 @@
 export type Translation = {
-  generic: {
+  common: {
+    back: string;
     number: string;
     create: string;
     delete: string;
-  }
+  };
   authLayout: {
     help: string;
     version: string;
+  };
+  loginPage: {
+    title: string;
+    email: string;
+    sendEmailOtp: string;
+    emailOtpSent: string;
+    emailRequiredError: string;
+    emailFormatError: string;
+    sendAgain: string;
+    otp: string;
+    invalidOtpError: string;
+    phoneNumber: string;
+    sendPhoneOtp: string;
+    phoneOtpSend: string;
+    phoneNumberRequiredError: string;
+    phoneNumberFormatError: string;
+    rememberMeFor: string;
+    thisSessionOnly: {
+      label: string;
+      description: string;
+    };
+    hours24: {
+      label: string;
+      description: string;
+    };
+    days7: {
+      label: string;
+      description: string;
+    };
+    days30: {
+      label: string;
+      description: string;
+    };
+    loggedInSuccess: string;
   };
   rooms: {
     name: string;

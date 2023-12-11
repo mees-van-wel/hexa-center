@@ -1,0 +1,16 @@
+<mj-column>
+  <mj-text align="center" font-size="20px" font-weight="bold">
+    {{title}}
+  </mj-text>
+  <mj-text align="center" padding="20px">{{message}}</mj-text>
+  <mj-text
+    align="center"
+    font-size="24px"
+    font-weight="bold"
+    padding-bottom="10px"
+    letter-spacing="6px"
+  >
+    {{otp}}
+  </mj-text>
+  <mj-text align="center">{{validity}}</mj-text>
+</mj-column>

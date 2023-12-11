@@ -1,0 +1,16 @@
+.callingCodeInput {
+  position: relative;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  transition: width var(--transition);
+
+  &:focus {
+    width: 106px !important;
+    z-index: 1;
+  }
+}
+
+.numberInput {
+  flex-grow: 1;
+  margin-left: -2px;
+}

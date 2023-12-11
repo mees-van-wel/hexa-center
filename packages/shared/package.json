@@ -11,5 +11,8 @@
   "license": "ISC",
   "devDependencies": {
     "typescript": "^5.3.2"
+  },
+  "dependencies": {
+    "valibot": "^0.22.0"
   }
 }
