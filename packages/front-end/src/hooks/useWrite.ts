@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { type AxiosError } from "axios";
 import { useState } from "react";
 
 export const useWrite = (
@@ -6,8 +6,9 @@ export const useWrite = (
   endpoint: string
 ) => {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<AxiosError>();
 
-  const execute = async (data?: any) => {
+  const execute = async (data?: Record<string, any>) => {
     setLoading(true);
 
     try {
@@ -17,13 +18,14 @@ export const useWrite = (
         data,
       });
 
-      return result;
-    } catch (error) {
-      return error;
+      return result.data;
+    } catch (axiosError) {
+      setError(axiosError as AxiosError);
+      return axiosError;
     } finally {
       setLoading(false);
     }
   };
 
-  return { execute, loading };
+  return { error, loading, execute };
 };

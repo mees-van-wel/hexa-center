@@ -50,6 +50,7 @@ export default function AuthLayout({
           alt="Background"
           src={background}
           quality={100}
+          sizes="90vw"
           fill
           priority
         />

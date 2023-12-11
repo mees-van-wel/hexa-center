@@ -41,7 +41,7 @@ export const EmailOtpInput = ({ onCompleted }: EmailOtpProps) => {
             aria-required
             autoFocus
           />
-          <Loader type="dots" />
+          {validateOtp.loading && <Loader type="dots" />}
         </Group>
       </Input.Wrapper>
       <Group justify="space-between">
