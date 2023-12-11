@@ -19,38 +19,44 @@ type DashboardHeaderProps = {
   icon?: ReactNode;
 };
 
-export const DashboardHeader = ({ children, title, icon }: DashboardHeaderProps) => {
+export const DashboardHeader = ({
+  children,
+  title,
+  icon,
+}: DashboardHeaderProps) => {
   const t = useTranslation();
-    
-  return  (
+
+  return (
     <Group align="stretch">
-      {children && 
+      {children && (
         <Paper p="md" className={styles.headerChildren}>
           {children}
         </Paper>
-      }
+      )}
       <Paper className={styles.dashboardcontainer} p="md">
         <Group justify="space-between" wrap="nowrap">
           <span>&nbsp;</span>
           <Group justify="center" gap={"xs"}>
-              {icon && icon}
-              {title.map(({ content, href }, index) => {
-            const isLast = title.length - 1 === index;
-            const Component = href ? Link : Title;
+            {icon && icon}
+            {title.map(({ content, href }, index) => {
+              const isLast = title.length - 1 === index;
+              const Component = href ? Link : Title;
 
-            return (
-              <div key={content + index}>
-                <div className={styles.dashboardHeaderTitle}>
-                    <Component href={href} order={2}>{content}</Component>
+              return (
+                <div key={content + index}>
+                  <div className={styles.dashboardHeaderTitle}>
+                    <Component href={href} order={2}>
+                      {content}
+                    </Component>
+                  </div>
+                  {!isLast && <IconChevronRight />}
                 </div>
-                {!isLast && <IconChevronRight /> }
-              </div>
-            );
+              );
             })}
           </Group>
           <CustomAvatar />
         </Group>
       </Paper>
     </Group>
-  )
+  );
 };

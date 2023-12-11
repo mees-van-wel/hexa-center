@@ -4,7 +4,18 @@ import "modern-normalize/modern-normalize.css";
 import "@mantine/core/styles.css";
 import "./globals.scss";
 
-import { MantineProvider, ColorSchemeScript, Group, Paper, Stack, Title, Button, Popover, Avatar, Menu } from "@mantine/core";
+import {
+  MantineProvider,
+  ColorSchemeScript,
+  Group,
+  Paper,
+  Stack,
+  Title,
+  Button,
+  Popover,
+  Avatar,
+  Menu,
+} from "@mantine/core";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { TranslationInitializer } from "@/initializers/TranslationInitializer";

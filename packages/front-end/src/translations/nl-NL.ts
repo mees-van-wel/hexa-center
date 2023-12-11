@@ -27,7 +27,7 @@ export default {
     users: "Gebruikers",
     reservations: "Reservaties",
     rooms: "Kamers",
-  }
+  },
   loginPage: {
     title: "Inloggen",
     email: "E-mailadres",
