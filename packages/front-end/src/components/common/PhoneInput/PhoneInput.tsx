@@ -39,14 +39,14 @@ export const PhoneInput = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const parsedPhoneNumber = useMemo(
     () => (value ? parsePhoneNumber(value) : undefined),
-    [value]
+    [value],
   );
   const [storedCountryCode, setStoredRegionCode] = useLocalStorage<CountryKey>({
     key: "phoneInput.countryCode",
   });
 
   const [countryCodeState, setRegionCodeState] = useState(
-    parsedPhoneNumber?.regionCode as CountryKey | undefined
+    parsedPhoneNumber?.regionCode as CountryKey | undefined,
   );
 
   const countryCode = countryCodeState || storedCountryCode;
@@ -57,7 +57,7 @@ export const PhoneInput = ({
         label: callingCode,
         value: countryCode,
       })),
-    []
+    [],
   );
 
   useDidUpdate(() => {
@@ -132,7 +132,7 @@ export const PhoneInput = ({
               onChange(
                 parsedPhoneNumber.number?.e164 ||
                   parsedPhoneNumber.number?.input ||
-                  ""
+                  "",
               );
             else if (parsedPhoneNumber.number?.national)
               e.target.value = parsedPhoneNumber.number.national;

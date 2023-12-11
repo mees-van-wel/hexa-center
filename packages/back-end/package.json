@@ -8,7 +8,8 @@
     "build": "tsc",
     "dev": "nodemon src/app.ts",
     "start": "node dist/app.js",
-    "gen-migration": "drizzle-kit generate:pg"
+    "gen-migration": "drizzle-kit generate:pg",
+    "fmt": "prettier --write ."
   },
   "keywords": [],
   "author": "",

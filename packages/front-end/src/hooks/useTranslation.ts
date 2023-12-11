@@ -20,7 +20,7 @@ export const useTranslation = () => {
         .split(".")
         .reduce<Record<string, any>>(
           (o, x) => (o === undefined ? undefined : o[x]),
-          translation
+          translation,
         );
 
       return value
@@ -30,6 +30,6 @@ export const useTranslation = () => {
             value(params)
         : key;
     },
-    [translation]
+    [translation],
   ) as Translator;
 };
