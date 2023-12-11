@@ -6,9 +6,7 @@ import { EmailInput } from "@/components/pages/login/EmailInput";
 import { EmailOtpInput } from "@/components/pages/login/EmailOtpInput";
 import { PhoneInput } from "@/components/pages/login/PhoneInput";
 import { PhoneOtpInput } from "@/components/pages/login/PhoneOtpInput";
-import { useRead } from "@/hooks/useRead";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Loader } from "@mantine/core";
 import { IconLogin } from "@tabler/icons-react";
 import { useState } from "react";
 
@@ -24,15 +22,8 @@ const steps = [
 type Step = (typeof steps)[number];
 
 export default function Login() {
-  // const [data, { loading, error }] = useRead("/test");
   const [step, setStep] = useState<Step>("EMAIL_INPUT");
   const t = useTranslation();
-
-  // if (loading) return <Loader />;
-
-  // if (error) return <p>Error {error.message}</p>;
-
-  // return <p>{data}</p>;
 
   return (
     <>
