@@ -10,7 +10,7 @@ export type Translation = {
     version: string;
   };
   loginPage: {
-    title: string;
+    login: string;
     email: string;
     sendEmailOtp: string;
     emailOtpSent: string;
@@ -21,7 +21,7 @@ export type Translation = {
     invalidOtpError: string;
     phoneNumber: string;
     sendPhoneOtp: string;
-    phoneOtpSend: string;
+    phoneOtpSent: string;
     phoneNumberRequiredError: string;
     phoneNumberFormatError: string;
     rememberMeFor: string;
@@ -68,12 +68,12 @@ type PathValue<T, P extends string> = P extends `${infer K}.${infer R}`
     ? PathValue<T[K], R>
     : never
   : P extends keyof T
-  ? T[P] extends string
-    ? undefined
-    : T[P] extends (params: infer Params) => string
-    ? Params
-    : never
-  : never;
+    ? T[P] extends string
+      ? undefined
+      : T[P] extends (params: infer Params) => string
+        ? Params
+        : never
+    : never;
 
 type PathTypes<T> = {
   [P in Leaves<T>]: PathValue<T, P>;

@@ -59,9 +59,35 @@ export const usersRelations = relations(users, ({ one, many }) => ({
     fields: [users.deletedById],
     references: [users.id],
   }),
+  sessions: many(sessions),
   account: one(accounts, {
     fields: [users.id],
     references: [accounts.userId],
+  }),
+}));
+
+export const sessions = pgTable("sessions", {
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom(),
+  issuedAt: timestamp("issued_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  lastAccessed: timestamp("last_accessed", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }),
+  userId: integer("user_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
+  refreshToken: text("refresh_token").unique().notNull(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+});
+
+export const sessionsRelations = relations(sessions, ({ one }) => ({
+  user: one(users, {
+    fields: [sessions.userId],
+    references: [users.id],
   }),
 }));
 

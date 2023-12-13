@@ -5,6 +5,12 @@
     "dev:front-end": "pnpm --filter @hexa-center/front-end run dev",
     "dev": "git fetch && pnpm install && concurrently \"npm:dev:back-end\" \"npm:dev:front-end\""
   },
+  "pnpm": {
+    "allowedDeprecatedVersions": {
+      "rollup-plugin-inject": "3.0.2",
+      "sourcemap-codec": "1.4.8"
+    }
+  },
   "devDependencies": {
     "concurrently": "^8.2.2"
   }

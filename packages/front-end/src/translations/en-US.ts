@@ -12,10 +12,10 @@ export default {
     version: "Version",
   },
   loginPage: {
-    title: "Login",
+    login: "Login",
     email: "Email",
     sendEmailOtp: "Send Email Code",
-    emailOtpSent: "If the entered email is correct, a code has been sent to",
+    emailOtpSent: "If the entered email is correct, a code has been mailed to",
     emailRequiredError: "Email is required",
     emailFormatError: "Invalid or badly formatted email",
     sendAgain: "Send Again",
@@ -23,7 +23,7 @@ export default {
     invalidOtpError: "The code is invalid",
     phoneNumber: "Phone number",
     sendPhoneOtp: "Receive SMS Code",
-    phoneOtpSend:
+    phoneOtpSent:
       "If the entered phone number is correct, an SMS code has been sent to",
     phoneNumberRequiredError: "Phone number is required",
     phoneNumberFormatError: "Invalid or badly formatted phone number",

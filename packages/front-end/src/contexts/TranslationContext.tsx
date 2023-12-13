@@ -31,7 +31,7 @@ export const useTranslationContext = () => {
 
   if (!translationContext)
     throw new Error(
-      "useTranslationContext must be used within TranslationContextProvider"
+      "useTranslationContext must be used within TranslationContextProvider",
     );
 
   return translationContext;

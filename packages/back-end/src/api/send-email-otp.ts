@@ -1,9 +1,9 @@
 import type { Endpoint } from "../types.js";
 import { createOtp } from "../utils/otp.js";
-import client from "../db/client.js";
+import db from "../db/client.js";
 import { users } from "../db/schema.js";
 import { eq } from "drizzle-orm";
-import { isDev } from "../utils/environment.js";
+import { isProduction } from "../utils/environment.js";
 import { sendMail } from "../utils/mail.js";
 import { encrypt } from "../utils/encryption.js";
 import { sign } from "../utils/jwt.js";
@@ -19,7 +19,7 @@ export const POST: Endpoint = async ({ res, validate }) => {
   const otp = createOtp();
 
   (async () => {
-    const result = await client
+    const result = await db
       .select({
         firstName: users.firstName,
         lastName: users.lastName,
@@ -30,23 +30,26 @@ export const POST: Endpoint = async ({ res, validate }) => {
 
     const user = result[0];
 
-    if (isDev)
+    if (!isProduction)
       return console.log(user ? otp : `No user found with email: '${email}'`);
 
     if (!user) return;
 
     await sendMail({
-      title: "OTP",
+      title: "Login email code",
       to: {
         name: `${user.firstName} ${user.lastName}`,
         email,
       },
       template: "otp",
       variables: {
-        message: "lol",
+        message: `Hello ${user.firstName}, here is your code to login.`,
         otp,
-        validity: "10 minutes",
+        validity:
+          "This code is valid for 10 minutes. Do not share this code with anyone.",
       },
+      footer:
+        "If you did not request this, please ignore this email or contact our support department.",
     });
   })();
 

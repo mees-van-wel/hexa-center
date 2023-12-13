@@ -3,33 +3,50 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useWrite } from "@/hooks/useWrite";
 import { Button, Group, Input, Loader, PinInput, Stack } from "@mantine/core";
 import { IconArrowLeft, IconRefresh } from "@tabler/icons-react";
+import { useLoginContext } from "./LoginContext";
+import { useState } from "react";
 
-type EmailOtpProps = {
-  onCompleted: () => any;
-};
-
-// TODO login context to store shared values and loading overlay state
-export const EmailOtpInput = ({ onCompleted }: EmailOtpProps) => {
+export const EmailOtpInput = () => {
   const sendEmailOtp = useWrite("POST", "/send-email-otp");
   const validateOtp = useWrite("POST", "/validate-otp");
+  const [error, setError] = useState("");
+  const { loginState, setLoginState } = useLoginContext();
   const { count, reset } = useCountdown(60);
   const t = useTranslation();
 
   const inputHandler = async (value: string) => {
-    const result = await validateOtp.execute();
-    onCompleted();
+    if (value.length < 4) return;
+
+    try {
+      const result = await validateOtp.execute({
+        token: loginState.emailToken,
+        otp: value,
+      });
+
+      if (!result.valid) return setError("Invalid code");
+      if (error) setError("");
+      setLoginState({ step: "PHONE_INPUT", emailOtp: value });
+    } catch (error) {
+      // TODO Error handling
+      console.log("CATCHED", error);
+    }
+  };
+
+  const backHandler = () => {
+    setLoginState({ step: "EMAIL_INPUT" });
   };
 
   const sendAgainHandler = async () => {
-    await sendEmailOtp.execute();
+    await sendEmailOtp.execute({ email: loginState.email });
     reset();
   };
 
   return (
-    <Stack gap="xl">
+    <Stack>
       <Input.Wrapper
         label={t("loginPage.otp")}
-        description={t("loginPage.emailOtpSent")}
+        description={`${t("loginPage.emailOtpSent")} ${loginState.email}`}
+        error={error}
         withAsterisk
       >
         <Group>
@@ -39,6 +56,7 @@ export const EmailOtpInput = ({ onCompleted }: EmailOtpProps) => {
             onChange={inputHandler}
             oneTimeCode
             aria-required
+            aria-invalid={!!error}
             autoFocus
           />
           {validateOtp.loading && <Loader type="dots" />}
@@ -46,6 +64,7 @@ export const EmailOtpInput = ({ onCompleted }: EmailOtpProps) => {
       </Input.Wrapper>
       <Group justify="space-between">
         <Button
+          onClick={backHandler}
           leftSection={<IconArrowLeft size={16} />}
           variant="light"
           size="xs"
