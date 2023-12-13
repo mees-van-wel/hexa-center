@@ -1,14 +1,20 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { forwardRef, useMemo, useRef, useState } from "react";
+import { mergeRefs } from "react-merge-refs";
 import { parsePhoneNumber } from "awesome-phonenumber";
 import { useLocalStorage, useId, useDidUpdate } from "@mantine/hooks";
 import { Group, Select } from "@mantine/core";
 import { Input } from "@mantine/core";
-import { COUNTRIES, COUNTRY_VALUES, CountryKey } from "@/constants/countries";
+import {
+  COUNTRIES,
+  COUNTRY_VALUES,
+  CountryKey,
+  DEFAULT_COUNTRY,
+} from "@/constants/countries";
 import styles from "./PhoneInput.module.scss";
 
-interface PhoneInputProps {
+type PhoneInputProps = {
   label?: string;
   description?: string;
   error?: string;
@@ -19,126 +25,136 @@ interface PhoneInputProps {
   autoComplete?: boolean;
   autoFocus?: boolean;
   withAsterisk?: boolean;
-}
+};
 
 // TODO Fix console error Attempted import error: 'parsePhoneNumber' is not exported from 'awesome-phonenumber' (imported as 'parsePhoneNumber').
 // TODO Add country as description to select options
-export const PhoneInput = ({
-  label,
-  description,
-  error,
-  required,
-  value,
-  onChange,
-  disabled,
-  autoFocus,
-  withAsterisk,
-  autoComplete,
-}: PhoneInputProps) => {
-  const id = useId();
-  const inputRef = useRef<HTMLInputElement>(null);
-  const parsedPhoneNumber = useMemo(
-    () => (value ? parsePhoneNumber(value) : undefined),
-    [value]
-  );
-  const [storedCountryCode, setStoredRegionCode] = useLocalStorage<CountryKey>({
-    key: "phoneInput.countryCode",
-  });
+export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
+  (
+    {
+      label,
+      description,
+      error,
+      required,
+      value,
+      onChange,
+      disabled,
+      autoFocus,
+      withAsterisk,
+      autoComplete,
+    },
+    ref
+  ) => {
+    const id = useId();
+    const inputRef = useRef<HTMLInputElement>(null);
+    const parsedPhoneNumber = useMemo(
+      () => (value ? parsePhoneNumber(value) : undefined),
+      [value]
+    );
 
-  const [countryCodeState, setRegionCodeState] = useState(
-    parsedPhoneNumber?.regionCode as CountryKey | undefined
-  );
+    const [storedCountryCode, setStoredRegionCode] =
+      useLocalStorage<CountryKey>({
+        key: "phoneInput.countryCode",
+        defaultValue: DEFAULT_COUNTRY.countryCode,
+      });
 
-  const countryCode = countryCodeState || storedCountryCode;
+    const [countryCodeState, setRegionCodeState] = useState(
+      parsedPhoneNumber?.regionCode as CountryKey | undefined
+    );
 
-  const options = useMemo(
-    () =>
-      COUNTRY_VALUES.map(({ countryCode, callingCode }) => ({
-        label: callingCode,
-        value: countryCode,
-      })),
-    []
-  );
+    const countryCode = countryCodeState || storedCountryCode;
 
-  useDidUpdate(() => {
-    if (countryCodeState && storedCountryCode !== countryCodeState)
-      setStoredRegionCode(countryCodeState);
-  }, [countryCodeState]);
+    const options = useMemo(
+      () =>
+        COUNTRY_VALUES.map(({ countryCode, callingCode }) => ({
+          label: callingCode,
+          value: countryCode,
+        })),
+      []
+    );
 
-  if (!countryCode) return null;
+    useDidUpdate(() => {
+      if (countryCodeState && storedCountryCode !== countryCodeState)
+        setStoredRegionCode(countryCodeState);
+    }, [countryCodeState]);
 
-  return (
-    <Input.Wrapper
-      id={id}
-      label={label}
-      description={description}
-      error={error}
-      required={required}
-      withAsterisk={withAsterisk}
-    >
-      <Group gap={0} wrap="nowrap">
-        <Select
-          searchable
-          allowDeselect={false}
-          autoComplete="off"
-          styles={{
-            input: {
-              width: `${
-                (COUNTRIES[countryCode].callingCode.length - 2) * 10 + 69
-              }px`,
-            },
-          }}
-          classNames={{
-            input: styles.callingCodeInput,
-          }}
-          onChange={(value) => {
-            if (value) {
-              setRegionCodeState(value as CountryKey);
-              inputRef.current?.focus();
-            }
-          }}
-          value={countryCode}
-          data={options}
-          disabled={disabled}
-        />
-        <Input
-          ref={inputRef}
-          id={id}
-          type="tel"
-          autoComplete={autoComplete ? "tel" : undefined}
-          disabled={disabled}
-          required={required}
-          autoFocus={autoFocus}
-          value={
-            value
-              ? parsedPhoneNumber?.number?.national ||
-                parsedPhoneNumber?.number?.input ||
-                ""
-              : undefined
-          }
-          styles={{
-            input: {
-              borderTopLeftRadius: 0,
-              borderBottomLeftRadius: 0,
-            },
-          }}
-          className={styles.numberInput}
-          onChange={(e) => {
-            const parsedPhoneNumber = parsePhoneNumber(e.target.value, {
-              regionCode: countryCode,
-            });
+    if (!countryCode) return null;
 
-            if (onChange)
-              onChange(
-                parsedPhoneNumber.number?.e164 ||
-                  parsedPhoneNumber.number?.input ||
+    return (
+      <Input.Wrapper
+        id={id}
+        label={label}
+        description={description}
+        error={error}
+        required={required}
+        withAsterisk={withAsterisk}
+      >
+        <Group gap={0} wrap="nowrap">
+          <Select
+            searchable
+            allowDeselect={false}
+            autoComplete="off"
+            styles={{
+              input: {
+                width: `${
+                  (COUNTRIES[countryCode].callingCode.length - 2) * 10 + 69
+                }px`,
+              },
+            }}
+            classNames={{
+              input: styles.callingCodeInput,
+            }}
+            onChange={(value) => {
+              if (value) {
+                setRegionCodeState(value as CountryKey);
+                inputRef.current?.focus();
+              }
+            }}
+            value={countryCode}
+            data={options}
+            disabled={disabled}
+          />
+          <Input
+            ref={mergeRefs([inputRef, ref])}
+            id={id}
+            type="tel"
+            autoComplete={autoComplete ? "tel" : undefined}
+            disabled={disabled}
+            required={required}
+            autoFocus={autoFocus}
+            value={
+              value
+                ? parsedPhoneNumber?.number?.national ||
+                  parsedPhoneNumber?.number?.input ||
                   ""
-              );
-            else if (parsedPhoneNumber.number?.national)
-              e.target.value = parsedPhoneNumber.number.national;
-          }}
-        />
-      </Group>
-    </Input.Wrapper>
-  );
-};
+                : undefined
+            }
+            styles={{
+              input: {
+                borderTopLeftRadius: 0,
+                borderBottomLeftRadius: 0,
+              },
+            }}
+            className={styles.numberInput}
+            onChange={(e) => {
+              const parsedPhoneNumber = parsePhoneNumber(e.target.value, {
+                regionCode: countryCode,
+              });
+
+              if (onChange)
+                onChange(
+                  parsedPhoneNumber.number?.e164 ||
+                    parsedPhoneNumber.number?.input ||
+                    ""
+                );
+              else if (parsedPhoneNumber.number?.national)
+                e.target.value = parsedPhoneNumber.number.national;
+            }}
+          />
+        </Group>
+      </Input.Wrapper>
+    );
+  }
+);
+
+PhoneInput.displayName = "PhoneInput";
