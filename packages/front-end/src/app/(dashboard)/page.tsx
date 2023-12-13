@@ -1,6 +1,6 @@
 "use client";
 
-import { Badge, Button, Group, Paper, Stack, Title } from "@mantine/core";
+import { Badge, Button, Paper, Stack, Title } from "@mantine/core";
 import { DashboardHeader } from "@/components/layouts/Dashboard/DashboardHeader";
 import { useTranslation } from "@/hooks/useTranslation";
 
@@ -9,7 +9,7 @@ export default function Home() {
 
   return (
     <Stack h="100%">
-      <DashboardHeader backRouteFallback="/login" title={[{ content: "Home" }]}>
+      <DashboardHeader title={[{ content: "Home" }]}>
         <Button>{t("common.create")}</Button>
         <Badge size="lg" color="green">
           {t("common.saved")}

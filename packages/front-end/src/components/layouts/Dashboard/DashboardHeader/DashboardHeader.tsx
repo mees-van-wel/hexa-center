@@ -6,13 +6,11 @@ import styles from "./DashboardHeader.module.scss";
 import { CustomAvatar } from "../ContextMenu";
 import { useTranslation } from "@/hooks/useTranslation";
 import Link from "next/link";
-import {
-  IconArrowLeft,
-  IconChevronRight,
-  IconSignLeft,
-} from "@tabler/icons-react";
+import { IconArrowLeft, IconChevronRight } from "@tabler/icons-react";
 import { Route } from "next";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useRecoilValue } from "recoil";
+import { routeHistoryState } from "@/states/routeHistoryState";
 
 type DashboardHeaderProps = {
   children?: ReactNode;
@@ -32,22 +30,28 @@ export const DashboardHeader = ({
 }: DashboardHeaderProps) => {
   const t = useTranslation();
   const router = useRouter();
+  const pathName = usePathname();
+  const routeHistory = useRecoilValue(routeHistoryState);
+  const previousRoute = routeHistory[routeHistory.length - 2];
+  const showBackButton =
+    !!(previousRoute !== pathName && previousRoute) || !!backRouteFallback;
 
   return (
     <Group align="stretch">
       <Paper p="md" className={styles.headerChildren}>
         <Group>
-          {/* TODO: only show if there is something to go back too */}
-          <Button
-            leftSection={<IconArrowLeft />}
-            onClick={() => {
-              backRouteFallback
-                ? router.push(backRouteFallback)
-                : router.back();
-            }}
-          >
-            {t("common.back")}
-          </Button>
+          {showBackButton && (
+            <Button
+              leftSection={<IconArrowLeft />}
+              onClick={() => {
+                backRouteFallback
+                  ? router.push(backRouteFallback)
+                  : router.back();
+              }}
+            >
+              {t("common.back")}
+            </Button>
+          )}
           {children}
         </Group>
       </Paper>

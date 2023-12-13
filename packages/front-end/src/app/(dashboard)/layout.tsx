@@ -4,10 +4,13 @@ import { Group, Stack, Paper, Drawer } from "@mantine/core";
 import Image from "next/image";
 import background from "@/assets/images/bg.jpeg";
 import styles from "./layout.module.scss";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Navigation } from "@/components/layouts/Dashboard/Navigation";
 import { IconDotsVertical } from "@tabler/icons-react";
 import { CompanyTitle } from "@/components/layouts/Dashboard/CompanyTitle";
+import { usePathname } from "next/navigation";
+import { useRecoilState } from "recoil";
+import { routeHistoryState } from "@/states/routeHistoryState";
 
 export default function DashboardLayout({
   children,
@@ -15,6 +18,22 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const [routeHistory, setRouteHistory] = useRecoilState(routeHistoryState);
+  const activeRef = useRef(true);
+
+  useEffect(() => {
+    activeRef.current = true;
+
+    return () => {
+      activeRef.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!activeRef.current) return;
+    setRouteHistory([...routeHistory, pathname]);
+  }, [pathname]);
 
   return (
     <>
