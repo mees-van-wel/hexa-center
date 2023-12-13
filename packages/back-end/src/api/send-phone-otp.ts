@@ -28,7 +28,7 @@ export const POST: Endpoint = async ({ res, validate }) => {
 
     if (!isProduction)
       return console.log(
-        user ? otp : `No user found with phone number: '${phoneNumber}'`
+        user ? otp : `No user found with phone number: '${phoneNumber}'`,
       );
 
     if (!user) return;

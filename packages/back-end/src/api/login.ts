@@ -121,8 +121,8 @@ export const POST: Endpoint = async ({ req, res, validate }) => {
           and(
             eq(sessions.userId, user.id),
             eq(sessions.ipAddress, ipAddress),
-            eq(sessions.userAgent, trueUserAgent)
-          )
+            eq(sessions.userAgent, trueUserAgent),
+          ),
         );
 
       sessionId = selectSessinosResult[0]?.id;

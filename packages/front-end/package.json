@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "fmt": "prettier --write ."
   },
   "dependencies": {
     "@hexa-center/shared": "workspace:*",
@@ -33,9 +34,11 @@
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.0.3",
+    "eslint-config-prettier": "^9.1.0",
     "postcss": "^8.4.31",
     "postcss-preset-mantine": "^1.11.1",
     "postcss-simple-vars": "^7.0.1",
+    "prettier": "^3.1.1",
     "sass": "^1.69.5",
     "typescript": "^5"
   }

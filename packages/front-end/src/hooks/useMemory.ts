@@ -17,10 +17,10 @@ type Return<T extends Action> = {
 };
 
 function useMemory<T extends Action>(
-  props: UseMemoryProps<T> & { initialData: Awaited<ReturnType<T>> }
+  props: UseMemoryProps<T> & { initialData: Awaited<ReturnType<T>> },
 ): [Awaited<ReturnType<T>>, Return<T>];
 function useMemory<T extends Action>(
-  props: UseMemoryProps<T>
+  props: UseMemoryProps<T>,
 ): [Awaited<ReturnType<T>> | undefined, Return<T>];
 
 function useMemory<T extends Action>({
@@ -32,7 +32,7 @@ function useMemory<T extends Action>({
 }: UseMemoryProps<T>) {
   const [cacheMemory, setMemoryStore] = useRecoilState(memoryState);
   const [data, setData] = useState<Awaited<ReturnType<T>> | undefined>(
-    initialData
+    initialData,
   );
 
   const fetch = async () => {

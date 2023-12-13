@@ -20,7 +20,7 @@ export const useRead = (endpoint: string, options?: UseReadProps) => {
       const { data } = await axios.get(
         process.env.NEXT_PUBLIC_API_URL +
           endpoint +
-          (queryParams ? "?" + queryParams : "")
+          (queryParams ? "?" + queryParams : ""),
       );
 
       setData(data);

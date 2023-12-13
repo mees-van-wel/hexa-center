@@ -43,7 +43,7 @@ export const useLoginContext = () => {
 
   if (!context)
     throw new Error(
-      "useLoginContext must be used within a LoginContextProvider"
+      "useLoginContext must be used within a LoginContextProvider",
     );
 
   return context;

@@ -43,13 +43,13 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
       withAsterisk,
       autoComplete,
     },
-    ref
+    ref,
   ) => {
     const id = useId();
     const inputRef = useRef<HTMLInputElement>(null);
     const parsedPhoneNumber = useMemo(
       () => (value ? parsePhoneNumber(value) : undefined),
-      [value]
+      [value],
     );
 
     const [storedCountryCode, setStoredRegionCode] =
@@ -59,7 +59,7 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
       });
 
     const [countryCodeState, setRegionCodeState] = useState(
-      parsedPhoneNumber?.regionCode as CountryKey | undefined
+      parsedPhoneNumber?.regionCode as CountryKey | undefined,
     );
 
     const countryCode = countryCodeState || storedCountryCode;
@@ -70,7 +70,7 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
           label: callingCode,
           value: countryCode,
         })),
-      []
+      [],
     );
 
     useDidUpdate(() => {
@@ -145,7 +145,7 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
                 onChange(
                   parsedPhoneNumber.number?.e164 ||
                     parsedPhoneNumber.number?.input ||
-                    ""
+                    "",
                 );
               else if (parsedPhoneNumber.number?.national)
                 e.target.value = parsedPhoneNumber.number.national;
@@ -154,7 +154,7 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
         </Group>
       </Input.Wrapper>
     );
-  }
+  },
 );
 
 PhoneInput.displayName = "PhoneInput";

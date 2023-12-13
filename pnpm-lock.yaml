@@ -90,9 +90,18 @@ importers:
       drizzle-kit:
         specifier: ^0.20.6
         version: 0.20.6
+      eslint:
+        specifier: ^8
+        version: 8.54.0
+      eslint-config-prettier:
+        specifier: ^9.1.0
+        version: 9.1.0(eslint@8.54.0)
       nodemon:
         specifier: ^3.0.1
         version: 3.0.1
+      prettier:
+        specifier: ^3.1.1
+        version: 3.1.1
       ts-node:
         specifier: ^10.9.1
         version: 10.9.1(@types/node@20.10.0)(typescript@5.3.2)
@@ -169,6 +178,9 @@ importers:
       eslint-config-next:
         specifier: 14.0.3
         version: 14.0.3(eslint@8.54.0)(typescript@5.3.2)
+      eslint-config-prettier:
+        specifier: ^9.1.0
+        version: 9.1.0(eslint@8.54.0)
       postcss:
         specifier: ^8.4.31
         version: 8.4.31
@@ -178,6 +190,9 @@ importers:
       postcss-simple-vars:
         specifier: ^7.0.1
         version: 7.0.1(postcss@8.4.31)
+      prettier:
+        specifier: ^3.1.1
+        version: 3.1.1
       sass:
         specifier: ^1.69.5
         version: 1.69.5
@@ -2988,6 +3003,15 @@ packages:
       - supports-color
     dev: true
 
+  /eslint-config-prettier@9.1.0(eslint@8.54.0):
+    resolution: {integrity: sha512-NSWl5BFQWEPi1j4TjVNItzYV7dZXZ+wP6I6ZhrBGpChQhZRUaElihE9uRRkcbRnNb76UMKDF3r+WTmNcGPKsqw==}
+    hasBin: true
+    peerDependencies:
+      eslint: '>=7.0.0'
+    dependencies:
+      eslint: 8.54.0
+    dev: true
+
   /eslint-import-resolver-node@0.3.9:
     resolution: {integrity: sha512-WFj2isz22JahUv+B788TlO3N6zL3nNJGU8CcZbPZvVEkBPaJdCV4vy5wyghty5ROFbCRnm132v8BScu5/1BQ8g==}
     dependencies:
@@ -5119,6 +5143,12 @@ packages:
   /prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
+    dev: true
+
+  /prettier@3.1.1:
+    resolution: {integrity: sha512-22UbSzg8luF4UuZtzgiUOfcGM8s4tjBv6dJRT7j275NXsy2jb4aJa4NNveul5x4eqlF1wuhuR2RElK71RvmVaw==}
+    engines: {node: '>=14'}
+    hasBin: true
     dev: true
 
   /printable-characters@1.0.42:

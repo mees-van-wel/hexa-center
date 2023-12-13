@@ -16,7 +16,7 @@ type PhoneInputSchema = Input<typeof PhoneInputSchema>;
 
 export const PhoneInput = () => {
   const sendPhoneOtp = useWrite("POST", "/send-phone-otp");
-  const { loginState, setLoginState } = useLoginContext();
+  const { setLoginState } = useLoginContext();
   const t = useTranslation();
 
   const { control, handleSubmit } = useForm<PhoneInputSchema>({

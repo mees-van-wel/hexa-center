@@ -3,7 +3,7 @@ import { useRef, useState } from "react";
 
 export const useWrite = (
   method: "POST" | "PATCH" | "DELETE",
-  endpoint: string
+  endpoint: string,
 ) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<AxiosError>();

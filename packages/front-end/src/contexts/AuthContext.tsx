@@ -54,7 +54,7 @@ export const AuthContextProvider = ({
           method: "POST",
           credentials: "include",
           signal: abortController.signal,
-        }
+        },
       );
 
       const { accessToken, expiresAt } = await res.json();

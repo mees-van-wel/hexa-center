@@ -27,8 +27,8 @@ export const GET: Endpoint = async ({ req, res }) => {
     .where(
       and(
         eq(sessions.refreshToken, refreshToken),
-        or(gt(sessions.expiresAt, now), isNull(sessions.expiresAt))
-      )
+        or(gt(sessions.expiresAt, now), isNull(sessions.expiresAt)),
+      ),
     );
 
   const session = sessionsResult[0];

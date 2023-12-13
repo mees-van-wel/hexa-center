@@ -53,21 +53,29 @@ body {
 .mantine-Input-input {
   --_input-bd: transparent;
 
-  box-shadow: inset 2px 2px 2px #adb5bd, inset -2px -2px 2px #f1f3f5;
+  box-shadow:
+    inset 2px 2px 2px #adb5bd,
+    inset -2px -2px 2px #f1f3f5;
   background-color: rgb(var(--color-background));
 
   &:disabled {
-    box-shadow: inset 0 0 1.5px #f1f3f5, inset 0 0 1.5px #adb5bd;
+    box-shadow:
+      inset 0 0 1.5px #f1f3f5,
+      inset 0 0 1.5px #adb5bd;
     background-color: rgb(var(--color-background) / 40%);
     color: rgb(var(--color-text));
     opacity: 1;
   }
 
   body[data-theme="dark"] & {
-    box-shadow: inset 2px 2px 2px #141517, inset -2px -2px 2px #2c2e33;
+    box-shadow:
+      inset 2px 2px 2px #141517,
+      inset -2px -2px 2px #2c2e33;
 
     &:disabled {
-      box-shadow: inset 0 0 1.5px #2c2e33, inset 0 0 1.5px #141517;
+      box-shadow:
+        inset 0 0 1.5px #2c2e33,
+        inset 0 0 1.5px #141517;
     }
   }
 
