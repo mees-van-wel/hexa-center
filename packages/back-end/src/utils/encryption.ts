@@ -12,7 +12,7 @@ if (encryptionKey?.length !== 32)
     "Missing or invalid ENCRYPTION_KEY in .env.local, must be a 32-character string.",
   );
 
-export const encrypt = <T>(data: T) => {
+export const encrypt = (data: any) => {
   const text = JSON.stringify(data);
   const iv = crypto.randomBytes(IV_LENGTH);
   const cipher = crypto.createCipheriv(
@@ -23,12 +23,10 @@ export const encrypt = <T>(data: T) => {
   let encrypted = cipher.update(text, "utf8", "base64");
   encrypted += cipher.final("base64");
   const authTag = cipher.getAuthTag();
-  return `${iv.toString("base64")}:${encrypted}:${authTag.toString(
-    "base64",
-  )}` as string & Encrypted<T>;
+  return `${iv.toString("base64")}:${encrypted}:${authTag.toString("base64")}`;
 };
 
-export const decrypt = <T>(text: Encrypted<T>): T => {
+export const decrypt = (text: string): any => {
   const textParts = text.split(":");
   const iv = Buffer.from(textParts.shift()!, "base64");
   const encryptedText = textParts.shift()!;

@@ -22,15 +22,27 @@ const corsOptions: CorsOptions = {
 const endpoints = await setupEndpoints();
 
 const app = express();
-app.use(
-  helmet({
-    // contentSecurityPolicy: isProduction ? undefined : false,
-    // crossOriginEmbedderPolicy: isProduction ? undefined : false,
-  }),
-);
+
+app.use(helmet());
 app.use(compression());
-app.use(cookieParser());
+
+// Setting IP
+app.use((req, _, next) => {
+  const forwarded = req.headers["x-forwarded-for"];
+  const forwardedIps =
+    typeof forwarded === "string" ? forwarded.split(",") : forwarded;
+
+  req.headers["x-forwarded-for"] =
+    req.headers["fly-client-ip"] ||
+    forwardedIps?.shift() ||
+    req.socket.remoteAddress;
+
+  next();
+});
+app.set("trust proxy", true);
+
 app.use(cors(corsOptions));
+app.use(cookieParser());
 app.use(express.json());
 app.use(endpoints);
 

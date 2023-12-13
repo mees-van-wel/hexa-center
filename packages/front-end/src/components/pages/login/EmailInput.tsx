@@ -5,10 +5,7 @@ import { IconMailFast } from "@tabler/icons-react";
 import { Input, object, string, email } from "valibot";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { valibotResolver } from "@hookform/resolvers/valibot";
-
-type EmailInputProps = {
-  onCompleted: () => any;
-};
+import { useLoginContext } from "./LoginContext";
 
 const EmailInputSchema = object({
   email: string([email()]),
@@ -16,8 +13,9 @@ const EmailInputSchema = object({
 
 type EmailInputSchema = Input<typeof EmailInputSchema>;
 
-export const EmailInput = ({ onCompleted }: EmailInputProps) => {
+export const EmailInput = () => {
   const sendEmailOtp = useWrite("POST", "/send-email-otp");
+  const { setLoginState } = useLoginContext();
   const t = useTranslation();
 
   const {
@@ -29,22 +27,23 @@ export const EmailInput = ({ onCompleted }: EmailInputProps) => {
   });
 
   const onSubmit: SubmitHandler<EmailInputSchema> = async ({ email }) => {
-    await sendEmailOtp.execute({
-      email,
-    });
+    const response = await sendEmailOtp.execute({ email });
 
-    onCompleted();
+    setLoginState({
+      step: "EMAIL_OTP",
+      email,
+      emailToken: response.token,
+    });
   };
 
   return (
     <form autoComplete="on" onSubmit={handleSubmit(onSubmit)}>
-      <Stack gap="xl">
+      <Stack>
         <TextInput
           {...register("email")}
           error={errors.email?.message}
           label={t("loginPage.email")}
           type="email"
-          id="email"
           autoComplete="email"
           withAsterisk
           autoFocus

@@ -7,7 +7,7 @@ export type Translation = {
     version: string;
   };
   loginPage: {
-    title: string;
+    login: string;
     email: string;
     sendEmailOtp: string;
     emailOtpSent: string;
@@ -18,7 +18,7 @@ export type Translation = {
     invalidOtpError: string;
     phoneNumber: string;
     sendPhoneOtp: string;
-    phoneOtpSend: string;
+    phoneOtpSent: string;
     phoneNumberRequiredError: string;
     phoneNumberFormatError: string;
     rememberMeFor: string;

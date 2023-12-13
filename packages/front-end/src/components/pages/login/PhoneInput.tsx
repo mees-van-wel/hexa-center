@@ -1,57 +1,59 @@
 import { useTranslation } from "@/hooks/useTranslation";
 import { useWrite } from "@/hooks/useWrite";
-import { Button, Stack, TextInput } from "@mantine/core";
-import { IconMailFast } from "@tabler/icons-react";
+import { Button, Stack } from "@mantine/core";
+import { IconDeviceMobileMessage } from "@tabler/icons-react";
 import { Input, object, string } from "valibot";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { valibotResolver } from "@hookform/resolvers/valibot";
-
-type PhoneInputProps = {
-  onCompleted: () => any;
-};
+import { PhoneInput as PhoneInputComponent } from "@/components/common/PhoneInput";
+import { useLoginContext } from "./LoginContext";
 
 const PhoneInputSchema = object({
-  phone: string(),
+  phoneNumber: string(),
 });
 
 type PhoneInputSchema = Input<typeof PhoneInputSchema>;
 
-export const PhoneInput = ({ onCompleted }: PhoneInputProps) => {
+export const PhoneInput = () => {
   const sendPhoneOtp = useWrite("POST", "/send-phone-otp");
+  const { setLoginState } = useLoginContext();
   const t = useTranslation();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<PhoneInputSchema>({
+  const { control, handleSubmit } = useForm<PhoneInputSchema>({
     resolver: valibotResolver(PhoneInputSchema),
   });
 
-  const onSubmit: SubmitHandler<PhoneInputSchema> = async ({ phone }) => {
-    await sendPhoneOtp.execute({
-      phone,
-    });
+  const onSubmit: SubmitHandler<PhoneInputSchema> = async ({ phoneNumber }) => {
+    const response = await sendPhoneOtp.execute({ phoneNumber });
 
-    onCompleted();
+    setLoginState({
+      step: "PHONE_OTP",
+      phoneNumber,
+      phoneToken: response.token,
+    });
   };
 
   return (
     <form autoComplete="on" onSubmit={handleSubmit(onSubmit)}>
       <Stack>
-        <TextInput
-          {...register("phone")}
-          error={errors.phone?.message}
-          label={t("loginPage.phone")}
-          type="tel"
-          id="phone"
-          autoComplete="tel"
-          withAsterisk
-          autoFocus
+        <Controller
+          control={control}
+          name="phoneNumber"
+          render={({ field, fieldState: { error } }) => (
+            <PhoneInputComponent
+              {...field}
+              value={field.value}
+              error={error?.message}
+              label={t("loginPage.phoneNumber")}
+              autoComplete
+              withAsterisk
+              autoFocus
+            />
+          )}
         />
         <Button
           type="submit"
-          leftSection={<IconMailFast />}
+          leftSection={<IconDeviceMobileMessage />}
           loading={sendPhoneOtp.loading}
         >
           {t("loginPage.sendPhoneOtp")}
