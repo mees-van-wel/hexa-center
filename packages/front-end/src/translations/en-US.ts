@@ -3,10 +3,30 @@ import { Translation } from "@/types/translation";
 export default {
   common: {
     back: "Back",
+    create: "Create",
+    saving: "Saving",
+    saved: "Saved",
   },
   authLayout: {
     help: "Help",
     version: "Version",
+  },
+  dashboardLayout: {
+    modules: {
+      essentials: "Essentials",
+      bookings: "Bookings",
+    },
+    avatar: {
+      profile: "Profile",
+      preferences: "Preferences",
+      logout: "Logout",
+    },
+    home: "Home",
+    properties: "Properties",
+    roles: "Roles",
+    users: "Users",
+    reservations: "Reservations",
+    rooms: "Rooms",
   },
   loginPage: {
     login: "Login",
