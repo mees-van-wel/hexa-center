@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { socket } from "../../socket";
 import useSocket from "@/hooks/useSocket";
 import { Button } from "@mantine/core";
+import { socket } from "@/socket";
 
-export function ConnectionManager() {
+export function Socket() {
   const [isConnected, setIsConnected] = useState(socket.connected);
 
   useEffect(() => {

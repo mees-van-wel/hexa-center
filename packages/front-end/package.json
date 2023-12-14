@@ -12,8 +12,8 @@
   "dependencies": {
     "@hexa-center/shared": "workspace:*",
     "@hookform/resolvers": "^3.3.2",
-    "@mantine/core": "^7.3.0",
-    "@mantine/hooks": "^7.3.0",
+    "@mantine/core": "^7.3.2",
+    "@mantine/hooks": "^7.3.2",
     "@tabler/icons-react": "^2.42.0",
     "awesome-phonenumber": "^6.2.0",
     "axios": "^1.6.2",
