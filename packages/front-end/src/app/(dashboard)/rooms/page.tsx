@@ -9,15 +9,18 @@ import { readRooms } from "@/server/actions";
 import { useTranslation } from "@/hooks/useTranslation";
 
 // TODO: database data
-const roos = [{
-  id: 1,
-  name: "Tony's kamer",
-  price: 100,
-}, {
-  id: 2,
-  name: "Damian's kamer",
-  price: 200,
-}]
+const roos = [
+  {
+    id: 1,
+    name: "Tony's kamer",
+    price: 100,
+  },
+  {
+    id: 2,
+    name: "Damian's kamer",
+    price: 200,
+  },
+];
 
 export default function Rooms() {
   const router = useRouter();
@@ -29,7 +32,11 @@ export default function Rooms() {
   });
 
   const rows = roos.map(({ name, price, id }) => (
-    <Table.Tr onClick={() => router.push(`${ROUTES.ROOMS}${id}`)} key={name} className={styles.roomColumn}>
+    <Table.Tr
+      onClick={() => router.push(`/rooms/${id}`)}
+      key={name}
+      className={styles.roomColumn}
+    >
       <Table.Td>{name}</Table.Td>
       <Table.Td>{price}</Table.Td>
       <Table.Td>{id}</Table.Td>
@@ -40,9 +47,11 @@ export default function Rooms() {
     <main>
       <Stack>
         <Paper p="md">
-          <Button onClick={() => {
-            alert("Add new Room");
-          }}>
+          <Button
+            onClick={() => {
+              alert("Add new Room");
+            }}
+          >
             Create
           </Button>
         </Paper>
@@ -52,7 +61,7 @@ export default function Rooms() {
               <Table.Tr>
                 <Table.Th>{t("rooms.name")}</Table.Th>
                 <Table.Th>{t("rooms.price")}</Table.Th>
-                <Table.Th>{t("generic.number")}</Table.Th>
+                <Table.Th>{t("common.number")}</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>{rows}</Table.Tbody>
