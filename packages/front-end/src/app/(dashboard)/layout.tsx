@@ -20,18 +20,8 @@ export default function DashboardLayout({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const [routeHistory, setRouteHistory] = useRecoilState(routeHistoryState);
-  const activeRef = useRef(true);
 
   useEffect(() => {
-    activeRef.current = true;
-
-    return () => {
-      activeRef.current = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!activeRef.current) return;
     setRouteHistory([...routeHistory, pathname]);
   }, [pathname]);
 
