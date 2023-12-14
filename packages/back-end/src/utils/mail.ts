@@ -24,13 +24,13 @@ type Mails = {
 
 const replaceTemplateVariables = (
   template: string,
-  variables: Record<string, string | undefined>
+  variables: Record<string, string | undefined>,
 ) =>
   Object.keys(variables)
     .filter((key) => variables[key])
     .reduce(
       (acc, key) => acc.replace(new RegExp(`{{${key}}}`, "g"), variables[key]!),
-      template
+      template,
     );
 
 type SendMailProps<T extends keyof Mails> = {
@@ -68,7 +68,7 @@ export const sendMail = <T extends keyof Mails>({
   const templatePath = path.join(basePath, `${template}.mjml`);
   const templateContent = replaceTemplateVariables(
     fs.readFileSync(templatePath, "utf8"),
-    variables
+    variables,
   );
 
   const baseTemplatePath = path.join(basePath, `_base.mjml`);
@@ -80,10 +80,10 @@ export const sendMail = <T extends keyof Mails>({
       footer: footer
         ? replaceTemplateVariables(
             fs.readFileSync(path.join(basePath, `_footer.mjml`), "utf8"),
-            { children: footer }
+            { children: footer },
           )
         : undefined,
-    }
+    },
   );
 
   const { html } = mjml2html(baseTemplateContent.replace(/{{.*?}}/g, ""));

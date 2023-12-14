@@ -19,7 +19,7 @@ export const verify = async (token: string) => {
       payload: { data },
     } = await jose.jwtVerify(
       token.toString(),
-      new TextEncoder().encode(jwtSecret)
+      new TextEncoder().encode(jwtSecret),
     );
     return data as any;
   } catch (err) {

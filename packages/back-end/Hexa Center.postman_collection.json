@@ -33,7 +33,7 @@
           "response": []
         },
         {
-          "name": "Send sms OTP",
+          "name": "Send phone OTP",
           "request": {
             "method": "POST",
             "header": [],
@@ -47,9 +47,9 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/send-sms-otp",
+              "raw": "{{baseUrl}}/send-phone-otp",
               "host": ["{{baseUrl}}"],
-              "path": ["send-sms-otp"]
+              "path": ["send-phone-otp"]
             },
             "description": "This endpoint is used to generate and send a one-time password (OTP) to the user's phone number. It returns a JSON Web Token (JWT) that holds the encrypted OTP to preserve the state thoughout the validation process.\n\n## Request Body\n\n| Name | Type | **Required** | **Description** |\n| --- | --- | --- | --- |\n| `phoneNumber` | `string` | Yes | The phone number to which the OTP will be sent. |\n\n## Response\n\n| Name | Type | **Description** |\n| --- | --- | --- |\n| `success` | `boolean` | Indicates if the request was successful. |\n| `token` | `string` | The JWT holding the encrypted OTP |"
           },

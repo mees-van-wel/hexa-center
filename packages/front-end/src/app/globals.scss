@@ -94,3 +94,7 @@ body {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.mantine-Progress-section {
+  transition: width var(--transition);
+}

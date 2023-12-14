@@ -29,7 +29,7 @@ export default {
     rooms: "Kamers",
   },
   loginPage: {
-    title: "Inloggen",
+    login: "Inloggen",
     email: "E-mailadres",
     sendEmailOtp: "Verstuur E-mailcode",
     emailOtpSent:
@@ -41,7 +41,7 @@ export default {
     invalidOtpError: "De code is ongeldig",
     phoneNumber: "Telefoonnummer",
     sendPhoneOtp: "Ontvang SMS Code",
-    phoneOtpSend:
+    phoneOtpSent:
       "Als het ingevoerde telefoonnummer correct is, is er een SMS-code verzonden naar",
     phoneNumberRequiredError: "Telefoonnummer is verplicht",
     phoneNumberFormatError: "Ongeldig of verkeerd geformatteerd telefoonnummer",

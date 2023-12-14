@@ -32,7 +32,7 @@ export const DashboardHeader = ({
   const router = useRouter();
   const pathName = usePathname();
   const routeHistory = useRecoilValue(routeHistoryState);
-  const previousRoute = routeHistory[routeHistory.length - 2];
+  const previousRoute = routeHistory.at(-2);
   const showBackButton =
     !!(previousRoute !== pathName && previousRoute) || !!backRouteFallback;
 
