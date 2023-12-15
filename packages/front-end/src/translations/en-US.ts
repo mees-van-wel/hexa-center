@@ -43,4 +43,16 @@ export default {
     },
     loggedInSuccess: "You're logged in successfully",
   },
+  metadata: {
+    field: {
+      createdAt: "Created at",
+      createdBy: "Created by",
+      id: "Number",
+      updatedAt: "Updated at",
+      updatedBy: "Updated by",
+    },
+    hide: "Hide",
+    name: "Metadata",
+    show: "Show",
+  },
 } satisfies Translation;

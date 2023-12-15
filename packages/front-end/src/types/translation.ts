@@ -40,6 +40,18 @@ export type Translation = {
     };
     loggedInSuccess: string;
   };
+  metadata: {
+    field: {
+      createdAt: string;
+      createdBy: string;
+      id: string;
+      updatedAt: string;
+      updatedBy: string;
+    };
+    hide: string;
+    name: string;
+    show: string;
+  };
 };
 
 type Join<K, P> = K extends string | number

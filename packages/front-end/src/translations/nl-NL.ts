@@ -45,4 +45,16 @@ export default {
     },
     loggedInSuccess: "U bent succesvol ingelogd",
   },
+  metadata: {
+    field: {
+      createdAt: "Gemaakt op",
+      createdBy: "Gemaakt door",
+      id: "Nummer",
+      updatedAt: "Bijgewerkt op",
+      updatedBy: "Bijgewerkt door",
+    },
+    hide: "Verbergen",
+    name: "Metagegevens",
+    show: "Weergeven",
+  },
 } satisfies Translation;
