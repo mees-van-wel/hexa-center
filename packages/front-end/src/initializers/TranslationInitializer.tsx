@@ -1,14 +1,13 @@
 import { DEFAULT_LOCALE, type Locale } from "@/constants/locales";
 import { TranslationContextProvider } from "@/contexts/TranslationContext";
 import { Translation } from "@/types/translation";
-import { ReactNode } from "react";
 
 // TODO Implement variable initial locale
 export const TranslationInitializer = async ({
   children,
   initialLocale = DEFAULT_LOCALE,
 }: {
-  children: ReactNode;
+  children: React.ReactNode;
   initialLocale?: Locale;
 }) => {
   const translation: Translation = (

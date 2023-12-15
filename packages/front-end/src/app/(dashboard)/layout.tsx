@@ -4,7 +4,7 @@ import { Group, Stack, Paper, Drawer } from "@mantine/core";
 import Image from "next/image";
 import background from "@/assets/images/bg.jpeg";
 import styles from "./layout.module.scss";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Navigation } from "@/components/layouts/Dashboard/Navigation";
 import { IconDotsVertical } from "@tabler/icons-react";
 import { CompanyTitle } from "@/components/layouts/Dashboard/CompanyTitle";

@@ -1,6 +1,8 @@
 import { router, procedure } from "../trpc.js";
-import { SendEmailOtpSchema } from "@hexa-center/shared/schemas/sendEmailOtpSchema.js";
-import { SendPhoneOtpSchema } from "@hexa-center/shared/schemas/sendPhoneOtpSchema.js";
+import {
+  SendEmailOtpSchema,
+  SendPhoneOtpSchema,
+} from "@hexa-center/shared/schemas/auth.js";
 import { wrap } from "@decs/typeschema";
 import { createOtp } from "../utils/otp.js";
 import db from "../db/client.js";

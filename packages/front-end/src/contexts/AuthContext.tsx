@@ -1,13 +1,7 @@
 "use client";
 
 import { RouterOutput, trpc } from "@/utils/trpc";
-import {
-  ReactNode,
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 type CurrentUser = RouterOutput["auth"]["currentUser"];
 
@@ -27,7 +21,7 @@ export const AuthContextProvider = ({
   children,
   currentUser,
 }: {
-  children: ReactNode;
+  children: React.ReactNode;
   currentUser: CurrentUser | null;
 }) => {
   const [auth, setAuth] = useState<AuthState>({

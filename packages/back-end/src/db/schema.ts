@@ -4,12 +4,121 @@ import {
   date,
   integer,
   pgTable,
+  primaryKey,
   serial,
   text,
   time,
   timestamp,
   uuid,
 } from "drizzle-orm/pg-core";
+
+export const properties = pgTable("Property", {
+  $kind: text("$kind").default("property").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom(),
+  createdAt: timestamp("createdAt", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updatedAt", { withTimezone: true })
+    .default(sql`now()`)
+    .notNull(),
+  deletedAt: timestamp("deletedAt", { withTimezone: true }),
+  createdById: integer("createdById").references((): AnyPgColumn => users.id, {
+    onDelete: "set null",
+  }),
+  updatedById: integer("updatedById").references((): AnyPgColumn => users.id, {
+    onDelete: "set null",
+  }),
+  deletedById: integer("deletedById").references((): AnyPgColumn => users.id, {
+    onDelete: "cascade",
+  }),
+  name: text("name").unique().notNull(),
+  email: text("email"),
+  phoneNumber: text("phoneNumber"),
+  street: text("street"),
+  houseNumber: text("houseNumber"),
+  postalCode: text("postalCode"),
+  city: text("city"),
+  region: text("region"),
+  country: text("country"),
+});
+
+export const propertiesRelations = relations(properties, ({ one, many }) => ({
+  createdBy: one(users, {
+    fields: [properties.createdById],
+    references: [users.id],
+  }),
+  updatedBy: one(users, {
+    fields: [properties.updatedById],
+    references: [users.id],
+  }),
+  deletedBy: one(users, {
+    fields: [properties.deletedById],
+    references: [users.id],
+  }),
+  users: many(users),
+}));
+
+export const roles = pgTable("Role", {
+  $kind: text("$kind").default("role").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom(),
+  createdAt: timestamp("createdAt", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updatedAt", { withTimezone: true })
+    .default(sql`now()`)
+    .notNull(),
+  deletedAt: timestamp("deletedAt", { withTimezone: true }),
+  createdById: integer("createdById").references((): AnyPgColumn => users.id, {
+    onDelete: "set null",
+  }),
+  updatedById: integer("updatedById").references((): AnyPgColumn => users.id, {
+    onDelete: "set null",
+  }),
+  deletedById: integer("deletedById").references((): AnyPgColumn => users.id, {
+    onDelete: "cascade",
+  }),
+  name: text("name").unique().notNull(),
+});
+
+export const rolesRelations = relations(roles, ({ one, many }) => ({
+  createdBy: one(users, {
+    fields: [roles.createdById],
+    references: [users.id],
+  }),
+  updatedBy: one(users, {
+    fields: [roles.updatedById],
+    references: [users.id],
+  }),
+  deletedBy: one(users, {
+    fields: [roles.deletedById],
+    references: [users.id],
+  }),
+  users: many(users),
+}));
+
+export const permissions = pgTable(
+  "Permission",
+  {
+    roleId: integer("roleId")
+      .references(() => properties.id, { onDelete: "restrict" })
+      .notNull(),
+    key: text("key").notNull(),
+  },
+  (table) => {
+    return {
+      pk: primaryKey({ columns: [table.roleId, table.key] }),
+    };
+  },
+);
+
+export const permissionsRelations = relations(permissions, ({ one, many }) => ({
+  role: one(roles, {
+    fields: [permissions.roleId],
+    references: [roles.id],
+  }),
+}));
 
 export const users = pgTable("User", {
   $kind: text("$kind").default("user").notNull(),
@@ -31,6 +140,12 @@ export const users = pgTable("User", {
   deletedById: integer("deletedById").references((): AnyPgColumn => users.id, {
     onDelete: "cascade",
   }),
+  propertyId: integer("propertyId")
+    .references(() => properties.id, { onDelete: "restrict" })
+    .notNull(),
+  roleId: integer("roleId")
+    .references(() => roles.id, { onDelete: "restrict" })
+    .notNull(),
   firstName: text("firstName").notNull(),
   lastName: text("lastName").notNull(),
   email: text("email").unique(),
@@ -57,6 +172,14 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   deletedBy: one(users, {
     fields: [users.deletedById],
     references: [users.id],
+  }),
+  property: one(properties, {
+    fields: [users.propertyId],
+    references: [properties.id],
+  }),
+  role: one(roles, {
+    fields: [users.roleId],
+    references: [roles.id],
   }),
   sessions: many(sessions),
   account: one(accounts, {

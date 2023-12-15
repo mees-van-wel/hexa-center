@@ -7,6 +7,7 @@ import {
   TextInput,
 } from "@mantine/core";
 import { useMemo, useState } from "react";
+import styles from "./Table.module.scss";
 
 type TableProps<T extends Record<string, any>> = {
   columns: {
@@ -33,17 +34,16 @@ export const Table = <T extends Record<string, any>>({
   }, [search, elements]);
 
   return (
-    <Stack>
-      <Paper p="md">
+    <Paper p="md">
+      <Stack>
         <TextInput
           value={search}
           placeholder="Search"
+          className={styles.searchInput}
           onChange={(e) => {
             setSearch(e.target.value);
           }}
         />
-      </Paper>
-      <Paper p="md">
         <TableComponent highlightOnHover>
           <TableComponent.Thead>
             <TableComponent.Tr>
@@ -66,7 +66,7 @@ export const Table = <T extends Record<string, any>>({
             ))}
           </TableComponent.Tbody>
         </TableComponent>
-      </Paper>
-    </Stack>
+      </Stack>
+    </Paper>
   );
 };

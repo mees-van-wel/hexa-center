@@ -1,10 +1,9 @@
 import { Group, Title } from "@mantine/core";
-import type { ReactNode } from "react";
 import styles from "./AuthTitle.module.scss";
 
 type AuthTitleProps = {
-  children: ReactNode;
-  icon?: ReactNode;
+  children: React.ReactNode;
+  icon?: React.ReactNode;
 };
 
 export const AuthTitle = ({ children, icon }: AuthTitleProps) => (

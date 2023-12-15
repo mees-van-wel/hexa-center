@@ -2,28 +2,27 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useMutation } from "@/hooks/useMutation";
 import { Button, Stack } from "@mantine/core";
 import { IconDeviceMobileMessage } from "@tabler/icons-react";
-import { Input, object, string } from "valibot";
+import { Input } from "valibot";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { PhoneInput as PhoneInputComponent } from "@/components/common/PhoneInput";
 import { useLoginContext } from "./LoginContext";
+import { SendPhoneOtpSchema } from "@hexa-center/shared/schemas/auth";
 
-const PhoneInputSchema = object({
-  phoneNumber: string(),
-});
-
-type PhoneInputSchema = Input<typeof PhoneInputSchema>;
+type SendPhoneOtpSchema = Input<typeof SendPhoneOtpSchema>;
 
 export const PhoneInput = () => {
   const sendPhoneOtp = useMutation("auth", "sendPhoneOtp");
   const { setLoginState } = useLoginContext();
   const t = useTranslation();
 
-  const { control, handleSubmit } = useForm<PhoneInputSchema>({
-    resolver: valibotResolver(PhoneInputSchema),
+  const { control, handleSubmit } = useForm<SendPhoneOtpSchema>({
+    resolver: valibotResolver(SendPhoneOtpSchema),
   });
 
-  const onSubmit: SubmitHandler<PhoneInputSchema> = async ({ phoneNumber }) => {
+  const onSubmit: SubmitHandler<SendPhoneOtpSchema> = async ({
+    phoneNumber,
+  }) => {
     const phoneToken = await sendPhoneOtp.mutate({ phoneNumber });
 
     setLoginState({

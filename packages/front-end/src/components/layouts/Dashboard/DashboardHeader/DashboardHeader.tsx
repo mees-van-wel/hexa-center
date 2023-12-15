@@ -1,7 +1,6 @@
 "use client";
 
 import { Button, Group, Paper, Title } from "@mantine/core";
-import type { ReactNode } from "react";
 import styles from "./DashboardHeader.module.scss";
 import { CustomAvatar } from "../ContextMenu";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -13,12 +12,12 @@ import { useRecoilValue } from "recoil";
 import { routeHistoryState } from "@/states/routeHistoryState";
 
 type DashboardHeaderProps = {
-  children?: ReactNode;
+  children?: React.ReactNode;
   title: {
     content: string;
     href?: Route;
   }[];
-  icon?: ReactNode;
+  icon?: React.ReactNode;
   backRouteFallback?: Route;
 };
 

@@ -2,10 +2,8 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { Button, Stack, Title } from "@mantine/core";
 import {
   IconBed,
-  IconBuilding,
   IconHome,
   IconHotelService,
-  IconLock,
   IconUser,
 } from "@tabler/icons-react";
 import Link from "next/link";
@@ -32,10 +30,10 @@ export const Navigation = () => {
           >
             {t("dashboardLayout.home")}
           </Button>
-          {/* <Stack gap="xs">
+          <Stack gap="xs">
             <Title order={4}>{t("dashboardLayout.modules.essentials")}</Title>
             <Stack gap={0}>
-              <Button
+              {/* <Button
                 component={Link}
                 href="/properties"
                 variant={pathname === "/properties" ? "filled" : "subtle"}
@@ -54,7 +52,7 @@ export const Navigation = () => {
                 justify="left"
               >
                 {t("dashboardLayout.roles")}
-              </Button>
+              </Button> */}
               <Button
                 component={Link}
                 href="/users"
@@ -66,7 +64,7 @@ export const Navigation = () => {
                 {t("dashboardLayout.users")}
               </Button>
             </Stack>
-          </Stack> */}
+          </Stack>
           <Stack gap="xs">
             <Title order={4}>{t("dashboardLayout.modules.bookings")}</Title>
             <Stack gap={0}>

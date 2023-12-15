@@ -9,13 +9,13 @@ export const useQuery = <
 >(
   scope: T,
   procedure: P,
-  initialParams?: RouterInput[T][P],
   options?: {
-    skip?: boolean;
+    initial?: boolean;
+    initialParams?: RouterInput[T][P];
   },
 ) => {
   const [data, setData] = useState<RouterOutput[T][P]>();
-  const [loading, setLoading] = useState(!options?.skip);
+  const [loading, setLoading] = useState(options?.initial);
 
   const query = useCallback(
     async (params?: RouterInput[T][P]) => {
@@ -23,7 +23,7 @@ export const useQuery = <
 
       // @ts-ignore
       const result: RouterOutput[T][P] = await trpc[scope][procedure]
-        .query(initialParams || params)
+        .query(params)
         .finally(() => {
           setLoading(false);
         });
@@ -31,13 +31,13 @@ export const useQuery = <
       setData(result);
       return result;
     },
-    [initialParams, procedure, scope],
+    [scope, procedure],
   );
 
   useEffect(() => {
-    if (options?.skip) return;
-    query(initialParams);
-  }, [initialParams, options?.skip, query]);
+    if (!options?.initial) return;
+    query(options?.initialParams);
+  }, [options?.initial, options?.initialParams, query]);
 
   return { data, loading, query };
 };
