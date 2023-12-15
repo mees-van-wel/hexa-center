@@ -1,10 +1,30 @@
 export type Translation = {
   common: {
     back: string;
+    create: string;
+    saving: string;
+    saved: string;
   };
   authLayout: {
     help: string;
     version: string;
+  };
+  dashboardLayout: {
+    modules: {
+      essentials: string;
+      bookings: string;
+    };
+    avatar: {
+      profile: string;
+      preferences: string;
+      logout: string;
+    };
+    home: string;
+    properties: string;
+    roles: string;
+    users: string;
+    reservations: string;
+    rooms: string;
   };
   loginPage: {
     login: string;

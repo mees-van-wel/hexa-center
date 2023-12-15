@@ -46,18 +46,10 @@
   flex-shrink: 1;
   flex-basis: 0;
   position: relative;
-  overflow: hidden;
-  width: 100%;
 }
 
 .background {
-  width: 100%;
   object-fit: cover;
   object-position: left;
   scale: -1 1;
-}
-
-.gradient {
-  position: absolute;
-  inset: 0;
 }

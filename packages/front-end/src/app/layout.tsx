@@ -12,6 +12,7 @@ import { TranslationInitializer } from "@/initializers/TranslationInitializer";
 import Providers from "./providers";
 import { AuthContextProvider } from "@/contexts/AuthContext";
 import { redirect } from "next/navigation";
+import { RouterOutput, setTRPCRefreshToken, trpc } from "@/utils/trpc";
 
 const eurostile = localFont({
   src: "../assets/fonts/eurostile.woff2",
@@ -34,18 +35,16 @@ export default async function RootLayout({
   const pathname = headers().get("x-pathname");
   if (!pathname) throw new Error("Missing pathname");
 
-  const res = refreshToken
-    ? await fetch(`${process.env.NEXT_PUBLIC_API_URL}/current-user`, {
-        headers: refreshToken
-          ? { Authorization: `Bearer ${refreshToken}` }
-          : undefined,
-      })
-    : undefined;
+  let user: RouterOutput["auth"]["currentUser"] | null = null;
 
-  if ((!refreshToken || !res?.ok) && pathname !== "/login") redirect("/login");
-  if (refreshToken && res?.ok && pathname === "/login") redirect("/");
+  try {
+    if (refreshToken) setTRPCRefreshToken(refreshToken);
+    user = await trpc.auth.currentUser.query();
+  } catch (error) {}
 
-  const data = await res?.json();
+  // TODO Set redirect type to replace
+  if (!user && pathname !== "/login") redirect("/login");
+  if (user && pathname === "/login") redirect("/");
 
   return (
     <html lang="en">
@@ -57,7 +56,7 @@ export default async function RootLayout({
         data-theme={dark ? "dark" : "light"}
       >
         <Providers>
-          <AuthContextProvider currentUser={res?.ok && data ? data : null}>
+          <AuthContextProvider currentUser={user}>
             <TranslationInitializer>
               <MantineProvider
                 defaultColorScheme={dark ? "dark" : "light"}
