@@ -1,24 +1,12 @@
 "use client";
 
-import {
-  ReactNode,
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { RouterOutput, trpc } from "@/utils/trpc";
+import { createContext, useContext, useEffect, useState } from "react";
 
-type CurrentUser = {
-  id: number;
-  firstName: string;
-  lastName: string;
-  account?: {
-    theme: string;
-  };
-};
+type CurrentUser = RouterOutput["auth"]["currentUser"];
 
 type AuthState = {
-  user: CurrentUser;
+  user: CurrentUser | null;
   accessToken: string | null;
 };
 
@@ -33,8 +21,8 @@ export const AuthContextProvider = ({
   children,
   currentUser,
 }: {
-  children: ReactNode;
-  currentUser: CurrentUser;
+  children: React.ReactNode;
+  currentUser: CurrentUser | null;
 }) => {
   const [auth, setAuth] = useState<AuthState>({
     user: currentUser,
@@ -48,24 +36,22 @@ export const AuthContextProvider = ({
     let timeoutRef: NodeJS.Timeout | null = null;
 
     const setToken = async () => {
-      const res = await fetch(
-        process.env.NEXT_PUBLIC_API_URL + "/request-token",
-        {
-          method: "POST",
-          credentials: "include",
-          signal: abortController.signal,
-        },
-      );
-
-      const { accessToken, expiresAt } = await res.json();
-
-      setAuth({ ...auth, accessToken });
-
-      const timeout = new Date(expiresAt).getTime() - Date.now() - 60000;
-      if (timeoutRef) clearTimeout(timeoutRef);
-      timeoutRef = setTimeout(() => {
-        setToken();
-      }, timeout);
+      try {
+        const { accessToken, expiresAt } = await trpc.auth.token.query(
+          undefined,
+          {
+            signal: abortController.signal,
+          },
+        );
+        setAuth({ ...auth, accessToken });
+        const timeout = expiresAt.getTime() - Date.now() - 60000;
+        if (timeoutRef) clearTimeout(timeoutRef);
+        timeoutRef = setTimeout(() => {
+          setToken();
+        }, timeout);
+      } catch (error) {
+        console.error(error);
+      }
     };
 
     setToken();
@@ -90,4 +76,13 @@ export const useAuthContext = () => {
     throw new Error("useAuthContext must be used within AuthContextProvider");
 
   return authContext;
+};
+
+export const useAuthUser = () => {
+  const authContext = useContext(AuthContext);
+
+  if (!authContext?.auth.user)
+    throw new Error("useUser must be used within authenticated pages only");
+
+  return authContext.auth.user;
 };

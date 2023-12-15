@@ -1,5 +1,5 @@
 {
-  "id": "fd2a503b-7977-49e2-9cd2-24f193333433",
+  "id": "4e5ae3b5-0e56-4a18-a18b-28e069996baa",
   "prevId": "b590d250-77f6-4b25-99cf-f3568cde1d39",
   "version": "5",
   "dialect": "pg",
@@ -58,12 +58,8 @@
           "name": "Account_userId_User_id_fk",
           "tableFrom": "Account",
           "tableTo": "User",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -71,8 +67,45 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "Room": {
-      "name": "Room",
+    "Permission": {
+      "name": "Permission",
+      "schema": "",
+      "columns": {
+        "roleId": {
+          "name": "roleId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "key": {
+          "name": "key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "Permission_roleId_Property_id_fk": {
+          "name": "Permission_roleId_Property_id_fk",
+          "tableFrom": "Permission",
+          "tableTo": "Property",
+          "columnsFrom": ["roleId"],
+          "columnsTo": ["id"],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "Permission_roleId_key_pk": {
+          "name": "Permission_roleId_key_pk",
+          "columns": ["roleId", "key"]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "Property": {
+      "name": "Property",
       "schema": "",
       "columns": {
         "$kind": {
@@ -80,7 +113,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'room'"
+          "default": "'property'"
         },
         "id": {
           "name": "id",
@@ -139,63 +172,199 @@
           "primaryKey": false,
           "notNull": true
         },
-        "price": {
-          "name": "price",
-          "type": "numeric(10, 2)",
+        "email": {
+          "name": "email",
+          "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
+        },
+        "phoneNumber": {
+          "name": "phoneNumber",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "street": {
+          "name": "street",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "houseNumber": {
+          "name": "houseNumber",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "postalCode": {
+          "name": "postalCode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "city": {
+          "name": "city",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "region": {
+          "name": "region",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "country": {
+          "name": "country",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "Room_createdById_User_id_fk": {
-          "name": "Room_createdById_User_id_fk",
-          "tableFrom": "Room",
+        "Property_createdById_User_id_fk": {
+          "name": "Property_createdById_User_id_fk",
+          "tableFrom": "Property",
           "tableTo": "User",
-          "columnsFrom": [
-            "createdById"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["createdById"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "Room_updatedById_User_id_fk": {
-          "name": "Room_updatedById_User_id_fk",
-          "tableFrom": "Room",
+        "Property_updatedById_User_id_fk": {
+          "name": "Property_updatedById_User_id_fk",
+          "tableFrom": "Property",
           "tableTo": "User",
-          "columnsFrom": [
-            "updatedById"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["updatedById"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "Room_deletedById_User_id_fk": {
-          "name": "Room_deletedById_User_id_fk",
-          "tableFrom": "Room",
+        "Property_deletedById_User_id_fk": {
+          "name": "Property_deletedById_User_id_fk",
+          "tableFrom": "Property",
           "tableTo": "User",
-          "columnsFrom": [
-            "deletedById"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["deletedById"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "Room_name_unique": {
-          "name": "Room_name_unique",
+        "Property_name_unique": {
+          "name": "Property_name_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "name"
-          ]
+          "columns": ["name"]
+        }
+      }
+    },
+    "Role": {
+      "name": "Role",
+      "schema": "",
+      "columns": {
+        "$kind": {
+          "name": "$kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'role'"
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "uuid": {
+          "name": "uuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "gen_random_uuid()"
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deletedAt": {
+          "name": "deletedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdById": {
+          "name": "createdById",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updatedById": {
+          "name": "updatedById",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "deletedById": {
+          "name": "deletedById",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "Role_createdById_User_id_fk": {
+          "name": "Role_createdById_User_id_fk",
+          "tableFrom": "Role",
+          "tableTo": "User",
+          "columnsFrom": ["createdById"],
+          "columnsTo": ["id"],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "Role_updatedById_User_id_fk": {
+          "name": "Role_updatedById_User_id_fk",
+          "tableFrom": "Role",
+          "tableTo": "User",
+          "columnsFrom": ["updatedById"],
+          "columnsTo": ["id"],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "Role_deletedById_User_id_fk": {
+          "name": "Role_deletedById_User_id_fk",
+          "tableFrom": "Role",
+          "tableTo": "User",
+          "columnsFrom": ["deletedById"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "Role_name_unique": {
+          "name": "Role_name_unique",
+          "nullsNotDistinct": false,
+          "columns": ["name"]
         }
       }
     },
@@ -267,12 +436,8 @@
           "name": "sessions_user_id_User_id_fk",
           "tableFrom": "sessions",
           "tableTo": "User",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -282,9 +447,7 @@
         "sessions_refresh_token_unique": {
           "name": "sessions_refresh_token_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "refresh_token"
-          ]
+          "columns": ["refresh_token"]
         }
       }
     },
@@ -349,6 +512,18 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": false
+        },
+        "propertyId": {
+          "name": "propertyId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "roleId": {
+          "name": "roleId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
         },
         "firstName": {
           "name": "firstName",
@@ -429,12 +604,8 @@
           "name": "User_createdById_User_id_fk",
           "tableFrom": "User",
           "tableTo": "User",
-          "columnsFrom": [
-            "createdById"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["createdById"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -442,12 +613,8 @@
           "name": "User_updatedById_User_id_fk",
           "tableFrom": "User",
           "tableTo": "User",
-          "columnsFrom": [
-            "updatedById"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["updatedById"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -455,13 +622,27 @@
           "name": "User_deletedById_User_id_fk",
           "tableFrom": "User",
           "tableTo": "User",
-          "columnsFrom": [
-            "deletedById"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["deletedById"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "User_propertyId_Property_id_fk": {
+          "name": "User_propertyId_Property_id_fk",
+          "tableFrom": "User",
+          "tableTo": "Property",
+          "columnsFrom": ["propertyId"],
+          "columnsTo": ["id"],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "User_roleId_Role_id_fk": {
+          "name": "User_roleId_Role_id_fk",
+          "tableFrom": "User",
+          "tableTo": "Role",
+          "columnsFrom": ["roleId"],
+          "columnsTo": ["id"],
+          "onDelete": "restrict",
           "onUpdate": "no action"
         }
       },
@@ -470,16 +651,12 @@
         "User_email_unique": {
           "name": "User_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         },
         "User_phoneNumber_unique": {
           "name": "User_phoneNumber_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "phoneNumber"
-          ]
+          "columns": ["phoneNumber"]
         }
       }
     },
@@ -537,12 +714,8 @@
           "name": "workingHours_accountId_Account_id_fk",
           "tableFrom": "workingHours",
           "tableTo": "Account",
-          "columnsFrom": [
-            "accountId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["accountId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }

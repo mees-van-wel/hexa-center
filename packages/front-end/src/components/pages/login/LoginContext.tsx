@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState } from "react";
 
 export const LOGIN_STEPS = [
   "EMAIL_INPUT",
@@ -49,7 +49,11 @@ export const useLoginContext = () => {
   return context;
 };
 
-export const LoginContextProvider = ({ children }: { children: ReactNode }) => {
+export const LoginContextProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const [loginState, setLoginState] = useState<LoginState>(initialState);
 
   return (

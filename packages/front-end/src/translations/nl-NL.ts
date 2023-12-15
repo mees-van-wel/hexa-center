@@ -3,6 +3,9 @@ import { Translation } from "@/types/translation";
 export default {
   common: {
     back: "Terug",
+    create: "Aanmaken",
+    saving: "Opslaan",
+    saved: "Opgeslagen",
     number: "Nummer",
     create: "Nieuw",
     delete: "Verwijderen",
@@ -10,6 +13,23 @@ export default {
   authLayout: {
     help: "Help",
     version: "Versie",
+  },
+  dashboardLayout: {
+    modules: {
+      essentials: "Essentiële zaken",
+      bookings: "Bookingen",
+    },
+    avatar: {
+      profile: "Profile",
+      preferences: "Preferences",
+      logout: "Logout",
+    },
+    home: "Home",
+    properties: "Vestigingen",
+    roles: "Rollen",
+    users: "Gebruikers",
+    reservations: "Reservaties",
+    rooms: "Kamers",
   },
   loginPage: {
     login: "Inloggen",

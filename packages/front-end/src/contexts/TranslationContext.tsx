@@ -1,7 +1,7 @@
 "use client";
 
 import { Translation } from "@/types/translation";
-import { ReactNode, createContext, useContext, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
 type TranslationContext = {
   translation: Translation;
@@ -14,7 +14,7 @@ export const TranslationContextProvider = ({
   children,
   initalTranslation,
 }: {
-  children: ReactNode;
+  children: React.ReactNode;
   initalTranslation: Translation;
 }) => {
   const [translation, setTranslation] = useState(initalTranslation);

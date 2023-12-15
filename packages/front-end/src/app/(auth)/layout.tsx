@@ -52,9 +52,7 @@ export default function AuthLayout({
           quality={100}
           sizes="90vw"
           fill
-          priority
         />
-        <div className={styles.gradient} />
       </div>
     </main>
   );

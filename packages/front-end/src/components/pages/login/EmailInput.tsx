@@ -1,20 +1,17 @@
 import { useTranslation } from "@/hooks/useTranslation";
-import { useWrite } from "@/hooks/useWrite";
 import { Button, Stack, TextInput } from "@mantine/core";
 import { IconMailFast } from "@tabler/icons-react";
-import { Input, object, string, email } from "valibot";
+import { Input } from "valibot";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useLoginContext } from "./LoginContext";
+import { SendEmailOtpSchema } from "@hexa-center/shared/schemas/auth";
+import { useMutation } from "@/hooks/useMutation";
 
-const EmailInputSchema = object({
-  email: string([email()]),
-});
-
-type EmailInputSchema = Input<typeof EmailInputSchema>;
+type SendEmailOtpSchema = Input<typeof SendEmailOtpSchema>;
 
 export const EmailInput = () => {
-  const sendEmailOtp = useWrite("POST", "/send-email-otp");
+  const sendEmailOtp = useMutation("auth", "sendEmailOtp");
   const { setLoginState } = useLoginContext();
   const t = useTranslation();
 
@@ -22,17 +19,17 @@ export const EmailInput = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<EmailInputSchema>({
-    resolver: valibotResolver(EmailInputSchema),
+  } = useForm<SendEmailOtpSchema>({
+    resolver: valibotResolver(SendEmailOtpSchema),
   });
 
-  const onSubmit: SubmitHandler<EmailInputSchema> = async ({ email }) => {
-    const response = await sendEmailOtp.execute({ email });
+  const onSubmit: SubmitHandler<SendEmailOtpSchema> = async ({ email }) => {
+    const emailToken = await sendEmailOtp.mutate({ email });
 
     setLoginState({
       step: "EMAIL_OTP",
       email,
-      emailToken: response.token,
+      emailToken,
     });
   };
 

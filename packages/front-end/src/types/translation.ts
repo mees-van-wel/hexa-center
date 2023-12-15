@@ -1,6 +1,9 @@
 export type Translation = {
   common: {
     back: string;
+    create: string;
+    saving: string;
+    saved: string;
     number: string;
     create: string;
     delete: string;
@@ -8,6 +11,23 @@ export type Translation = {
   authLayout: {
     help: string;
     version: string;
+  };
+  dashboardLayout: {
+    modules: {
+      essentials: string;
+      bookings: string;
+    };
+    avatar: {
+      profile: string;
+      preferences: string;
+      logout: string;
+    };
+    home: string;
+    properties: string;
+    roles: string;
+    users: string;
+    reservations: string;
+    rooms: string;
   };
   loginPage: {
     login: string;
@@ -46,7 +66,7 @@ export type Translation = {
   rooms: {
     name: string;
     price: string;
-  }
+  };
 };
 
 type Join<K, P> = K extends string | number
