@@ -1,5 +1,5 @@
 import { useTranslation } from "@/hooks/useTranslation";
-import { useWrite } from "@/hooks/useWrite";
+import { useMutation } from "@/hooks/useMutation";
 import { Button, Stack } from "@mantine/core";
 import { IconDeviceMobileMessage } from "@tabler/icons-react";
 import { Input, object, string } from "valibot";
@@ -15,7 +15,7 @@ const PhoneInputSchema = object({
 type PhoneInputSchema = Input<typeof PhoneInputSchema>;
 
 export const PhoneInput = () => {
-  const sendPhoneOtp = useWrite("POST", "/send-phone-otp");
+  const sendPhoneOtp = useMutation("auth", "sendPhoneOtp");
   const { setLoginState } = useLoginContext();
   const t = useTranslation();
 
@@ -24,12 +24,12 @@ export const PhoneInput = () => {
   });
 
   const onSubmit: SubmitHandler<PhoneInputSchema> = async ({ phoneNumber }) => {
-    const response = await sendPhoneOtp.execute({ phoneNumber });
+    const phoneToken = await sendPhoneOtp.mutate({ phoneNumber });
 
     setLoginState({
       step: "PHONE_OTP",
       phoneNumber,
-      phoneToken: response.token,
+      phoneToken,
     });
   };
 

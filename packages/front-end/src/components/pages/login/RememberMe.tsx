@@ -3,7 +3,7 @@ import {
   SESSION_DURATIONS,
 } from "@hexa-center/shared/constants/sessionDurations";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useWrite } from "@/hooks/useWrite";
+import { useMutation } from "@/hooks/useMutation";
 import { Button, Group, Radio, Stack } from "@mantine/core";
 import { IconLogin } from "@tabler/icons-react";
 import { useState } from "react";
@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 import { useAuthContext } from "@/contexts/AuthContext";
 
 export const RememberMe = () => {
-  const login = useWrite("POST", "/login");
+  const login = useMutation("auth", "login");
   const [duration, setDuration] = useState<string>(DEFAULT_SESSION_DURATION);
   const { loginState, setLoginState } = useLoginContext();
   const { auth, setAuth } = useAuthContext();
@@ -20,13 +20,7 @@ export const RememberMe = () => {
   const router = useRouter();
 
   const clickHandler = async () => {
-    setLoginState({ step: "SUCCESS" });
-
-    setTimeout(() => {
-      router.replace("/");
-    }, 1000);
-
-    const user = await login.execute({
+    const user = await login.mutate({
       email: loginState.email,
       emailToken: loginState.emailToken,
       emailOtp: loginState.emailOtp,
@@ -38,6 +32,11 @@ export const RememberMe = () => {
     });
 
     setAuth({ ...auth, user });
+    setLoginState({ step: "SUCCESS" });
+
+    setTimeout(() => {
+      router.replace("/");
+    }, 800);
   };
 
   return (

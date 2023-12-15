@@ -1,14 +1,14 @@
 import { useCountdown } from "@/hooks/useCountdown";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useWrite } from "@/hooks/useWrite";
+import { useMutation } from "@/hooks/useMutation";
 import { Button, Group, Input, Loader, PinInput, Stack } from "@mantine/core";
 import { IconArrowLeft, IconRefresh } from "@tabler/icons-react";
 import { useLoginContext } from "./LoginContext";
 import { useState } from "react";
 
 export const EmailOtpInput = () => {
-  const sendEmailOtp = useWrite("POST", "/send-email-otp");
-  const validateOtp = useWrite("POST", "/validate-otp");
+  const sendEmailOtp = useMutation("auth", "sendEmailOtp");
+  const validateOtp = useMutation("auth", "validateOtp");
   const [error, setError] = useState("");
   const { loginState, setLoginState } = useLoginContext();
   const { count, reset } = useCountdown(60);
@@ -17,19 +17,14 @@ export const EmailOtpInput = () => {
   const inputHandler = async (value: string) => {
     if (value.length < 4) return;
 
-    try {
-      const result = await validateOtp.execute({
-        token: loginState.emailToken,
-        otp: value,
-      });
+    const valid = await validateOtp.mutate({
+      token: loginState.emailToken,
+      otp: value,
+    });
 
-      if (!result.valid) return setError("Invalid code");
-      if (error) setError("");
-      setLoginState({ step: "PHONE_INPUT", emailOtp: value });
-    } catch (error) {
-      // TODO Error handling
-      console.log("CATCHED", error);
-    }
+    if (!valid && !error) return setError("Invalid code");
+
+    setLoginState({ step: "PHONE_INPUT", emailOtp: value });
   };
 
   const backHandler = () => {
@@ -37,7 +32,8 @@ export const EmailOtpInput = () => {
   };
 
   const sendAgainHandler = async () => {
-    await sendEmailOtp.execute({ email: loginState.email });
+    const emailToken = await sendEmailOtp.mutate({ email: loginState.email });
+    setLoginState({ emailToken });
     reset();
   };
 

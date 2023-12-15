@@ -47,6 +47,7 @@ body {
   --mantine-color-text: rgb(var(--color-text));
   --mantine-color-body: rgb(var(--color-foreground));
 
+  position: relative;
   background-color: rgb(var(--color-background));
   color: rgb(var(--color-text));
 }
