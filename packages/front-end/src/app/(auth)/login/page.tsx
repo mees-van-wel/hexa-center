@@ -6,7 +6,7 @@ import { LoginSteps } from "@/components/pages/login/LoginSteps";
 import { useTranslation } from "@/hooks/useTranslation";
 import { IconLogin } from "@tabler/icons-react";
 
-export default function Login() {
+export default function Page() {
   const t = useTranslation();
 
   return (

@@ -4,7 +4,7 @@ import {
   IconBed,
   IconHome,
   IconHotelService,
-  IconUser,
+  IconUsers,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -57,7 +57,7 @@ export const Navigation = () => {
                 component={Link}
                 href="/users"
                 variant={pathname === "/users" ? "filled" : "subtle"}
-                leftSection={<IconUser />}
+                leftSection={<IconUsers />}
                 fullWidth
                 justify="left"
               >

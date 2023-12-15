@@ -15,11 +15,13 @@ type TableProps<T extends Record<string, any>> = {
     label: string;
   }[];
   elements: T[];
+  onClick?: (row: T) => any;
 };
 
 export const Table = <T extends Record<string, any>>({
   columns,
   elements,
+  onClick,
 }: TableProps<T>) => {
   const [search, setSearch] = useState("");
 
@@ -56,7 +58,11 @@ export const Table = <T extends Record<string, any>>({
           </TableComponent.Thead>
           <TableComponent.Tbody>
             {filtered.map((element, index) => (
-              <TableComponent.Tr key={index}>
+              <TableComponent.Tr
+                key={index}
+                className={onClick ? styles.clickableRow : undefined}
+                onClick={onClick ? () => onClick(element) : undefined}
+              >
                 {columns.map(({ selector }) => (
                   <TableComponent.Td key={selector as string}>
                     {element[selector]}

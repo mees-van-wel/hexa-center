@@ -3,7 +3,7 @@
 import { useAuthUser } from "@/contexts/AuthContext";
 import { useTranslation } from "@/hooks/useTranslation";
 import { trpc } from "@/utils/trpc";
-import { Avatar, Group, Menu, Stack } from "@mantine/core";
+import { Avatar, Group, Menu, Stack, Text } from "@mantine/core";
 import { IconLogout, IconPalette, IconUser } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -23,10 +23,10 @@ export const CustomAvatar = () => {
       <Menu.Target>
         <Group>
           <Stack ta="right" visibleFrom="md" gap={0}>
-            <span>
+            <Text size="xs">
               {authUser.firstName} {authUser.lastName}
-            </span>
-            <span>{authUser.email}</span>
+            </Text>
+            <Text size="xs">{authUser.email}</Text>
           </Stack>
           <Avatar />
         </Group>

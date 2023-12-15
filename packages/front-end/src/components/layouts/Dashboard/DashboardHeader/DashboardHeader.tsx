@@ -6,7 +6,7 @@ import { CustomAvatar } from "../ContextMenu";
 import { useTranslation } from "@/hooks/useTranslation";
 import Link from "next/link";
 import { IconArrowLeft, IconChevronRight } from "@tabler/icons-react";
-import { Route } from "next";
+import type { Route } from "next";
 import { usePathname, useRouter } from "next/navigation";
 import { useRecoilValue } from "recoil";
 import { routeHistoryState } from "@/states/routeHistoryState";
@@ -14,17 +14,16 @@ import { routeHistoryState } from "@/states/routeHistoryState";
 type DashboardHeaderProps = {
   children?: React.ReactNode;
   title: {
-    content: string;
+    label: string;
     href?: Route;
+    icon?: React.ReactNode;
   }[];
-  icon?: React.ReactNode;
   backRouteFallback?: Route;
 };
 
 export const DashboardHeader = ({
   children,
   title,
-  icon,
   backRouteFallback,
 }: DashboardHeaderProps) => {
   const t = useTranslation();
@@ -56,25 +55,26 @@ export const DashboardHeader = ({
       </Paper>
       <Paper className={styles.dashboardcontainer} p="md">
         <Group justify="space-between" wrap="nowrap">
-          <span>&nbsp;</span>
-          <Group justify="center" gap="xs">
-            {icon && icon}
-            {title.map(({ content, href }, index) => {
+          <span />
+          <Group align="center" gap="xs">
+            {title.map(({ icon, label, href }, index) => {
               const isLast = title.length - 1 === index;
+              const labelComponent = <Title order={3}>{label}</Title>;
 
               return (
-                <Group key={content} gap="xs">
-                  {href ? (
-                    <Link className={styles.dashboardHeaderLink} href={href}>
-                      {content}
-                    </Link>
-                  ) : (
-                    <Title className={styles.dashboardHeaderTitle} order={2}>
-                      {content}
-                    </Title>
-                  )}
+                <>
+                  <Group key={label} gap="xs">
+                    {icon}
+                    {href ? (
+                      <Link className={styles.dashboardHeaderLink} href={href}>
+                        {labelComponent}
+                      </Link>
+                    ) : (
+                      labelComponent
+                    )}
+                  </Group>
                   {!isLast && <IconChevronRight />}
-                </Group>
+                </>
               );
             })}
           </Group>
