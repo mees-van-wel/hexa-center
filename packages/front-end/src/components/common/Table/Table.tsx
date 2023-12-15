@@ -8,7 +8,7 @@ import {
 } from "@mantine/core";
 import { useMemo, useState } from "react";
 
-type TableProps<T extends Record<string, string>> = {
+type TableProps<T extends Record<string, any>> = {
   columns: {
     selector: keyof T;
     label: string;
@@ -16,7 +16,7 @@ type TableProps<T extends Record<string, string>> = {
   elements: T[];
 };
 
-export const Table = <T extends Record<string, string>>({
+export const Table = <T extends Record<string, any>>({
   columns,
   elements,
 }: TableProps<T>) => {

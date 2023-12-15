@@ -31,8 +31,10 @@
     "typescript": "^5.3.2"
   },
   "dependencies": {
+    "@decs/typeschema": "^0.12.1",
     "@socket.io/redis-adapter": "^8.2.1",
     "@socket.io/redis-emitter": "^5.1.0",
+    "@trpc/server": "^10.44.1",
     "@vonage/auth": "^1.7.0",
     "@vonage/server-sdk": "^3.10.2",
     "compression": "^1.7.4",

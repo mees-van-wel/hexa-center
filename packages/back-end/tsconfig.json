@@ -9,12 +9,11 @@
     "strict": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "sourceMap": true,
-    "jsx": "react-jsx"
+    "sourceMap": true
   },
   "ts-node": {
     "esm": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../shared/utils/trpcTransformer.ts"],
   "exclude": ["node_modules", "dist"]
 }

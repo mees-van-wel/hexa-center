@@ -28,13 +28,13 @@ export default function DashboardLayout({
   return (
     <>
       <Image
+        className={styles.background}
+        placeholder="blur"
         alt="Background"
         src={background}
-        placeholder="blur"
         quality={100}
-        fill
         sizes="100vw"
-        className={styles.background}
+        fill
       />
       <Drawer.Root
         opened={mobileMenuOpen}

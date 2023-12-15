@@ -10,13 +10,14 @@
     "fmt": "prettier --write ."
   },
   "dependencies": {
+    "@hexa-center/back-end": "workspace:*",
     "@hexa-center/shared": "workspace:*",
     "@hookform/resolvers": "^3.3.2",
     "@mantine/core": "^7.3.2",
     "@mantine/hooks": "^7.3.2",
     "@tabler/icons-react": "^2.42.0",
+    "@trpc/client": "^10.44.1",
     "awesome-phonenumber": "^6.2.0",
-    "axios": "^1.6.2",
     "clsx": "^2.0.0",
     "modern-normalize": "^2.0.0",
     "next": "14.0.4",

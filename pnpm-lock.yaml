@@ -14,12 +14,18 @@ importers:
 
   packages/back-end:
     dependencies:
+      '@decs/typeschema':
+        specifier: ^0.12.1
+        version: 0.12.1(valibot@0.22.0)
       '@socket.io/redis-adapter':
         specifier: ^8.2.1
         version: 8.2.1(socket.io-adapter@2.5.2)
       '@socket.io/redis-emitter':
         specifier: ^5.1.0
         version: 5.1.0
+      '@trpc/server':
+        specifier: ^10.44.1
+        version: 10.44.1
       '@vonage/auth':
         specifier: ^1.7.0
         version: 1.7.0
@@ -111,6 +117,9 @@ importers:
 
   packages/front-end:
     dependencies:
+      '@hexa-center/back-end':
+        specifier: workspace:*
+        version: link:../back-end
       '@hexa-center/shared':
         specifier: workspace:*
         version: link:../shared
@@ -126,12 +135,12 @@ importers:
       '@tabler/icons-react':
         specifier: ^2.42.0
         version: 2.42.0(react@18.2.0)
+      '@trpc/client':
+        specifier: ^10.44.1
+        version: 10.44.1(@trpc/server@10.44.1)
       awesome-phonenumber:
         specifier: ^6.2.0
         version: 6.2.0
-      axios:
-        specifier: ^1.6.2
-        version: 1.6.2
       clsx:
         specifier: ^2.0.0
         version: 2.0.0
@@ -202,10 +211,16 @@ importers:
 
   packages/shared:
     dependencies:
+      msgpackr:
+        specifier: ^1.10.0
+        version: 1.10.0
       valibot:
         specifier: ^0.22.0
         version: 0.22.0
     devDependencies:
+      '@types/node':
+        specifier: ^20.10.4
+        version: 20.10.4
       typescript:
         specifier: ^5.3.2
         version: 5.3.2
@@ -280,6 +295,62 @@ packages:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
+
+  /@decs/typeschema@0.12.1(valibot@0.22.0):
+    resolution: {integrity: sha512-PhoCbaJ6T+9EfvUkemgYVnNfLmLoP2+Aa5yvQ3sIzH4fmIgDEFPGSRPuaTO04c99sqLeKuhHEY+WLzNubGABOA==}
+    peerDependencies:
+      '@deepkit/type': ^1.0.1-alpha.97
+      '@effect/data': ^0.18.6
+      '@effect/schema': ^0.36.5
+      '@sinclair/typebox': ^0.31.15
+      ajv: ^8.12.0
+      arktype: ^1.0.21-alpha
+      fp-ts: ^2.16.1
+      io-ts: ^2.2.20
+      joi: ^17.10.2
+      ow: ^0.28.2
+      runtypes: ^6.7.0
+      superstruct: ^1.0.3
+      valibot: ^0.17.0
+      vite: ^4.4.10
+      yup: ^1.2.0
+      zod: ^3.22.2
+    peerDependenciesMeta:
+      '@deepkit/type':
+        optional: true
+      '@effect/data':
+        optional: true
+      '@effect/schema':
+        optional: true
+      '@sinclair/typebox':
+        optional: true
+      ajv:
+        optional: true
+      arktype:
+        optional: true
+      fp-ts:
+        optional: true
+      io-ts:
+        optional: true
+      joi:
+        optional: true
+      ow:
+        optional: true
+      runtypes:
+        optional: true
+      superstruct:
+        optional: true
+      valibot:
+        optional: true
+      vite:
+        optional: true
+      yup:
+        optional: true
+      zod:
+        optional: true
+    dependencies:
+      valibot: 0.22.0
+    dev: false
 
   /@drizzle-team/studio@0.0.35:
     resolution: {integrity: sha512-t5LTNOVf+L7Bb/wdssOIPx0ueNvhyaIXdrvKgoHR4wK0GD7SRmILcCTzn6N6Ltr1VnFzQZG/bzn6HMagn17Jtw==}
@@ -1080,6 +1151,54 @@ packages:
       react: 18.2.0
     dev: false
 
+  /@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.2:
+    resolution: {integrity: sha512-9bfjwDxIDWmmOKusUcqdS4Rw+SETlp9Dy39Xui9BEGEk19dDwH0jhipwFzEff/pFg95NKymc6TOTbRKcWeRqyQ==}
+    cpu: [arm64]
+    os: [darwin]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@msgpackr-extract/msgpackr-extract-darwin-x64@3.0.2:
+    resolution: {integrity: sha512-lwriRAHm1Yg4iDf23Oxm9n/t5Zpw1lVnxYU3HnJPTi2lJRkKTrps1KVgvL6m7WvmhYVt/FIsssWay+k45QHeuw==}
+    cpu: [x64]
+    os: [darwin]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@msgpackr-extract/msgpackr-extract-linux-arm64@3.0.2:
+    resolution: {integrity: sha512-FU20Bo66/f7He9Fp9sP2zaJ1Q8L9uLPZQDub/WlUip78JlPeMbVL8546HbZfcW9LNciEXc8d+tThSJjSC+tmsg==}
+    cpu: [arm64]
+    os: [linux]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@msgpackr-extract/msgpackr-extract-linux-arm@3.0.2:
+    resolution: {integrity: sha512-MOI9Dlfrpi2Cuc7i5dXdxPbFIgbDBGgKR5F2yWEa6FVEtSWncfVNKW5AKjImAQ6CZlBK9tympdsZJ2xThBiWWA==}
+    cpu: [arm]
+    os: [linux]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@msgpackr-extract/msgpackr-extract-linux-x64@3.0.2:
+    resolution: {integrity: sha512-gsWNDCklNy7Ajk0vBBf9jEx04RUxuDQfBse918Ww+Qb9HCPoGzS+XJTLe96iN3BVK7grnLiYghP/M4L8VsaHeA==}
+    cpu: [x64]
+    os: [linux]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@msgpackr-extract/msgpackr-extract-win32-x64@3.0.2:
+    resolution: {integrity: sha512-O+6Gs8UeDbyFpbSh2CPEz/UOrrdWPTBYNblZK5CxxLisYt4kGX3Sc+czffFonyjiGSq3jWLwJS/CCJc7tBr4sQ==}
+    cpu: [x64]
+    os: [win32]
+    requiresBuild: true
+    dev: false
+    optional: true
+
   /@next/env@14.0.4:
     resolution: {integrity: sha512-irQnbMLbUNQpP1wcE5NstJtbuA/69kRfzBrpAD7Gsn8zm/CY6YQYc3HQBz8QPxwISG26tIm5afvvVbu508oBeQ==}
     dev: false
@@ -1304,6 +1423,19 @@ packages:
     resolution: {integrity: sha512-ynV4iaC1c1mUhuAr9HRaoq8KrWYmZ0bJEpOh7qTBE+OfdDsdvQUe+0S7FW+DHkJ4RuxQMdO8djrZK7HrUw9YMA==}
     dev: false
 
+  /@trpc/client@10.44.1(@trpc/server@10.44.1):
+    resolution: {integrity: sha512-vTWsykNcgz1LnwePVl2fKZnhvzP9N3GaaLYPkfGINo314ZOS0OBqe9x0ytB2LLUnRVTAAZ2WoONzARd8nHiqrA==}
+    peerDependencies:
+      '@trpc/server': 10.44.1
+    dependencies:
+      '@trpc/server': 10.44.1
+    dev: false
+
+  /@trpc/server@10.44.1:
+    resolution: {integrity: sha512-mF7B+K6LjuboX8I1RZgKE5GA/fJhsJ8tKGK2UBt3Bwik7hepEPb4NJgNr7vO6BK5IYwPdBLRLTctRw6XZx0sRg==}
+    engines: {node: '>=18.0.0'}
+    dev: false
+
   /@tsconfig/node10@1.0.9:
     resolution: {integrity: sha512-jNsYVVxU8v5g43Erja32laIDHXeoNvFEpX33OK4d6hljo3jDhCBDhx5dhCCTMWUojscpAagGiRkBKxpdl9fxqA==}
     dev: true
@@ -1418,6 +1550,12 @@ packages:
     resolution: {integrity: sha512-D0WfRmU9TQ8I9PFx9Yc+EBHw+vSpIub4IDvQivcp26PtPrdMGAq5SDcpXEo/epqa/DXotVpekHiLNTg3iaKXBQ==}
     dependencies:
       undici-types: 5.26.5
+
+  /@types/node@20.10.4:
+    resolution: {integrity: sha512-D08YG6rr8X90YB56tSIuBaddy/UXAA9RKJoFvrsnogAum/0pmjkgi4+2nx96A330FmioegBWmEYQ+syqCFaveg==}
+    dependencies:
+      undici-types: 5.26.5
+    dev: true
 
   /@types/prop-types@15.7.11:
     resolution: {integrity: sha512-ga8y9v9uyeiLdpKddhxYQkxNDrfvuPrlFb0N1qnZZByvcElJaXthF1UhvCh9TLWJBEHeNtdnbysW7Y6Uq8CVng==}
@@ -4742,6 +4880,28 @@ packages:
   /ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
 
+  /msgpackr-extract@3.0.2:
+    resolution: {integrity: sha512-SdzXp4kD/Qf8agZ9+iTu6eql0m3kWm1A2y1hkpTeVNENutaB0BwHlSvAIaMxwntmRUAUjon2V4L8Z/njd0Ct8A==}
+    hasBin: true
+    requiresBuild: true
+    dependencies:
+      node-gyp-build-optional-packages: 5.0.7
+    optionalDependencies:
+      '@msgpackr-extract/msgpackr-extract-darwin-arm64': 3.0.2
+      '@msgpackr-extract/msgpackr-extract-darwin-x64': 3.0.2
+      '@msgpackr-extract/msgpackr-extract-linux-arm': 3.0.2
+      '@msgpackr-extract/msgpackr-extract-linux-arm64': 3.0.2
+      '@msgpackr-extract/msgpackr-extract-linux-x64': 3.0.2
+      '@msgpackr-extract/msgpackr-extract-win32-x64': 3.0.2
+    dev: false
+    optional: true
+
+  /msgpackr@1.10.0:
+    resolution: {integrity: sha512-rVQ5YAQDoZKZLX+h8tNq7FiHrPJoeGHViz3U4wIcykhAEpwF/nH2Vbk8dQxmpX5JavkI8C7pt4bnkJ02ZmRoUw==}
+    optionalDependencies:
+      msgpackr-extract: 3.0.2
+    dev: false
+
   /mustache@4.2.0:
     resolution: {integrity: sha512-71ippSywq5Yb7/tVYyGbkBggbU8H3u5Rz56fH60jGFgr8uHwxs+aSKeqmluIVzM0m0kB7xQjKS6qPfd0b2ZoqQ==}
     hasBin: true
@@ -4828,6 +4988,13 @@ packages:
     resolution: {integrity: sha512-dPEtOeMvF9VMcYV/1Wb8CPoVAXtp6MKMlcbAt4ddqmGqUJ6fQZFXkNZNkNlfevtNkGtaSoXf/vNNNSvgrdXwtA==}
     engines: {node: '>= 6.13.0'}
     dev: true
+
+  /node-gyp-build-optional-packages@5.0.7:
+    resolution: {integrity: sha512-YlCCc6Wffkx0kHkmam79GKvDQ6x+QZkMjFGrIMxgFNILFvGSbCp2fCBC55pGTT9gVaz8Na5CLmxt/urtzRv36w==}
+    hasBin: true
+    requiresBuild: true
+    dev: false
+    optional: true
 
   /nodemon@3.0.1:
     resolution: {integrity: sha512-g9AZ7HmkhQkqXkRc20w+ZfQ73cHLbE8hnPbtaFbFtCumZsjyMhKk9LajQ07U5Ux28lvFjZ5X7HvWR1xzU8jHVw==}
