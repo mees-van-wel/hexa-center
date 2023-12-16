@@ -1,15 +1,17 @@
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
+import { useAuthContext } from "@/contexts/AuthContext";
+import { useMutation } from "@/hooks/useMutation";
+import { useTranslation } from "@/hooks/useTranslation";
+import { Button, Group, Radio, Stack } from "@mantine/core";
 import {
   DEFAULT_SESSION_DURATION,
   SESSION_DURATIONS,
 } from "@shared/constants/sessionDurations";
-import { useTranslation } from "@/hooks/useTranslation";
-import { useMutation } from "@/hooks/useMutation";
-import { Button, Group, Radio, Stack } from "@mantine/core";
 import { IconLogin } from "@tabler/icons-react";
-import { useState } from "react";
+
 import { useLoginContext } from "./LoginContext";
-import { useRouter } from "next/navigation";
-import { useAuthContext } from "@/contexts/AuthContext";
 
 export const RememberMe = () => {
   const login = useMutation("auth", "login");

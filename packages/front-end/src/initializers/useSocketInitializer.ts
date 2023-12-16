@@ -1,5 +1,6 @@
-import { socket } from "@/utils/socket";
 import { useEffect } from "react";
+
+import { socket } from "@/utils/socket";
 
 export default function useSocketInitializer() {
   useEffect(() => {

@@ -1,22 +1,23 @@
-import { router, procedure } from "@/trpc";
-import { SendEmailOtpSchema, SendPhoneOtpSchema } from "@shared/schemas/auth";
-import { wrap } from "@decs/typeschema";
-import { createOtp } from "@/utils/otp";
+import crypto from "crypto";
+import { and, eq } from "drizzle-orm";
+import { nullable, object, string } from "valibot";
+
 import db from "@/db/client";
 import { sessions, users } from "@/db/schema";
-import { and, eq } from "drizzle-orm";
-import { isProduction } from "@shared/utils/environment";
-import { sign, verify } from "@/utils/jwt";
+import { procedure, router } from "@/trpc";
 import { decrypt, encrypt } from "@/utils/encryption";
+import { sign, verify } from "@/utils/jwt";
 import { sendMail } from "@/utils/mail";
+import { createOtp } from "@/utils/otp";
 import { sendSms } from "@/utils/sms";
+import { wrap } from "@decs/typeschema";
 import {
   SESSION_DURATIONS,
   type SessionDuration,
 } from "@shared/constants/sessionDurations";
+import { SendEmailOtpSchema, SendPhoneOtpSchema } from "@shared/schemas/auth";
+import { isProduction } from "@shared/utils/environment";
 import { TRPCError } from "@trpc/server";
-import crypto from "crypto";
-import { nullable, object, string } from "valibot";
 
 const MAX_AGE = {
   [SESSION_DURATIONS.SESSION]: undefined,

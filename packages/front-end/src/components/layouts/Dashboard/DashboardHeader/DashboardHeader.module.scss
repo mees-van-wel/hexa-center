@@ -1,13 +1,5 @@
-.headerChildren {
-  display: flex;
-
-  @media (max-width: 36em) {
-    width: 100%;
-  }
-}
-
-.dashboardcontainer {
-  flex: 1;
+.titleContainer {
+  flex-grow: 1;
 }
 
 .dashboardHeaderLink {

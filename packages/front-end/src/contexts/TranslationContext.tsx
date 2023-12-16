@@ -1,7 +1,8 @@
 "use client";
 
-import { Translation } from "@/types/translation";
 import { createContext, useContext, useState } from "react";
+
+import { Translation } from "@/types/translation";
 
 type TranslationContext = {
   translation: Translation;

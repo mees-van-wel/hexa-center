@@ -1,4 +1,5 @@
 import { Group, Title } from "@mantine/core";
+
 import styles from "./AuthTitle.module.scss";
 
 type AuthTitleProps = {

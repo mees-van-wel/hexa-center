@@ -2,13 +2,15 @@
 
 import Image from "next/image";
 import Link from "next/link";
+
 import background from "@/assets/images/bg.jpeg";
 import icon from "@/assets/images/icon-white.svg";
-import styles from "./layout.module.scss";
-import { Button, Group, Stack, Title } from "@mantine/core";
 import { useCompanyName } from "@/hooks/useCompanyName";
-import { IconQuestionMark } from "@tabler/icons-react";
 import { useTranslation } from "@/hooks/useTranslation";
+import { Button, Group, Stack, Title } from "@mantine/core";
+import { IconQuestionMark } from "@tabler/icons-react";
+
+import styles from "./layout.module.scss";
 
 export default function AuthLayout({
   children,

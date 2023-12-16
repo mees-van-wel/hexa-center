@@ -1,16 +1,16 @@
 import { AuthProgress } from "@/components/layouts/auth/AuthProgress";
-import { EmailInput } from "./EmailInput";
-import { EmailOtpInput } from "./EmailOtpInput";
-import { PhoneInput } from "./PhoneInput";
-import { PhoneOtpInput } from "./PhoneOtpInput";
-import { LOGIN_STEPS, useLoginContext } from "./LoginContext";
-import { RememberMe } from "./RememberMe";
-import { useTranslation } from "@/hooks/useTranslation";
 import { Stack } from "@mantine/core";
 import { IconCircleCheck } from "@tabler/icons-react";
 
+import { EmailInput } from "./EmailInput";
+import { EmailOtpInput } from "./EmailOtpInput";
+import { LOGIN_STEPS, useLoginContext } from "./LoginContext";
+import { PhoneInput } from "./PhoneInput";
+import { PhoneOtpInput } from "./PhoneOtpInput";
+import { RememberMe } from "./RememberMe";
+
 export const LoginSteps = () => {
-  const t = useTranslation();
+  // const t = useTranslation();
   const {
     loginState: { step },
   } = useLoginContext();

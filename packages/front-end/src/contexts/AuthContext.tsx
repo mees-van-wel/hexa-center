@@ -1,7 +1,8 @@
 "use client";
 
-import { RouterOutput, trpc } from "@/utils/trpc";
 import { createContext, useContext, useEffect, useState } from "react";
+
+import { RouterOutput, trpc } from "@/utils/trpc";
 
 type CurrentUser = RouterOutput["auth"]["currentUser"];
 

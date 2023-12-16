@@ -1,6 +1,6 @@
-import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 import type { AppRouter, RI, RO } from "@back-end/routes/_app";
 import { trpcTransformer } from "@shared/utils/trpcTransformer";
+import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 
 export type RouterInput = RI;
 export type RouterOutput = RO;

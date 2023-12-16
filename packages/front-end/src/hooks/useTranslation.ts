@@ -1,8 +1,9 @@
 "use client";
 
+import { useCallback } from "react";
+
 import { useTranslationContext } from "@/contexts/TranslationContext";
 import type { TranslationPaths } from "@/types/translation";
-import { useCallback } from "react";
 
 type Translator = <P extends keyof TranslationPaths>(
   key: P,

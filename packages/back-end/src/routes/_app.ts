@@ -1,5 +1,5 @@
-import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import { router } from "@/trpc";
+import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 
 import { authRouter } from "./auth";
 import { userRouter } from "./user";

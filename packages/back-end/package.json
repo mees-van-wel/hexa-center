@@ -8,8 +8,9 @@
     "dev": "nodemon",
     "build": "node esbuild.js",
     "start": "node dist/index.js",
-    "gen-migration": "drizzle-kit generate:pg",
-    "fmt": "prettier --write ."
+    "lint": "eslint . --ext .ts,.tsx --fix",
+    "format": "cd packages/frontend && pnpm prettier \"**/*.{ts,tsx}\" --write",
+    "gen-migration": "drizzle-kit generate:pg"
   },
   "keywords": [],
   "author": "",
@@ -26,11 +27,7 @@
     "drizzle-kit": "^0.20.6",
     "esbuild": "^0.19.9",
     "esbuild-node-externals": "^1.11.0",
-    "eslint": "^8",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-unused-imports": "^3.0.0",
     "nodemon": "^3.0.1",
-    "prettier": "^3.1.1",
     "typescript": "^5.3.2"
   },
   "dependencies": {

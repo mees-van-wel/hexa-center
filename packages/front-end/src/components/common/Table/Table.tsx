@@ -1,14 +1,16 @@
 "use client";
 
-import { Paper, Table as TableComponent, TextInput } from "@mantine/core";
-import { useId, useMemo } from "react";
-import styles from "./Table.module.scss";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useMemo } from "react";
+import { useRecoilValue } from "recoil";
+
 import { searchState } from "@/states/searchState";
+import { Paper, Table as TableComponent } from "@mantine/core";
 
-const random = new Date().toISOString();
+import { SearchBar } from "./SearchBar";
 
+import styles from "./Table.module.scss";
 type TableProps<T extends Record<string, any>> = {
+  searchBarId?: string;
   columns: {
     selector: keyof T;
     label: string;
@@ -18,27 +20,29 @@ type TableProps<T extends Record<string, any>> = {
 };
 
 export const Table = <T extends Record<string, any>>({
+  searchBarId,
   columns,
   elements,
   onClick,
 }: TableProps<T>) => {
-  // TOOD Push id to search state and update accordingly from search input
-  const id = useId();
   const search = useRecoilValue(searchState);
 
   const filtered = useMemo(() => {
-    if (!search) return elements;
-    const searchLower = search.toLowerCase();
+    if (!searchBarId) return elements;
+
+    const val = search[searchBarId];
+    if (!val) return elements;
+
+    const searchLower = val.toLowerCase();
     return elements.filter((element) =>
       Object.values(element).some((value) =>
         value.toString().toLowerCase().includes(searchLower),
       ),
     );
-  }, [search, elements]);
+  }, [searchBarId, search, elements]);
 
   return (
     <Paper p="md">
-      {random}
       <TableComponent highlightOnHover>
         <TableComponent.Thead>
           <TableComponent.Tr>
@@ -66,24 +70,6 @@ export const Table = <T extends Record<string, any>>({
         </TableComponent.Tbody>
       </TableComponent>
     </Paper>
-  );
-};
-
-const SearchBar = () => {
-  const [search, setSearch] = useRecoilState(searchState);
-
-  return (
-    <>
-      {random}
-      <TextInput
-        value={search}
-        placeholder="Search"
-        className={styles.searchInput}
-        onChange={(e) => {
-          setSearch(e.target.value);
-        }}
-      />
-    </>
   );
 };
 

@@ -1,12 +1,14 @@
-import { useTranslation } from "@/hooks/useTranslation";
-import { Button, Stack, TextInput } from "@mantine/core";
-import { IconMailFast } from "@tabler/icons-react";
-import { Input } from "valibot";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { valibotResolver } from "@hookform/resolvers/valibot";
-import { useLoginContext } from "./LoginContext";
-import { SendEmailOtpSchema } from "@shared/schemas/auth";
+import { Input } from "valibot";
+
 import { useMutation } from "@/hooks/useMutation";
+import { useTranslation } from "@/hooks/useTranslation";
+import { valibotResolver } from "@hookform/resolvers/valibot";
+import { Button, Stack, TextInput } from "@mantine/core";
+import { SendEmailOtpSchema } from "@shared/schemas/auth";
+import { IconMailFast } from "@tabler/icons-react";
+
+import { useLoginContext } from "./LoginContext";
 
 type SendEmailOtpSchema = Input<typeof SendEmailOtpSchema>;
 

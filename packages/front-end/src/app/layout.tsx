@@ -1,18 +1,20 @@
 // export const runtime = "edge";
 
+import type { Metadata } from "next";
+import localFont from "next/font/local";
+import { cookies, headers } from "next/headers";
+import { redirect } from "next/navigation";
+
+import { AuthContextProvider } from "@/contexts/AuthContext";
+import { TranslationInitializer } from "@/initializers/TranslationInitializer";
+import { RouterOutput, setTRPCRefreshToken, trpc } from "@/utils/trpc";
+import { ColorSchemeScript, MantineProvider } from "@mantine/core";
+
+import Providers from "./providers";
+
 import "modern-normalize/modern-normalize.css";
 import "@mantine/core/styles.css";
 import "./globals.scss";
-
-import { cookies, headers } from "next/headers";
-import { MantineProvider, ColorSchemeScript } from "@mantine/core";
-import type { Metadata } from "next";
-import localFont from "next/font/local";
-import { TranslationInitializer } from "@/initializers/TranslationInitializer";
-import Providers from "./providers";
-import { AuthContextProvider } from "@/contexts/AuthContext";
-import { redirect } from "next/navigation";
-import { RouterOutput, setTRPCRefreshToken, trpc } from "@/utils/trpc";
 
 const eurostile = localFont({
   src: "../assets/fonts/eurostile.woff2",

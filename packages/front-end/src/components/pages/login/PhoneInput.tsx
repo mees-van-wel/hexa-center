@@ -1,13 +1,15 @@
-import { useTranslation } from "@/hooks/useTranslation";
-import { useMutation } from "@/hooks/useMutation";
-import { Button, Stack } from "@mantine/core";
-import { IconDeviceMobileMessage } from "@tabler/icons-react";
-import { Input } from "valibot";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import { valibotResolver } from "@hookform/resolvers/valibot";
+import { Input } from "valibot";
+
 import { PhoneInput as PhoneInputComponent } from "@/components/common/PhoneInput";
-import { useLoginContext } from "./LoginContext";
+import { useMutation } from "@/hooks/useMutation";
+import { useTranslation } from "@/hooks/useTranslation";
+import { valibotResolver } from "@hookform/resolvers/valibot";
+import { Button, Stack } from "@mantine/core";
 import { SendPhoneOtpSchema } from "@shared/schemas/auth";
+import { IconDeviceMobileMessage } from "@tabler/icons-react";
+
+import { useLoginContext } from "./LoginContext";
 
 type SendPhoneOtpSchema = Input<typeof SendPhoneOtpSchema>;
 

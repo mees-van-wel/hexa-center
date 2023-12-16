@@ -1,4 +1,5 @@
 import { Progress } from "@mantine/core";
+
 import styles from "./AuthProgress.module.scss";
 
 type AuthProgressOProps = {

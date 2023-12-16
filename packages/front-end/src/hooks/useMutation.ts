@@ -1,5 +1,6 @@
-import { trpc, type RouterInput, type RouterOutput } from "@/utils/trpc";
 import { useState } from "react";
+
+import { type RouterInput, type RouterOutput, trpc } from "@/utils/trpc";
 
 // TODO Error handling
 // TODO Caching

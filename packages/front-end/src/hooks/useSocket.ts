@@ -1,5 +1,6 @@
-import { socket } from "@/utils/socket";
 import { useEffect, useState } from "react";
+
+import { socket } from "@/utils/socket";
 
 const useSocket = <T = any>(event: string, exec?: (data: T) => any) => {
   const [data, setData] = useState<T>();

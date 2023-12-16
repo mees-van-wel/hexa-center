@@ -1,17 +1,19 @@
 "use client";
 
 import { forwardRef, useMemo, useRef, useState } from "react";
-import { mergeRefs } from "react-merge-refs";
 import { parsePhoneNumber } from "awesome-phonenumber";
-import { useLocalStorage, useId, useDidUpdate } from "@mantine/hooks";
-import { Group, Select } from "@mantine/core";
-import { Input } from "@mantine/core";
+import { mergeRefs } from "react-merge-refs";
+
 import {
   COUNTRIES,
   COUNTRY_VALUES,
   CountryKey,
   DEFAULT_COUNTRY,
 } from "@/constants/countries";
+import { Group, Select } from "@mantine/core";
+import { Input } from "@mantine/core";
+import { useDidUpdate, useId, useLocalStorage } from "@mantine/hooks";
+
 import styles from "./PhoneInput.module.scss";
 
 type PhoneInputProps = {

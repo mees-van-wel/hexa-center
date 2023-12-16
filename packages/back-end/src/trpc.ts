@@ -1,10 +1,12 @@
-import { TRPCError, initTRPC } from "@trpc/server";
-import * as trpcExpress from "@trpc/server/adapters/express";
-import db from "./db/client";
-import { sessions, users } from "./db/schema";
 import { and, eq, gt, isNull, or } from "drizzle-orm";
+
 import { isProduction } from "@shared/utils/environment";
 import { trpcTransformer } from "@shared/utils/trpcTransformer";
+import { initTRPC, TRPCError } from "@trpc/server";
+import * as trpcExpress from "@trpc/server/adapters/express";
+
+import db from "./db/client";
+import { sessions, users } from "./db/schema";
 
 export const createContext = async ({
   req,

@@ -1,12 +1,30 @@
 {
   "private": true,
   "scripts": {
-    "dev": "git fetch && pnpm install && pnpm run --parallel dev"
+    "dev": "git fetch && pnpm install && pnpm run --parallel dev",
+    "lint": "cd packages/frontend && pnpm eslint . --ext .ts,.tsx --fix",
+    "format": "cd packages/frontend && pnpm prettier \"**/*.{ts,tsx}\" --write",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   },
   "pnpm": {
     "allowedDeprecatedVersions": {
       "rollup-plugin-inject": "3.0.2",
       "sourcemap-codec": "1.4.8"
     }
+  },
+  "devDependencies": {
+    "eslint": "^8",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-simple-import-sort": "^10.0.0",
+    "eslint-plugin-unused-imports": "^3.0.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.1.1"
   }
 }

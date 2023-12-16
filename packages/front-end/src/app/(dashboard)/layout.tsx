@@ -1,16 +1,18 @@
 "use client";
 
-import { Group, Stack, Paper, Drawer } from "@mantine/core";
-import Image from "next/image";
-import background from "@/assets/images/bg.jpeg";
-import styles from "./layout.module.scss";
 import { useEffect, useState } from "react";
-import { Navigation } from "@/components/layouts/dashboard/Navigation";
-import { IconDotsVertical } from "@tabler/icons-react";
-import { CompanyTitle } from "@/components/layouts/dashboard/CompanyTitle";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useRecoilState } from "recoil";
+
+import background from "@/assets/images/bg.jpeg";
+import { CompanyTitle } from "@/components/layouts/dashboard/CompanyTitle";
+import { Navigation } from "@/components/layouts/dashboard/Navigation";
 import { routeHistoryState } from "@/states/routeHistoryState";
+import { Drawer, Group, Paper, Stack } from "@mantine/core";
+import { IconDotsVertical } from "@tabler/icons-react";
+
+import styles from "./layout.module.scss";
 
 export default function DashboardLayout({
   children,
@@ -38,7 +40,7 @@ export default function DashboardLayout({
   }, []);
 
   return (
-    <div>
+    <>
       <Image
         suppressHydrationWarning
         className={styles.background}
@@ -97,6 +99,6 @@ export default function DashboardLayout({
           <main className={styles.main}>{children}</main>
         </Group>
       </div>
-    </div>
+    </>
   );
 }

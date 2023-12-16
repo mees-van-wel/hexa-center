@@ -1,6 +1,7 @@
+import { cookies } from "next/headers";
+
 import { Users } from "@/components/pages/Users";
 import { setTRPCRefreshToken, trpc } from "@/utils/trpc";
-import { cookies } from "next/headers";
 
 export default async function Page() {
   const refreshToken = cookies().get("refreshToken")?.value;

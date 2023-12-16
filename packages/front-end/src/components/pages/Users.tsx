@@ -1,12 +1,15 @@
 "use client";
 
+import { useId } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
 import type { RouterOutput } from "@/utils/trpc";
 import { Button, Stack } from "@mantine/core";
-import { DashboardHeader } from "../layouts/dashboard/DashboardHeader";
 import { IconPlus, IconUsers } from "@tabler/icons-react";
+
 import { Table } from "../common/Table";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { DashboardHeader } from "../layouts/dashboard/DashboardHeader";
 
 type UsersPageProps = {
   users: RouterOutput["user"]["list"];
@@ -14,16 +17,18 @@ type UsersPageProps = {
 
 export const Users = ({ users }: UsersPageProps) => {
   const router = useRouter();
+  const searchBarId = useId();
 
   return (
     <Stack>
       <DashboardHeader title={[{ icon: <IconUsers />, label: "Users" }]}>
+        <Table.SearchBar id={searchBarId} />
         <Button leftSection={<IconPlus />} component={Link} href="/users/new">
           New
         </Button>
-        <Table.SearchBar />
       </DashboardHeader>
       <Table
+        searchBarId={searchBarId}
         onClick={({ id }) => {
           router.push(`/users/${id}`);
         }}

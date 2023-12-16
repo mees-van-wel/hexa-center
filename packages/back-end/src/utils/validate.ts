@@ -1,5 +1,5 @@
-import { type ObjectSchema, parse } from "valibot";
 import type { Request, Response } from "express";
+import { type ObjectSchema, parse } from "valibot";
 
 export const validator =
   (req: Request, res: Response) =>

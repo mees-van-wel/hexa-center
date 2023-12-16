@@ -1,11 +1,12 @@
-import { router, procedure } from "@/trpc";
-import { UserCreateSchema, UserUpdateSchema } from "@shared/schemas/user";
+import { eq } from "drizzle-orm";
+import { number } from "valibot";
+
 import db from "@/db/client";
 import { users } from "@/db/schema";
-import { number } from "valibot";
-import { eq } from "drizzle-orm";
-import { TRPCError } from "@trpc/server";
+import { procedure, router } from "@/trpc";
 import { wrap } from "@decs/typeschema";
+import { UserCreateSchema, UserUpdateSchema } from "@shared/schemas/user";
+import { TRPCError } from "@trpc/server";
 
 export const userRouter = router({
   create: procedure.input(wrap(UserCreateSchema)).mutation(({ input, ctx }) =>
