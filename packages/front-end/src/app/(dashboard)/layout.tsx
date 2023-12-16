@@ -25,9 +25,22 @@ export default function DashboardLayout({
     setRouteHistory([...routeHistory, pathname]);
   }, [pathname]);
 
+  useEffect(() => {
+    if (!window.localStorage.getItem("fade")) return;
+
+    const timer = setTimeout(() => {
+      window.localStorage.removeItem("fade");
+    }, 1500);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, []);
+
   return (
-    <>
+    <div>
       <Image
+        suppressHydrationWarning
         className={styles.background}
         placeholder="blur"
         alt="Background"
@@ -36,47 +49,54 @@ export default function DashboardLayout({
         sizes="100vw"
         fill
       />
-      <Drawer.Root
-        opened={mobileMenuOpen}
-        onClose={() => {
-          setMobileMenuOpen(false);
-        }}
+      <div
+        className={
+          typeof window !== "undefined" && window.localStorage.getItem("fade")
+            ? styles.fade
+            : undefined
+        }
       >
-        <Drawer.Overlay />
-        <Drawer.Content>
-          <Drawer.Header>
-            <Drawer.Title>
-              <CompanyTitle />
-            </Drawer.Title>
-            <Drawer.CloseButton />
-          </Drawer.Header>
-          <Drawer.Body className={styles.mobileNav}>
-            <Navigation />
-          </Drawer.Body>
-        </Drawer.Content>
-      </Drawer.Root>
-
-      <Group align="stretch" className={styles.layoutContainer}>
-        <div className={styles.mobileMenuContainer}>
-          <span
-            className={styles.mobileMenu}
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            <IconDotsVertical />
-          </span>
-        </div>
-        <Paper
-          component={Stack}
-          pos="relative"
-          h="100%"
-          visibleFrom="md"
-          p="md"
+        <Drawer.Root
+          opened={mobileMenuOpen}
+          onClose={() => {
+            setMobileMenuOpen(false);
+          }}
         >
-          <CompanyTitle />
-          <Navigation />
-        </Paper>
-        <main className={styles.main}>{children}</main>
-      </Group>
-    </>
+          <Drawer.Overlay />
+          <Drawer.Content>
+            <Drawer.Header>
+              <Drawer.Title>
+                <CompanyTitle />
+              </Drawer.Title>
+              <Drawer.CloseButton />
+            </Drawer.Header>
+            <Drawer.Body className={styles.mobileNav}>
+              <Navigation />
+            </Drawer.Body>
+          </Drawer.Content>
+        </Drawer.Root>
+        <Group align="stretch" className={styles.layoutContainer}>
+          <div className={styles.mobileMenuContainer}>
+            <span
+              className={styles.mobileMenu}
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              <IconDotsVertical />
+            </span>
+          </div>
+          <Paper
+            component={Stack}
+            pos="relative"
+            h="100%"
+            visibleFrom="md"
+            p="md"
+          >
+            <CompanyTitle />
+            <Navigation />
+          </Paper>
+          <main className={styles.main}>{children}</main>
+        </Group>
+      </div>
+    </div>
   );
 }

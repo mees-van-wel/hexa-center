@@ -31,12 +31,16 @@ export const RememberMe = () => {
       duration,
     });
 
+    const main = document.querySelector("main");
+    main?.setAttribute("data-fade", "true");
+    window.localStorage.setItem("fade", "true");
+
     setAuth({ ...auth, user });
     setLoginState({ step: "SUCCESS" });
 
     setTimeout(() => {
       router.replace("/");
-    }, 800);
+    }, 3000);
   };
 
   return (

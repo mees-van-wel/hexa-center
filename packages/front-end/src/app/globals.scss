@@ -99,3 +99,7 @@ body {
 .mantine-Progress-section {
   transition: width var(--transition);
 }
+ 
+.mantine-Menu-dropdown {
+  background-color: rgb(var(--color-midground));
+}

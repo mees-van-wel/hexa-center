@@ -1,13 +1,12 @@
 "use client";
 
-import {
-  Paper,
-  Stack,
-  Table as TableComponent,
-  TextInput,
-} from "@mantine/core";
-import { useMemo, useState } from "react";
+import { Paper, Table as TableComponent, TextInput } from "@mantine/core";
+import { useId, useMemo } from "react";
 import styles from "./Table.module.scss";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { searchState } from "@/states/searchState";
+
+const random = new Date().toISOString();
 
 type TableProps<T extends Record<string, any>> = {
   columns: {
@@ -23,7 +22,9 @@ export const Table = <T extends Record<string, any>>({
   elements,
   onClick,
 }: TableProps<T>) => {
-  const [search, setSearch] = useState("");
+  // TOOD Push id to search state and update accordingly from search input
+  const id = useId();
+  const search = useRecoilValue(searchState);
 
   const filtered = useMemo(() => {
     if (!search) return elements;
@@ -37,42 +38,53 @@ export const Table = <T extends Record<string, any>>({
 
   return (
     <Paper p="md">
-      <Stack>
-        <TextInput
-          value={search}
-          placeholder="Search"
-          className={styles.searchInput}
-          onChange={(e) => {
-            setSearch(e.target.value);
-          }}
-        />
-        <TableComponent highlightOnHover>
-          <TableComponent.Thead>
-            <TableComponent.Tr>
-              {columns.map(({ selector, label }) => (
-                <TableComponent.Th key={selector as string}>
-                  {label}
-                </TableComponent.Th>
+      {random}
+      <TableComponent highlightOnHover>
+        <TableComponent.Thead>
+          <TableComponent.Tr>
+            {columns.map(({ selector, label }) => (
+              <TableComponent.Th key={selector as string}>
+                {label}
+              </TableComponent.Th>
+            ))}
+          </TableComponent.Tr>
+        </TableComponent.Thead>
+        <TableComponent.Tbody>
+          {filtered.map((element, index) => (
+            <TableComponent.Tr
+              key={index}
+              className={onClick ? styles.clickableRow : undefined}
+              onClick={onClick ? () => onClick(element) : undefined}
+            >
+              {columns.map(({ selector }) => (
+                <TableComponent.Td key={selector as string}>
+                  {element[selector]}
+                </TableComponent.Td>
               ))}
             </TableComponent.Tr>
-          </TableComponent.Thead>
-          <TableComponent.Tbody>
-            {filtered.map((element, index) => (
-              <TableComponent.Tr
-                key={index}
-                className={onClick ? styles.clickableRow : undefined}
-                onClick={onClick ? () => onClick(element) : undefined}
-              >
-                {columns.map(({ selector }) => (
-                  <TableComponent.Td key={selector as string}>
-                    {element[selector]}
-                  </TableComponent.Td>
-                ))}
-              </TableComponent.Tr>
-            ))}
-          </TableComponent.Tbody>
-        </TableComponent>
-      </Stack>
+          ))}
+        </TableComponent.Tbody>
+      </TableComponent>
     </Paper>
   );
 };
+
+const SearchBar = () => {
+  const [search, setSearch] = useRecoilState(searchState);
+
+  return (
+    <>
+      {random}
+      <TextInput
+        value={search}
+        placeholder="Search"
+        className={styles.searchInput}
+        onChange={(e) => {
+          setSearch(e.target.value);
+        }}
+      />
+    </>
+  );
+};
+
+Table.SearchBar = SearchBar;

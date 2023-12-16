@@ -8,7 +8,7 @@ import { IconLogout, IconPalette, IconUser } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-export const CustomAvatar = () => {
+export const ContextMenu = () => {
   const t = useTranslation();
   const authUser = useAuthUser();
   const router = useRouter();
@@ -23,7 +23,7 @@ export const CustomAvatar = () => {
       <Menu.Target>
         <Group>
           <Stack ta="right" visibleFrom="md" gap={0}>
-            <Text size="xs">
+            <Text size="xs" fw={700}>
               {authUser.firstName} {authUser.lastName}
             </Text>
             <Text size="xs">{authUser.email}</Text>

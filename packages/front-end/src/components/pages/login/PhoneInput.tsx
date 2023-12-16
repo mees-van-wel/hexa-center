@@ -13,7 +13,7 @@ type SendPhoneOtpSchema = Input<typeof SendPhoneOtpSchema>;
 
 export const PhoneInput = () => {
   const sendPhoneOtp = useMutation("auth", "sendPhoneOtp");
-  const { setLoginState } = useLoginContext();
+  const { loginState, setLoginState } = useLoginContext();
   const t = useTranslation();
 
   const { control, handleSubmit } = useForm<SendPhoneOtpSchema>({
@@ -42,6 +42,7 @@ export const PhoneInput = () => {
             <PhoneInputComponent
               {...field}
               value={field.value}
+              defaultValue={loginState.phoneNumber}
               error={error?.message}
               label={t("loginPage.phoneNumber")}
               autoComplete

@@ -28,8 +28,8 @@ export const LoginSteps = () => {
       {step === "SUCCESS" && (
         <Stack align="center">
           <IconCircleCheck color="#2f9e44" size={48} />
-          <Title order={4}>{t("loginPage.loggedInSuccess")}</Title>
-          <Loader type="dots" />
+          {/* <Title order={4}>{t("loginPage.loggedInSuccess")}</Title>
+          <Loader type="dots" /> */}
         </Stack>
       )}
     </>

@@ -1,19 +1,28 @@
 .main {
-  background-color: rgb(var(--color-foreground));
   display: flex;
   height: 100%;
 }
 
 .aside {
-  flex-grow: 1;
-  flex-basis: 350px;
-  flex-shrink: 1;
+  background-color: rgb(var(--color-foreground));
+  width: 100%;
   max-width: 350px;
-  gap: 2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
+
+  main[data-fade="true"] & {
+    animation: fadeinphoto 3s forwards;
+  }
+
+}
+
+@keyframes fadeinphoto {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-350px);
+  }
 }
 
 .header {
@@ -42,9 +51,7 @@
 }
 
 .backgroundWrapper {
-  flex-grow: 1;
-  flex-shrink: 1;
-  flex-basis: 0;
+  width: calc(100vw - 350px);
   position: relative;
 }
 
@@ -52,4 +59,24 @@
   object-fit: cover;
   object-position: left;
   scale: -1 1;
+  pointer-events: none;
+
+  main[data-fade="true"] & {
+    animation: fadeinbg 3s forwards;
+    
+  }
+}
+
+@keyframes fadeinbg {
+  0% {
+    transform: translateX(0);
+    width: calc(100vw - 350px);
+  }
+
+  100% {
+    transform: translateX(350px);
+    width: 100vw;
+    opacity: 0.2;
+    filter: blur(8px);
+  }
 }

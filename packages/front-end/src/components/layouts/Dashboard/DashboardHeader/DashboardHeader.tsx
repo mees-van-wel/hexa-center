@@ -2,7 +2,6 @@
 
 import { Button, Group, Paper, Title } from "@mantine/core";
 import styles from "./DashboardHeader.module.scss";
-import { CustomAvatar } from "../ContextMenu";
 import { useTranslation } from "@/hooks/useTranslation";
 import Link from "next/link";
 import { IconArrowLeft, IconChevronRight } from "@tabler/icons-react";
@@ -10,6 +9,8 @@ import type { Route } from "next";
 import { usePathname, useRouter } from "next/navigation";
 import { useRecoilValue } from "recoil";
 import { routeHistoryState } from "@/states/routeHistoryState";
+import { Fragment } from "react";
+import { ContextMenu } from "../ContextMenu";
 
 type DashboardHeaderProps = {
   children?: React.ReactNode;
@@ -40,6 +41,7 @@ export const DashboardHeader = ({
         <Group>
           {showBackButton && (
             <Button
+              variant="light"
               leftSection={<IconArrowLeft />}
               onClick={() => {
                 backRouteFallback
@@ -62,8 +64,8 @@ export const DashboardHeader = ({
               const labelComponent = <Title order={3}>{label}</Title>;
 
               return (
-                <>
-                  <Group key={label} gap="xs">
+                <Fragment key={index}>
+                  <Group gap="xs">
                     {icon}
                     {href ? (
                       <Link className={styles.dashboardHeaderLink} href={href}>
@@ -74,11 +76,11 @@ export const DashboardHeader = ({
                     )}
                   </Group>
                   {!isLast && <IconChevronRight />}
-                </>
+                </Fragment>
               );
             })}
           </Group>
-          <CustomAvatar />
+          <ContextMenu />
         </Group>
       </Paper>
     </Group>

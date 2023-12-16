@@ -12,7 +12,7 @@ type SendEmailOtpSchema = Input<typeof SendEmailOtpSchema>;
 
 export const EmailInput = () => {
   const sendEmailOtp = useMutation("auth", "sendEmailOtp");
-  const { setLoginState } = useLoginContext();
+  const { loginState, setLoginState } = useLoginContext();
   const t = useTranslation();
 
   const {
@@ -38,6 +38,7 @@ export const EmailInput = () => {
       <Stack>
         <TextInput
           {...register("email")}
+          defaultValue={loginState.email}
           error={errors.email?.message}
           label={t("loginPage.email")}
           type="email"

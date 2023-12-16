@@ -1,5 +1,21 @@
+.fade {
+  opacity: 0;
+  animation: fadeinbg 1.5s forwards;
+}
+
+@keyframes fadeinbg {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
 .background {
-  opacity: 0.75;
+  opacity: 0.2;
+  filter: blur(8px);
   object-fit: cover;
   scale: -1 1;
 }

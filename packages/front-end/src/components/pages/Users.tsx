@@ -21,6 +21,7 @@ export const Users = ({ users }: UsersPageProps) => {
         <Button leftSection={<IconPlus />} component={Link} href="/users/new">
           New
         </Button>
+        <Table.SearchBar />
       </DashboardHeader>
       <Table
         onClick={({ id }) => {

@@ -10,9 +10,9 @@ export const CompanyTitle = () => {
 
   return (
     <Group justify="center" pb="md">
-      <Image alt="Icon" src={Icon} width={64} height={64} />
+      <Image alt="Icon" src={Icon} width={32} height={32} />
       <Stack gap={0}>
-        <Title order={1}>Hexa Center</Title>
+        <Title order={2}>Hexa Center</Title>
         {companyName && <Title order={6}>{companyName}</Title>}
       </Stack>
     </Group>

@@ -20,6 +20,7 @@ type PhoneInputProps = {
   error?: string;
   required?: boolean;
   value?: string;
+  defaultValue?: string;
   onChange?: (value: string) => any;
   disabled?: boolean;
   autoComplete?: boolean;
@@ -37,6 +38,7 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
       error,
       required,
       value,
+      defaultValue,
       onChange,
       disabled,
       autoFocus,
@@ -50,6 +52,11 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
     const parsedPhoneNumber = useMemo(
       () => (value ? parsePhoneNumber(value) : undefined),
       [value],
+    );
+
+    const parsedDefaultPhoneNumber = useMemo(
+      () => (defaultValue ? parsePhoneNumber(defaultValue) : undefined),
+      [defaultValue],
     );
 
     const [storedCountryCode, setStoredRegionCode] =
@@ -111,6 +118,7 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
               }
             }}
             value={countryCode}
+            defaultValue={parsedDefaultPhoneNumber?.regionCode}
             data={options}
             disabled={disabled}
           />
@@ -128,6 +136,10 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
                   parsedPhoneNumber?.number?.input ||
                   ""
                 : undefined
+            }
+            defaultValue={
+              parsedDefaultPhoneNumber?.number?.national ||
+              parsedDefaultPhoneNumber?.number?.input
             }
             styles={{
               input: {
