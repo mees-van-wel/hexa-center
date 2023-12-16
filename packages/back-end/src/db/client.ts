@@ -1,8 +1,8 @@
 import { type PostgresJsDatabase, drizzle } from "drizzle-orm/postgres-js";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import postgres from "postgres";
-import * as schema from "./schema.js";
-import { isProduction } from "@hexa-center/shared/utils/environment.js";
+import * as schema from "./schema";
+import { isProduction } from "@shared/utils/environment";
 
 let db: PostgresJsDatabase<typeof schema>;
 

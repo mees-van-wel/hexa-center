@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { Stringified } from "../types.js";
+import { Stringified } from "@/types";
 
 const IV_LENGTH = 16;
 

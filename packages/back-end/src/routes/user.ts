@@ -1,10 +1,7 @@
-import { router, procedure } from "../trpc.js";
-import {
-  UserCreateSchema,
-  UserUpdateSchema,
-} from "@hexa-center/shared/schemas/user.js";
-import db from "../db/client.js";
-import { users } from "../db/schema.js";
+import { router, procedure } from "@/trpc";
+import { UserCreateSchema, UserUpdateSchema } from "@shared/schemas/user";
+import db from "@/db/client";
+import { users } from "@/db/schema";
 import { number } from "valibot";
 import { eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";

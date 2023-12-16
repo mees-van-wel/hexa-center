@@ -1,22 +1,19 @@
-import { router, procedure } from "../trpc.js";
-import {
-  SendEmailOtpSchema,
-  SendPhoneOtpSchema,
-} from "@hexa-center/shared/schemas/auth.js";
+import { router, procedure } from "@/trpc";
+import { SendEmailOtpSchema, SendPhoneOtpSchema } from "@shared/schemas/auth";
 import { wrap } from "@decs/typeschema";
-import { createOtp } from "../utils/otp.js";
-import db from "../db/client.js";
-import { sessions, users } from "../db/schema.js";
+import { createOtp } from "@/utils/otp";
+import db from "@/db/client";
+import { sessions, users } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
-import { isProduction } from "@hexa-center/shared/utils/environment.js";
-import { sign, verify } from "../utils/jwt.js";
-import { decrypt, encrypt } from "../utils/encryption.js";
-import { sendMail } from "../utils/mail.js";
-import { sendSms } from "../utils/sms.js";
+import { isProduction } from "@shared/utils/environment";
+import { sign, verify } from "@/utils/jwt";
+import { decrypt, encrypt } from "@/utils/encryption";
+import { sendMail } from "@/utils/mail";
+import { sendSms } from "@/utils/sms";
 import {
   SESSION_DURATIONS,
   type SessionDuration,
-} from "@hexa-center/shared/constants/sessionDurations.js";
+} from "@shared/constants/sessionDurations";
 import { TRPCError } from "@trpc/server";
 import crypto from "crypto";
 import { nullable, object, string } from "valibot";

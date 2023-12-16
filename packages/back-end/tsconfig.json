@@ -1,19 +1,15 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "target": "ESNext",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "lib": ["ESNext"],
-    "outDir": "dist",
-    "esModuleInterop": true,
-    "strict": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "sourceMap": true
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "outDir": "./dist",
+    "paths": {
+      "@shared/*": ["../../packages/shared/*"],
+      "@/*": ["./src/*"]
+    }
   },
-  "ts-node": {
-    "esm": true
-  },
-  "include": ["src/**/*", "../shared/utils/trpcTransformer.ts"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

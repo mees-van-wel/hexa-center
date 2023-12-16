@@ -5,7 +5,7 @@ import { Input } from "valibot";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useLoginContext } from "./LoginContext";
-import { SendEmailOtpSchema } from "@hexa-center/shared/schemas/auth";
+import { SendEmailOtpSchema } from "@shared/schemas/auth";
 import { useMutation } from "@/hooks/useMutation";
 
 type SendEmailOtpSchema = Input<typeof SendEmailOtpSchema>;

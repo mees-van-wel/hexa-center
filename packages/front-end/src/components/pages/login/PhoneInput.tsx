@@ -7,7 +7,7 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { PhoneInput as PhoneInputComponent } from "@/components/common/PhoneInput";
 import { useLoginContext } from "./LoginContext";
-import { SendPhoneOtpSchema } from "@hexa-center/shared/schemas/auth";
+import { SendPhoneOtpSchema } from "@shared/schemas/auth";
 
 type SendPhoneOtpSchema = Input<typeof SendPhoneOtpSchema>;
 

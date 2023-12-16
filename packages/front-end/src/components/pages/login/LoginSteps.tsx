@@ -6,7 +6,7 @@ import { PhoneOtpInput } from "./PhoneOtpInput";
 import { LOGIN_STEPS, useLoginContext } from "./LoginContext";
 import { RememberMe } from "./RememberMe";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Loader, Stack, Title } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import { IconCircleCheck } from "@tabler/icons-react";
 
 export const LoginSteps = () => {

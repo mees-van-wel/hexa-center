@@ -1,7 +1,7 @@
 import {
   DEFAULT_SESSION_DURATION,
   SESSION_DURATIONS,
-} from "@hexa-center/shared/constants/sessionDurations";
+} from "@shared/constants/sessionDurations";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useMutation } from "@/hooks/useMutation";
 import { Button, Group, Radio, Stack } from "@mantine/core";

@@ -1,8 +1,8 @@
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
-import { router } from "../trpc.js";
+import { router } from "@/trpc";
 
-import { authRouter } from "./auth.js";
-import { userRouter } from "./user.js";
+import { authRouter } from "./auth";
+import { userRouter } from "./user";
 
 export const appRouter = router({
   auth: authRouter,

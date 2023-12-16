@@ -1,7 +1,6 @@
 {
   "watch": ["src"],
   "ext": "ts",
-  "execMap": {
-    "ts": "node --env-file=.env.local --loader ts-node/esm src/app.ts"
-  }
+  "ignore": ["src/**/*.test.ts"],
+  "exec": "node esbuild.js --dev && node --env-file=.env.local ./dist/server.js"
 }

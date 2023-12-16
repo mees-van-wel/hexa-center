@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { validator } from "./utils/validate.js";
+import { validator } from "./utils/validate";
 
 export type Endpoint = (params: {
   req: Request;
