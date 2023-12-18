@@ -4,10 +4,10 @@ export default {
   common: {
     back: "Back",
     create: "Create",
+    save: "Save",
     saving: "Saving",
     saved: "Saved",
     number: "Number",
-    create: "Create",
     delete: "Delete",
   },
   authLayout: {
@@ -66,8 +66,8 @@ export default {
     },
     loggedInSuccess: "You're logged in successfully",
   },
-  rooms: {
-    name: "Name",
+  roomsPage: {
+    name: "Room name",
     price: "Price per night",
   },
 } satisfies Translation;

@@ -4,10 +4,10 @@ export default {
   common: {
     back: "Terug",
     create: "Aanmaken",
+    save: "Opslaan",
     saving: "Opslaan",
     saved: "Opgeslagen",
     number: "Nummer",
-    create: "Nieuw",
     delete: "Verwijderen",
   },
   authLayout: {
@@ -68,8 +68,8 @@ export default {
     },
     loggedInSuccess: "U bent succesvol ingelogd",
   },
-  rooms: {
-    name: "Naam",
+  roomsPage: {
+    name: "Kamer naam",
     price: "Prijs per nacht",
   },
 } satisfies Translation;

@@ -2,8 +2,8 @@ import { relations, sql } from "drizzle-orm";
 import {
   AnyPgColumn,
   date,
+  doublePrecision,
   integer,
-  numeric,
   pgTable,
   primaryKey,
   serial,
@@ -270,7 +270,7 @@ export const rooms = pgTable("Room", {
     onDelete: "cascade",
   }),
   name: text("name").unique().notNull(),
-  price: numeric("price", { precision: 10, scale: 2 }).notNull(),
+  price: doublePrecision("price").notNull(),
   // TODO: propertyId
 });
 

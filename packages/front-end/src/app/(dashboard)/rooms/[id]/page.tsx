@@ -1,24 +1,18 @@
-"use client";
+import { Room } from "@/components/pages/rooms/Room";
+import { setTRPCRefreshToken, trpc } from "@/utils/trpc";
+import { cookies } from "next/headers";
 
-import { useTranslation } from "@/hooks/useTranslation";
-import { Button, Group, Paper, Stack, TextInput } from "@mantine/core";
-import { IconTrash } from "@tabler/icons-react";
+interface RoomPageParams {
+  params: {
+    id: string;
+  };
+}
 
-export default function RoomId() {
-  const t = useTranslation();
+export default async function Page({ params }: RoomPageParams) {
+  const refreshToken = cookies().get("refreshToken")?.value;
+  if (refreshToken) setTRPCRefreshToken(refreshToken);
 
-  return (
-    <Paper p="md">
-      <Group>
-        <Button>{t("common.create")}</Button>
-        <Button leftSection={<IconTrash />} variant="light">
-          {t("common.delete")}
-        </Button>
-      </Group>
-      <Stack>
-        <TextInput label="Name" />
-        <TextInput label="Price per night" />
-      </Stack>
-    </Paper>
-  );
+  const room = await trpc.room.get.query(parseInt(params.id));
+
+  return <Room data={room} />;
 }
