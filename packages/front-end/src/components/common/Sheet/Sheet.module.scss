@@ -1,0 +1,18 @@
+.header {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    padding: 12px;
+}
+
+.headerClosed {
+    padding: 12px;
+}
+
+.content {
+    border-top-left-radius: 0;
+    padding: 12px;
+}
+
+.headerContent {
+    display: flex;
+}
