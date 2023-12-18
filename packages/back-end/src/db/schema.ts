@@ -271,7 +271,9 @@ export const rooms = pgTable("Room", {
   }),
   name: text("name").unique().notNull(),
   price: doublePrecision("price").notNull(),
-  // TODO: propertyId
+  propertyId: integer("propertyId")
+    .references(() => properties.id, { onDelete: "restrict" })
+    .notNull(),
 });
 
 export const roomsRelations = relations(rooms, ({ one }) => ({
@@ -286,5 +288,9 @@ export const roomsRelations = relations(rooms, ({ one }) => ({
   deletedBy: one(users, {
     fields: [rooms.deletedById],
     references: [users.id],
+  }),
+  property: one(properties, {
+    fields: [rooms.propertyId],
+    references: [properties.id],
   }),
 }));

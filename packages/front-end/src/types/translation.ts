@@ -2,6 +2,7 @@ export type Translation = {
   common: {
     back: string;
     create: string;
+    new: string;
     save: string;
     saving: string;
     saved: string;
@@ -64,6 +65,7 @@ export type Translation = {
     loggedInSuccess: string;
   };
   roomsPage: {
+    rooms: string;
     name: string;
     price: string;
   };

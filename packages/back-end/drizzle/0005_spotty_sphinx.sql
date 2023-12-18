@@ -1,1 +1,0 @@
-ALTER TABLE "Room" ALTER COLUMN "price" SET DATA TYPE double precision;

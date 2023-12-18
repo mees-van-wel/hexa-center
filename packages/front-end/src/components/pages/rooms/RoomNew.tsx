@@ -11,7 +11,7 @@ import {
   RoomCreateSchema,
 } from "@hexa-center/shared/schemas/room";
 import { useMutation } from "@/hooks/useMutation";
-import { RoomsForm } from "./RoomsForm";
+import { RoomForm } from "./RoomForm";
 import { useRouter } from "next/navigation";
 
 export const RoomNew = () => {
@@ -36,13 +36,18 @@ export const RoomNew = () => {
     <FormProvider {...methods}>
       <form autoComplete="on" onSubmit={methods.handleSubmit(onSubmit)}>
         <Stack>
-          <DashboardHeader title={[{ content: "Room" }]}>
+          <DashboardHeader
+            title={[
+              { content: t("roomsPage.rooms"), href: "/rooms" },
+              { content: t("common.new") },
+            ]}
+          >
             <Button type="submit" leftSection={<IconPlus />}>
               {t("common.create")}
             </Button>
           </DashboardHeader>
           <Paper p={"1rem"}>
-            <RoomsForm />
+            <RoomForm />
           </Paper>
         </Stack>
       </form>

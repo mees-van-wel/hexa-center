@@ -16,6 +16,7 @@ export const userRouter = router({
       .insert(users)
       .values({
         ...input,
+        createdById: ctx.user.id,
         updatedById: ctx.user.id,
         propertyId: 1,
         // Customer role

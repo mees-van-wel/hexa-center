@@ -4,6 +4,7 @@ export default {
   common: {
     back: "Terug",
     create: "Aanmaken",
+    new: "Nieuw",
     save: "Opslaan",
     saving: "Opslaan",
     saved: "Opgeslagen",
@@ -69,6 +70,7 @@ export default {
     loggedInSuccess: "U bent succesvol ingelogd",
   },
   roomsPage: {
+    rooms: "Kamers",
     name: "Kamer naam",
     price: "Prijs per nacht",
   },

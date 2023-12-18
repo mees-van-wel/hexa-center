@@ -4,6 +4,7 @@ export default {
   common: {
     back: "Back",
     create: "Create",
+    new: "New",
     save: "Save",
     saving: "Saving",
     saved: "Saved",
@@ -67,6 +68,7 @@ export default {
     loggedInSuccess: "You're logged in successfully",
   },
   roomsPage: {
+    rooms: "Rooms",
     name: "Room name",
     price: "Price per night",
   },

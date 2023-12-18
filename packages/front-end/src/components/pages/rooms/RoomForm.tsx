@@ -13,7 +13,7 @@ type RoomFormProps = {
   initialValues?: RouterOutput["room"]["get"];
 };
 
-export const RoomsForm = ({ initialValues }: RoomFormProps) => {
+export const RoomForm = ({ initialValues }: RoomFormProps) => {
   const t = useTranslation();
   const {
     register,

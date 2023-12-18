@@ -14,7 +14,12 @@ export const roomRouter = router({
   create: procedure.input(wrap(RoomCreateSchema)).mutation(({ input, ctx }) =>
     db
       .insert(rooms)
-      .values({ ...input, createdById: ctx.user.id })
+      .values({
+        ...input,
+        createdById: ctx.user.id,
+        updatedById: ctx.user.id,
+        propertyId: 1,
+      })
       .returning({
         $kind: rooms.$kind,
         id: rooms.id,

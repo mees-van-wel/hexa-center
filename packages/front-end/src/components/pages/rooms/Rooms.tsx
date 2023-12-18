@@ -7,16 +7,16 @@ import { IconPlus } from "@tabler/icons-react";
 import { Table } from "@/components/common/Table";
 import Link from "next/link";
 
-type RoomsTableViewProps = {
-  elements: any;
+type RoomsProps = {
+  elements: Record<string, any>[];
 };
 
-export const Rooms = ({ elements }: RoomsTableViewProps) => {
+export const Rooms = ({ elements }: RoomsProps) => {
   const t = useTranslation();
 
   return (
     <Stack>
-      <DashboardHeader title={[{ content: "Rooms" }]}>
+      <DashboardHeader title={[{ content: t("roomsPage.rooms") }]}>
         <Button component={Link} href="/rooms/new" leftSection={<IconPlus />}>
           {t("common.create")}
         </Button>

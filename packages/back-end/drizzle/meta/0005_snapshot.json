@@ -1,5 +1,5 @@
 {
-  "id": "f817187e-fe29-4838-8bec-5cd019d82b14",
+  "id": "26f83ca8-a218-4d7f-9faf-df773833cf00",
   "prevId": "760bc0ad-3894-466e-8dfe-4d810b10b672",
   "version": "5",
   "dialect": "pg",
@@ -480,6 +480,12 @@
           "type": "double precision",
           "primaryKey": false,
           "notNull": true
+        },
+        "propertyId": {
+          "name": "propertyId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
@@ -521,6 +527,19 @@
             "id"
           ],
           "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "Room_propertyId_Property_id_fk": {
+          "name": "Room_propertyId_Property_id_fk",
+          "tableFrom": "Room",
+          "tableTo": "Property",
+          "columnsFrom": [
+            "propertyId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
           "onUpdate": "no action"
         }
       },
