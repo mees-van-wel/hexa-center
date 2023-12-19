@@ -1,30 +1,20 @@
 {
   "private": true,
   "scripts": {
-    "dev": "git fetch && pnpm install && pnpm run --parallel dev",
-    "lint": "cd packages/frontend && pnpm eslint . --ext .ts,.tsx --fix",
-    "format": "cd packages/frontend && pnpm prettier \"**/*.{ts,tsx}\" --write",
+    "dev": "git fetch && pnpm install && concurrently --names \"front-end,back-end\" \"pnpm run dev:front-end\" \"pnpm run dev:back-end\"",
+    "dev:front-end": "cd ./front-end && pnpm run dev",
+    "dev:back-end": "cd ./back-end && pnpm run dev",
+    "lint": "concurrently --names \"front-end,back-end\" \"pnpm run lint:front-end\" \"pnpm run lint:back-end\"",
+    "format": "concurrently --names \"front-end,back-end\" \"pnpm run format:front-end\" \"pnpm run format:back-end\"",
+    "lint:front-end": "cd ./front-end && pnpm run lint",
+    "lint:back-end": "cd ./back-end && pnpm run lint",
+    "format:front-end": "cd ./front-end && pnpm run format",
+    "format:back-end": "cd ./back-end && pnpm run format",
     "prepare": "husky install"
   },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ]
-  },
-  "pnpm": {
-    "allowedDeprecatedVersions": {
-      "rollup-plugin-inject": "3.0.2",
-      "sourcemap-codec": "1.4.8"
-    }
-  },
   "devDependencies": {
-    "eslint": "^8",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-simple-import-sort": "^10.0.0",
-    "eslint-plugin-unused-imports": "^3.0.0",
+    "concurrently": "^8.2.2",
     "husky": "^8.0.3",
-    "lint-staged": "^15.2.0",
-    "prettier": "^3.1.1"
+    "lint-staged": "^15.2.0"
   }
 }
