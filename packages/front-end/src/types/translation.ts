@@ -8,6 +8,8 @@ export type Translation = {
     saved: string;
     number: string;
     delete: string;
+    name: string;
+    deleteTitle: string;
   };
   authLayout: {
     help: string;
@@ -65,9 +67,10 @@ export type Translation = {
     loggedInSuccess: string;
   };
   roomsPage: {
-    rooms: string;
-    name: string;
     price: string;
+    deleteRoom: string;
+    roomDeleted: string;
+    roomCreated: string;
   };
 };
 

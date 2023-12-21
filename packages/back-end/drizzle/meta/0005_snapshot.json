@@ -1,5 +1,5 @@
 {
-  "id": "26f83ca8-a218-4d7f-9faf-df773833cf00",
+  "id": "45ba1ce8-c743-4419-be35-1f68bac55c22",
   "prevId": "760bc0ad-3894-466e-8dfe-4d810b10b672",
   "version": "5",
   "dialect": "pg",
@@ -407,8 +407,8 @@
         }
       }
     },
-    "Room": {
-      "name": "Room",
+    "rooms": {
+      "name": "rooms",
       "schema": "",
       "columns": {
         "$kind": {
@@ -469,6 +469,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "propertyId": {
+          "name": "propertyId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
         "name": {
           "name": "name",
           "type": "text",
@@ -480,19 +486,13 @@
           "type": "double precision",
           "primaryKey": false,
           "notNull": true
-        },
-        "propertyId": {
-          "name": "propertyId",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "Room_createdById_User_id_fk": {
-          "name": "Room_createdById_User_id_fk",
-          "tableFrom": "Room",
+        "rooms_createdById_User_id_fk": {
+          "name": "rooms_createdById_User_id_fk",
+          "tableFrom": "rooms",
           "tableTo": "User",
           "columnsFrom": [
             "createdById"
@@ -503,9 +503,9 @@
           "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "Room_updatedById_User_id_fk": {
-          "name": "Room_updatedById_User_id_fk",
-          "tableFrom": "Room",
+        "rooms_updatedById_User_id_fk": {
+          "name": "rooms_updatedById_User_id_fk",
+          "tableFrom": "rooms",
           "tableTo": "User",
           "columnsFrom": [
             "updatedById"
@@ -516,9 +516,9 @@
           "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "Room_deletedById_User_id_fk": {
-          "name": "Room_deletedById_User_id_fk",
-          "tableFrom": "Room",
+        "rooms_deletedById_User_id_fk": {
+          "name": "rooms_deletedById_User_id_fk",
+          "tableFrom": "rooms",
           "tableTo": "User",
           "columnsFrom": [
             "deletedById"
@@ -529,9 +529,9 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "Room_propertyId_Property_id_fk": {
-          "name": "Room_propertyId_Property_id_fk",
-          "tableFrom": "Room",
+        "rooms_propertyId_Property_id_fk": {
+          "name": "rooms_propertyId_Property_id_fk",
+          "tableFrom": "rooms",
           "tableTo": "Property",
           "columnsFrom": [
             "propertyId"
@@ -545,8 +545,8 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "Room_name_unique": {
-          "name": "Room_name_unique",
+        "rooms_name_unique": {
+          "name": "rooms_name_unique",
           "nullsNotDistinct": false,
           "columns": [
             "name"
@@ -948,7 +948,9 @@
   "schemas": {},
   "_meta": {
     "schemas": {},
-    "tables": {},
+    "tables": {
+      "\"Room\"": "\"rooms\""
+    },
     "columns": {}
   }
 }

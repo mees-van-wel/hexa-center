@@ -8,5 +8,5 @@ export default async function Page() {
 
   const rooms = await trpc.room.list.query();
 
-  return <Rooms elements={rooms} />;
+  return <Rooms rooms={rooms} />;
 }

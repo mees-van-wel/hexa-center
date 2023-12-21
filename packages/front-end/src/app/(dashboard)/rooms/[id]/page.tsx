@@ -2,11 +2,11 @@ import { Room } from "@/components/pages/rooms/Room";
 import { setTRPCRefreshToken, trpc } from "@/utils/trpc";
 import { cookies } from "next/headers";
 
-interface RoomPageParams {
+type RoomPageParams = {
   params: {
     id: string;
   };
-}
+};
 
 export default async function Page({ params }: RoomPageParams) {
   const refreshToken = cookies().get("refreshToken")?.value;
@@ -14,5 +14,5 @@ export default async function Page({ params }: RoomPageParams) {
 
   const room = await trpc.room.get.query(parseInt(params.id));
 
-  return <Room data={room} />;
+  return <Room room={room} />;
 }

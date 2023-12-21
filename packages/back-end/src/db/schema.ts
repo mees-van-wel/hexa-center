@@ -249,7 +249,7 @@ export const workingHoursRelations = relations(workingHours, ({ one }) => ({
   }),
 }));
 
-export const rooms = pgTable("Room", {
+export const rooms = pgTable("rooms", {
   $kind: text("$kind").default("room").notNull(),
   id: serial("id").primaryKey(),
   uuid: uuid("uuid").defaultRandom(),
@@ -269,11 +269,11 @@ export const rooms = pgTable("Room", {
   deletedById: integer("deletedById").references((): AnyPgColumn => users.id, {
     onDelete: "cascade",
   }),
-  name: text("name").unique().notNull(),
-  price: doublePrecision("price").notNull(),
   propertyId: integer("propertyId")
     .references(() => properties.id, { onDelete: "restrict" })
     .notNull(),
+  name: text("name").unique().notNull(),
+  price: doublePrecision("price").notNull(),
 });
 
 export const roomsRelations = relations(rooms, ({ one }) => ({

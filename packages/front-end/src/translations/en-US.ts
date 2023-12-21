@@ -10,6 +10,8 @@ export default {
     saved: "Saved",
     number: "Number",
     delete: "Delete",
+    name: "Name",
+    deleteTitle: "Are you sure?",
   },
   authLayout: {
     help: "Help",
@@ -68,8 +70,9 @@ export default {
     loggedInSuccess: "You're logged in successfully",
   },
   roomsPage: {
-    rooms: "Rooms",
-    name: "Room name",
-    price: "Price per night",
+    price: "Price",
+    deleteRoom: "If you continue this room will be deleted.",
+    roomDeleted: "Room successfully deleted",
+    roomCreated: "Room successfully created",
   },
 } satisfies Translation;

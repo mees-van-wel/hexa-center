@@ -2,6 +2,7 @@
 
 import "modern-normalize/modern-normalize.css";
 import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
 import "./globals.scss";
 
 import { cookies, headers } from "next/headers";
@@ -13,6 +14,8 @@ import Providers from "./providers";
 import { AuthContextProvider } from "@/contexts/AuthContext";
 import { redirect } from "next/navigation";
 import { RouterOutput, setTRPCRefreshToken, trpc } from "@/utils/trpc";
+import { ModalsProvider } from "@mantine/modals";
+import { Notifications } from "@mantine/notifications";
 
 const eurostile = localFont({
   src: "../assets/fonts/eurostile.woff2",
@@ -54,6 +57,7 @@ export default async function RootLayout({
       <body
         className={eurostile.className}
         data-theme={dark ? "dark" : "light"}
+        style={{ height: "100%" }}
       >
         <Providers>
           <AuthContextProvider currentUser={user}>
@@ -65,7 +69,8 @@ export default async function RootLayout({
                   cursorType: "pointer",
                 }}
               >
-                {children}
+                <Notifications position="top-right" />
+                <ModalsProvider>{children}</ModalsProvider>
               </MantineProvider>
             </TranslationInitializer>
           </AuthContextProvider>

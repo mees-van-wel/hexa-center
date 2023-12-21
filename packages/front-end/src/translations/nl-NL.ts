@@ -10,6 +10,8 @@ export default {
     saved: "Opgeslagen",
     number: "Nummer",
     delete: "Verwijderen",
+    name: "Name",
+    deleteTitle: "Weet u het zeker",
   },
   authLayout: {
     help: "Help",
@@ -70,8 +72,9 @@ export default {
     loggedInSuccess: "U bent succesvol ingelogd",
   },
   roomsPage: {
-    rooms: "Kamers",
-    name: "Kamer naam",
-    price: "Prijs per nacht",
+    price: "Prijs",
+    deleteRoom: "Als u doorgaat wordt deze kamer verwijdert.",
+    roomDeleted: "Kamer succesvol verwijderd",
+    roomCreated: "Kamer succesvol aangemaakt",
   },
 } satisfies Translation;

@@ -1,7 +1,6 @@
 "use client";
 
 import { useTranslation } from "@/hooks/useTranslation";
-import { RouterOutput } from "@/utils/trpc";
 import { NumberInput, Stack, TextInput } from "@mantine/core";
 import { Controller, useFormContext } from "react-hook-form";
 import {
@@ -9,11 +8,7 @@ import {
   RoomInputUpdateSchema,
 } from "@hexa-center/shared/schemas/room";
 
-type RoomFormProps = {
-  initialValues?: RouterOutput["room"]["get"];
-};
-
-export const RoomForm = ({ initialValues }: RoomFormProps) => {
+export const RoomForm = () => {
   const t = useTranslation();
   const {
     register,
@@ -26,8 +21,7 @@ export const RoomForm = ({ initialValues }: RoomFormProps) => {
       <TextInput
         {...register("name")}
         error={errors.name?.message}
-        label={t("roomsPage.name")}
-        defaultValue={initialValues?.name}
+        label={t("common.name")}
       />
       <Controller
         name="price"
@@ -37,7 +31,6 @@ export const RoomForm = ({ initialValues }: RoomFormProps) => {
             {...field}
             error={error?.message}
             label={t("roomsPage.price")}
-            defaultValue={initialValues?.price}
           />
         )}
       />

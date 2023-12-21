@@ -132,6 +132,12 @@ importers:
       '@mantine/hooks':
         specifier: ^7.3.2
         version: 7.3.2(react@18.2.0)
+      '@mantine/modals':
+        specifier: ^7.3.2
+        version: 7.3.2(@mantine/core@7.3.2)(@mantine/hooks@7.3.2)(react-dom@18.2.0)(react@18.2.0)
+      '@mantine/notifications':
+        specifier: ^7.3.2
+        version: 7.3.2(@mantine/core@7.3.2)(@mantine/hooks@7.3.2)(react-dom@18.2.0)(react@18.2.0)
       '@tabler/icons-react':
         specifier: ^2.42.0
         version: 2.42.0(react@18.2.0)
@@ -1145,6 +1151,44 @@ packages:
 
   /@mantine/hooks@7.3.2(react@18.2.0):
     resolution: {integrity: sha512-xgumuuI3PBWXff5N02HCI7PEy25mDEdyXDQklUYK93J6FKwpcosyZnGVitoUrV1gLtYYa9ZudeAWdhHuh/CpOg==}
+    peerDependencies:
+      react: ^18.2.0
+    dependencies:
+      react: 18.2.0
+    dev: false
+
+  /@mantine/modals@7.3.2(@mantine/core@7.3.2)(@mantine/hooks@7.3.2)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-vhpcp0Yqgm+K/vorDbuweTjzDO4pJaG2POc00cSTV3zJdsbeMAzVClovTuseJT+UO2lUdUP3RG1cInaZqSclhA==}
+    peerDependencies:
+      '@mantine/core': 7.3.2
+      '@mantine/hooks': 7.3.2
+      react: ^18.2.0
+      react-dom: ^18.2.0
+    dependencies:
+      '@mantine/core': 7.3.2(@mantine/hooks@7.3.2)(@types/react@18.2.38)(react-dom@18.2.0)(react@18.2.0)
+      '@mantine/hooks': 7.3.2(react@18.2.0)
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
+  /@mantine/notifications@7.3.2(@mantine/core@7.3.2)(@mantine/hooks@7.3.2)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-XOzgm4pm4XszavVN0QUjN+IP0xiG2IochxJSz/FduTI0r3u1WxdpvDYlOvEJpHhtWvyqI8W8rx6cPJaD2HdAwQ==}
+    peerDependencies:
+      '@mantine/core': 7.3.2
+      '@mantine/hooks': 7.3.2
+      react: ^18.2.0
+      react-dom: ^18.2.0
+    dependencies:
+      '@mantine/core': 7.3.2(@mantine/hooks@7.3.2)(@types/react@18.2.38)(react-dom@18.2.0)(react@18.2.0)
+      '@mantine/hooks': 7.3.2(react@18.2.0)
+      '@mantine/store': 7.3.2(react@18.2.0)
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+      react-transition-group: 4.4.5(react-dom@18.2.0)(react@18.2.0)
+    dev: false
+
+  /@mantine/store@7.3.2(react@18.2.0):
+    resolution: {integrity: sha512-M1eWHzTRCeCFvrpFhXKIM9zblrlIT5/XrMue/fP2HrkA43dpkgq+ArnZkN3LhG9lWR/EKbRwQWDhDIvdLtfD7w==}
     peerDependencies:
       react: ^18.2.0
     dependencies:
@@ -2629,6 +2673,13 @@ packages:
     dependencies:
       esutils: 2.0.3
     dev: true
+
+  /dom-helpers@5.2.1:
+    resolution: {integrity: sha512-nRCa7CK3VTrM2NmGkIy4cbK7IZlgBE/PYMn55rrXefr5xXDP0LdtfPnblFDoVdcAfslJ7or6iqAUnx0CCGIWQA==}
+    dependencies:
+      '@babel/runtime': 7.23.4
+      csstype: 3.1.2
+    dev: false
 
   /dom-serializer@1.4.1:
     resolution: {integrity: sha512-VHwB3KfrcOOkelEG2ZOfxqLZdfkil8PtJi4P8N2MMXucZq2yLp75ClViUlOVwyoHEDjYU433Aq+5zWP61+RGag==}
@@ -5481,6 +5532,20 @@ packages:
       use-latest: 1.2.1(@types/react@18.2.38)(react@18.2.0)
     transitivePeerDependencies:
       - '@types/react'
+    dev: false
+
+  /react-transition-group@4.4.5(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-pZcd1MCJoiKiBR2NRxeCRg13uCXbydPnmB4EOeRrY7480qNWO8IIgQG6zlDkm6uRMsURXPuKq0GWtiM59a5Q6g==}
+    peerDependencies:
+      react: '>=16.6.0'
+      react-dom: '>=16.6.0'
+    dependencies:
+      '@babel/runtime': 7.23.4
+      dom-helpers: 5.2.1
+      loose-envify: 1.4.0
+      prop-types: 15.8.1
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
     dev: false
 
   /react@18.2.0:

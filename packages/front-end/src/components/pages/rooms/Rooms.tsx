@@ -6,17 +6,18 @@ import { Button, Stack } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { Table } from "@/components/common/Table";
 import Link from "next/link";
+import { RouterOutput } from "@/utils/trpc";
 
 type RoomsProps = {
-  elements: Record<string, any>[];
+  rooms: RouterOutput["room"]["list"];
 };
 
-export const Rooms = ({ elements }: RoomsProps) => {
+export const Rooms = ({ rooms }: RoomsProps) => {
   const t = useTranslation();
 
   return (
     <Stack>
-      <DashboardHeader title={[{ content: t("roomsPage.rooms") }]}>
+      <DashboardHeader title={[{ content: t("dashboardLayout.rooms") }]}>
         <Button component={Link} href="/rooms/new" leftSection={<IconPlus />}>
           {t("common.create")}
         </Button>
@@ -25,7 +26,7 @@ export const Rooms = ({ elements }: RoomsProps) => {
         columns={[
           {
             selector: "name",
-            label: t("roomsPage.name"),
+            label: t("common.name"),
           },
           {
             selector: "price",
@@ -36,7 +37,7 @@ export const Rooms = ({ elements }: RoomsProps) => {
             label: t("common.number"),
           },
         ]}
-        elements={elements}
+        elements={rooms}
       />
     </Stack>
   );
