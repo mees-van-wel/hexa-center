@@ -1,17 +1,8 @@
 "use client";
 
-import {
-  Badge,
-  Button,
-  Card,
-  Paper,
-  Stack,
-  TextInput,
-  Title,
-} from "@mantine/core";
+import { Badge, Button, Paper, Stack, Title } from "@mantine/core";
 import { DashboardHeader } from "@/components/layouts/Dashboard/DashboardHeader";
 import { useTranslation } from "@/hooks/useTranslation";
-import Sheet from "@/components/common/Sheet/Sheet";
 
 export default function Home() {
   const t = useTranslation();
@@ -24,6 +15,9 @@ export default function Home() {
           {t("common.saved")}
         </Badge>
       </DashboardHeader>
+      <Paper p="md">
+        <Title>Content</Title>
+      </Paper>
     </Stack>
   );
 }
