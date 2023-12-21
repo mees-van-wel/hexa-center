@@ -6,6 +6,9 @@ export default {
     create: "Create",
     saving: "Saving",
     saved: "Saved",
+    hide: "Hide",
+    name: "Metadata",
+    show: "Show",
   },
   authLayout: {
     help: "Help",
@@ -62,17 +65,5 @@ export default {
       description: "Useful for secured primary devices.",
     },
     loggedInSuccess: "You're logged in successfully",
-  },
-  metadata: {
-    field: {
-      createdAt: "Created at",
-      createdBy: "Created by",
-      id: "Number",
-      updatedAt: "Updated at",
-      updatedBy: "Updated by",
-    },
-    hide: "Hide",
-    name: "Metadata",
-    show: "Show",
   },
 } satisfies Translation;

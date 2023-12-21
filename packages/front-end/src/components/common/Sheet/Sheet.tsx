@@ -21,7 +21,7 @@ export default function Sheet({ title, showDefault, children }: SheetProps) {
       <Paper className={`${show ? styles.header : undefined}`} p="md">
         <Group>
           <Title order={3}>{title}</Title>
-          {showDefault && (
+          {showDefault !== undefined && (
             <Button
               size="xs"
               variant="light"
@@ -32,7 +32,7 @@ export default function Sheet({ title, showDefault, children }: SheetProps) {
                 setShow((prev) => !prev);
               }}
             >
-              {show ? t("metadata.show") : t("metadata.hide")}
+              {show ? t("common.show") : t("common.hide")}
             </Button>
           )}
         </Group>

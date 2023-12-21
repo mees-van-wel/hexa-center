@@ -4,6 +4,9 @@ export type Translation = {
     create: string;
     saving: string;
     saved: string;
+    hide: string;
+    name: string;
+    show: string;
   };
   authLayout: {
     help: string;
@@ -59,18 +62,6 @@ export type Translation = {
       description: string;
     };
     loggedInSuccess: string;
-  };
-  metadata: {
-    field: {
-      createdAt: string;
-      createdBy: string;
-      id: string;
-      updatedAt: string;
-      updatedBy: string;
-    };
-    hide: string;
-    name: string;
-    show: string;
   };
 };
 
