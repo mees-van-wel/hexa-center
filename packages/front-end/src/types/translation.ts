@@ -4,6 +4,8 @@ export type Translation = {
     create: string;
     saving: string;
     saved: string;
+    hide: string;
+    show: string;
   };
   authLayout: {
     help: string;

@@ -6,6 +6,8 @@ export default {
     create: "Aanmaken",
     saving: "Opslaan",
     saved: "Opgeslagen",
+    hide: "Verbergen",
+    show: "Weergeven",
   },
   authLayout: {
     help: "Help",

@@ -6,6 +6,8 @@ export default {
     create: "Create",
     saving: "Saving",
     saved: "Saved",
+    hide: "Hide",
+    show: "Show",
   },
   authLayout: {
     help: "Help",
