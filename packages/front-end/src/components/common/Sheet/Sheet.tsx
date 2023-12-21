@@ -4,6 +4,7 @@ import { useState } from "react";
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Button, Group, Paper, Stack, Title } from "@mantine/core";
+import clsx from "clsx";
 import styles from "./Sheet.module.scss";
 
 interface SheetProps {
@@ -14,25 +15,31 @@ interface SheetProps {
 
 export default function Sheet({ title, showDefault, children }: SheetProps) {
   const t = useTranslation();
-  const [show, setShow] = useState(showDefault);
+  const [show, setShow] = useState(
+    showDefault === undefined ? true : showDefault,
+  );
 
   return (
-    <Stack gap={0} align="flex-start">
-      <Paper className={`${show ? styles.header : undefined}`} p="md">
+    <Stack align="flex-start" gap={0}>
+      <Paper
+        className={clsx(styles.header, {
+          [styles.headerOpen]: show,
+        })}
+      >
         <Group>
-          <Title order={3}>{title}</Title>
+          <Title order={3} className={styles.title}>
+            {title}
+          </Title>
           {showDefault !== undefined && (
             <Button
-              size="xs"
               variant="light"
+              className={styles.button}
+              onClick={() => setShow((prev) => !prev)}
               leftSection={
-                show ? <IconEye size={16} /> : <IconEyeOff size={16} />
+                show ? <IconEyeOff size={16} /> : <IconEye size={16} />
               }
-              onClick={() => {
-                setShow((prev) => !prev);
-              }}
             >
-              {show ? t("common.show") : t("common.hide")}
+              {show ? t("common.hide") : t("common.show")}
             </Button>
           )}
         </Group>

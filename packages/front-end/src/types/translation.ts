@@ -5,7 +5,6 @@ export type Translation = {
     saving: string;
     saved: string;
     hide: string;
-    name: string;
     show: string;
   };
   authLayout: {

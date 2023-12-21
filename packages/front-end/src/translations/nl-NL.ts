@@ -7,7 +7,6 @@ export default {
     saving: "Opslaan",
     saved: "Opgeslagen",
     hide: "Verbergen",
-    name: "Metagegevens",
     show: "Weergeven",
   },
   authLayout: {

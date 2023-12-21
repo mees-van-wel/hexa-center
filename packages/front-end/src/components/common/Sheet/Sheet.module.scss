@@ -1,11 +1,20 @@
-.header {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    padding: 1rem;
+.headerOpen {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.title {
+  padding-left: 1rem;
+}
+
+.button {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 .content {
-    border-top-left-radius: 0;
-    padding: 1rem;
-    width: 100%;
+  border-top-left-radius: 0;
+  padding: 1rem;
+  width: 100%;
 }

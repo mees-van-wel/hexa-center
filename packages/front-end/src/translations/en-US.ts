@@ -7,7 +7,6 @@ export default {
     saving: "Saving",
     saved: "Saved",
     hide: "Hide",
-    name: "Metadata",
     show: "Show",
   },
   authLayout: {
