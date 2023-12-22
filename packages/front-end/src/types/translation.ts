@@ -2,10 +2,16 @@ export type Translation = {
   common: {
     back: string;
     create: string;
+    new: string;
+    save: string;
     saving: string;
     saved: string;
     hide: string;
     show: string;
+    number: string;
+    delete: string;
+    name: string;
+    deleteTitle: string;
   };
   authLayout: {
     help: string;
@@ -61,6 +67,12 @@ export type Translation = {
       description: string;
     };
     loggedInSuccess: string;
+  };
+  roomsPage: {
+    price: string;
+    deleteRoom: string;
+    roomDeleted: string;
+    roomCreated: string;
   };
 };
 

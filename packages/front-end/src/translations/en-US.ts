@@ -4,10 +4,16 @@ export default {
   common: {
     back: "Back",
     create: "Create",
+    new: "New",
+    save: "Save",
     saving: "Saving",
     saved: "Saved",
     hide: "Hide",
     show: "Show",
+    number: "Number",
+    delete: "Delete",
+    name: "Name",
+    deleteTitle: "Are you sure?",
   },
   authLayout: {
     help: "Help",
@@ -64,5 +70,11 @@ export default {
       description: "Useful for secured primary devices.",
     },
     loggedInSuccess: "You're logged in successfully",
+  },
+  roomsPage: {
+    price: "Price",
+    deleteRoom: "If you continue this room will be deleted.",
+    roomDeleted: "Room successfully deleted",
+    roomCreated: "Room successfully created",
   },
 } satisfies Translation;

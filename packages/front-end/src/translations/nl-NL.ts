@@ -4,10 +4,16 @@ export default {
   common: {
     back: "Terug",
     create: "Aanmaken",
+    new: "Nieuw",
+    save: "Opslaan",
     saving: "Opslaan",
     saved: "Opgeslagen",
     hide: "Verbergen",
     show: "Weergeven",
+    number: "Nummer",
+    delete: "Verwijderen",
+    name: "Name",
+    deleteTitle: "Weet u het zeker",
   },
   authLayout: {
     help: "Help",
@@ -66,5 +72,11 @@ export default {
       description: "Handig voor beveiligde primaire apparaten.",
     },
     loggedInSuccess: "U bent succesvol ingelogd",
+  },
+  roomsPage: {
+    price: "Prijs",
+    deleteRoom: "Als u doorgaat wordt deze kamer verwijdert.",
+    roomDeleted: "Kamer succesvol verwijderd",
+    roomCreated: "Kamer succesvol aangemaakt",
   },
 } satisfies Translation;
