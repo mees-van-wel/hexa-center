@@ -2,8 +2,9 @@ import { trpcTransformer } from "@/utils/trpcTransformer";
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 
-import type { AppRouter } from "../../../back-end/src/types";
+import type { appRouter } from "../../../back-end/src/routes/_app";
 
+export type AppRouter = typeof appRouter;
 export type RouterInput = inferRouterInputs<AppRouter>;
 export type RouterOutput = inferRouterOutputs<AppRouter>;
 

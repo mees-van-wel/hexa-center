@@ -1,4 +1,5 @@
 {
+  "references": [{ "path": "../back-end" }],
   "compilerOptions": {
     "target": "es5",
     "module": "esnext",

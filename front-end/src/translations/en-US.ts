@@ -4,8 +4,13 @@ export default {
   common: {
     back: "Back",
     create: "Create",
+    new: "New",
+    save: "Save",
     saving: "Saving",
     saved: "Saved",
+    number: "Number",
+    delete: "Delete",
+    name: "Name",
   },
   authLayout: {
     help: "Help",

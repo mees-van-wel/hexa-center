@@ -1,5 +1,6 @@
 import {
   email,
+  Input,
   minLength,
   nullable,
   nullish,
@@ -49,3 +50,6 @@ export const UserUpdateSchema = object({
   // TODO country picklist
   country: nullish(string()),
 });
+
+export type UserCreateInputSchema = Input<typeof UserCreateSchema>;
+export type UserUpdateInputSchema = Input<typeof UserUpdateSchema>;

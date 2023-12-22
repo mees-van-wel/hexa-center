@@ -4,8 +4,13 @@ export default {
   common: {
     back: "Terug",
     create: "Aanmaken",
+    new: "Nieuw",
+    save: "Opslaan",
     saving: "Opslaan",
     saved: "Opgeslagen",
+    number: "Nummer",
+    delete: "Verwijderen",
+    name: "Name",
   },
   authLayout: {
     help: "Help",

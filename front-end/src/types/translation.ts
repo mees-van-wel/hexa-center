@@ -2,8 +2,13 @@ export type Translation = {
   common: {
     back: string;
     create: string;
+    new: string;
+    save: string;
     saving: string;
     saved: string;
+    number: string;
+    delete: string;
+    name: string;
   };
   authLayout: {
     help: string;

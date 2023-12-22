@@ -28,6 +28,7 @@ type PhoneInputProps = {
   autoComplete?: boolean;
   autoFocus?: boolean;
   withAsterisk?: boolean;
+  style?: React.CSSProperties;
 };
 
 // TODO Fix console error Attempted import error: 'parsePhoneNumber' is not exported from 'awesome-phonenumber' (imported as 'parsePhoneNumber').
@@ -46,6 +47,7 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
       autoFocus,
       withAsterisk,
       autoComplete,
+      style,
     },
     ref,
   ) => {
@@ -97,6 +99,7 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
         error={error}
         required={required}
         withAsterisk={withAsterisk}
+        style={style}
       >
         <Group gap={0} wrap="nowrap">
           <Select
