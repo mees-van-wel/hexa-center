@@ -8,6 +8,8 @@ export default {
     save: "Save",
     saving: "Saving",
     saved: "Saved",
+    hide: "Hide",
+    show: "Show",
     number: "Number",
     delete: "Delete",
     name: "Name",

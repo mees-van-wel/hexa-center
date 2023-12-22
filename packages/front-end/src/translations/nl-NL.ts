@@ -8,6 +8,8 @@ export default {
     save: "Opslaan",
     saving: "Opslaan",
     saved: "Opgeslagen",
+    hide: "Verbergen",
+    show: "Weergeven",
     number: "Nummer",
     delete: "Verwijderen",
     name: "Name",

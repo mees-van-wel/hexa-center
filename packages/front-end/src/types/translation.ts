@@ -6,6 +6,8 @@ export type Translation = {
     save: string;
     saving: string;
     saved: string;
+    hide: string;
+    show: string;
     number: string;
     delete: string;
     name: string;
