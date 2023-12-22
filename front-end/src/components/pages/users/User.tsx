@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
@@ -25,9 +24,9 @@ type UserPageProps = {
 
 export const User = ({ user }: UserPageProps) => {
   const t = useTranslation();
-  const router = useRouter();
+  // const router = useRouter();
   const updateUser = useMutation("user", "update");
-  const deleteUser = useMutation("user", "delete");
+  // const deleteUser = useMutation("user", "delete");
 
   const { handleSubmit, reset, formState, ...restFormMethods } =
     useForm<UserUpdateInputSchema>({

@@ -20,6 +20,8 @@
     "@hookform/resolvers": "^3.3.2",
     "@mantine/core": "^7.3.2",
     "@mantine/hooks": "^7.3.2",
+    "@mantine/modals": "^7.3.2",
+    "@mantine/notifications": "^7.3.2",
     "@pnpm/make-dedicated-lockfile": "^0.5.12",
     "@tabler/icons-react": "^2.44.0",
     "@trpc/client": "^10.44.1",

@@ -29,6 +29,20 @@
       "when": 1702642597050,
       "tag": "0003_hard_lilandra",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1702653686428,
+      "tag": "0004_gifted_darkstar",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1703173854975,
+      "tag": "0005_sharp_black_knight",
+      "breakpoints": true
     }
   ]
 }

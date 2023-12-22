@@ -2,6 +2,7 @@ import { relations, sql } from "drizzle-orm";
 import {
   AnyPgColumn,
   date,
+  doublePrecision,
   integer,
   pgTable,
   primaryKey,
@@ -245,5 +246,51 @@ export const workingHoursRelations = relations(workingHours, ({ one }) => ({
   account: one(accounts, {
     fields: [workingHours.accountId],
     references: [accounts.id],
+  }),
+}));
+
+export const rooms = pgTable("rooms", {
+  $kind: text("$kind").default("room").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom(),
+  createdAt: timestamp("createdAt", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updatedAt", { withTimezone: true })
+    .default(sql`now()`)
+    .notNull(),
+  deletedAt: timestamp("deletedAt", { withTimezone: true }),
+  createdById: integer("createdById").references((): AnyPgColumn => users.id, {
+    onDelete: "set null",
+  }),
+  updatedById: integer("updatedById").references((): AnyPgColumn => users.id, {
+    onDelete: "set null",
+  }),
+  deletedById: integer("deletedById").references((): AnyPgColumn => users.id, {
+    onDelete: "cascade",
+  }),
+  propertyId: integer("propertyId")
+    .references(() => properties.id, { onDelete: "restrict" })
+    .notNull(),
+  name: text("name").unique().notNull(),
+  price: doublePrecision("price").notNull(),
+});
+
+export const roomsRelations = relations(rooms, ({ one }) => ({
+  createdBy: one(users, {
+    fields: [rooms.createdById],
+    references: [users.id],
+  }),
+  updatedBy: one(users, {
+    fields: [rooms.updatedById],
+    references: [users.id],
+  }),
+  deletedBy: one(users, {
+    fields: [rooms.deletedById],
+    references: [users.id],
+  }),
+  property: one(properties, {
+    fields: [rooms.propertyId],
+    references: [properties.id],
   }),
 }));
