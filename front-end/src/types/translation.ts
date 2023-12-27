@@ -72,6 +72,14 @@ export type Translation = {
     roomDeleted: string;
     roomCreated: string;
   };
+  reservationPage: {
+    roomId: string;
+    customerId: string;
+    startDate: string;
+    endDate: string;
+    notes: string;
+    guestName: string;
+  };
 };
 
 type Join<K, P> = K extends string | number

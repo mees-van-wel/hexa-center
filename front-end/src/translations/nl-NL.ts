@@ -77,4 +77,12 @@ export default {
     roomDeleted: "Kamer succesvol verwijderd",
     roomCreated: "Kamer succesvol aangemaakt",
   },
+  reservationPage: {
+    roomId: "Kamer",
+    customerId: "Klant",
+    startDate: "Start datum",
+    endDate: "Eind datum",
+    notes: "Notities",
+    guestName: "Gast naam",
+  },
 } satisfies Translation;

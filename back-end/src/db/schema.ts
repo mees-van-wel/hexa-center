@@ -294,3 +294,58 @@ export const roomsRelations = relations(rooms, ({ one }) => ({
     references: [properties.id],
   }),
 }));
+
+export const reservations = pgTable("Reservations", {
+  $kind: text("$kind").default("reservation").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom(),
+  createdAt: timestamp("createdAt", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updatedAt", { withTimezone: true })
+    .default(sql`now()`)
+    .notNull(),
+  deletedAt: timestamp("deletedAt", { withTimezone: true }),
+  createdById: integer("createdById").references((): AnyPgColumn => users.id, {
+    onDelete: "set null",
+  }),
+  updatedById: integer("updatedById").references((): AnyPgColumn => users.id, {
+    onDelete: "set null",
+  }),
+  deletedById: integer("deletedById").references((): AnyPgColumn => users.id, {
+    onDelete: "cascade",
+  }),
+  roomId: integer("roomId")
+    .references(() => rooms.id, { onDelete: "cascade" })
+    .notNull(),
+  customerId: integer("customerId")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
+  startDate: timestamp("startDate", { withTimezone: true }).notNull(),
+  endDate: timestamp("endDate", { withTimezone: true }).notNull(),
+  notes: text("notes"),
+  guestName: text("guestName"),
+});
+
+export const reservationsRelations = relations(reservations, ({ one }) => ({
+  createdBy: one(users, {
+    fields: [reservations.createdById],
+    references: [users.id],
+  }),
+  updatedBy: one(users, {
+    fields: [reservations.updatedById],
+    references: [users.id],
+  }),
+  deletedBy: one(users, {
+    fields: [reservations.deletedById],
+    references: [users.id],
+  }),
+  customer: one(users, {
+    fields: [reservations.customerId],
+    references: [users.id],
+  }),
+  room: one(rooms, {
+    fields: [reservations.roomId],
+    references: [rooms.id],
+  }),
+}));

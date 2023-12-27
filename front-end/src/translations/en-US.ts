@@ -75,4 +75,12 @@ export default {
     roomDeleted: "Room successfully deleted",
     roomCreated: "Room successfully created",
   },
+  reservationPage: {
+    roomId: "Room",
+    customerId: "Customer",
+    startDate: "Start date",
+    endDate: "End date",
+    notes: "Notes",
+    guestName: "Guest name",
+  },
 } satisfies Translation;
