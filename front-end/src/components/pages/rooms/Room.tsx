@@ -82,9 +82,7 @@ export const Room = ({ room }: RoomProps) => {
             <Button
               variant="light"
               color="red"
-              onClick={() => {
-                deletehandler();
-              }}
+              onClick={deletehandler}
               leftSection={<IconTrash />}
             >
               {t("common.delete")}

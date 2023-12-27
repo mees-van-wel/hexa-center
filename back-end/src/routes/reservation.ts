@@ -5,7 +5,7 @@ import { wrap } from "@decs/typeschema";
 import { TRPCError } from "@trpc/server";
 
 import db from "../db/client.js";
-import { reservations } from "../db/schema.js";
+import { reservations, users } from "../db/schema.js";
 import {
   ReservationCreateSchema,
   ReservationUpdateSchema,
@@ -15,8 +15,8 @@ import { procedure, router } from "../trpc.js";
 export const reservationRouter = router({
   create: procedure
     .input(wrap(ReservationCreateSchema))
-    .mutation(({ input, ctx }) =>
-      db
+    .mutation(async ({ input, ctx }) => {
+      const result = await db
         .insert(reservations)
         .values({
           ...input,
@@ -36,8 +36,13 @@ export const reservationRouter = router({
           endDate: reservations.endDate,
           notes: reservations.notes,
           guestName: reservations.guestName,
-        }),
-    ),
+        });
+
+      const reservation = result[0];
+      if (!reservation) throw new TRPCError({ code: "NOT_FOUND" });
+
+      return reservation;
+    }),
   list: procedure.query(() =>
     db
       .select({
@@ -61,8 +66,10 @@ export const reservationRouter = router({
         endDate: reservations.endDate,
         notes: reservations.notes,
         guestName: reservations.guestName,
+        users: { firstName: users.firstName, lastName: users.lastName },
       })
       .from(reservations)
+      .innerJoin(users, eq(reservations.customerId, users.id))
       .where(eq(reservations.id, input));
 
     const reservation = result[0];
@@ -72,8 +79,8 @@ export const reservationRouter = router({
   }),
   update: procedure
     .input(wrap(ReservationUpdateSchema))
-    .mutation(({ input, ctx }) =>
-      db
+    .mutation(async ({ input, ctx }) => {
+      const result = await db
         .update(reservations)
         .set({
           ...input,
@@ -93,8 +100,13 @@ export const reservationRouter = router({
           endDate: reservations.endDate,
           notes: reservations.notes,
           guestName: reservations.guestName,
-        }),
-    ),
+        });
+
+      const reservation = result[0];
+      if (!reservation) throw new TRPCError({ code: "NOT_FOUND" });
+
+      return reservation;
+    }),
   delete: procedure
     .input(wrap(number()))
     .mutation(({ input }) =>

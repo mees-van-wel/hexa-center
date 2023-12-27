@@ -8,6 +8,7 @@ export default async function Page() {
   if (refreshToken) setTRPCRefreshToken(refreshToken);
 
   const users = await trpc.user.list.query();
+  const rooms = await trpc.room.list.query();
 
-  return <ReservationNew users={users} />;
+  return <ReservationNew rooms={rooms} users={users} />;
 }

@@ -84,5 +84,9 @@ export default {
     endDate: "Eind datum",
     notes: "Notities",
     guestName: "Gast naam",
+    reservationCreated: "Reservatie succesvol aangemaakt",
+    confirmDeleteModal: "Als u doorgaat wordt deze reservatie verwijdert.",
+    roomDeleted: "Reservatie succesvol verwijderd",
+    dateError: "De startdatum moet eerder zijn dan de einddatum.",
   },
 } satisfies Translation;

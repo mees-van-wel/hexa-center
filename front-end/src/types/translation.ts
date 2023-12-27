@@ -79,6 +79,10 @@ export type Translation = {
     endDate: string;
     notes: string;
     guestName: string;
+    reservationCreated: string;
+    confirmDeleteModal: string;
+    roomDeleted: string;
+    dateError: string;
   };
 };
 

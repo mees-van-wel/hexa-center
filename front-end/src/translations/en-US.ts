@@ -82,5 +82,9 @@ export default {
     endDate: "End date",
     notes: "Notes",
     guestName: "Guest name",
+    reservationCreated: "Reservation successfully created",
+    confirmDeleteModal: "If you continue this reservation will be deleted.",
+    roomDeleted: "Reservation successfully deleted",
+    dateError: "Start date must be earlier than the end date.",
   },
 } satisfies Translation;
