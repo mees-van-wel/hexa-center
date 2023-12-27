@@ -11,6 +11,7 @@ export default {
     number: "Number",
     delete: "Delete",
     name: "Name",
+    areYouSure: "Are you sure?",
   },
   authLayout: {
     help: "Help",
@@ -67,5 +68,11 @@ export default {
       description: "Useful for secured primary devices.",
     },
     loggedInSuccess: "You're logged in successfully",
+  },
+  roomsPage: {
+    price: "Price",
+    confirmDeleteModal: "If you continue this room will be deleted.",
+    roomDeleted: "Room successfully deleted",
+    roomCreated: "Room successfully created",
   },
 } satisfies Translation;

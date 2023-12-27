@@ -12,7 +12,7 @@ import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Badge, Button, Paper, Stack } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { IconDeviceFloppy, IconTrash } from "@tabler/icons-react";
+import { IconCheck, IconDeviceFloppy, IconTrash } from "@tabler/icons-react";
 
 import { RoomForm } from "./RoomForm";
 
@@ -26,15 +26,16 @@ export const Room = ({ room }: RoomProps) => {
   const updateRoom = useMutation("room", "update");
   const deleteRoom = useMutation("room", "delete");
 
-  const { handleSubmit, reset, formState, ...restFormMethods } =
-    useForm<RoomInputUpdateSchema>({
-      defaultValues: {
-        id: room.id,
-        name: room.name,
-        price: room.price,
-      },
-      resolver: valibotResolver(RoomUpdateSchema),
-    });
+  const methods = useForm<RoomInputUpdateSchema>({
+    defaultValues: {
+      id: room.id,
+      name: room.name,
+      price: room.price,
+    },
+    resolver: valibotResolver(RoomUpdateSchema),
+  });
+
+  const { handleSubmit, reset, formState } = methods;
 
   const onSubmit: SubmitHandler<RoomInputUpdateSchema> = async ({
     name,
@@ -46,8 +47,8 @@ export const Room = ({ room }: RoomProps) => {
 
   const deletehandler = () => {
     modals.openConfirmModal({
-      title: t("common.deleteTitle"),
-      children: <div>{t("roomsPage.deleteRoom")}</div>,
+      title: t("common.areYouSure"),
+      children: <div>{t("roomsPage.confirmDeleteModal")}</div>,
       labels: { confirm: "Confirm", cancel: "Cancel" },
       onConfirm: onDelete,
     });
@@ -63,12 +64,7 @@ export const Room = ({ room }: RoomProps) => {
   };
 
   return (
-    <FormProvider
-      reset={reset}
-      formState={formState}
-      handleSubmit={handleSubmit}
-      {...restFormMethods}
-    >
+    <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack>
           <DashboardHeader
@@ -84,13 +80,21 @@ export const Room = ({ room }: RoomProps) => {
               </Button>
             )}
             <Button
+              variant="light"
               color="red"
-              onClick={deletehandler}
+              onClick={() => {
+                deletehandler();
+              }}
               leftSection={<IconTrash />}
             >
               {t("common.delete")}
             </Button>
-            <Badge color={updateRoom.loading ? "orange" : "green"}>
+            <Badge
+              size="lg"
+              variant="light"
+              color={updateRoom.loading ? "orange" : "green"}
+              leftSection={<IconCheck size="1rem" />}
+            >
               {updateRoom.loading ? t("common.saving") : t("common.saved")}
             </Badge>
           </DashboardHeader>

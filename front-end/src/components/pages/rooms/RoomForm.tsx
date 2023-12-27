@@ -3,12 +3,9 @@
 import { Controller, useFormContext } from "react-hook-form";
 
 import { useTranslation } from "@/hooks/useTranslation";
-import {
-  RoomInputCreateSchema,
-  RoomInputUpdateSchema,
-} from "@hexa-center/shared/schemas/room";
+import { RoomInputCreateSchema, RoomInputUpdateSchema } from "@/schemas/room";
 import { NumberInput, Stack, TextInput } from "@mantine/core";
- 
+
 export const RoomForm = () => {
   const t = useTranslation();
   const {

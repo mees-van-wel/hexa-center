@@ -11,6 +11,7 @@ export default {
     number: "Nummer",
     delete: "Verwijderen",
     name: "Name",
+    areYouSure: "Weet je het zeker?",
   },
   authLayout: {
     help: "Help",
@@ -69,5 +70,11 @@ export default {
       description: "Handig voor beveiligde primaire apparaten.",
     },
     loggedInSuccess: "U bent succesvol ingelogd",
+  },
+  roomsPage: {
+    price: "Prijs",
+    confirmDeleteModal: "Als u doorgaat wordt deze kamer verwijdert.",
+    roomDeleted: "Kamer succesvol verwijderd",
+    roomCreated: "Kamer succesvol aangemaakt",
   },
 } satisfies Translation;

@@ -9,6 +9,7 @@ import { AuthContextProvider } from "@/contexts/AuthContext";
 import { TranslationInitializer } from "@/initializers/TranslationInitializer";
 import { RouterOutput, setTRPCRefreshToken, trpc } from "@/utils/trpc";
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
+import { ModalsProvider } from "@mantine/modals";
 
 import Providers from "./providers";
 
@@ -67,7 +68,7 @@ export default async function RootLayout({
                   cursorType: "pointer",
                 }}
               >
-                {children}
+                <ModalsProvider>{children}</ModalsProvider>
               </MantineProvider>
             </TranslationInitializer>
           </AuthContextProvider>

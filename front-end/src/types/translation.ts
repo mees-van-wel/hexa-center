@@ -9,6 +9,7 @@ export type Translation = {
     number: string;
     delete: string;
     name: string;
+    areYouSure: string;
   };
   authLayout: {
     help: string;
@@ -64,6 +65,12 @@ export type Translation = {
       description: string;
     };
     loggedInSuccess: string;
+  };
+  roomsPage: {
+    price: string;
+    confirmDeleteModal: string;
+    roomDeleted: string;
+    roomCreated: string;
   };
 };
 
