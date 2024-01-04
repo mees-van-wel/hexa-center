@@ -36,12 +36,9 @@ export const Room = ({ room }: RoomProps) => {
       resolver: valibotResolver(RoomUpdateSchema),
     });
 
-  const onSubmit: SubmitHandler<RoomInputUpdateSchema> = async ({
-    name,
-    price,
-  }) => {
-    await updateRoom.mutate({ id: room.id, name, price });
-    reset({ id: room.id, name, price });
+  const onSubmit: SubmitHandler<RoomInputUpdateSchema> = async (values) => {
+    await updateRoom.mutate({ ...values, id: room.id });
+    reset({ ...values, id: room.id });
   };
 
   const deletehandler = () => {

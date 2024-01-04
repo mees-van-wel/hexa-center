@@ -70,4 +70,21 @@ export default {
     },
     loggedInSuccess: "U bent succesvol ingelogd",
   },
+  usersPage: {
+    firstName: "Voornam",
+    lastName: "Achternaam",
+    email: "E-mail",
+    phoneNumber: "Telefoonnummer",
+    dateOfBirth: "Geboortedatum",
+    sex: "Sekse",
+  },
+  components: {
+    address: {
+      streetAndHouseNumber: "Straat en huisnummer",
+      postalCode: "Postcode",
+      city: "Stad",
+      region: "Provincie",
+      country: "Land",
+    },
+  },
 } satisfies Translation;

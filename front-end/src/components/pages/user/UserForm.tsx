@@ -8,47 +8,40 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { UserCreateInputSchema, UserUpdateInputSchema } from "@/schemas/user";
 import { Avatar, Group, Paper, Stack, TextInput } from "@mantine/core";
 
-export const UserForm = () => {
+type UserFormProps = {
+  disabled?: boolean;
+};
+
+export const UserForm = ({ disabled }: UserFormProps) => {
   const t = useTranslation();
-  const formMethods = useFormContext<
+
+  const { register, control, formState } = useFormContext<
     UserCreateInputSchema | UserUpdateInputSchema
   >();
-
-  const { register, control, formState } = formMethods;
 
   return (
     <Paper p="md">
       <Stack>
         <Group align="end">
-          <Avatar
-            style={{
-              flexGrow: 0,
-            }}
-          />
+          <Avatar size="lg" />
           <TextInput
             {...register("firstName")}
             label={t("usersPage.firstName")}
             error={formState.errors.firstName?.message}
-            style={{
-              flexGrow: 1,
-            }}
+            disabled={disabled}
           />
           <TextInput
             {...register("lastName")}
             label={t("usersPage.lastName")}
             error={formState.errors.lastName?.message}
-            style={{
-              flexGrow: 1,
-            }}
+            disabled={disabled}
           />
           <TextInput
             {...register("email")}
             label={t("usersPage.email")}
             error={formState.errors.email?.message}
             type="email"
-            style={{
-              flexGrow: 1,
-            }}
+            disabled={disabled}
           />
           <Controller
             name="phoneNumber"
@@ -56,16 +49,14 @@ export const UserForm = () => {
             render={({ field, fieldState: { error } }) => (
               <PhoneInput
                 {...field}
-                label={t("roomsPage.phoneNumber")}
+                label={t("usersPage.phoneNumber")}
                 error={error?.message}
-                style={{
-                  flexGrow: 1,
-                }}
+                disabled={disabled}
               />
             )}
           />
         </Group>
-        <Address form={formMethods} />
+        <Address disabled={disabled} />
       </Stack>
     </Paper>
   );

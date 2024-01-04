@@ -65,6 +65,23 @@ export type Translation = {
     };
     loggedInSuccess: string;
   };
+  usersPage: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phoneNumber: string;
+    dateOfBirth: string;
+    sex: string;
+  };
+  components: {
+    address: {
+      streetAndHouseNumber: string;
+      postalCode: string;
+      city: string;
+      region: string;
+      country: string;
+    };
+  };
 };
 
 type Join<K, P> = K extends string | number

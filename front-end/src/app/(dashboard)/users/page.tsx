@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-import { Users } from "@/components/pages/users/Users";
+import { UsersOverview } from "@/components/pages/user/UsersOverview";
 import { setTRPCRefreshToken, trpc } from "@/utils/trpc";
 
 export default async function Page() {
@@ -9,5 +9,5 @@ export default async function Page() {
 
   const users = await trpc.user.list.query();
 
-  return <Users users={users} />;
+  return <UsersOverview users={users} />;
 }

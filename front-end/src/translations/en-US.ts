@@ -68,4 +68,21 @@ export default {
     },
     loggedInSuccess: "You're logged in successfully",
   },
+  usersPage: {
+    firstName: "First name",
+    lastName: "Last name",
+    email: "Email",
+    phoneNumber: "Phone number",
+    dateOfBirth: "Date of birth",
+    sex: "Sex",
+  },
+  components: {
+    address: {
+      streetAndHouseNumber: "Street and House number",
+      postalCode: "Postal code",
+      city: "City",
+      region: "Region",
+      country: "Country",
+    },
+  },
 } satisfies Translation;
