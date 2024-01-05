@@ -5,7 +5,7 @@ import { wrap } from "@decs/typeschema";
 import { TRPCError } from "@trpc/server";
 
 import db from "../db/client.js";
-import { reservations, users } from "../db/schema.js";
+import { reservations, rooms, users } from "../db/schema.js";
 import {
   ReservationCreateSchema,
   ReservationUpdateSchema,
@@ -53,8 +53,12 @@ export const reservationRouter = router({
         endDate: reservations.endDate,
         notes: reservations.notes,
         guestName: reservations.guestName,
+        customer: { firstName: users.firstName, lastName: users.lastName },
+        room: { name: rooms.name },
       })
-      .from(reservations),
+      .from(reservations)
+      .innerJoin(users, eq(reservations.customerId, users.id))
+      .innerJoin(rooms, eq(reservations.roomId, rooms.id)),
   ),
   get: procedure.input(wrap(number())).query(async ({ input }) => {
     const result = await db
@@ -66,7 +70,7 @@ export const reservationRouter = router({
         endDate: reservations.endDate,
         notes: reservations.notes,
         guestName: reservations.guestName,
-        users: { firstName: users.firstName, lastName: users.lastName },
+        user: { firstName: users.firstName, lastName: users.lastName },
       })
       .from(reservations)
       .innerJoin(users, eq(reservations.customerId, users.id))

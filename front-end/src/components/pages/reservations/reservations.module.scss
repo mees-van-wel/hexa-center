@@ -1,0 +1,65 @@
+// .weekHidden {
+//     max-width: 20%;
+//     padding: 0 0.5rem;
+// }
+
+// .week {
+//     min-width: 500px;
+//     overflow: hidden;
+//     text-overflow: ellipsis;
+//     white-space: nowrap;
+//     padding: 0, 0.5rem;
+// }
+
+.rooms {
+    &:nth-of-type(odd){
+        background-color: rgb(var(--color-midground));
+    }
+
+    .room {
+        display: flex;
+        max-width: 20%;
+        align-items: center;
+        border-right: solid 1px rgb(var(--color-background));
+        border-top: solid 1px rgb(var(--color-background));
+        padding: 0.5rem;
+    }
+}
+
+.reservationContainer {
+    position: relative;
+    border-top: solid 1px rgb(var(--color-background));
+}
+
+.reservation {
+    // transition....
+    position: absolute;
+    z-index: 10;
+    margin: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    // border-radius: 1rem;
+    // right blue and dark mode?
+    // background-color: var(--mantine-color-blue-9);
+    // padding: 0.125rem 0.5rem;
+    // color: rgb(var(--color-text));
+    // text-decoration: none;
+
+    &.begin {
+        background-color: var(--mantine-color-green-6)
+        // background-color: var(--mantine-color-blue-7);
+    }
+}
+
+
+
+// class={clsx(
+//     " px-2 py-0.5 text-white no-underline hover:bg-primary-7 dark:bg-primary-8 hover:dark:bg-primary-9",
+//     {
+//       "border-r-8 border-r-red-6 dark:border-red-8":
+//         hasEnd,
+//       "border-l-8 border-l-green-6 dark:border-green-8":
+//         hasStart,
+//     },
+//   )}

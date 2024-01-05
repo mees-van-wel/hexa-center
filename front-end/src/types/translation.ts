@@ -11,6 +11,54 @@ export type Translation = {
     name: string;
     areYouSure: string;
   };
+  dates: {
+    weekdayNames: {
+      FRIDAY: string;
+      MONDAY: string;
+      SATURDAY: string;
+      SUNDAY: string;
+      THURSDAY: string;
+      TUESDAY: string;
+      WEDNESDAY: string;
+    };
+    weekdayNamesShort: {
+      FRIDAY: string;
+      MONDAY: string;
+      SATURDAY: string;
+      SUNDAY: string;
+      THURSDAY: string;
+      TUESDAY: string;
+      WEDNESDAY: string;
+    };
+    monthsLong: {
+      JANUARY: string;
+      FEBRUARY: string;
+      MARCH: string;
+      APRIL: string;
+      MAY: string;
+      JUNE: string;
+      JULY: string;
+      AUGUST: string;
+      SEPTEMBER: string;
+      OCTOBER: string;
+      NOVEMBER: string;
+      DECEMBER: string;
+    };
+    monthsShort: {
+      JANUARY: string;
+      FEBRUARY: string;
+      MARCH: string;
+      APRIL: string;
+      MAY: string;
+      JUNE: string;
+      JULY: string;
+      AUGUST: string;
+      SEPTEMBER: string;
+      OCTOBER: string;
+      NOVEMBER: string;
+      DECEMBER: string;
+    };
+  };
   authLayout: {
     help: string;
     version: string;
@@ -83,6 +131,9 @@ export type Translation = {
     confirmDeleteModal: string;
     roomDeleted: string;
     dateError: string;
+    calendar: {
+      noRooms: string;
+    };
   };
 };
 

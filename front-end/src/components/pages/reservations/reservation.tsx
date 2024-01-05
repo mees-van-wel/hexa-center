@@ -50,16 +50,12 @@ export const Reservation = ({
 
   const { handleSubmit, reset, formState } = methods;
 
-  const onSubmit: SubmitHandler<ReservationInputUpdateSchema> = async ({
-    roomId,
-    customerId,
-    startDate,
-    endDate,
-    notes,
-    guestName,
-  }) => {
+  const onSubmit: SubmitHandler<ReservationInputUpdateSchema> = async (
+    values,
+  ) => {
     if (
-      (startDate || reservation.startDate) > (endDate || reservation.endDate)
+      (values.startDate || reservation.startDate) >
+      (values.endDate || reservation.endDate)
     ) {
       notifications.show({
         message: t("reservationPage.dateError"),
@@ -70,22 +66,12 @@ export const Reservation = ({
     }
 
     await updateReservation.mutate({
+      ...values,
       id: reservation.id,
-      roomId,
-      customerId,
-      startDate,
-      endDate,
-      notes,
-      guestName,
     });
     reset({
+      ...values,
       id: reservation.id,
-      roomId,
-      customerId,
-      startDate,
-      endDate,
-      notes,
-      guestName,
     });
   };
 
@@ -119,7 +105,7 @@ export const Reservation = ({
                 href: "/reservations",
               },
               {
-                label: `${reservation.users.firstName} ${reservation.users.lastName}`,
+                label: `${reservation.user.firstName} ${reservation.user.lastName}`,
               },
             ]}
           >
