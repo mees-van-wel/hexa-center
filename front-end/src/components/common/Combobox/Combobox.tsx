@@ -191,7 +191,6 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
             onClick={() => {
               searchable ? combobox.openDropdown() : combobox.toggleDropdown();
             }}
-            placeholder="Search value"
             pointer={!searchable}
           />
         </ComboboxComponent.Target>

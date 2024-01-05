@@ -179,7 +179,7 @@ export const Address = ({ disabled }: AddressProps) => {
     () =>
       COUNTRY_VALUES.map((country) => ({
         value: country.countryCode,
-        label: t(`countries.${country.countryCode}`),
+        label: t(`constants.countries.${country.countryCode}`),
       })),
     [t],
   );
@@ -221,7 +221,6 @@ export const Address = ({ disabled }: AddressProps) => {
         label={t("components.address.region")}
         disabled={disabled}
       />
-
       <Controller
         name="country"
         control={control}

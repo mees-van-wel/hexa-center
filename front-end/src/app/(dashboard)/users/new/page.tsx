@@ -10,7 +10,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { UserCreateInputSchema, UserCreateSchema } from "@/schemas/user";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Button, Stack } from "@mantine/core";
-import { IconPlus, IconUsers } from "@tabler/icons-react";
+import { IconDeviceFloppy, IconUsers } from "@tabler/icons-react";
 
 export default function Page() {
   const t = useTranslation();
@@ -19,9 +19,23 @@ export default function Page() {
 
   const formMethods = useForm<UserCreateInputSchema>({
     resolver: valibotResolver(UserCreateSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      phoneNumber: "",
+      street: "",
+      houseNumber: "",
+      postalCode: "",
+      city: "",
+      region: "",
+      country: null,
+      dateOfBirth: null,
+      sex: null,
+    },
   });
 
-  const { handleSubmit } = formMethods;
+  const { handleSubmit, formState } = formMethods;
 
   const onSubmit = async (values: UserCreateInputSchema) => {
     const response = await createUser.mutate(values);
@@ -40,8 +54,12 @@ export default function Page() {
           { label: t("common.new") },
         ]}
       >
-        <Button type="submit" leftSection={<IconPlus />}>
-          {t("common.create")}
+        <Button
+          type="submit"
+          leftSection={<IconDeviceFloppy />}
+          disabled={!formState.isDirty}
+        >
+          {t("common.save")}
         </Button>
       </DashboardHeader>
       <FormProvider {...formMethods}>

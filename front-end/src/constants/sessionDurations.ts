@@ -6,12 +6,12 @@ export const SESSION_DURATIONS = {
 } as const;
 
 export type SessionDurations = typeof SESSION_DURATIONS;
-export type SessionDurationKeys = keyof SessionDurations;
-export type SessionDuration = SessionDurations[SessionDurationKeys];
+export type SessionDurationKey = keyof SessionDurations;
+export type SessionDuration = SessionDurations[SessionDurationKey];
 
 export const SESSION_DURATION_KEYS = Object.keys(
   SESSION_DURATIONS,
-) as SessionDurationKeys[];
+) as SessionDurationKey[];
 export const SESSION_DURATION_VALUES = Object.values(
   SESSION_DURATIONS,
 ) as SessionDuration[];

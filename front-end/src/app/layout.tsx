@@ -14,6 +14,7 @@ import Providers from "./providers";
 
 import "modern-normalize/modern-normalize.css";
 import "@mantine/core/styles.css";
+import "@mantine/dates/styles.css";
 import "./globals.scss";
 
 const eurostile = localFont({

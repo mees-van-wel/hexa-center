@@ -1,3 +1,6 @@
+import { CountryKey } from "@/constants/countries";
+import { SexKey } from "@/constants/sexes";
+
 export type Translation = {
   common: {
     back: string;
@@ -81,6 +84,10 @@ export type Translation = {
       region: string;
       country: string;
     };
+  };
+  constants: {
+    sexes: Record<SexKey, string>;
+    countries: Record<CountryKey, string>;
   };
 };
 

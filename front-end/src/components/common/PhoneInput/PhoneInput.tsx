@@ -82,9 +82,9 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
         COUNTRY_VALUES.map(({ countryCode, callingCode }) => ({
           label: callingCode,
           value: countryCode,
-          description: t(`countries.${countryCode}`),
+          description: t(`constants.countries.${countryCode}`),
         })),
-      [],
+      [t],
     );
 
     useDidUpdate(() => {
