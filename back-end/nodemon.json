@@ -1,0 +1,6 @@
+{
+  "watch": ["src"],
+  "ext": "ts",
+  "ignore": ["src/**/*.test.ts"],
+  "exec": "node esbuild.js --dev && node --env-file=.env.local ./dist/server.js"
+}

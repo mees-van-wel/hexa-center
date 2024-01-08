@@ -1,0 +1,110 @@
+* {
+  letter-spacing: 1px;
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+:root {
+  --color-lightest: 255 255 255;
+  --color-lighter: 233 233 231;
+  --color-light: 222 222 219;
+  --color-neutral: 127 127 127;
+  --color-dark: 33 33 36;
+  --color-darker: 22 22 24;
+  --color-darkest: 0 0 0;
+
+  --scale: 1;
+
+  --transition: 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+body {
+  --color-background: var(--color-light);
+  --color-background-inverted: var(--color-dark);
+  --color-midground: var(--color-lighter);
+  --color-midground-inverted: var(--color-darker);
+  --color-foreground: var(--color-lightest);
+  --color-foreground-inverted: var(--color-darkest);
+  --color-text: var(--color-darkest);
+  --color-text-inverted: var(--color-lightest);
+
+  color-scheme: light;
+
+  &[data-theme="dark"] {
+    --color-background: var(--color-dark);
+    --color-background-inverted: var(--color-light);
+    --color-midground: var(--color-darker);
+    --color-midground-inverted: var(--color-lighter);
+    --color-foreground: var(--color-darkest);
+    --color-foreground-inverted: var(--color-lightest);
+    --color-text: var(--color-lightest);
+    --color-text-inverted: var(--color-darkest);
+
+    color-scheme: dark;
+  }
+
+  --mantine-color-text: rgb(var(--color-text));
+  --mantine-color-body: rgb(var(--color-foreground));
+
+  position: relative;
+  background-color: rgb(var(--color-background));
+  color: rgb(var(--color-text));
+}
+
+.mantine-InputWrapper-root {
+  flex-grow: 1;
+}
+
+.mantine-Input-input {
+  --_input-bd: transparent;
+
+  box-shadow:
+    inset 2px 2px 2px #adb5bd,
+    inset -2px -2px 2px #f1f3f5;
+  background-color: rgb(var(--color-background));
+
+  &:disabled {
+    box-shadow:
+      inset 0 0 1.5px #f1f3f5,
+      inset 0 0 1.5px #adb5bd;
+    background-color: rgb(var(--color-background) / 40%);
+    color: rgb(var(--color-text));
+    opacity: 1;
+    cursor: text;
+  }
+
+  body[data-theme="dark"] & {
+    box-shadow:
+      inset 2px 2px 2px #141517,
+      inset -2px -2px 2px #2c2e33;
+
+    &:disabled {
+      box-shadow:
+        inset 0 0 1.5px #2c2e33,
+        inset 0 0 1.5px #141517;
+    }
+  }
+
+  // &--error {
+  //   border-color: var(--oc-red-6);
+
+  //   body[data-theme="dark"] & {
+  //     border-color: var(--oc-red-8);
+  //   }
+  // }
+}
+
+.mantine-Title-root {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mantine-Progress-section {
+  transition: width var(--transition);
+}
+
+.mantine-Menu-dropdown {
+  background-color: rgb(var(--color-midground));
+}

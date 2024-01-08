@@ -1,0 +1,12 @@
+.input {
+  min-width: 200px;
+}
+
+.clearIcon {
+  cursor: pointer;
+  transition: color var(--transition);
+
+  &:hover {
+    color: rgb(var(--color-text));
+  }
+}
