@@ -27,6 +27,14 @@ export const ReservationForm = ({ rooms, users }: ReservationForm) => {
     ReservationInputCreateSchema | ReservationInputUpdateSchema
   >();
 
+  const roomsOptions =
+    rooms.length === 0
+      ? [{ value: "no-rooms", label: t("roomsPage.noRooms"), disabled: true }]
+      : rooms.map((room) => ({
+          label: room.name,
+          value: room.id.toString(),
+        }));
+
   return (
     <Stack>
       <Controller
@@ -40,12 +48,10 @@ export const ReservationForm = ({ rooms, users }: ReservationForm) => {
             {...restFields}
             value={value?.toString() ?? ""}
             required
+            searchable
             error={error?.message}
             label={t("reservationPage.roomId")}
-            data={rooms.map((room) => ({
-              label: room.name,
-              value: room.id.toString(),
-            }))}
+            data={roomsOptions}
             onChange={(value) => {
               onChange(Number(value));
             }}

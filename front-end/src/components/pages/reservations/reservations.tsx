@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import dayjs from "dayjs";
@@ -19,7 +20,6 @@ import {
 } from "@tabler/icons-react";
 
 import styles from "./reservations.module.scss";
-import Link from "next/link";
 
 type ReservationsProps = {
   reservations: RouterOutput["reservation"]["list"];
@@ -146,7 +146,11 @@ export const Reservations = ({
           },
         ]}
       >
-        <Button type="submit" leftSection={<IconPlus />}>
+        <Button
+          component={Link}
+          href="/reservations/new"
+          leftSection={<IconPlus />}
+        >
           {t("common.new")}
         </Button>
       </DashboardHeader>
@@ -192,7 +196,7 @@ export const Reservations = ({
                       let reservationsShown: number[] = [];
 
                       return (
-                        <Group key={name} gap={0} className={styles.rooms}>
+                        <Group key={name} gap={0} className={styles.row}>
                           <div
                             className={styles.room}
                             style={{
@@ -363,11 +367,22 @@ export const Reservations = ({
                                       reservation.customer.lastName
                                     }`;
 
+                                    const startColor = hasStart
+                                      ? "green"
+                                      : "blue";
+                                    const endColor = hasEnd ? "red" : "blue";
+
                                     return (
                                       <Button
                                         key={`${reservation.room.name}-${reservationIndex}`}
                                         component={Link}
                                         title={title}
+                                        variant="gradient"
+                                        gradient={{
+                                          from: startColor,
+                                          to: endColor,
+                                          deg: 90,
+                                        }}
                                         size="xs"
                                         ta="left"
                                         className={clsx(styles.reservation, {
@@ -394,19 +409,23 @@ export const Reservations = ({
                       );
                     })
                 ) : (
-                  <div class="border-t border-gray-4 bg-gray-0 p-2 text-center dark:border-gray-8 dark:bg-gray-9">
+                  <div className={styles.noRooms}>
                     {t("reservationPage.calendar.noRooms")}
                   </div>
                 )}
               </Stack>
             </Stack>
             <div
-              class="absolute -right-2 -top-2 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-gray-0 bg-white"
-              onClick$={() => {
+              className={styles.sideBarIcon}
+              onClick={() => {
                 setSideBarToggle(!sidebarToggle);
               }}
             >
-              {sidebarToggle ? <IconArrowBarRight /> : <IconArrowBarLeft />}
+              {sidebarToggle ? (
+                <IconArrowBarRight width={"xs"} />
+              ) : (
+                <IconArrowBarLeft width={"xs"} />
+              )}
             </div>
           </div>
           {/* <CalendarSidebar

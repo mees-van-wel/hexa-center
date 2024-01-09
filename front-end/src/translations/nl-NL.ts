@@ -121,6 +121,7 @@ export default {
   },
   roomsPage: {
     price: "Prijs",
+    noRooms: "Voeg eerst een kamer toe",
     confirmDeleteModal: "Als u doorgaat wordt deze kamer verwijdert.",
     roomDeleted: "Kamer succesvol verwijderd",
     roomCreated: "Kamer succesvol aangemaakt",

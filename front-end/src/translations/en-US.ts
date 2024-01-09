@@ -119,6 +119,7 @@ export default {
   },
   roomsPage: {
     price: "Price",
+    noRooms: "Please add a room first",
     confirmDeleteModal: "If you continue this room will be deleted.",
     roomDeleted: "Room successfully deleted",
     roomCreated: "Room successfully created",

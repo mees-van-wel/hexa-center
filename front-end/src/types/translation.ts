@@ -116,6 +116,7 @@ export type Translation = {
   };
   roomsPage: {
     price: string;
+    noRooms: string;
     confirmDeleteModal: string;
     roomDeleted: string;
     roomCreated: string;
