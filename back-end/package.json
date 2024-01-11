@@ -33,6 +33,7 @@
     "postmark": "^4.0.2",
     "redis": "^4.6.11",
     "socket.io": "^4.7.2",
+    "superjson": "^2.2.1",
     "valibot": "^0.22.0"
   },
   "devDependencies": {

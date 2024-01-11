@@ -35,10 +35,17 @@ export default function Page() {
     },
   });
 
-  const { handleSubmit, formState } = formMethods;
+  const { formState, getValues } = formMethods;
 
-  const onSubmit = async (values: UserCreateInputSchema) => {
-    const response = await createUser.mutate(values);
+  const onSubmit = async () => {
+    const values = getValues();
+    console.log("TRIGGER", values);
+    try {
+      const response = await createUser.mutate(values);
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -55,17 +62,16 @@ export default function Page() {
         ]}
       >
         <Button
-          type="submit"
+          onClick={onSubmit}
           leftSection={<IconDeviceFloppy />}
           disabled={!formState.isDirty}
+          loading={createUser.loading}
         >
           {t("common.save")}
         </Button>
       </DashboardHeader>
       <FormProvider {...formMethods}>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <UserForm />
-        </form>
+        <UserForm />
       </FormProvider>
     </Stack>
   );

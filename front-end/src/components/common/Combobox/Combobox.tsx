@@ -194,7 +194,6 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
             pointer={!searchable}
           />
         </ComboboxComponent.Target>
-
         <ComboboxComponent.Dropdown hidden={disabled} p={0}>
           <ComboboxComponent.Options>
             <ScrollArea.Autosize type="always" mah={300}>
@@ -206,15 +205,7 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
                 >
                   {item.label}
                   {item.description && (
-                    <Text
-                      size="xs"
-                      style={{
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      }}
-                      opacity={0.6}
-                    >
+                    <Text size="xs" opacity={0.6}>
                       {item.description}
                     </Text>
                   )}
