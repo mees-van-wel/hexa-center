@@ -60,9 +60,9 @@ export const DashboardHeader = ({
   };
 
   return (
-    <Group align="stretch">
+    <Group align="stretch" wrap="nowrap">
       {(children || showBackButton) && (
-        <Paper component={Group} p="md">
+        <Paper component={Group} p="md" wrap="nowrap">
           {showBackButton && (
             <Button
               variant="light"
@@ -82,17 +82,30 @@ export const DashboardHeader = ({
       <Paper
         className={styles.titleContainer}
         component={Group}
+        wrap="nowrap"
         justify="center"
         gap="xs"
         p="md"
+        // maw={250}
       >
         {title.map(({ icon, label, href }, index) => {
           const isLast = title.length - 1 === index;
-          const labelComponent = <Title order={3}>{label}</Title>;
+          const labelComponent = (
+            <Title
+              style={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+              order={3}
+            >
+              {label}
+            </Title>
+          );
 
           return (
             <Fragment key={index}>
-              <Group gap="xs">
+              <Group gap="xs" wrap="nowrap" maw="44vw">
                 {icon}
                 {href ? (
                   <Link className={styles.dashboardHeaderLink} href={href}>
@@ -109,12 +122,25 @@ export const DashboardHeader = ({
       </Paper>
       <Paper component={Menu} trigger="hover" position="bottom-end" p="md">
         <Menu.Target>
-          <Group>
+          <Group wrap="nowrap">
             <Stack ta="right" visibleFrom="md" gap={0}>
-              <Text size="xs" fw={700}>
+              <Text
+                size="xs"
+                fw={700}
+                style={{
+                  whiteSpace: "nowrap",
+                }}
+              >
                 {authUser.firstName} {authUser.lastName}
               </Text>
-              <Text size="xs">{authUser.email}</Text>
+              <Text
+                size="xs"
+                style={{
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {authUser.email}
+              </Text>
             </Stack>
             <Avatar />
           </Group>

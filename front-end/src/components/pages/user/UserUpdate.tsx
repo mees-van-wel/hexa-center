@@ -1,17 +1,18 @@
 "use client";
 
+import { useRef } from "react";
 import Link from "next/link";
-import { FormProvider, useForm } from "react-hook-form";
 
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { useAuthUser } from "@/contexts/AuthContext";
+import { FormProvider } from "@/contexts/FormContext";
+import { useForm } from "@/hooks/useForm";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
-import { UserUpdateInputSchema, UserUpdateSchema } from "@/schemas/user";
+import { UserUpdateSchema } from "@/schemas/user";
 import { type RouterOutput } from "@/utils/trpc";
-import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Alert, Badge, Button, Loader, Stack } from "@mantine/core";
-import { useDebouncedValue, useDidUpdate } from "@mantine/hooks";
+import { useDidUpdate } from "@mantine/hooks";
 import {
   IconAlertTriangle,
   IconCheck,
@@ -29,32 +30,38 @@ export const UserUpdate = ({ user }: UserPageProps) => {
   const t = useTranslation();
   const authUser = useAuthUser();
   const updateUser = useMutation("user", "update");
+  const timeoutRef = useRef<NodeJS.Timeout>();
   // const deleteUser = useMutation("user", "delete");
   // const router = useRouter();
 
   const isSelf = user.id === authUser.id;
 
-  const formMethods = useForm<UserUpdateInputSchema>({
-    defaultValues: user,
-    resolver: valibotResolver(UserUpdateSchema),
+  const formMethods = useForm({
+    initialValues: user,
+    validation: UserUpdateSchema,
   });
 
-  const { reset, getValues, formState } = formMethods;
-
-  const [debounced] = useDebouncedValue(formState.isDirty, 500);
+  const { values, reset, validate, isDirty, dirtyValues } = formMethods;
 
   useDidUpdate(() => {
-    if (!formState.isDirty) return;
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
-    const values = getValues();
+    if (!isDirty) return;
 
-    // TODO FE validation
+    timeoutRef.current = setTimeout(async () => {
+      if (!isDirty) return;
 
-    updateUser.mutate(values).then((response) => {
-      console.log(response);
-      reset(response);
-    });
-  }, [debounced]);
+      const success = validate();
+      if (!success) return;
+
+      const updatedUser = await updateUser.mutate({
+        ...dirtyValues,
+        id: user.id,
+      });
+
+      reset(updatedUser);
+    }, 500);
+  }, [values]);
 
   const deletehandler = () => {};
 
@@ -68,7 +75,7 @@ export const UserUpdate = ({ user }: UserPageProps) => {
             label: t("dashboardLayout.users"),
             href: "/users",
           },
-          { label: `${user.firstName} ${user.lastName}` },
+          { label: `${values.firstName} ${values.lastName}` },
         ]}
       >
         {!isSelf && (
@@ -83,9 +90,9 @@ export const UserUpdate = ({ user }: UserPageProps) => {
             </Button>
             <Badge
               size="lg"
-              color={updateUser.loading ? "orange" : "green"}
+              color={isDirty || updateUser.loading ? "orange" : "green"}
               leftSection={
-                updateUser.loading ? (
+                isDirty || updateUser.loading ? (
                   <Loader color="orange" variant="oval" size="1rem" />
                 ) : (
                   <IconCheck size="1rem" />
@@ -93,19 +100,23 @@ export const UserUpdate = ({ user }: UserPageProps) => {
               }
               variant="light"
             >
-              {updateUser.loading ? t("common.saving") : t("common.saved")}
+              {isDirty || updateUser.loading
+                ? t("common.saving")
+                : t("common.saved")}
             </Badge>
           </>
         )}
       </DashboardHeader>
-      <Alert
-        icon={<IconAlertTriangle />}
-        color="orange"
-        title="You can't edit yourself here"
-      >
-        Your own personal details are editable only on the{" "}
-        <Link href="/profile">Profile page</Link>.
-      </Alert>
+      {isSelf && (
+        <Alert
+          icon={<IconAlertTriangle />}
+          color="orange"
+          title="You can't edit yourself here"
+        >
+          Your own personal details are editable only on the{" "}
+          <Link href="/profile">Profile page</Link>.
+        </Alert>
+      )}
       <FormProvider {...formMethods}>
         <UserForm disabled={isSelf} />
       </FormProvider>

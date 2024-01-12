@@ -3,53 +3,47 @@ import { number } from "valibot";
 
 import db from "@/db/client";
 import { users } from "@/db/schema";
-import { UserCreateSchema, UserUpdateSchema } from "@/schemas/user";
 import { procedure, router } from "@/trpc";
 import { wrap } from "@decs/typeschema";
+import { UserCreateSchema, UserUpdateSchema } from "@front-end/schemas/user";
 import { TRPCError } from "@trpc/server";
 
 export const userRouter = router({
   create: procedure
     .input(wrap(UserCreateSchema))
     .mutation(async ({ input, ctx }) => {
-      console.log(input);
+      const result = await db
+        .insert(users)
+        .values({
+          ...input,
+          createdById: ctx.user.id,
+          updatedById: ctx.user.id,
+          propertyId: 1,
+          // Customer role
+          roleId: 2,
+        })
+        .returning({
+          $kind: users.$kind,
+          id: users.id,
+          createdAt: users.createdAt,
+          createdById: users.createdById,
+          updatedAt: users.updatedAt,
+          updatedById: users.updatedById,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          email: users.email,
+          phoneNumber: users.phoneNumber,
+          street: users.street,
+          houseNumber: users.houseNumber,
+          postalCode: users.postalCode,
+          city: users.city,
+          region: users.region,
+          country: users.country,
+          sex: users.sex,
+          dateOfBirth: users.dateOfBirth,
+        });
 
-      try {
-        const result = await db
-          .insert(users)
-          .values({
-            ...input,
-            createdById: ctx.user.id,
-            updatedById: ctx.user.id,
-            propertyId: 1,
-            // Customer role
-            roleId: 2,
-          })
-          .returning({
-            $kind: users.$kind,
-            id: users.id,
-            createdAt: users.createdAt,
-            createdById: users.createdById,
-            updatedAt: users.updatedAt,
-            updatedById: users.updatedById,
-            firstName: users.firstName,
-            lastName: users.lastName,
-            email: users.email,
-            phoneNumber: users.phoneNumber,
-            street: users.street,
-            houseNumber: users.houseNumber,
-            postalCode: users.postalCode,
-            city: users.city,
-            region: users.region,
-            country: users.country,
-            sex: users.sex,
-            dateOfBirth: users.dateOfBirth,
-          });
-        console.log(result);
-        return result;
-      } catch (error) {
-        console.log(error);
-      }
+      return result[0];
     }),
   list: procedure.query(() =>
     db

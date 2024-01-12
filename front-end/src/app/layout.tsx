@@ -9,11 +9,14 @@ import { AuthContextProvider } from "@/contexts/AuthContext";
 import { TranslationInitializer } from "@/initializers/TranslationInitializer";
 import { RouterOutput, setTRPCRefreshToken, trpc } from "@/utils/trpc";
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
+import { ModalsProvider } from "@mantine/modals";
+import { Notifications } from "@mantine/notifications";
 
 import Providers from "./providers";
 
 import "modern-normalize/modern-normalize.css";
 import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
 import "@mantine/dates/styles.css";
 import "./globals.scss";
 
@@ -68,7 +71,8 @@ export default async function RootLayout({
                   cursorType: "pointer",
                 }}
               >
-                {children}
+                <Notifications position="top-right" />
+                <ModalsProvider>{children}</ModalsProvider>
               </MantineProvider>
             </TranslationInitializer>
           </AuthContextProvider>
