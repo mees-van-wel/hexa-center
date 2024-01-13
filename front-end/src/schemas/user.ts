@@ -1,5 +1,4 @@
 import {
-  date,
   Input,
   minLength,
   nullable,
@@ -21,7 +20,7 @@ export const UserCreateSchema = object({
   email: nullable(string([toNull(), nullableEmail()])),
   // TODO Phone number validation pipe
   phoneNumber: nullable(string()),
-  dateOfBirth: nullable(date()),
+  dateOfBirth: nullable(string()),
   // TODO sex picklist
   sex: nullable(string()),
   street: nullable(string()),
@@ -42,7 +41,7 @@ export const UserUpdateSchema = object({
   email: nullish(string()),
   // TODO Phone number validation pipe
   phoneNumber: nullish(string()),
-  dateOfBirth: nullish(date()),
+  dateOfBirth: nullish(string()),
   // TODO sex picklist
   sex: nullish(string()),
   street: nullish(string()),

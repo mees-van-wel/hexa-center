@@ -1,10 +1,11 @@
 "use client";
 
+import { Controller, useFormContext } from "react-hook-form";
+
 import { Address } from "@/components/common/Address";
 import { Combobox } from "@/components/common/Combobox";
 import { PhoneInput } from "@/components/common/PhoneInput";
 import { SEX_VALUES } from "@/constants/sexes";
-import { useFormContext } from "@/hooks/useFormContext";
 import { useTranslation } from "@/hooks/useTranslation";
 import { UserCreateInputSchema, UserUpdateInputSchema } from "@/schemas/user";
 import { Avatar, Group, Paper, Stack, TextInput } from "@mantine/core";
@@ -17,7 +18,7 @@ type UserFormProps = {
 export const UserForm = ({ disabled }: UserFormProps) => {
   const t = useTranslation();
 
-  const { register } = useFormContext<
+  const { register, control } = useFormContext<
     UserCreateInputSchema | UserUpdateInputSchema
   >();
 
@@ -44,29 +45,50 @@ export const UserForm = ({ disabled }: UserFormProps) => {
             disabled={disabled}
             type="email"
           />
-          <PhoneInput
-            {...register("phoneNumber")}
-            label={t("usersPage.phoneNumber")}
-            disabled={disabled}
+          <Controller
+            name="phoneNumber"
+            control={control}
+            render={({ field, fieldState: { error } }) => (
+              <PhoneInput
+                {...field}
+                label={t("usersPage.phoneNumber")}
+                error={error?.message}
+                disabled={disabled}
+              />
+            )}
           />
         </Group>
         <Address disabled={disabled} />
         <Group>
-          <DateInput
-            {...register("dateOfBirth")}
-            label={t("usersPage.dateOfBirth")}
-            disabled={disabled}
-            clearable
+          <Controller
+            name="dateOfBirth"
+            control={control}
+            render={({ field, fieldState: { error } }) => (
+              <DateInput
+                {...field}
+                label={t("usersPage.dateOfBirth")}
+                error={error?.message}
+                disabled={disabled}
+                clearable
+              />
+            )}
           />
-          <Combobox
-            {...register("sex")}
-            label={t("usersPage.sex")}
-            data={SEX_VALUES.map((sex) => ({
-              label: t(`constants.sexes.${sex}`),
-              value: sex,
-            }))}
-            disabled={disabled}
-            clearable
+          <Controller
+            name="sex"
+            control={control}
+            render={({ field, fieldState: { error } }) => (
+              <Combobox
+                {...field}
+                label={t("usersPage.sex")}
+                error={error?.message}
+                data={SEX_VALUES.map((sex) => ({
+                  label: t(`constants.sexes.${sex}`),
+                  value: sex,
+                }))}
+                disabled={disabled}
+                clearable
+              />
+            )}
           />
         </Group>
       </Stack>

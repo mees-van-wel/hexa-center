@@ -2,9 +2,9 @@
 
 import { useCallback, useMemo } from "react";
 import { useState } from "react";
+import { useFormContext } from "react-hook-form";
 
 import { COUNTRY_VALUES } from "@/constants/countries";
-import { useFormContext } from "@/hooks/useFormContext";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Group, TextInput } from "@mantine/core";
 import { useDidUpdate } from "@mantine/hooks";
@@ -42,7 +42,12 @@ type AddressProps = {
 export const Address = ({ disabled }: AddressProps) => {
   const t = useTranslation();
 
-  const { values, setValues, errors, register } = useFormContext<{
+  const {
+    register,
+    getValues,
+    setValue,
+    formState: { errors },
+  } = useFormContext<{
     street?: string | null;
     houseNumber?: string | null;
     postalCode?: string | null;
@@ -51,16 +56,25 @@ export const Address = ({ disabled }: AddressProps) => {
     country?: string | null;
   }>();
 
-  const street = values.street;
-  const houseNumber = values.houseNumber;
+  // const street = watch("street");
+  // const houseNumber = watch("houseNumber");
 
-  const defaultValue = useMemo(
-    () =>
-      street && houseNumber
-        ? `${street} ${houseNumber}`
-        : street ?? houseNumber,
-    [street, houseNumber],
-  );
+  // const defaultValue = useMemo(
+  //   () =>
+  //     street && houseNumber
+  //       ? `${street} ${houseNumber}`
+  //       : street ?? houseNumber,
+  //   [street, houseNumber],
+  // );
+
+  const defaultValue = useMemo(() => {
+    const street = getValues("street");
+    const houseNumber = getValues("houseNumber");
+
+    return street && houseNumber
+      ? `${street} ${houseNumber}`
+      : street ?? houseNumber;
+  }, [getValues]);
 
   const [searchValue, setSearchValue] = useState(defaultValue);
   const [options, setOptions] = useState<{ label: string; value: string }[]>(
@@ -129,11 +143,11 @@ export const Address = ({ disabled }: AddressProps) => {
 
   const selectHandler = useCallback(
     (option: string | null) => {
-      if (!option)
-        return setValues({
-          street: null,
-          houseNumber: null,
-        });
+      if (!option) {
+        setValue("street", null, { shouldDirty: true, shouldTouch: true });
+        setValue("houseNumber", null, { shouldDirty: true, shouldTouch: true });
+        return;
+      }
 
       if (option.substring(0, 2) !== '{"') {
         const addressArray = option.split(/(\d+.*)/) as string[];
@@ -142,11 +156,17 @@ export const Address = ({ disabled }: AddressProps) => {
         let houseNumber = "";
         if (addressArray.length) houseNumber = addressArray.join("").trim();
 
-        return setValues({ street, houseNumber });
+        setValue("street", street, { shouldDirty: true, shouldTouch: true });
+        setValue("houseNumber", houseNumber, {
+          shouldDirty: true,
+          shouldTouch: true,
+        });
+        return;
       }
 
       const selectedAddress = JSON.parse(option);
-      const newValues = Object.values(AddressKey).reduce((values, key) => {
+
+      Object.values(AddressKey).forEach((key) => {
         let value = selectedAddress[key];
 
         if (key === AddressKey.Country)
@@ -154,15 +174,10 @@ export const Address = ({ disabled }: AddressProps) => {
             (countryObject) => countryObject.isoAlpha3 === value,
           )?.countryCode;
 
-        return {
-          ...values,
-          [key]: value,
-        };
-      }, {});
-
-      setValues(newValues);
+        setValue(key, value, { shouldDirty: true, shouldTouch: true });
+      });
     },
-    [setValues],
+    [setValue],
   );
 
   const countryOptions = useMemo(
@@ -186,7 +201,7 @@ export const Address = ({ disabled }: AddressProps) => {
         defaultValue={defaultValue}
         disabled={disabled}
         // positionDependencies={[options]}
-        error={errors.street}
+        error={errors.street?.message}
         // filter={({ options }) => options}
         searchable
         clearable
