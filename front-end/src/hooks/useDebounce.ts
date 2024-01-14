@@ -1,9 +1,8 @@
 import { useRef } from "react";
-import { useWatch } from "react-hook-form";
+import { useFormState, useWatch } from "react-hook-form";
 
 import { useDidUpdate } from "@mantine/hooks";
 
-// TODO * Only dirtyfields
 // TODO Fix typings
 export const useDebounce = <T>(
   control: T,
@@ -12,10 +11,18 @@ export const useDebounce = <T>(
 ) => {
   const timeoutRef = useRef<NodeJS.Timeout>();
   const values = useWatch({ control });
+  const { dirtyFields } = useFormState({ control });
 
   useDidUpdate(() => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    // TODO *
-    timeoutRef.current = setTimeout(() => callback(values), delay);
+    timeoutRef.current = setTimeout(
+      () =>
+        callback(
+          Object.keys(dirtyFields).reduce((acc, key) => {
+            return { ...acc, [key]: values[key] };
+          }, {}),
+        ),
+      delay,
+    );
   }, [values]);
 };

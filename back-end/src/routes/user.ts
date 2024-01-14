@@ -4,6 +4,7 @@ import { number } from "valibot";
 import db from "@/db/client";
 import { users } from "@/db/schema";
 import { procedure, router } from "@/trpc";
+import { dateToString } from "@/utils/date";
 import { wrap } from "@decs/typeschema";
 import { UserCreateSchema, UserUpdateSchema } from "@front-end/schemas/user";
 import { TRPCError } from "@trpc/server";
@@ -16,6 +17,9 @@ export const userRouter = router({
         .insert(users)
         .values({
           ...input,
+          dateOfBirth: input.dateOfBirth
+            ? dateToString(input.dateOfBirth)
+            : undefined,
           createdById: ctx.user.id,
           updatedById: ctx.user.id,
           propertyId: 1,
@@ -43,7 +47,12 @@ export const userRouter = router({
           dateOfBirth: users.dateOfBirth,
         });
 
-      return result[0];
+      const user = result[0];
+
+      return {
+        ...user,
+        dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth) : null,
+      };
     }),
   list: procedure.query(() =>
     db
@@ -90,6 +99,9 @@ export const userRouter = router({
         .update(users)
         .set({
           ...input,
+          dateOfBirth: input.dateOfBirth
+            ? dateToString(input.dateOfBirth)
+            : undefined,
           updatedById: ctx.user.id,
         })
         .where(eq(users.id, input.id))
@@ -114,7 +126,12 @@ export const userRouter = router({
           dateOfBirth: users.dateOfBirth,
         });
 
-      return result[0];
+      const user = result[0];
+
+      return {
+        ...user,
+        dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth) : null,
+      };
     }),
   delete: procedure
     .input(wrap(number()))

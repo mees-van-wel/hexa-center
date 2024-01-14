@@ -2,11 +2,11 @@
 
 import { useCallback, useMemo } from "react";
 import { useState } from "react";
-import { useFormContext } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 
 import { COUNTRY_VALUES } from "@/constants/countries";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Group, TextInput } from "@mantine/core";
+import { Group, Select, TextInput } from "@mantine/core";
 import { useDidUpdate } from "@mantine/hooks";
 
 import { Combobox } from "../Combobox";
@@ -46,6 +46,7 @@ export const Address = ({ disabled }: AddressProps) => {
     register,
     getValues,
     setValue,
+    control,
     formState: { errors },
   } = useFormContext<{
     street?: string | null;
@@ -55,17 +56,6 @@ export const Address = ({ disabled }: AddressProps) => {
     region?: string | null;
     country?: string | null;
   }>();
-
-  // const street = watch("street");
-  // const houseNumber = watch("houseNumber");
-
-  // const defaultValue = useMemo(
-  //   () =>
-  //     street && houseNumber
-  //       ? `${street} ${houseNumber}`
-  //       : street ?? houseNumber,
-  //   [street, houseNumber],
-  // );
 
   const defaultValue = useMemo(() => {
     const street = getValues("street");
@@ -201,7 +191,7 @@ export const Address = ({ disabled }: AddressProps) => {
         defaultValue={defaultValue}
         disabled={disabled}
         // positionDependencies={[options]}
-        error={errors.street?.message}
+        error={errors.street?.message || errors.houseNumber?.message}
         // filter={({ options }) => options}
         searchable
         clearable
@@ -209,6 +199,7 @@ export const Address = ({ disabled }: AddressProps) => {
       <TextInput
         {...register("postalCode")}
         label={t("components.address.postalCode")}
+        error={errors.postalCode?.message}
         autoComplete="none"
         disabled={disabled}
       />
@@ -216,22 +207,31 @@ export const Address = ({ disabled }: AddressProps) => {
         {...register("city")}
         autoComplete="none"
         label={t("components.address.city")}
+        error={errors.city?.message}
         disabled={disabled}
       />
       <TextInput
         {...register("region")}
         autoComplete="none"
         label={t("components.address.region")}
+        error={errors.region?.message}
         disabled={disabled}
       />
-      <Combobox
-        {...register("country")}
-        autoComplete="none"
-        label={t("components.address.country")}
-        data={countryOptions}
-        disabled={disabled}
-        searchable
-        clearable
+      <Controller
+        name="country"
+        control={control}
+        render={({ field, fieldState: { error } }) => (
+          <Select
+            {...field}
+            error={error?.message}
+            autoComplete="none"
+            label={t("components.address.country")}
+            data={countryOptions}
+            disabled={disabled}
+            searchable
+            clearable
+          />
+        )}
       />
     </Group>
   );

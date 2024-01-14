@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   FormProvider,
   useForm,
@@ -17,6 +18,8 @@ import { UserUpdateInputSchema, UserUpdateSchema } from "@/schemas/user";
 import { type RouterOutput } from "@/utils/trpc";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Alert, Badge, Button, Loader, Stack } from "@mantine/core";
+import { modals } from "@mantine/modals";
+import { notifications } from "@mantine/notifications";
 import {
   IconAlertTriangle,
   IconCheck,
@@ -30,30 +33,42 @@ type UserPageProps = {
   user: RouterOutput["user"]["get"];
 };
 
-// TODO Populate inputs with form errors
-// TODO Translate is self alert
-// TODO User deletion
 // TODO Fix type errors in user form
-// TODO Fix date
+// TODO Fix select input search
+// TODO Fix hydration errors
 export const UserUpdate = ({ user }: UserPageProps) => {
+  const deleteUser = useMutation("user", "delete");
   const authUser = useAuthUser();
+  const router = useRouter();
   const t = useTranslation();
 
-  // const deleteUser = useMutation("user", "delete");
-  // const router = useRouter();
+  const formMethods = useForm({
+    defaultValues: user,
+    resolver: valibotResolver(UserUpdateSchema),
+  });
 
   const isSelf = user.id === authUser.id;
 
-  const deletehandler = () => {};
+  const deletehandler = () => {
+    modals.openConfirmModal({
+      title: t("common.areYouSure"),
+      labels: { confirm: t("common.yes"), cancel: t("common.no") },
+      onConfirm: async () => {
+        await deleteUser.mutate(user.id);
+
+        notifications.show({
+          message: t("usersPage.deletedNotification"),
+          color: "green",
+        });
+
+        router.push("/users");
+      },
+    });
+  };
 
   return (
     <Stack>
-      <FormProvider
-        {...useForm({
-          defaultValues: user,
-          resolver: valibotResolver(UserUpdateSchema),
-        })}
-      >
+      <FormProvider {...formMethods}>
         <DashboardHeader
           backRouteFallback="/users"
           title={[
@@ -72,6 +87,7 @@ export const UserUpdate = ({ user }: UserPageProps) => {
                 variant="light"
                 onClick={deletehandler}
                 leftSection={<IconTrash />}
+                loading={deleteUser.loading}
               >
                 {t("common.delete")}
               </Button>
@@ -83,10 +99,10 @@ export const UserUpdate = ({ user }: UserPageProps) => {
           <Alert
             icon={<IconAlertTriangle />}
             color="orange"
-            title="You can't edit yourself here"
+            title={t("usersPage.isSelfAlert.title")}
           >
-            Your own personal details are editable only on the{" "}
-            <Link href="/profile">Profile page</Link>.
+            {t("usersPage.isSelfAlert.message") + " "}
+            <Link href="/profile">{t("usersPage.isSelfAlert.button")}</Link>.
           </Alert>
         )}
         <UserForm disabled={isSelf} />

@@ -12,6 +12,9 @@ export type Translation = {
     number: string;
     delete: string;
     name: string;
+    areYouSure: string;
+    yes: string;
+    no: string;
   };
   authLayout: {
     help: string;
@@ -75,6 +78,13 @@ export type Translation = {
     phoneNumber: string;
     dateOfBirth: string;
     sex: string;
+    createdNotification: string;
+    deletedNotification: string;
+    isSelfAlert: {
+      title: string;
+      message: string;
+      button: string;
+    };
   };
   components: {
     address: {

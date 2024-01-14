@@ -11,6 +11,9 @@ export default {
     number: "Number",
     delete: "Delete",
     name: "Name",
+    areYouSure: "Are you sure?",
+    yes: "Yes",
+    no: "No",
   },
   authLayout: {
     help: "Help",
@@ -75,6 +78,13 @@ export default {
     phoneNumber: "Phone number",
     dateOfBirth: "Date of birth",
     sex: "Sex",
+    createdNotification: "User successfully created",
+    deletedNotification: "User successfully deleted",
+    isSelfAlert: {
+      title: "You can't edit yourself here",
+      message: "Your own personal details are editable only on the",
+      button: "Profile Page",
+    },
   },
   components: {
     address: {

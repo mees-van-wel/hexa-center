@@ -18,9 +18,11 @@ type UserFormProps = {
 export const UserForm = ({ disabled }: UserFormProps) => {
   const t = useTranslation();
 
-  const { register, control } = useFormContext<
-    UserCreateInputSchema | UserUpdateInputSchema
-  >();
+  const {
+    register,
+    control,
+    formState: { errors },
+  } = useFormContext<UserCreateInputSchema | UserUpdateInputSchema>();
 
   return (
     <Paper p="md">
@@ -30,18 +32,21 @@ export const UserForm = ({ disabled }: UserFormProps) => {
           <TextInput
             {...register("firstName")}
             label={t("usersPage.firstName")}
+            error={errors.firstName?.message}
             disabled={disabled}
             withAsterisk
           />
           <TextInput
             {...register("lastName")}
             label={t("usersPage.lastName")}
+            error={errors.lastName?.message}
             disabled={disabled}
             withAsterisk
           />
           <TextInput
             {...register("email")}
             label={t("usersPage.email")}
+            error={errors.email?.message}
             disabled={disabled}
             type="email"
           />

@@ -11,6 +11,9 @@ export default {
     number: "Nummer",
     delete: "Verwijderen",
     name: "Name",
+    areYouSure: "Weet je het zeker?",
+    yes: "Ja",
+    no: "Nee",
   },
   authLayout: {
     help: "Help",
@@ -77,6 +80,13 @@ export default {
     phoneNumber: "Telefoonnummer",
     dateOfBirth: "Geboortedatum",
     sex: "Sekse",
+    createdNotification: "Gebruiker succesvol aangemaakt",
+    deletedNotification: "Gebruiker succesvol verwijderd",
+    isSelfAlert: {
+      title: "Je kunt jezelf hier niet bewerken",
+      message: "Je eigen persoonlijke gegevens zijn alleen bewerkbaar op de",
+      button: "Profielpagina",
+    },
   },
   components: {
     address: {
