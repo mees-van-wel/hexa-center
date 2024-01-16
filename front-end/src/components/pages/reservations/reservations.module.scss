@@ -11,8 +11,17 @@
 //     padding: 0, 0.5rem;
 // }
 
+.calendarOverview {
+  transition: gap 0.2s ease-in;
+}
+
+.calendarContainer {
+  flex-grow: 1;
+}
+
 .calendar {
   position: relative;
+  flex-grow: 1;
 }
 
 .row {
@@ -37,24 +46,16 @@
 }
 
 .reservation {
-  // transition....
   position: absolute;
   z-index: 10;
   margin-left: 6px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  // border-radius: 1rem;
-  // right blue and dark mode?
-  // background-color: var(--mantine-color-blue-9);
-  // padding: 0.125rem 0.5rem;
-  // color: rgb(var(--color-text));
-  // text-decoration: none;
 
   &.begin {
     // border-left: solid 10px red;
-    // background-color: var(--mantine-color-green-6);
-    // background-color: var(--mantine-color-blue-7);
+    // border gradient?
   }
 }
 
@@ -67,8 +68,6 @@
   position: absolute;
   right: -1.5rem;
   top: -1.5rem;
-  //   height: 2rem;
-  //   width: 2rem;
   display: flex;
   cursor: pointer;
   align-items: center;

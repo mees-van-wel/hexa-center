@@ -10,6 +10,10 @@ export type Translation = {
     delete: string;
     name: string;
     areYouSure: string;
+    today: string;
+    week: string;
+    workweek: string;
+    day: string;
   };
   dates: {
     weekdayNames: {

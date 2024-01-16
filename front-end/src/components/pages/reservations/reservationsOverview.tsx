@@ -2,10 +2,10 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import dayjs from "dayjs";
 
+import { CalendarSidebar } from "@/components/common/CalendarSidebar";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { CALENDARVIEW, CalendarView } from "@/constants/calendarView";
 import { MONTH_VALUES } from "@/constants/months";
@@ -44,9 +44,6 @@ const isDateBetween = (date: Date, startDate: Date, endDate: Date) =>
   toUTC(date) >= toUTC(startDate) && toUTC(date) <= toUTC(endDate);
 
 const now = new Date();
-// now.setFullYear(2023);
-// now.setMonth(11);
-// now.setDate(21);
 now.setHours(0, 0, 0, 0);
 
 export const Reservations = ({
@@ -55,14 +52,13 @@ export const Reservations = ({
   showAll,
 }: ReservationsProps) => {
   const t = useTranslation();
-  const router = useRouter();
 
   const preferredStartDayIndex: number | "AUTO" = 1;
   const [date, setDate] = useState(now);
   const [calendarView, setCalendarView] = useState<CalendarView>(
     CALENDARVIEW.WEEK,
   );
-  const [sidebarToggle, setSideBarToggle] = useState(false);
+  const [sidebarToggle, setSideBarToggle] = useState(true);
 
   const currentWeek = useMemo(() => {
     const utcDate = toUTC(date);
@@ -138,7 +134,7 @@ export const Reservations = ({
   );
 
   return (
-    <Stack>
+    <Stack h="100%">
       <DashboardHeader
         title={[
           {
@@ -154,9 +150,15 @@ export const Reservations = ({
           {t("common.new")}
         </Button>
       </DashboardHeader>
-      <Paper p={"1rem"}>
-        <Group grow wrap="nowrap" gap={sidebarToggle ? "md" : 0} align="start">
-          {/* <Paper class="relative grow"> (check styling with sidebar) */}
+
+      <Group
+        wrap="nowrap"
+        gap={sidebarToggle ? "md" : 0}
+        align="stretch"
+        h="100%"
+        className={styles.calendarOverview}
+      >
+        <Paper p={"1rem"} className={styles.calendarContainer}>
           <div className={styles.calendar}>
             <Stack>
               <Group grow gap={0} ta="center" fw="700">
@@ -164,7 +166,7 @@ export const Reservations = ({
                   style={{
                     flexBasis: `calc(100% / ${currentWeek.length + 1})`,
                   }}
-                  // className={styles.weekHidden}
+                  className={styles.weekHidden}
                 />
                 {currentWeek.map((weekDay, index) => (
                   // TODO: use group to calc with inside prop? instead of div
@@ -173,7 +175,7 @@ export const Reservations = ({
                     style={{
                       flexBasis: `calc(100% / ${currentWeek.length + 1})`,
                     }}
-                    // className={styles.week}
+                    className={styles.week}
                   >
                     {t(
                       `dates.weekdayNamesShort.${
@@ -186,9 +188,9 @@ export const Reservations = ({
                 ))}
               </Group>
 
-              <Stack gap={0}>
-                {rooms.length ? (
-                  rooms
+              <Stack gap={0} w="100%">
+                {currentRooms.length ? (
+                  currentRooms
                     .sort((a, b) =>
                       a.name > b.name ? 1 : b.name > a.name ? -1 : 0,
                     )
@@ -421,27 +423,23 @@ export const Reservations = ({
                 setSideBarToggle(!sidebarToggle);
               }}
             >
-              {sidebarToggle ? (
-                <IconArrowBarRight width={"xs"} />
-              ) : (
-                <IconArrowBarLeft width={"xs"} />
-              )}
+              {sidebarToggle ? <IconArrowBarRight /> : <IconArrowBarLeft />}
             </div>
           </div>
-          {/* <CalendarSidebar
-            date={date.value}
-            now={now}
-            sideBarToggle={sideBarToggle.value}
-            onDateChange$={(value) => {
-              date.value = toUTC(value);
-            }}
-            onCalendarViewChange$={(value) => {
-              CalendarView.value = value;
-            }}
-            CalendarView={CalendarView.value}
-          /> */}
-        </Group>
-      </Paper>
+        </Paper>
+        <CalendarSidebar
+          date={date}
+          now={now}
+          sideBarToggle={sidebarToggle}
+          onDateChange={(value) => {
+            setDate(toUTC(value));
+          }}
+          onCalendarViewChange={(value) => {
+            setCalendarView(value);
+          }}
+          calendarView={calendarView}
+        />
+      </Group>
     </Stack>
   );
 };

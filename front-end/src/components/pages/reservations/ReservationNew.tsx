@@ -44,27 +44,30 @@ export const ReservationNew = ({ rooms, users }: ReservationNewProps) => {
   };
 
   return (
-    <FormProvider {...methods}>
-      <form autoComplete="on" onSubmit={methods.handleSubmit(onSubmit)}>
-        <Stack>
-          <DashboardHeader
-            title={[
-              {
-                label: t("dashboardLayout.reservations"),
-                href: "/reservations",
-              },
-              { label: t("common.new") },
-            ]}
-          >
-            <Button type="submit" leftSection={<IconPlus />}>
-              {t("common.create")}
-            </Button>
-          </DashboardHeader>
-          <Paper p={"1rem"}>
+    <Stack>
+      <DashboardHeader
+        title={[
+          {
+            label: t("dashboardLayout.reservations"),
+            href: "/reservations",
+          },
+          { label: t("common.new") },
+        ]}
+      >
+        <Button
+          onClick={methods.handleSubmit(onSubmit)}
+          leftSection={<IconPlus />}
+        >
+          {t("common.create")}
+        </Button>
+      </DashboardHeader>
+      <Paper p={"1rem"}>
+        <FormProvider {...methods}>
+          <form autoComplete="on">
             <ReservationForm rooms={rooms} users={users} />
-          </Paper>
-        </Stack>
-      </form>
-    </FormProvider>
+          </form>
+        </FormProvider>
+      </Paper>
+    </Stack>
   );
 };

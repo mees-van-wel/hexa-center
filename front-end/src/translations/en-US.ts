@@ -12,6 +12,10 @@ export default {
     delete: "Delete",
     name: "Name",
     areYouSure: "Are you sure?",
+    today: "Today",
+    week: "Week",
+    workweek: "Workweek",
+    day: "Day",
   },
   dates: {
     weekdayNames: {

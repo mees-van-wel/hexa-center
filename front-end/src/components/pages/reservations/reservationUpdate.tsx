@@ -105,7 +105,7 @@ export const Reservation = ({
                 href: "/reservations",
               },
               {
-                label: `${reservation.user.firstName} ${reservation.user.lastName}`,
+                label: `${reservation.customer.firstName} ${reservation.customer.lastName}`,
               },
             ]}
           >

@@ -5,7 +5,7 @@ import { wrap } from "@decs/typeschema";
 import { TRPCError } from "@trpc/server";
 
 import db from "../db/client.js";
-import { reservations, rooms, users } from "../db/schema.js";
+import { reservations } from "../db/schema.js";
 import {
   ReservationCreateSchema,
   ReservationUpdateSchema,
@@ -44,39 +44,22 @@ export const reservationRouter = router({
       return reservation;
     }),
   list: procedure.query(() =>
-    db
-      .select({
-        id: reservations.id,
-        roomId: reservations.roomId,
-        customerId: reservations.customerId,
-        startDate: reservations.startDate,
-        endDate: reservations.endDate,
-        notes: reservations.notes,
-        guestName: reservations.guestName,
-        customer: { firstName: users.firstName, lastName: users.lastName },
-        room: { name: rooms.name },
-      })
-      .from(reservations)
-      .innerJoin(users, eq(reservations.customerId, users.id))
-      .innerJoin(rooms, eq(reservations.roomId, rooms.id)),
+    db.query.reservations.findMany({
+      with: {
+        customer: true,
+        room: true,
+      },
+    }),
   ),
   get: procedure.input(wrap(number())).query(async ({ input }) => {
-    const result = await db
-      .select({
-        id: reservations.id,
-        roomId: reservations.roomId,
-        customerId: reservations.customerId,
-        startDate: reservations.startDate,
-        endDate: reservations.endDate,
-        notes: reservations.notes,
-        guestName: reservations.guestName,
-        user: { firstName: users.firstName, lastName: users.lastName },
-      })
-      .from(reservations)
-      .innerJoin(users, eq(reservations.customerId, users.id))
-      .where(eq(reservations.id, input));
+    const reservation = await db.query.reservations.findFirst({
+      where: eq(reservations.id, input),
+      with: {
+        customer: true,
+        room: true,
+      },
+    });
 
-    const reservation = result[0];
     if (!reservation) throw new TRPCError({ code: "NOT_FOUND" });
 
     return reservation;
