@@ -74,6 +74,15 @@ body {
     cursor: text;
   }
 
+  &[data-error] {
+    border-color: var(--mantine-color-error);
+  }
+
+  &:focus {
+    border-color: var(--mantine-primary-color-filled);
+    color: unset;
+  }
+
   body[data-theme="dark"] & {
     box-shadow:
       inset 2px 2px 2px #141517,

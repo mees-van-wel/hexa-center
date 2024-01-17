@@ -1,8 +1,12 @@
 import { pack, unpack } from "msgpackr";
+import { parse, stringify } from "superjson";
+
+import { isProduction } from "./environment";
 
 export const trpcTransformer = {
   serialize: (data: any) => {
     if (!data) return data;
+    if (!isProduction) return stringify(data);
 
     try {
       return pack(data).toString("base64");
@@ -14,6 +18,7 @@ export const trpcTransformer = {
   },
   deserialize: (data: string) => {
     if (!data) return data;
+    if (!isProduction) return parse(data);
 
     try {
       // @ts-ignore

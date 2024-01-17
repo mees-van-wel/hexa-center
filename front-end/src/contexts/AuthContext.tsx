@@ -16,15 +16,17 @@ type AuthContext = {
   setAuth: (auth: AuthState) => any;
 } | null;
 
+type AuthContextProps = {
+  children: React.ReactNode;
+  currentUser: CurrentUser | null;
+};
+
 const AuthContext = createContext<AuthContext>(null);
 
 export const AuthContextProvider = ({
   children,
   currentUser,
-}: {
-  children: React.ReactNode;
-  currentUser: CurrentUser | null;
-}) => {
+}: AuthContextProps) => {
   const [auth, setAuth] = useState<AuthState>({
     user: currentUser,
     accessToken: null,

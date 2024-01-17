@@ -1,6 +1,6 @@
 "use client";
 
-import React, { forwardRef, useEffect, useMemo } from "react";
+import React, { forwardRef, ReactNode, useEffect, useMemo } from "react";
 
 import {
   Combobox as ComboboxComponent,
@@ -29,11 +29,11 @@ type ComboboxProps = {
     root?: string;
     input?: string;
   };
-  value?: string;
+  value?: string | null;
   defaultValue?: string | null;
   label?: string;
   description?: string;
-  error?: string;
+  error?: ReactNode | string;
   autoComplete?: string;
   searchValue?: string;
   defaultSearchValue?: string;
@@ -103,11 +103,6 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
     });
 
     useEffect(() => {
-      if (value === null) {
-        setSearch("");
-        console.log("trigger 2E", "");
-      }
-
       if (typeof value === "string" && selectedOption) {
         // TODO Fix this, sometimes it overwrites search input
         setSearch(selectedOption.label);
@@ -118,7 +113,6 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
       <ComboboxComponent.ClearButton
         onClear={() => {
           setStateValue(null);
-          console.log("trigger 2C", "");
           setSearch("");
         }}
       />
@@ -136,10 +130,6 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
             : optionsLockup[val].value;
 
           setStateValue(nextValue);
-          console.log(
-            "trigger 2B",
-            typeof nextValue === "string" ? optionsLockup[val].label : "",
-          );
           setSearch(
             typeof nextValue === "string" ? optionsLockup[val].label : "",
           );
@@ -166,7 +156,6 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
             required={required}
             value={search}
             onChange={(event) => {
-              console.log("trigger 1", event.currentTarget.value);
               setSearch(event.currentTarget.value);
               combobox.openDropdown();
             }}
@@ -176,12 +165,6 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
             onBlur={() => {
               searchable && combobox.closeDropdown();
 
-              console.log(
-                "trigger 2A",
-                stateValue != null
-                  ? optionsLockup[stateValue]?.label || ""
-                  : "",
-              );
               setSearch(
                 stateValue != null
                   ? optionsLockup[stateValue]?.label || ""
@@ -194,7 +177,6 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
             pointer={!searchable}
           />
         </ComboboxComponent.Target>
-
         <ComboboxComponent.Dropdown hidden={disabled} p={0}>
           <ComboboxComponent.Options>
             <ScrollArea.Autosize type="always" mah={300}>
@@ -206,15 +188,7 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
                 >
                   {item.label}
                   {item.description && (
-                    <Text
-                      size="xs"
-                      style={{
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      }}
-                      opacity={0.6}
-                    >
+                    <Text size="xs" opacity={0.6}>
                       {item.description}
                     </Text>
                   )}

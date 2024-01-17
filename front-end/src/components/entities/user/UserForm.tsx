@@ -18,9 +18,11 @@ type UserFormProps = {
 export const UserForm = ({ disabled }: UserFormProps) => {
   const t = useTranslation();
 
-  const { register, control, formState } = useFormContext<
-    UserCreateInputSchema | UserUpdateInputSchema
-  >();
+  const {
+    register,
+    control,
+    formState: { errors },
+  } = useFormContext<UserCreateInputSchema | UserUpdateInputSchema>();
 
   return (
     <Paper p="md">
@@ -29,22 +31,24 @@ export const UserForm = ({ disabled }: UserFormProps) => {
           <Avatar size="lg" />
           <TextInput
             {...register("firstName")}
-            label={t("usersPage.firstName")}
-            error={formState.errors.firstName?.message}
+            label={t("entities.user.keys.firstName")}
+            error={errors.firstName?.message}
             disabled={disabled}
+            withAsterisk
           />
           <TextInput
             {...register("lastName")}
-            label={t("usersPage.lastName")}
-            error={formState.errors.lastName?.message}
+            label={t("entities.user.keys.lastName")}
+            error={errors.lastName?.message}
             disabled={disabled}
+            withAsterisk
           />
           <TextInput
             {...register("email")}
-            label={t("usersPage.email")}
-            error={formState.errors.email?.message}
-            type="email"
+            label={t("entities.user.keys.email")}
+            error={errors.email?.message}
             disabled={disabled}
+            type="email"
           />
           <Controller
             name="phoneNumber"
@@ -52,7 +56,7 @@ export const UserForm = ({ disabled }: UserFormProps) => {
             render={({ field, fieldState: { error } }) => (
               <PhoneInput
                 {...field}
-                label={t("usersPage.phoneNumber")}
+                label={t("entities.user.keys.phoneNumber")}
                 error={error?.message}
                 disabled={disabled}
               />
@@ -61,19 +65,35 @@ export const UserForm = ({ disabled }: UserFormProps) => {
         </Group>
         <Address disabled={disabled} />
         <Group>
-          <DateInput
-            label={t("usersPage.dateOfBirth")}
-            disabled={disabled}
-            clearable
+          <Controller
+            name="dateOfBirth"
+            control={control}
+            render={({ field, fieldState: { error } }) => (
+              <DateInput
+                {...field}
+                label={t("entities.user.keys.dateOfBirth")}
+                error={error?.message}
+                disabled={disabled}
+                clearable
+              />
+            )}
           />
-          <Combobox
-            label={t("usersPage.sex")}
-            data={SEX_VALUES.map((sex) => ({
-              label: t(`constants.sexes.${sex}`),
-              value: sex,
-            }))}
-            disabled={disabled}
-            clearable
+          <Controller
+            name="sex"
+            control={control}
+            render={({ field, fieldState: { error } }) => (
+              <Combobox
+                {...field}
+                label={t("entities.user.keys.sex")}
+                error={error?.message}
+                data={SEX_VALUES.map((sex) => ({
+                  label: t(`constants.sexes.${sex}`),
+                  value: sex,
+                }))}
+                disabled={disabled}
+                clearable
+              />
+            )}
           />
         </Group>
       </Stack>

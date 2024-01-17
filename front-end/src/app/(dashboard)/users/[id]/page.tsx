@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-import { UserUpdate } from "@/components/pages/user/UserUpdate";
+import { UserUpdate } from "@/components/entities/user/UserUpdate";
 import { setTRPCRefreshToken, trpc } from "@/utils/trpc";
 
 type UserPageParams = {

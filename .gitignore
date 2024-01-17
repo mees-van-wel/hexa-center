@@ -13,15 +13,6 @@ pnpm-debug.log
 *.pid
 *.gz
 
-# IDEs and Editors
-.vscode/
-.idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.swp
-
 # Operating System
 .DS_Store
 Thumbs.db
