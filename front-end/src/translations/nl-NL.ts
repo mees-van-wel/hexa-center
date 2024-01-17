@@ -14,6 +14,31 @@ export default {
     areYouSure: "Weet je het zeker?",
     yes: "Ja",
     no: "Nee",
+    error: "Fout",
+    oops: "Er is iets fout gegaan, probeer het later opnieuw",
+  },
+  entities: {
+    user: {
+      name: {
+        singular: "Gebruiker",
+        plural: "Gebruikers",
+      },
+      keys: {
+        firstName: "Voornam",
+        lastName: "Achternaam",
+        email: "E-mail",
+        phoneNumber: "Telefoonnummer",
+        dateOfBirth: "Geboortedatum",
+        sex: "Sekse",
+      },
+      createdNotification: "Gebruiker succesvol aangemaakt",
+      deletedNotification: "Gebruiker succesvol verwijderd",
+      isSelfAlert: {
+        title: "Je kunt jezelf hier niet bewerken",
+        message: "Je eigen persoonlijke gegevens zijn alleen bewerkbaar op de",
+        button: "Profielpagina",
+      },
+    },
   },
   authLayout: {
     help: "Help",
@@ -73,21 +98,6 @@ export default {
     },
     loggedInSuccess: "U bent succesvol ingelogd",
   },
-  usersPage: {
-    firstName: "Voornam",
-    lastName: "Achternaam",
-    email: "E-mail",
-    phoneNumber: "Telefoonnummer",
-    dateOfBirth: "Geboortedatum",
-    sex: "Sekse",
-    createdNotification: "Gebruiker succesvol aangemaakt",
-    deletedNotification: "Gebruiker succesvol verwijderd",
-    isSelfAlert: {
-      title: "Je kunt jezelf hier niet bewerken",
-      message: "Je eigen persoonlijke gegevens zijn alleen bewerkbaar op de",
-      button: "Profielpagina",
-    },
-  },
   components: {
     address: {
       streetAndHouseNumber: "Straat en huisnummer",
@@ -97,6 +107,12 @@ export default {
       country: "Land",
     },
   },
+  // exceptions: {
+  //   DB_UNIQUE_CONSTRAINT: ({ entity, value, column }) =>
+  //     `Een ${entity} met '${value}' als ${column} bestaat al.`,
+  //   DB_KEY_CONSTRAINT: ({ depend, entity }) =>
+  //     `Er zijn een of meerdere ${depend} die deze ${entity} gebruiken, verwijder ze eerst.`,
+  // },
   constants: {
     sexes: {
       FEMALE: "Vrouwelijk",

@@ -14,6 +14,31 @@ export default {
     areYouSure: "Are you sure?",
     yes: "Yes",
     no: "No",
+    error: "Error",
+    oops: "Something went wrong, try again later",
+  },
+  entities: {
+    user: {
+      name: {
+        singular: "User",
+        plural: "Users",
+      },
+      keys: {
+        firstName: "First name",
+        lastName: "Last name",
+        email: "Email",
+        phoneNumber: "Phone number",
+        dateOfBirth: "Date of birth",
+        sex: "Sex",
+      },
+      createdNotification: "User successfully created",
+      deletedNotification: "User successfully deleted",
+      isSelfAlert: {
+        title: "You can't edit yourself here",
+        message: "Your own personal details are editable only on the",
+        button: "Profile Page",
+      },
+    },
   },
   authLayout: {
     help: "Help",
@@ -71,21 +96,6 @@ export default {
     },
     loggedInSuccess: "You're logged in successfully",
   },
-  usersPage: {
-    firstName: "First name",
-    lastName: "Last name",
-    email: "Email",
-    phoneNumber: "Phone number",
-    dateOfBirth: "Date of birth",
-    sex: "Sex",
-    createdNotification: "User successfully created",
-    deletedNotification: "User successfully deleted",
-    isSelfAlert: {
-      title: "You can't edit yourself here",
-      message: "Your own personal details are editable only on the",
-      button: "Profile Page",
-    },
-  },
   components: {
     address: {
       streetAndHouseNumber: "Street and House number",
@@ -95,6 +105,12 @@ export default {
       country: "Country",
     },
   },
+  // exceptions: {
+  //   DB_UNIQUE_CONSTRAINT: ({ entity, value, column }) =>
+  //     `Another ${entity} with '${value}' as ${column} already exists.`,
+  //   DB_KEY_CONSTRAINT: ({ depend, entity }) =>
+  //     `There are one or more ${depend} using this ${entity}, please delete them first.`,
+  // },
   constants: {
     sexes: {
       FEMALE: "Female",

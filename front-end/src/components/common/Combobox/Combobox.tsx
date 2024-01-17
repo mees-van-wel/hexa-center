@@ -29,7 +29,7 @@ type ComboboxProps = {
     root?: string;
     input?: string;
   };
-  value?: string;
+  value?: string | null;
   defaultValue?: string | null;
   label?: string;
   description?: string;

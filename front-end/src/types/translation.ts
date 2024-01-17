@@ -15,6 +15,31 @@ export type Translation = {
     areYouSure: string;
     yes: string;
     no: string;
+    error: string;
+    oops: string;
+  };
+  entities: {
+    user: {
+      name: {
+        singular: string;
+        plural: string;
+      };
+      keys: {
+        firstName: string;
+        lastName: string;
+        email: string;
+        phoneNumber: string;
+        dateOfBirth: string;
+        sex: string;
+      };
+      createdNotification: string;
+      deletedNotification: string;
+      isSelfAlert: {
+        title: string;
+        message: string;
+        button: string;
+      };
+    };
   };
   authLayout: {
     help: string;
@@ -71,21 +96,6 @@ export type Translation = {
     };
     loggedInSuccess: string;
   };
-  usersPage: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phoneNumber: string;
-    dateOfBirth: string;
-    sex: string;
-    createdNotification: string;
-    deletedNotification: string;
-    isSelfAlert: {
-      title: string;
-      message: string;
-      button: string;
-    };
-  };
   components: {
     address: {
       streetAndHouseNumber: string;
@@ -95,6 +105,24 @@ export type Translation = {
       country: string;
     };
   };
+  // exceptions: {
+  //   DB_UNIQUE_CONSTRAINT: ({
+  //     entity,
+  //     value,
+  //     column,
+  //   }: {
+  //     entity: string;
+  //     column: string;
+  //     value: string;
+  //   }) => string;
+  //   DB_KEY_CONSTRAINT: ({
+  //     depend,
+  //     entity,
+  //   }: {
+  //     depend: string;
+  //     entity: string;
+  //   }) => string;
+  // };
   constants: {
     sexes: Record<SexKey, string>;
     countries: Record<CountryKey, string>;

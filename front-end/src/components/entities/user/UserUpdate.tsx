@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -11,7 +12,7 @@ import {
 
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { useAuthUser } from "@/contexts/AuthContext";
-import { useDebounce } from "@/hooks/useDebounce";
+import { useAutosave } from "@/hooks/useAutosave";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
 import { UserUpdateInputSchema, UserUpdateSchema } from "@/schemas/user";
@@ -33,9 +34,6 @@ type UserPageProps = {
   user: RouterOutput["user"]["get"];
 };
 
-// TODO Fix type errors in user form
-// TODO Fix select input search
-// TODO Fix hydration errors
 export const UserUpdate = ({ user }: UserPageProps) => {
   const deleteUser = useMutation("user", "delete");
   const authUser = useAuthUser();
@@ -57,7 +55,7 @@ export const UserUpdate = ({ user }: UserPageProps) => {
         await deleteUser.mutate(user.id);
 
         notifications.show({
-          message: t("usersPage.deletedNotification"),
+          message: t("entities.user.deletedNotification"),
           color: "green",
         });
 
@@ -67,8 +65,8 @@ export const UserUpdate = ({ user }: UserPageProps) => {
   };
 
   return (
-    <Stack>
-      <FormProvider {...formMethods}>
+    <FormProvider {...formMethods}>
+      <Stack>
         <DashboardHeader
           backRouteFallback="/users"
           title={[
@@ -99,46 +97,101 @@ export const UserUpdate = ({ user }: UserPageProps) => {
           <Alert
             icon={<IconAlertTriangle />}
             color="orange"
-            title={t("usersPage.isSelfAlert.title")}
+            title={t("entities.user.isSelfAlert.title")}
           >
-            {t("usersPage.isSelfAlert.message") + " "}
-            <Link href="/profile">{t("usersPage.isSelfAlert.button")}</Link>.
+            {t("entities.user.isSelfAlert.message") + " "}
+            <Link href="/profile">{t("entities.user.isSelfAlert.button")}</Link>
+            .
           </Alert>
         )}
         <UserForm disabled={isSelf} />
-      </FormProvider>
-    </Stack>
+      </Stack>
+    </FormProvider>
   );
 };
 
 const SaveBadge = () => {
+  const updateUser = useMutation("user", "update");
   const t = useTranslation();
 
-  const updateUser = useMutation("user", "update");
+  const { control, getValues, reset, setError } =
+    useFormContext<UserUpdateInputSchema>();
+  const { isDirty, errors } = useFormState({ control });
+  const isError = useMemo(() => !!Object.keys(errors).length, [errors]);
 
-  const { control, getValues, reset } = useFormContext<UserUpdateInputSchema>();
-  const { isDirty } = useFormState({ control });
+  useAutosave(control, async (values) => {
+    function isJson(str: string) {
+      if (!str) return { success: false, json: undefined };
 
-  useDebounce(control, async (values) => {
-    if (!isDirty) return;
+      try {
+        return { success: true, json: JSON.parse(str) };
+      } catch (e) {
+        return { success: false, json: undefined };
+      }
+    }
 
-    // TODO Validation
+    try {
+      const updatedUser = await updateUser.mutate({
+        ...values,
+        id: getValues("id"),
+      });
 
-    const id = getValues("id");
-    const updatedUser = await updateUser.mutate({
-      ...values,
-      id,
-    });
+      reset(updatedUser);
+    } catch (error) {
+      // TODO Fix typings
+      const { success, json } = isJson((error as any).message);
+      if (!success) {
+        notifications.show({
+          message: t("common.oops"),
+          color: "red",
+        });
 
-    reset(updatedUser);
+        reset();
+
+        return;
+      }
+
+      console.log({ success, json });
+
+      const { exception, data } = json;
+
+      if (exception === "DB_UNIQUE_CONSTRAINT") {
+        setError(data.column, {
+          message: `${t("entities.user.name.singular")} - ${getValues(
+            data.column,
+          )} - ${data.column}`,
+
+          // TODO Fix translations with arguments
+
+          // message: t("exceptions.DB_UNIQUE_CONSTRAINT", {
+          //   entity: t("entities.user.name.singular"),
+          //   value: getValues(data.column),
+          //   column: data.column,
+          // }),
+        });
+      }
+
+      // if (exception === "DB_KEY_CONSTRAINT")
+      //   notifications.show({
+      //     message: t("exceptions.DB_KEY_CONSTRAINT", {
+      //       depend: data.depend,
+      //       entity: t("entities.user.name.singular"),
+      //     }),
+      //     color: "red",
+      //   });
+    }
   });
 
   return (
     <Badge
       size="lg"
-      color={isDirty || updateUser.loading ? "orange" : "green"}
+      color={
+        isError ? "red" : isDirty || updateUser.loading ? "orange" : "green"
+      }
       leftSection={
-        isDirty || updateUser.loading ? (
+        isError ? (
+          <IconAlertTriangle size="1rem" />
+        ) : isDirty || updateUser.loading ? (
           <Loader color="orange" variant="oval" size="1rem" />
         ) : (
           <IconCheck size="1rem" />
@@ -146,7 +199,11 @@ const SaveBadge = () => {
       }
       variant="light"
     >
-      {isDirty || updateUser.loading ? t("common.saving") : t("common.saved")}
+      {isError
+        ? t("common.error")
+        : isDirty || updateUser.loading
+          ? t("common.saving")
+          : t("common.saved")}
     </Badge>
   );
 };

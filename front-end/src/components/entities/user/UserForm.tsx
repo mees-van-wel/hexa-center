@@ -31,21 +31,21 @@ export const UserForm = ({ disabled }: UserFormProps) => {
           <Avatar size="lg" />
           <TextInput
             {...register("firstName")}
-            label={t("usersPage.firstName")}
+            label={t("entities.user.keys.firstName")}
             error={errors.firstName?.message}
             disabled={disabled}
             withAsterisk
           />
           <TextInput
             {...register("lastName")}
-            label={t("usersPage.lastName")}
+            label={t("entities.user.keys.lastName")}
             error={errors.lastName?.message}
             disabled={disabled}
             withAsterisk
           />
           <TextInput
             {...register("email")}
-            label={t("usersPage.email")}
+            label={t("entities.user.keys.email")}
             error={errors.email?.message}
             disabled={disabled}
             type="email"
@@ -56,7 +56,7 @@ export const UserForm = ({ disabled }: UserFormProps) => {
             render={({ field, fieldState: { error } }) => (
               <PhoneInput
                 {...field}
-                label={t("usersPage.phoneNumber")}
+                label={t("entities.user.keys.phoneNumber")}
                 error={error?.message}
                 disabled={disabled}
               />
@@ -71,7 +71,7 @@ export const UserForm = ({ disabled }: UserFormProps) => {
             render={({ field, fieldState: { error } }) => (
               <DateInput
                 {...field}
-                label={t("usersPage.dateOfBirth")}
+                label={t("entities.user.keys.dateOfBirth")}
                 error={error?.message}
                 disabled={disabled}
                 clearable
@@ -84,7 +84,7 @@ export const UserForm = ({ disabled }: UserFormProps) => {
             render={({ field, fieldState: { error } }) => (
               <Combobox
                 {...field}
-                label={t("usersPage.sex")}
+                label={t("entities.user.keys.sex")}
                 error={error?.message}
                 data={SEX_VALUES.map((sex) => ({
                   label: t(`constants.sexes.${sex}`),

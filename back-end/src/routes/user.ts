@@ -4,7 +4,7 @@ import { number } from "valibot";
 import db from "@/db/client";
 import { users } from "@/db/schema";
 import { procedure, router } from "@/trpc";
-import { dateToString } from "@/utils/date";
+import { createPgException } from "@/utils/exception";
 import { wrap } from "@decs/typeschema";
 import { UserCreateSchema, UserUpdateSchema } from "@front-end/schemas/user";
 import { TRPCError } from "@trpc/server";
@@ -17,9 +17,6 @@ export const userRouter = router({
         .insert(users)
         .values({
           ...input,
-          dateOfBirth: input.dateOfBirth
-            ? dateToString(input.dateOfBirth)
-            : undefined,
           createdById: ctx.user.id,
           updatedById: ctx.user.id,
           propertyId: 1,
@@ -47,12 +44,7 @@ export const userRouter = router({
           dateOfBirth: users.dateOfBirth,
         });
 
-      const user = result[0];
-
-      return {
-        ...user,
-        dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth) : null,
-      };
+      return result[0];
     }),
   list: procedure.query(() =>
     db
@@ -95,43 +87,39 @@ export const userRouter = router({
   update: procedure
     .input(wrap(UserUpdateSchema))
     .mutation(async ({ input, ctx }) => {
-      const result = await db
-        .update(users)
-        .set({
-          ...input,
-          dateOfBirth: input.dateOfBirth
-            ? dateToString(input.dateOfBirth)
-            : undefined,
-          updatedById: ctx.user.id,
-        })
-        .where(eq(users.id, input.id))
-        .returning({
-          $kind: users.$kind,
-          id: users.id,
-          createdAt: users.createdAt,
-          createdById: users.createdById,
-          updatedAt: users.updatedAt,
-          updatedById: users.updatedById,
-          firstName: users.firstName,
-          lastName: users.lastName,
-          email: users.email,
-          phoneNumber: users.phoneNumber,
-          street: users.street,
-          houseNumber: users.houseNumber,
-          postalCode: users.postalCode,
-          city: users.city,
-          region: users.region,
-          country: users.country,
-          sex: users.sex,
-          dateOfBirth: users.dateOfBirth,
-        });
+      try {
+        const result = await db
+          .update(users)
+          .set({
+            ...input,
+            updatedById: ctx.user.id,
+          })
+          .where(eq(users.id, input.id))
+          .returning({
+            $kind: users.$kind,
+            id: users.id,
+            createdAt: users.createdAt,
+            createdById: users.createdById,
+            updatedAt: users.updatedAt,
+            updatedById: users.updatedById,
+            firstName: users.firstName,
+            lastName: users.lastName,
+            email: users.email,
+            phoneNumber: users.phoneNumber,
+            street: users.street,
+            houseNumber: users.houseNumber,
+            postalCode: users.postalCode,
+            city: users.city,
+            region: users.region,
+            country: users.country,
+            sex: users.sex,
+            dateOfBirth: users.dateOfBirth,
+          });
 
-      const user = result[0];
-
-      return {
-        ...user,
-        dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth) : null,
-      };
+        return result[0];
+      } catch (error) {
+        throw createPgException(error);
+      }
     }),
   delete: procedure
     .input(wrap(number()))

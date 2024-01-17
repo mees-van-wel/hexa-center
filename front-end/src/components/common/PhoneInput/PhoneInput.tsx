@@ -24,7 +24,7 @@ type PhoneInputProps = {
   description?: string;
   error?: string;
   required?: boolean;
-  value?: string;
+  value?: string | null;
   defaultValue?: string;
   onChange?: (value: string) => any;
   disabled?: boolean;

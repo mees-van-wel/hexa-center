@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-import { UsersOverview } from "@/components/pages/user/UsersOverview";
+import { UsersOverview } from "@/components/entities/user/UsersOverview";
 import { setTRPCRefreshToken, trpc } from "@/utils/trpc";
 
 export default async function Page() {

@@ -1,10 +1,10 @@
 import { useRef } from "react";
-import { useFormState, useWatch } from "react-hook-form";
+import { useFormContext, useFormState, useWatch } from "react-hook-form";
 
 import { useDidUpdate } from "@mantine/hooks";
 
 // TODO Fix typings
-export const useDebounce = <T>(
+export const useAutosave = <T>(
   control: T,
   callback: (values: T["_defaultValues"]) => any,
   delay = 700,
@@ -12,17 +12,21 @@ export const useDebounce = <T>(
   const timeoutRef = useRef<NodeJS.Timeout>();
   const values = useWatch({ control });
   const { dirtyFields } = useFormState({ control });
+  const { handleSubmit } = useFormContext();
 
   useDidUpdate(() => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(
-      () =>
+    timeoutRef.current = setTimeout(() => {
+      const dirtyFieldKeys = Object.keys(dirtyFields);
+      if (!dirtyFieldKeys.length) return;
+
+      handleSubmit((values) => {
         callback(
-          Object.keys(dirtyFields).reduce((acc, key) => {
+          dirtyFieldKeys.reduce((acc, key) => {
             return { ...acc, [key]: values[key] };
           }, {}),
-        ),
-      delay,
-    );
+        );
+      })();
+    }, delay);
   }, [values]);
 };
