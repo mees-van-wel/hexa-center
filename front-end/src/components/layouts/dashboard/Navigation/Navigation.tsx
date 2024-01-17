@@ -6,6 +6,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { Button, Stack, Title } from "@mantine/core";
 import {
   IconBed,
+  IconFileEuro,
   IconHome,
   IconHotelService,
   IconUsers,
@@ -33,7 +34,7 @@ export const Navigation = () => {
             {t("dashboardLayout.home")}
           </Button>
           <Stack gap="xs">
-            <Title order={4}>{t("dashboardLayout.modules.essentials")}</Title>
+            <Title order={4}>{t("modules.essentials")}</Title>
             <Stack gap={0}>
               {/* <Button
                 component={Link}
@@ -68,7 +69,22 @@ export const Navigation = () => {
             </Stack>
           </Stack>
           <Stack gap="xs">
-            <Title order={4}>{t("dashboardLayout.modules.bookings")}</Title>
+            <Title order={4}>{t("modules.sales")}</Title>
+            <Stack gap={0}>
+              <Button
+                component={Link}
+                href="/invoices"
+                variant={pathname === "/invoices" ? "filled" : "subtle"}
+                leftSection={<IconFileEuro />}
+                fullWidth
+                justify="left"
+              >
+                {t("entities.invoice.name.plural")}
+              </Button>
+            </Stack>
+          </Stack>
+          <Stack gap="xs">
+            <Title order={4}>{t("modules.bookings")}</Title>
             <Stack gap={0}>
               <Button
                 component={Link}

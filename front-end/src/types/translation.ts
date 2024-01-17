@@ -18,6 +18,11 @@ export type Translation = {
     error: string;
     oops: string;
   };
+  modules: {
+    essentials: string;
+    sales: string;
+    bookings: string;
+  };
   entities: {
     user: {
       name: {
@@ -40,16 +45,18 @@ export type Translation = {
         button: string;
       };
     };
+    invoice: {
+      name: {
+        singular: string;
+        plural: string;
+      };
+    };
   };
   authLayout: {
     help: string;
     version: string;
   };
   dashboardLayout: {
-    modules: {
-      essentials: string;
-      bookings: string;
-    };
     avatar: {
       profile: string;
       preferences: string;

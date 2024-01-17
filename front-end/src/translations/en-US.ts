@@ -17,6 +17,11 @@ export default {
     error: "Error",
     oops: "Something went wrong, try again later",
   },
+  modules: {
+    essentials: "Essentials",
+    sales: "Sales",
+    bookings: "Bookings",
+  },
   entities: {
     user: {
       name: {
@@ -39,16 +44,18 @@ export default {
         button: "Profile Page",
       },
     },
+    invoice: {
+      name: {
+        singular: "Invoice",
+        plural: "Invoices",
+      },
+    },
   },
   authLayout: {
     help: "Help",
     version: "Version",
   },
   dashboardLayout: {
-    modules: {
-      essentials: "Essentials",
-      bookings: "Bookings",
-    },
     avatar: {
       profile: "Profile",
       preferences: "Preferences",

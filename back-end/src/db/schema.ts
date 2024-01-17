@@ -4,6 +4,8 @@ import {
   date,
   doublePrecision,
   integer,
+  numeric,
+  pgEnum,
   pgTable,
   primaryKey,
   serial,
@@ -21,7 +23,7 @@ export const properties = pgTable("Property", {
     .defaultNow()
     .notNull(),
   updatedAt: timestamp("updatedAt", { withTimezone: true })
-    .default(sql`now()`)
+    .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
   deletedAt: timestamp("deletedAt", { withTimezone: true }),
   createdById: integer("createdById").references((): AnyPgColumn => users.id, {
@@ -68,7 +70,7 @@ export const roles = pgTable("Role", {
     .defaultNow()
     .notNull(),
   updatedAt: timestamp("updatedAt", { withTimezone: true })
-    .default(sql`now()`)
+    .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
   deletedAt: timestamp("deletedAt", { withTimezone: true }),
   createdById: integer("createdById").references((): AnyPgColumn => users.id, {
@@ -129,7 +131,7 @@ export const users = pgTable("User", {
     .defaultNow()
     .notNull(),
   updatedAt: timestamp("updatedAt", { withTimezone: true })
-    .default(sql`now()`)
+    .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
   deletedAt: timestamp("deletedAt", { withTimezone: true }),
   createdById: integer("createdById").references((): AnyPgColumn => users.id, {
@@ -147,6 +149,7 @@ export const users = pgTable("User", {
   roleId: integer("roleId")
     .references(() => roles.id, { onDelete: "restrict" })
     .notNull(),
+  // TODO merge first name and last name to support company names or create new customer table
   firstName: text("firstName").notNull(),
   lastName: text("lastName").notNull(),
   email: text("email").unique(),
@@ -257,7 +260,7 @@ export const rooms = pgTable("rooms", {
     .defaultNow()
     .notNull(),
   updatedAt: timestamp("updatedAt", { withTimezone: true })
-    .default(sql`now()`)
+    .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
   deletedAt: timestamp("deletedAt", { withTimezone: true }),
   createdById: integer("createdById").references((): AnyPgColumn => users.id, {
@@ -292,5 +295,168 @@ export const roomsRelations = relations(rooms, ({ one }) => ({
   property: one(properties, {
     fields: [rooms.propertyId],
     references: [properties.id],
+  }),
+}));
+
+export const invoiceRefTypeEnum = pgEnum("invoiceRefType", ["reservation"]);
+
+export const invoiceTypeEnum = pgEnum("invoiceTypeEnum", [
+  "standard",
+  "quotation",
+  "credit",
+  "final",
+]);
+
+// TODO Implement payment provider (Adyen or Stripe) to track payment status?
+export const invoiceStateEnum = pgEnum("invoiceStateEnum", [
+  "draft",
+  "issued",
+  "cancelled",
+  "refunded",
+]);
+
+export const invoices = pgTable("invoices", {
+  $kind: text("$kind").default("invoice").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom(),
+  createdAt: timestamp("createdAt", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updatedAt", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  deletedAt: timestamp("deletedAt", { withTimezone: true }),
+  createdById: integer("createdById").references((): AnyPgColumn => users.id, {
+    onDelete: "set null",
+  }),
+  updatedById: integer("updatedById").references((): AnyPgColumn => users.id, {
+    onDelete: "set null",
+  }),
+  deletedById: integer("deletedById").references((): AnyPgColumn => users.id, {
+    onDelete: "cascade",
+  }),
+  refType: invoiceRefTypeEnum("refType").notNull(),
+  refId: integer("refId").notNull(),
+  number: text("number").notNull(),
+  comments: text("comments"),
+  issueDate: date("issueDate", { mode: "date" }).notNull(),
+  dueDate: date("dueDate", { mode: "date" }).notNull(),
+  type: invoiceTypeEnum("type").notNull(),
+  state: invoiceStateEnum("state").notNull(),
+  discountAmount: numeric("discountAmount", {
+    precision: 10,
+    scale: 2,
+  }).notNull(),
+  totalNetAmount: numeric("totalNetAmount", {
+    precision: 10,
+    scale: 2,
+  }).notNull(),
+  totalTaxAmount: numeric("totalTaxAmount", {
+    precision: 10,
+    scale: 2,
+  }).notNull(),
+  totalGrossAmount: numeric("totalGrossAmount", {
+    precision: 10,
+    scale: 2,
+  }).notNull(),
+  totalDiscountAmount: numeric("totalDiscountAmount", {
+    precision: 10,
+    scale: 2,
+  }).notNull(),
+  customerId: integer("customerId").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  customerName: text("customerName").notNull(),
+  customerEmail: text("customerEmail"),
+  customerPhoneNumber: text("customerPhoneNumber"),
+  customerStreet: text("customerStreet").notNull(),
+  customerHouseNumber: text("customerHouseNumber").notNull(),
+  customerPostalCode: text("customerPostalCode").notNull(),
+  customerCity: text("customerCity").notNull(),
+  customerRegion: text("customerRegion").notNull(),
+  customerCountry: text("customerCountry").notNull(),
+  customerVatNumber: text("customerVatNumber"),
+  customerCocNumber: text("customerCocNumber"),
+  companyId: integer("companyId").references(() => properties.id, {
+    onDelete: "set null",
+  }),
+  companyName: text("companyName").notNull(),
+  companyEmail: text("companyEmail"),
+  companyPhoneNumber: text("companyPhoneNumber"),
+  companyStreet: text("companyStreet").notNull(),
+  companyHouseNumber: text("companyHouseNumber").notNull(),
+  companyPostalCode: text("companyPostalCode").notNull(),
+  companyCity: text("companyCity").notNull(),
+  companyRegion: text("companyRegion").notNull(),
+  companyCountry: text("companyCountry").notNull(),
+  companyVatNumber: text("companyVatNumber").notNull(),
+  companyCocNumber: text("companyCocNumber").notNull(),
+  companyIban: text("companyIban").notNull(),
+  companySwiftBic: text("companySwiftBic").notNull(),
+});
+
+export const invoicesRelations = relations(invoices, ({ one, many }) => ({
+  createdBy: one(users, {
+    fields: [invoices.createdById],
+    references: [users.id],
+  }),
+  updatedBy: one(users, {
+    fields: [invoices.updatedById],
+    references: [users.id],
+  }),
+  deletedBy: one(users, {
+    fields: [invoices.deletedById],
+    references: [users.id],
+  }),
+  customer: one(users, {
+    fields: [invoices.customerId],
+    references: [users.id],
+  }),
+  company: one(properties, {
+    fields: [invoices.companyId],
+    references: [properties.id],
+  }),
+  lines: many(invoiceLines),
+}));
+
+export const invoiceLines = pgTable("invoiceLines", {
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom(),
+  invoiceId: integer("invoiceId")
+    .references(() => invoices.id, { onDelete: "cascade" })
+    .notNull(),
+  name: text("name").notNull(),
+  comments: text("comments"),
+  unitNetAmount: numeric("unitNetAmount", {
+    precision: 10,
+    scale: 2,
+  }).notNull(),
+  quantity: numeric("quantity", { precision: 10, scale: 2 }).notNull(),
+  discountAmount: numeric("discountAmount", {
+    precision: 10,
+    scale: 2,
+  }).notNull(),
+  totalNetAmount: numeric("totalNetAmount", {
+    precision: 10,
+    scale: 2,
+  }).notNull(),
+  totalTaxAmount: numeric("totalTaxAmount", {
+    precision: 10,
+    scale: 2,
+  }).notNull(),
+  taxPercentage: numeric("taxPercentage", {
+    precision: 10,
+    scale: 2,
+  }).notNull(),
+  totalGrossAmount: numeric("totalGrossAmount", {
+    precision: 10,
+    scale: 2,
+  }).notNull(),
+});
+
+export const invoiceLinesRelations = relations(invoiceLines, ({ one }) => ({
+  invoice: one(invoices, {
+    fields: [invoiceLines.invoiceId],
+    references: [invoices.id],
   }),
 }));

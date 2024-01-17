@@ -17,6 +17,11 @@ export default {
     error: "Fout",
     oops: "Er is iets fout gegaan, probeer het later opnieuw",
   },
+  modules: {
+    essentials: "Essentieel",
+    sales: "Verkoop",
+    bookings: "Bookingen",
+  },
   entities: {
     user: {
       name: {
@@ -39,16 +44,18 @@ export default {
         button: "Profielpagina",
       },
     },
+    invoice: {
+      name: {
+        singular: "Factuur",
+        plural: "Facturen",
+      },
+    },
   },
   authLayout: {
     help: "Help",
     version: "Versie",
   },
   dashboardLayout: {
-    modules: {
-      essentials: "Essentiële zaken",
-      bookings: "Bookingen",
-    },
     avatar: {
       profile: "Profile",
       preferences: "Preferences",
