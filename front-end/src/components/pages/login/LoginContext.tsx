@@ -13,7 +13,7 @@ type LoginStep = (typeof LOGIN_STEPS)[number];
 
 type LoginState = {
   step: LoginStep;
-  email: string;
+  emailAddress: string;
   emailToken: string;
   emailOtp: string;
   phoneNumber: string;
@@ -28,7 +28,7 @@ type AuthContextType = {
 
 const initialState: LoginState = {
   step: "EMAIL_INPUT",
-  email: "",
+  emailAddress: "",
   emailToken: "",
   emailOtp: "",
   phoneNumber: "",

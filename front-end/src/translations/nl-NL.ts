@@ -23,21 +23,20 @@ export default {
     bookings: "Bookingen",
   },
   entities: {
-    user: {
+    relation: {
       name: {
-        singular: "Gebruiker",
-        plural: "Gebruikers",
+        singular: "Relatie",
+        plural: "Relaties",
       },
       keys: {
-        firstName: "Voornam",
-        lastName: "Achternaam",
-        email: "E-mail",
+        name: "Naam",
+        emailAddress: "E-mailadres",
         phoneNumber: "Telefoonnummer",
         dateOfBirth: "Geboortedatum",
         sex: "Sekse",
       },
-      createdNotification: "Gebruiker succesvol aangemaakt",
-      deletedNotification: "Gebruiker succesvol verwijderd",
+      createdNotification: "Relatie succesvol aangemaakt",
+      deletedNotification: "Relatie succesvol verwijderd",
       isSelfAlert: {
         title: "Je kunt jezelf hier niet bewerken",
         message: "Je eigen persoonlijke gegevens zijn alleen bewerkbaar op de",
@@ -48,6 +47,25 @@ export default {
       name: {
         singular: "Factuur",
         plural: "Facturen",
+      },
+      keys: {
+        type: {
+          name: "Type",
+          standard: "Factuur",
+          quotation: "Offerte",
+          credit: "Creditfactuur",
+          final: "Eindfactuur",
+        },
+        customerName: "Klant",
+        issueDate: "Datum",
+        totalGrossAmount: "Bedrag",
+        status: {
+          name: "Status",
+          draft: "Concept",
+          issued: "Definitief",
+          cancelled: "Geannuleerd",
+          refunded: "Terugbetaald",
+        },
       },
     },
   },
@@ -64,13 +82,12 @@ export default {
     home: "Home",
     properties: "Vestigingen",
     roles: "Rollen",
-    users: "Gebruikers",
     reservations: "Reservaties",
     rooms: "Kamers",
   },
   loginPage: {
     login: "Inloggen",
-    email: "E-mailadres",
+    emailAddress: "E-mailadres",
     sendEmailOtp: "Verstuur E-mailcode",
     emailOtpSent:
       "Als het ingevoerde e-mailadres correct is, is er een code verzonden naar",

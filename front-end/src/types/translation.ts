@@ -24,15 +24,14 @@ export type Translation = {
     bookings: string;
   };
   entities: {
-    user: {
+    relation: {
       name: {
         singular: string;
         plural: string;
       };
       keys: {
-        firstName: string;
-        lastName: string;
-        email: string;
+        name: string;
+        emailAddress: string;
         phoneNumber: string;
         dateOfBirth: string;
         sex: string;
@@ -50,6 +49,25 @@ export type Translation = {
         singular: string;
         plural: string;
       };
+      keys: {
+        type: {
+          name: string;
+          standard: string;
+          quotation: string;
+          credit: string;
+          final: string;
+        };
+        customerName: string;
+        issueDate: string;
+        totalGrossAmount: string;
+        status: {
+          name: string;
+          draft: string;
+          issued: string;
+          cancelled: string;
+          refunded: string;
+        };
+      };
     };
   };
   authLayout: {
@@ -65,13 +83,12 @@ export type Translation = {
     home: string;
     properties: string;
     roles: string;
-    users: string;
     reservations: string;
     rooms: string;
   };
   loginPage: {
     login: string;
-    email: string;
+    emailAddress: string;
     sendEmailOtp: string;
     emailOtpSent: string;
     emailRequiredError: string;

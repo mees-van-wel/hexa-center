@@ -4,10 +4,10 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 import { RouterOutput, trpc } from "@/utils/trpc";
 
-type CurrentUser = RouterOutput["auth"]["currentUser"];
+type CurrentRelation = RouterOutput["auth"]["currentRelation"];
 
 type AuthState = {
-  user: CurrentUser | null;
+  relation: CurrentRelation | null;
   accessToken: string | null;
 };
 
@@ -18,22 +18,22 @@ type AuthContext = {
 
 type AuthContextProps = {
   children: React.ReactNode;
-  currentUser: CurrentUser | null;
+  currentRelation: CurrentRelation | null;
 };
 
 const AuthContext = createContext<AuthContext>(null);
 
 export const AuthContextProvider = ({
   children,
-  currentUser,
+  currentRelation,
 }: AuthContextProps) => {
   const [auth, setAuth] = useState<AuthState>({
-    user: currentUser,
+    relation: currentRelation,
     accessToken: null,
   });
 
   useEffect(() => {
-    if (!auth.user) return;
+    if (!auth.relation) return;
 
     const abortController = new AbortController();
     let timeoutRef: NodeJS.Timeout | null = null;
@@ -63,7 +63,7 @@ export const AuthContextProvider = ({
       abortController.abort();
       if (timeoutRef) clearTimeout(timeoutRef);
     };
-  }, [auth.user]);
+  }, [auth.relation]);
 
   return (
     <AuthContext.Provider value={{ auth, setAuth }}>
@@ -81,11 +81,11 @@ export const useAuthContext = () => {
   return authContext;
 };
 
-export const useAuthUser = () => {
+export const useAuthRelation = () => {
   const authContext = useContext(AuthContext);
 
-  if (!authContext?.auth.user)
-    throw new Error("useUser must be used within authenticated pages only");
+  if (!authContext?.auth.relation)
+    throw new Error("useRelation must be used within authenticated pages only");
 
-  return authContext.auth.user;
+  return authContext.auth.relation;
 };

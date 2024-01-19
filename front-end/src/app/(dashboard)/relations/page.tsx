@@ -1,13 +1,13 @@
 import { cookies } from "next/headers";
 
-import { UsersOverview } from "@/components/entities/user/UsersOverview";
+import { RelationsOverview } from "@/components/entities/relation/RelationsOverview";
 import { setTRPCRefreshToken, trpc } from "@/utils/trpc";
 
 export default async function Page() {
   const refreshToken = cookies().get("refreshToken")?.value;
   if (refreshToken) setTRPCRefreshToken(refreshToken);
 
-  const users = await trpc.user.list.query();
+  const relations = await trpc.relation.list.query();
 
-  return <UsersOverview users={users} />;
+  return <RelationsOverview relations={relations} />;
 }

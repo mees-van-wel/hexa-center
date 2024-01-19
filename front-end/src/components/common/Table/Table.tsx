@@ -13,6 +13,8 @@ type TableProps<T extends Record<string, any>> = {
   searchBarId?: string;
   columns: {
     selector: keyof T;
+    // TODO Typings
+    format?: (value: any) => React.ReactNode;
     label: string;
   }[];
   elements: T[];
@@ -60,9 +62,9 @@ export const Table = <T extends Record<string, any>>({
               className={onClick ? styles.clickableRow : undefined}
               onClick={onClick ? () => onClick(element) : undefined}
             >
-              {columns.map(({ selector }) => (
+              {columns.map(({ selector, format }) => (
                 <TableComponent.Td key={selector as string}>
-                  {element[selector]}
+                  {format ? format(element[selector]) : element[selector]}
                 </TableComponent.Td>
               ))}
             </TableComponent.Tr>

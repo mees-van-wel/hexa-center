@@ -1,0 +1,1 @@
+ALTER TABLE "relations" ALTER COLUMN "type" SET NOT NULL;

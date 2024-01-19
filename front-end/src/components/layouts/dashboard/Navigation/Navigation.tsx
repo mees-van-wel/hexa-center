@@ -58,13 +58,13 @@ export const Navigation = () => {
               </Button> */}
               <Button
                 component={Link}
-                href="/users"
-                variant={pathname === "/users" ? "filled" : "subtle"}
+                href="/relations"
+                variant={pathname === "/relations" ? "filled" : "subtle"}
                 leftSection={<IconUsers />}
                 fullWidth
                 justify="left"
               >
-                {t("dashboardLayout.users")}
+                {t("entities.relation.name.plural")}
               </Button>
             </Stack>
           </Stack>

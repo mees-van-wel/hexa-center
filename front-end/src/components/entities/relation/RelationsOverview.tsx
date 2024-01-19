@@ -12,11 +12,11 @@ import { IconPlus, IconUsers } from "@tabler/icons-react";
 import { Table } from "../../common/Table";
 import { DashboardHeader } from "../../layouts/dashboard/DashboardHeader";
 
-type UsersPageProps = {
-  users: RouterOutput["user"]["list"];
+type RelationOverviewProps = {
+  relations: RouterOutput["relation"]["list"];
 };
 
-export const UsersOverview = ({ users }: UsersPageProps) => {
+export const RelationsOverview = ({ relations }: RelationOverviewProps) => {
   const router = useRouter();
   const searchBarId = useId();
   const t = useTranslation();
@@ -24,41 +24,43 @@ export const UsersOverview = ({ users }: UsersPageProps) => {
   return (
     <Stack>
       <DashboardHeader
-        title={[{ icon: <IconUsers />, label: t("dashboardLayout.users") }]}
+        title={[
+          { icon: <IconUsers />, label: t("entities.relation.name.plural") },
+        ]}
       >
-        <Button leftSection={<IconPlus />} component={Link} href="/users/new">
-          New
+        <Button
+          leftSection={<IconPlus />}
+          component={Link}
+          href="/relations/new"
+        >
+          {t("common.new")}
         </Button>
         <Table.SearchBar id={searchBarId} />
       </DashboardHeader>
       <Table
+        elements={relations}
         searchBarId={searchBarId}
         onClick={({ id }) => {
-          router.push(`/users/${id}`);
+          router.push(`/relations/${id}`);
         }}
         columns={[
           {
-            selector: "firstName",
-            label: "First name",
+            selector: "name",
+            label: t("entities.relation.keys.name"),
           },
           {
-            selector: "lastName",
-            label: "Last name",
-          },
-          {
-            selector: "email",
-            label: "Email",
+            selector: "emailAddress",
+            label: t("entities.relation.keys.emailAddress"),
           },
           {
             selector: "phoneNumber",
-            label: "Phone number",
+            label: t("entities.relation.keys.phoneNumber"),
           },
           {
             selector: "id",
-            label: "Number",
+            label: t("common.number"),
           },
         ]}
-        elements={users}
       />
     </Stack>
   );

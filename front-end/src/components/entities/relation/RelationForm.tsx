@@ -7,46 +7,59 @@ import { Combobox } from "@/components/common/Combobox";
 import { PhoneInput } from "@/components/common/PhoneInput";
 import { SEX_VALUES } from "@/constants/sexes";
 import { useTranslation } from "@/hooks/useTranslation";
-import { UserCreateInputSchema, UserUpdateInputSchema } from "@/schemas/user";
+import {
+  RelationCreateInputSchema,
+  RelationUpdateInputSchema,
+} from "@/schemas/relation";
 import { Avatar, Group, Paper, Stack, TextInput } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 
-type UserFormProps = {
+type RelationFormProps = {
   disabled?: boolean;
 };
 
-export const UserForm = ({ disabled }: UserFormProps) => {
+export const RelationForm = ({ disabled }: RelationFormProps) => {
   const t = useTranslation();
 
   const {
     register,
     control,
     formState: { errors },
-  } = useFormContext<UserCreateInputSchema | UserUpdateInputSchema>();
+  } = useFormContext<RelationCreateInputSchema | RelationUpdateInputSchema>();
 
   return (
     <Paper p="md">
       <Stack>
         <Group align="end">
           <Avatar size="lg" />
+          <Controller
+            name="type"
+            control={control}
+            render={({ field, fieldState: { error } }) => (
+              <Combobox
+                {...field}
+                label={t("entities.relation.keys.sex")}
+                error={error?.message}
+                data={SEX_VALUES.map((sex) => ({
+                  label: t(`constants.sexes.${sex}`),
+                  value: sex,
+                }))}
+                disabled={disabled}
+                clearable
+              />
+            )}
+          />
           <TextInput
-            {...register("firstName")}
-            label={t("entities.user.keys.firstName")}
-            error={errors.firstName?.message}
+            {...register("name")}
+            label={t("entities.relation.keys.name")}
+            error={errors.name?.message}
             disabled={disabled}
             withAsterisk
           />
           <TextInput
-            {...register("lastName")}
-            label={t("entities.user.keys.lastName")}
-            error={errors.lastName?.message}
-            disabled={disabled}
-            withAsterisk
-          />
-          <TextInput
-            {...register("email")}
-            label={t("entities.user.keys.email")}
-            error={errors.email?.message}
+            {...register("emailAddress")}
+            label={t("entities.relation.keys.emailAddress")}
+            error={errors.emailAddress?.message}
             disabled={disabled}
             type="email"
           />
@@ -56,7 +69,7 @@ export const UserForm = ({ disabled }: UserFormProps) => {
             render={({ field, fieldState: { error } }) => (
               <PhoneInput
                 {...field}
-                label={t("entities.user.keys.phoneNumber")}
+                label={t("entities.relation.keys.phoneNumber")}
                 error={error?.message}
                 disabled={disabled}
               />
@@ -71,7 +84,7 @@ export const UserForm = ({ disabled }: UserFormProps) => {
             render={({ field, fieldState: { error } }) => (
               <DateInput
                 {...field}
-                label={t("entities.user.keys.dateOfBirth")}
+                label={t("entities.relation.keys.dateOfBirth")}
                 error={error?.message}
                 disabled={disabled}
                 clearable
@@ -84,7 +97,7 @@ export const UserForm = ({ disabled }: UserFormProps) => {
             render={({ field, fieldState: { error } }) => (
               <Combobox
                 {...field}
-                label={t("entities.user.keys.sex")}
+                label={t("entities.relation.keys.sex")}
                 error={error?.message}
                 data={SEX_VALUES.map((sex) => ({
                   label: t(`constants.sexes.${sex}`),

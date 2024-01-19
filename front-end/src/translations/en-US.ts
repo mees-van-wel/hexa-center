@@ -23,21 +23,20 @@ export default {
     bookings: "Bookings",
   },
   entities: {
-    user: {
+    relation: {
       name: {
-        singular: "User",
-        plural: "Users",
+        singular: "Relation",
+        plural: "Relations",
       },
       keys: {
-        firstName: "First name",
-        lastName: "Last name",
-        email: "Email",
+        name: "Name",
+        emailAddress: "Email address",
         phoneNumber: "Phone number",
         dateOfBirth: "Date of birth",
         sex: "Sex",
       },
-      createdNotification: "User successfully created",
-      deletedNotification: "User successfully deleted",
+      createdNotification: "Relation successfully created",
+      deletedNotification: "Relation successfully deleted",
       isSelfAlert: {
         title: "You can't edit yourself here",
         message: "Your own personal details are editable only on the",
@@ -48,6 +47,25 @@ export default {
       name: {
         singular: "Invoice",
         plural: "Invoices",
+      },
+      keys: {
+        type: {
+          name: "Type",
+          standard: "Invoice",
+          quotation: "Quotation",
+          credit: "Credit",
+          final: "Final",
+        },
+        customerName: "Customer",
+        issueDate: "Date",
+        totalGrossAmount: "Amount",
+        status: {
+          name: "Status",
+          draft: "Draft",
+          issued: "Issued",
+          cancelled: "Cancelled",
+          refunded: "Refunded",
+        },
       },
     },
   },
@@ -64,13 +82,12 @@ export default {
     home: "Home",
     properties: "Properties",
     roles: "Roles",
-    users: "Users",
     reservations: "Reservations",
     rooms: "Rooms",
   },
   loginPage: {
     login: "Login",
-    email: "Email",
+    emailAddress: "Email address",
     sendEmailOtp: "Send Email Code",
     emailOtpSent: "If the entered email is correct, a code has been mailed to",
     emailRequiredError: "Email is required",

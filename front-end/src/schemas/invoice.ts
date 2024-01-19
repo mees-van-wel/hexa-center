@@ -13,12 +13,11 @@ import {
 import { nullableEmail } from "@/valibotPipes/nullableEmail";
 import { toNull } from "@/valibotPipes/toNull";
 
-export const UserCreateSchema = object({
+export const InvoiceCreateSchema = object({
   // propertyId: number(),
   // roleId: number(),
-  firstName: string([minLength(2)]),
-  lastName: string([minLength(2)]),
-  email: nullable(string([toNull(), nullableEmail()])),
+  name: string([minLength(2)]),
+  emailAddress: nullable(string([toNull(), nullableEmail()])),
   // TODO Phone number validation pipe
   phoneNumber: nullable(string([toNull()])),
   dateOfBirth: nullable(date()),
@@ -33,13 +32,12 @@ export const UserCreateSchema = object({
   country: nullable(string()),
 });
 
-export const UserUpdateSchema = object({
+export const InvoiceUpdateSchema = object({
   id: number(),
   // propertyId: optional(number()),
   // roleId: optional(number()),
-  firstName: optional(string([minLength(2)])),
-  lastName: optional(string([minLength(2)])),
-  email: nullish(string([toNull(), nullableEmail()])),
+  name: optional(string([minLength(2)])),
+  emailAddress: nullish(string([toNull(), nullableEmail()])),
   // TODO Phone number validation pipe
   phoneNumber: nullish(string([toNull()])),
   dateOfBirth: nullish(date()),
@@ -54,5 +52,5 @@ export const UserUpdateSchema = object({
   country: nullish(string()),
 });
 
-export type UserCreateInputSchema = Input<typeof UserCreateSchema>;
-export type UserUpdateInputSchema = Input<typeof UserUpdateSchema>;
+export type InvoiceCreateInputSchema = Input<typeof InvoiceCreateSchema>;
+export type InvoiceUpdateInputSchema = Input<typeof InvoiceUpdateSchema>;

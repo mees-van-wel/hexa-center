@@ -17,8 +17,8 @@ export const roomRouter = router({
         .insert(rooms)
         .values({
           ...input,
-          createdById: ctx.user.id,
-          updatedById: ctx.user.id,
+          createdById: ctx.relation.id,
+          updatedById: ctx.relation.id,
           propertyId: 1,
         })
         .returning({
@@ -68,7 +68,7 @@ export const roomRouter = router({
         .update(rooms)
         .set({
           ...input,
-          updatedById: ctx.user.id,
+          updatedById: ctx.relation.id,
         })
         .where(eq(rooms.id, input.id))
         .returning({

@@ -1,11 +1,11 @@
 {
-  "id": "2f1e6259-b261-4107-81f1-ab3d9f41a2de",
-  "prevId": "a4945e14-f357-4293-b55b-22ff9db7efba",
+  "id": "06fc2af5-e56f-42ce-85e3-98cecadcecfc",
+  "prevId": "aba57101-e1f0-4c21-ad16-e2f2199c1223",
   "version": "5",
   "dialect": "pg",
   "tables": {
-    "Account": {
-      "name": "Account",
+    "accounts": {
+      "name": "accounts",
       "schema": "",
       "columns": {
         "id": {
@@ -21,8 +21,8 @@
           "notNull": false,
           "default": "gen_random_uuid()"
         },
-        "userId": {
-          "name": "userId",
+        "relation_id": {
+          "name": "relation_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -54,12 +54,16 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "Account_userId_User_id_fk": {
-          "name": "Account_userId_User_id_fk",
-          "tableFrom": "Account",
-          "tableTo": "User",
-          "columnsFrom": ["userId"],
-          "columnsTo": ["id"],
+        "accounts_relation_id_relations_id_fk": {
+          "name": "accounts_relation_id_relations_id_fk",
+          "tableFrom": "accounts",
+          "tableTo": "relations",
+          "columnsFrom": [
+            "relation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -67,8 +71,105 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "User": {
-      "name": "User",
+    "invoice_lines": {
+      "name": "invoice_lines",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "uuid": {
+          "name": "uuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "gen_random_uuid()"
+        },
+        "invoice_id": {
+          "name": "invoice_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "comments": {
+          "name": "comments",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "unit_net_amount": {
+          "name": "unit_net_amount",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "discount_amount": {
+          "name": "discount_amount",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "total_net_amount": {
+          "name": "total_net_amount",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "total_tax_amount": {
+          "name": "total_tax_amount",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tax_percentage": {
+          "name": "tax_percentage",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "total_gross_amount": {
+          "name": "total_gross_amount",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "invoice_lines_invoice_id_invoices_id_fk": {
+          "name": "invoice_lines_invoice_id_invoices_id_fk",
+          "tableFrom": "invoice_lines",
+          "tableTo": "invoices",
+          "columnsFrom": [
+            "invoice_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "invoices": {
+      "name": "invoices",
       "schema": "",
       "columns": {
         "$kind": {
@@ -76,7 +177,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'user'"
+          "default": "'invoice'"
         },
         "id": {
           "name": "id",
@@ -91,64 +192,433 @@
           "notNull": false,
           "default": "gen_random_uuid()"
         },
-        "createdAt": {
-          "name": "createdAt",
+        "created_at": {
+          "name": "created_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
         },
-        "updatedAt": {
-          "name": "updatedAt",
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "created_by_id": {
+          "name": "created_by_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_by_id": {
+          "name": "updated_by_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ref_type": {
+          "name": "ref_type",
+          "type": "invoice_ref_type",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ref_id": {
+          "name": "ref_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "number": {
+          "name": "number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "comments": {
+          "name": "comments",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "issue_date": {
+          "name": "issue_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "due_date": {
+          "name": "due_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "invoice_type",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "invoice_state",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "discount_amount": {
+          "name": "discount_amount",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "total_net_amount": {
+          "name": "total_net_amount",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "total_tax_amount": {
+          "name": "total_tax_amount",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "total_gross_amount": {
+          "name": "total_gross_amount",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "total_discount_amount": {
+          "name": "total_discount_amount",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "customer_id": {
+          "name": "customer_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "customer_name": {
+          "name": "customer_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "customer_email_address": {
+          "name": "customer_email_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "customer_phone_number": {
+          "name": "customer_phone_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "customer_street": {
+          "name": "customer_street",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "customer_house_number": {
+          "name": "customer_house_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "customer_postal_code": {
+          "name": "customer_postal_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "customer_city": {
+          "name": "customer_city",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "customer_region": {
+          "name": "customer_region",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "customer_country": {
+          "name": "customer_country",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "customer_vat_number": {
+          "name": "customer_vat_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "customer_coc_number": {
+          "name": "customer_coc_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "company_id": {
+          "name": "company_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "company_name": {
+          "name": "company_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "company_email_address": {
+          "name": "company_email_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "company_phone_number": {
+          "name": "company_phone_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "company_street": {
+          "name": "company_street",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "company_house_number": {
+          "name": "company_house_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "company_postal_code": {
+          "name": "company_postal_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "company_city": {
+          "name": "company_city",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "company_region": {
+          "name": "company_region",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "company_country": {
+          "name": "company_country",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "company_vat_number": {
+          "name": "company_vat_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "company_coc_number": {
+          "name": "company_coc_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "company_iban": {
+          "name": "company_iban",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "company_swift_bic": {
+          "name": "company_swift_bic",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "invoices_created_by_id_relations_id_fk": {
+          "name": "invoices_created_by_id_relations_id_fk",
+          "tableFrom": "invoices",
+          "tableTo": "relations",
+          "columnsFrom": [
+            "created_by_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "invoices_updated_by_id_relations_id_fk": {
+          "name": "invoices_updated_by_id_relations_id_fk",
+          "tableFrom": "invoices",
+          "tableTo": "relations",
+          "columnsFrom": [
+            "updated_by_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "invoices_customer_id_relations_id_fk": {
+          "name": "invoices_customer_id_relations_id_fk",
+          "tableFrom": "invoices",
+          "tableTo": "relations",
+          "columnsFrom": [
+            "customer_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "invoices_company_id_properties_id_fk": {
+          "name": "invoices_company_id_properties_id_fk",
+          "tableFrom": "invoices",
+          "tableTo": "properties",
+          "columnsFrom": [
+            "company_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "permissions": {
+      "name": "permissions",
+      "schema": "",
+      "columns": {
+        "role_id": {
+          "name": "role_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "key": {
+          "name": "key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "permissions_role_id_properties_id_fk": {
+          "name": "permissions_role_id_properties_id_fk",
+          "tableFrom": "permissions",
+          "tableTo": "properties",
+          "columnsFrom": [
+            "role_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "permissions_role_id_key_pk": {
+          "name": "permissions_role_id_key_pk",
+          "columns": [
+            "role_id",
+            "key"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "properties": {
+      "name": "properties",
+      "schema": "",
+      "columns": {
+        "$kind": {
+          "name": "$kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'property'"
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "uuid": {
+          "name": "uuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "gen_random_uuid()"
+        },
+        "created_at": {
+          "name": "created_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
         },
-        "deletedAt": {
-          "name": "deletedAt",
+        "updated_at": {
+          "name": "updated_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
         },
-        "createdById": {
-          "name": "createdById",
+        "created_by_id": {
+          "name": "created_by_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
-        "updatedById": {
-          "name": "updatedById",
+        "updated_by_id": {
+          "name": "updated_by_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
-        "deletedById": {
-          "name": "deletedById",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "firstName": {
-          "name": "firstName",
+        "name": {
+          "name": "name",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "lastName": {
-          "name": "lastName",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "email": {
-          "name": "email",
+        "email_address": {
+          "name": "email_address",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "phoneNumber": {
-          "name": "phoneNumber",
+        "phone_number": {
+          "name": "phone_number",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -159,14 +629,177 @@
           "primaryKey": false,
           "notNull": false
         },
-        "houseNumber": {
-          "name": "houseNumber",
+        "house_number": {
+          "name": "house_number",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "postalCode": {
-          "name": "postalCode",
+        "postal_code": {
+          "name": "postal_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "city": {
+          "name": "city",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "region": {
+          "name": "region",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "country": {
+          "name": "country",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "properties_created_by_id_relations_id_fk": {
+          "name": "properties_created_by_id_relations_id_fk",
+          "tableFrom": "properties",
+          "tableTo": "relations",
+          "columnsFrom": [
+            "created_by_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "properties_updated_by_id_relations_id_fk": {
+          "name": "properties_updated_by_id_relations_id_fk",
+          "tableFrom": "properties",
+          "tableTo": "relations",
+          "columnsFrom": [
+            "updated_by_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "properties_name_unique": {
+          "name": "properties_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "name"
+          ]
+        }
+      }
+    },
+    "relations": {
+      "name": "relations",
+      "schema": "",
+      "columns": {
+        "$kind": {
+          "name": "$kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'relation'"
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "uuid": {
+          "name": "uuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "gen_random_uuid()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "created_by_id": {
+          "name": "created_by_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_by_id": {
+          "name": "updated_by_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "property_id": {
+          "name": "property_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role_id": {
+          "name": "role_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "relation_type",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email_address": {
+          "name": "email_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "phone_number": {
+          "name": "phone_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "street": {
+          "name": "street",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "house_number": {
+          "name": "house_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "postal_code": {
+          "name": "postal_code",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -195,59 +828,337 @@
           "primaryKey": false,
           "notNull": false
         },
-        "dateOfBirth": {
-          "name": "dateOfBirth",
+        "date_of_birth": {
+          "name": "date_of_birth",
           "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "vat_number": {
+          "name": "vat_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "coc_number": {
+          "name": "coc_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "corporate_contact_name": {
+          "name": "corporate_contact_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "corporate_contact_email_address": {
+          "name": "corporate_contact_email_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "corporate_contact_phone_number": {
+          "name": "corporate_contact_phone_number",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "User_createdById_User_id_fk": {
-          "name": "User_createdById_User_id_fk",
-          "tableFrom": "User",
-          "tableTo": "User",
-          "columnsFrom": ["createdById"],
-          "columnsTo": ["id"],
+        "relations_created_by_id_relations_id_fk": {
+          "name": "relations_created_by_id_relations_id_fk",
+          "tableFrom": "relations",
+          "tableTo": "relations",
+          "columnsFrom": [
+            "created_by_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "User_updatedById_User_id_fk": {
-          "name": "User_updatedById_User_id_fk",
-          "tableFrom": "User",
-          "tableTo": "User",
-          "columnsFrom": ["updatedById"],
-          "columnsTo": ["id"],
+        "relations_updated_by_id_relations_id_fk": {
+          "name": "relations_updated_by_id_relations_id_fk",
+          "tableFrom": "relations",
+          "tableTo": "relations",
+          "columnsFrom": [
+            "updated_by_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "User_deletedById_User_id_fk": {
-          "name": "User_deletedById_User_id_fk",
-          "tableFrom": "User",
-          "tableTo": "User",
-          "columnsFrom": ["deletedById"],
-          "columnsTo": ["id"],
-          "onDelete": "cascade",
+        "relations_property_id_properties_id_fk": {
+          "name": "relations_property_id_properties_id_fk",
+          "tableFrom": "relations",
+          "tableTo": "properties",
+          "columnsFrom": [
+            "property_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "relations_role_id_roles_id_fk": {
+          "name": "relations_role_id_roles_id_fk",
+          "tableFrom": "relations",
+          "tableTo": "roles",
+          "columnsFrom": [
+            "role_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "User_email_unique": {
-          "name": "User_email_unique",
+        "relations_email_address_unique": {
+          "name": "relations_email_address_unique",
           "nullsNotDistinct": false,
-          "columns": ["email"]
+          "columns": [
+            "email_address"
+          ]
         },
-        "User_phoneNumber_unique": {
-          "name": "User_phoneNumber_unique",
+        "relations_phone_number_unique": {
+          "name": "relations_phone_number_unique",
           "nullsNotDistinct": false,
-          "columns": ["phoneNumber"]
+          "columns": [
+            "phone_number"
+          ]
         }
       }
     },
-    "workingHours": {
-      "name": "workingHours",
+    "roles": {
+      "name": "roles",
+      "schema": "",
+      "columns": {
+        "$kind": {
+          "name": "$kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'role'"
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "uuid": {
+          "name": "uuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "gen_random_uuid()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "created_by_id": {
+          "name": "created_by_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_by_id": {
+          "name": "updated_by_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "roles_created_by_id_relations_id_fk": {
+          "name": "roles_created_by_id_relations_id_fk",
+          "tableFrom": "roles",
+          "tableTo": "relations",
+          "columnsFrom": [
+            "created_by_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "roles_updated_by_id_relations_id_fk": {
+          "name": "roles_updated_by_id_relations_id_fk",
+          "tableFrom": "roles",
+          "tableTo": "relations",
+          "columnsFrom": [
+            "updated_by_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "roles_name_unique": {
+          "name": "roles_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "name"
+          ]
+        }
+      }
+    },
+    "rooms": {
+      "name": "rooms",
+      "schema": "",
+      "columns": {
+        "$kind": {
+          "name": "$kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'room'"
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "uuid": {
+          "name": "uuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "gen_random_uuid()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "created_by_id": {
+          "name": "created_by_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_by_id": {
+          "name": "updated_by_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "property_id": {
+          "name": "property_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "price": {
+          "name": "price",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "rooms_created_by_id_relations_id_fk": {
+          "name": "rooms_created_by_id_relations_id_fk",
+          "tableFrom": "rooms",
+          "tableTo": "relations",
+          "columnsFrom": [
+            "created_by_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "rooms_updated_by_id_relations_id_fk": {
+          "name": "rooms_updated_by_id_relations_id_fk",
+          "tableFrom": "rooms",
+          "tableTo": "relations",
+          "columnsFrom": [
+            "updated_by_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "rooms_property_id_properties_id_fk": {
+          "name": "rooms_property_id_properties_id_fk",
+          "tableFrom": "rooms",
+          "tableTo": "properties",
+          "columnsFrom": [
+            "property_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "rooms_name_unique": {
+          "name": "rooms_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "name"
+          ]
+        }
+      }
+    },
+    "sessions": {
+      "name": "sessions",
       "schema": "",
       "columns": {
         "id": {
@@ -263,32 +1174,121 @@
           "notNull": false,
           "default": "gen_random_uuid()"
         },
-        "accountId": {
-          "name": "accountId",
+        "issued_at": {
+          "name": "issued_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "last_accessed": {
+          "name": "last_accessed",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "relation_id": {
+          "name": "relation_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "startDay": {
-          "name": "startDay",
+        "refresh_token": {
+          "name": "refresh_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ip_address": {
+          "name": "ip_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_agent": {
+          "name": "user_agent",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "sessions_relation_id_relations_id_fk": {
+          "name": "sessions_relation_id_relations_id_fk",
+          "tableFrom": "sessions",
+          "tableTo": "relations",
+          "columnsFrom": [
+            "relation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "sessions_refresh_token_unique": {
+          "name": "sessions_refresh_token_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "refresh_token"
+          ]
+        }
+      }
+    },
+    "working_hours": {
+      "name": "working_hours",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "uuid": {
+          "name": "uuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "gen_random_uuid()"
+        },
+        "account_id": {
+          "name": "account_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "endDay": {
-          "name": "endDay",
+        "start_day": {
+          "name": "start_day",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "startTime": {
-          "name": "startTime",
+        "end_day": {
+          "name": "end_day",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "start_time": {
+          "name": "start_time",
           "type": "time with time zone",
           "primaryKey": false,
           "notNull": true
         },
-        "endTime": {
-          "name": "endTime",
+        "end_time": {
+          "name": "end_time",
           "type": "time with time zone",
           "primaryKey": false,
           "notNull": true
@@ -296,12 +1296,16 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "workingHours_accountId_Account_id_fk": {
-          "name": "workingHours_accountId_Account_id_fk",
-          "tableFrom": "workingHours",
-          "tableTo": "Account",
-          "columnsFrom": ["accountId"],
-          "columnsTo": ["id"],
+        "working_hours_account_id_accounts_id_fk": {
+          "name": "working_hours_account_id_accounts_id_fk",
+          "tableFrom": "working_hours",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "account_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -310,11 +1314,43 @@
       "uniqueConstraints": {}
     }
   },
-  "enums": {},
+  "enums": {
+    "invoice_ref_type": {
+      "name": "invoice_ref_type",
+      "values": {
+        "reservation": "reservation"
+      }
+    },
+    "invoice_state": {
+      "name": "invoice_state",
+      "values": {
+        "draft": "draft",
+        "issued": "issued",
+        "cancelled": "cancelled",
+        "refunded": "refunded"
+      }
+    },
+    "invoice_type": {
+      "name": "invoice_type",
+      "values": {
+        "standard": "standard",
+        "quotation": "quotation",
+        "credit": "credit",
+        "final": "final"
+      }
+    },
+    "relation_type": {
+      "name": "relation_type",
+      "values": {
+        "individual": "individual",
+        "corporate": "corporate"
+      }
+    }
+  },
   "schemas": {},
   "_meta": {
+    "columns": {},
     "schemas": {},
-    "tables": {},
-    "columns": {}
+    "tables": {}
   }
 }

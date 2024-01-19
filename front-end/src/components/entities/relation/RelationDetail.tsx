@@ -11,11 +11,14 @@ import {
 } from "react-hook-form";
 
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
-import { useAuthUser } from "@/contexts/AuthContext";
+import { useAuthRelation } from "@/contexts/AuthContext";
 import { useAutosave } from "@/hooks/useAutosave";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
-import { UserUpdateInputSchema, UserUpdateSchema } from "@/schemas/user";
+import {
+  RelationUpdateInputSchema,
+  RelationUpdateSchema,
+} from "@/schemas/relation";
 import { type RouterOutput } from "@/utils/trpc";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Alert, Badge, Button, Loader, Stack } from "@mantine/core";
@@ -28,38 +31,38 @@ import {
   IconUsers,
 } from "@tabler/icons-react";
 
-import { UserForm } from "./UserForm";
+import { RelationForm } from "./RelationForm";
 
-type UserPageProps = {
-  user: RouterOutput["user"]["get"];
+type RelationDetailProps = {
+  relation: RouterOutput["relation"]["get"];
 };
 
-export const UserUpdate = ({ user }: UserPageProps) => {
-  const deleteUser = useMutation("user", "delete");
-  const authUser = useAuthUser();
+export const RelationDetail = ({ relation }: RelationDetailProps) => {
+  const deleteRelation = useMutation("relation", "delete");
+  const authRelation = useAuthRelation();
   const router = useRouter();
   const t = useTranslation();
 
   const formMethods = useForm({
-    defaultValues: user,
-    resolver: valibotResolver(UserUpdateSchema),
+    defaultValues: relation,
+    resolver: valibotResolver(RelationUpdateSchema),
   });
 
-  const isSelf = user.id === authUser.id;
+  const isSelf = relation.id === authRelation.id;
 
   const deletehandler = () => {
     modals.openConfirmModal({
       title: t("common.areYouSure"),
       labels: { confirm: t("common.yes"), cancel: t("common.no") },
       onConfirm: async () => {
-        await deleteUser.mutate(user.id);
+        await deleteRelation.mutate(relation.id);
 
         notifications.show({
-          message: t("entities.user.deletedNotification"),
+          message: t("entities.relation.deletedNotification"),
           color: "green",
         });
 
-        router.push("/users");
+        router.push("/relations");
       },
     });
   };
@@ -68,14 +71,14 @@ export const UserUpdate = ({ user }: UserPageProps) => {
     <FormProvider {...formMethods}>
       <Stack>
         <DashboardHeader
-          backRouteFallback="/users"
+          backRouteFallback="/relations"
           title={[
             {
               icon: <IconUsers />,
-              label: t("dashboardLayout.users"),
-              href: "/users",
+              label: t("entities.relation.name.plural"),
+              href: "/relations",
             },
-            { label: `${user.firstName} ${user.lastName}` },
+            { label: relation.name },
           ]}
         >
           {!isSelf && (
@@ -85,7 +88,7 @@ export const UserUpdate = ({ user }: UserPageProps) => {
                 variant="light"
                 onClick={deletehandler}
                 leftSection={<IconTrash />}
-                loading={deleteUser.loading}
+                loading={deleteRelation.loading}
               >
                 {t("common.delete")}
               </Button>
@@ -97,25 +100,27 @@ export const UserUpdate = ({ user }: UserPageProps) => {
           <Alert
             icon={<IconAlertTriangle />}
             color="orange"
-            title={t("entities.user.isSelfAlert.title")}
+            title={t("entities.relation.isSelfAlert.title")}
           >
-            {t("entities.user.isSelfAlert.message") + " "}
-            <Link href="/profile">{t("entities.user.isSelfAlert.button")}</Link>
+            {t("entities.relation.isSelfAlert.message") + " "}
+            <Link href="/profile">
+              {t("entities.relation.isSelfAlert.button")}
+            </Link>
             .
           </Alert>
         )}
-        <UserForm disabled={isSelf} />
+        <RelationForm disabled={isSelf} />
       </Stack>
     </FormProvider>
   );
 };
 
 const SaveBadge = () => {
-  const updateUser = useMutation("user", "update");
+  const updateRelation = useMutation("relation", "update");
   const t = useTranslation();
 
   const { control, getValues, reset, setError } =
-    useFormContext<UserUpdateInputSchema>();
+    useFormContext<RelationUpdateInputSchema>();
   const { isDirty, errors } = useFormState({ control });
   const isError = useMemo(() => !!Object.keys(errors).length, [errors]);
 
@@ -131,12 +136,12 @@ const SaveBadge = () => {
     }
 
     try {
-      const updatedUser = await updateUser.mutate({
+      const updatedRelation = await updateRelation.mutate({
         ...values,
         id: getValues("id"),
       });
 
-      reset(updatedUser);
+      reset(updatedRelation);
     } catch (error) {
       // TODO Fix typings
       const { success, json } = isJson((error as any).message);
@@ -151,20 +156,18 @@ const SaveBadge = () => {
         return;
       }
 
-      console.log({ success, json });
-
       const { exception, data } = json;
 
       if (exception === "DB_UNIQUE_CONSTRAINT") {
         setError(data.column, {
-          message: `${t("entities.user.name.singular")} - ${getValues(
+          message: `${t("entities.relation.name.singular")} - ${getValues(
             data.column,
           )} - ${data.column}`,
 
           // TODO Fix translations with arguments
 
           // message: t("exceptions.DB_UNIQUE_CONSTRAINT", {
-          //   entity: t("entities.user.name.singular"),
+          //   entity: t("entities.relation.name.singular"),
           //   value: getValues(data.column),
           //   column: data.column,
           // }),
@@ -175,7 +178,7 @@ const SaveBadge = () => {
       //   notifications.show({
       //     message: t("exceptions.DB_KEY_CONSTRAINT", {
       //       depend: data.depend,
-      //       entity: t("entities.user.name.singular"),
+      //       entity: t("entities.relation.name.singular"),
       //     }),
       //     color: "red",
       //   });
@@ -186,12 +189,12 @@ const SaveBadge = () => {
     <Badge
       size="lg"
       color={
-        isError ? "red" : isDirty || updateUser.loading ? "orange" : "green"
+        isError ? "red" : isDirty || updateRelation.loading ? "orange" : "green"
       }
       leftSection={
         isError ? (
           <IconAlertTriangle size="1rem" />
-        ) : isDirty || updateUser.loading ? (
+        ) : isDirty || updateRelation.loading ? (
           <Loader color="orange" variant="oval" size="1rem" />
         ) : (
           <IconCheck size="1rem" />
@@ -201,7 +204,7 @@ const SaveBadge = () => {
     >
       {isError
         ? t("common.error")
-        : isDirty || updateUser.loading
+        : isDirty || updateRelation.loading
           ? t("common.saving")
           : t("common.saved")}
     </Badge>
