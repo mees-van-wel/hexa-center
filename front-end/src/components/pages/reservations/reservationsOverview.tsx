@@ -46,6 +46,24 @@ const isDateBetween = (date: Date, startDate: Date, endDate: Date) =>
 const now = new Date();
 now.setHours(0, 0, 0, 0);
 
+// Helper function to calculate the duration of a reservation in days
+const getDurationInDays = (startDate, endDate) => {
+  const start = dayjs(startDate).startOf("day");
+  const end = dayjs(endDate).startOf("day");
+  return end.diff(start, "day") + 1; // +1 to include the start day
+};
+
+// Helper function to update positions array
+const updatePositions = (positions, reservationsForDay) => {
+  // Clean positions array from ended reservations
+  positions.forEach((position, index) => {
+    if (!reservationsForDay.some((res) => res.id === position.id)) {
+      positions[index] = null; // Mark the position as free
+    }
+  });
+  return positions.filter((pos) => pos !== null); // Remove nulls to compact the array
+};
+
 export const Reservations = ({
   reservations,
   rooms,
@@ -82,7 +100,8 @@ export const Reservations = ({
           weekDays = [0, 1, 2, 3, 4, 5, 6];
           break;
         case CALENDARVIEW.WORKWEEK:
-          weekDays = [1, 2, 3, 4, 5];
+          // [1, 2, 3, 4, 5]
+          weekDays = [1, 2];
           break;
         default:
           weekDays = [utcDate.getUTCDay()];
@@ -158,8 +177,8 @@ export const Reservations = ({
         h="100%"
         className={styles.calendarOverview}
       >
-        <Paper p={"1rem"} className={styles.calendarContainer}>
-          <div className={styles.calendar}>
+        <div className={styles.calendar}>
+          <Paper p={"1rem"} className={styles.calendarContainer}>
             <Stack>
               <Group grow gap={0} ta="center" fw="700">
                 <span
@@ -196,9 +215,16 @@ export const Reservations = ({
                     )
                     .map(({ name }) => {
                       let reservationsShown: number[] = [];
+                      let positions = [];
 
                       return (
-                        <Group key={name} gap={0} className={styles.row}>
+                        <Group
+                          grow
+                          key={name}
+                          gap={0}
+                          className={styles.row}
+                          align="top"
+                        >
                           <div
                             className={styles.room}
                             style={{
@@ -265,9 +291,6 @@ export const Reservations = ({
                               },
                             );
 
-                            const add =
-                              overlappingReservations.length > 1 ? 8 : 0;
-
                             return (
                               <div
                                 key={`${name}${dayjs(weekDay).day()}`}
@@ -276,7 +299,7 @@ export const Reservations = ({
                                     currentWeek.length + 1
                                   })`,
                                   height: `${
-                                    34 * overlappingReservations.length + add
+                                    34 * overlappingReservations.length + 4
                                   }px`,
                                 }}
                                 className={styles.reservationContainer}
@@ -374,6 +397,26 @@ export const Reservations = ({
                                       : "blue";
                                     const endColor = hasEnd ? "red" : "blue";
 
+                                    positions = updatePositions(
+                                      positions,
+                                      reservations,
+                                    );
+
+                                    // Find the first available position
+                                    let allocatedPosition = positions.findIndex(
+                                      (pos) => pos.end < reservation.startDate,
+                                    );
+                                    if (allocatedPosition === -1) {
+                                      allocatedPosition = positions.length; // If none, use the next available position
+                                    }
+
+                                    // Set the reservation's position
+                                    positions[allocatedPosition] = {
+                                      id: reservation.id,
+                                      end: reservation.endDate,
+                                      top: allocatedPosition * 34, // Assuming 34px per reservation
+                                    };
+
                                     return (
                                       <Button
                                         key={`${reservation.room.name}-${reservationIndex}`}
@@ -393,9 +436,13 @@ export const Reservations = ({
                                         })}
                                         style={{
                                           width: `calc(${
-                                            100 * multiplier - 6
-                                          }%)`,
-                                          top: `${34 * reservationIndex}px`,
+                                            100 * multiplier
+                                          }% - 12px)`,
+                                          top: `${
+                                            allocatedPosition
+                                              ? allocatedPosition * 34 // TODO: set variable
+                                              : 0
+                                          }px`,
                                         }}
                                         href={`/reservations/${reservation.id}`}
                                       >
@@ -425,8 +472,8 @@ export const Reservations = ({
             >
               {sidebarToggle ? <IconArrowBarRight /> : <IconArrowBarLeft />}
             </div>
-          </div>
-        </Paper>
+          </Paper>
+        </div>
         <CalendarSidebar
           date={date}
           now={now}

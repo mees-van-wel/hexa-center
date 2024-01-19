@@ -1,7 +1,7 @@
-// .weekHidden {
-//     max-width: 20%;
-//     padding: 0 0.5rem;
-// }
+.weekHidden {
+  max-width: 20%;
+  padding: 0 0.5rem;
+}
 
 // .week {
 //     min-width: 500px;
@@ -43,6 +43,7 @@
 
 .reservationContainer {
   position: relative;
+  margin-top: 6px;
 }
 
 .reservation {
@@ -66,8 +67,8 @@
 
 .sideBarIcon {
   position: absolute;
-  right: -1.5rem;
-  top: -1.5rem;
+  right: -0.5rem;
+  top: -0.5rem;
   display: flex;
   cursor: pointer;
   align-items: center;

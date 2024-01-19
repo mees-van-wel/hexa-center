@@ -39,73 +39,75 @@ export const CalendarSidebar = ({
 
   return (
     <div
-      className={clsx(styles.calendarSidebar, {
+      className={clsx(styles.sidebarContainer, {
         [styles.closed]: !sideBarToggle,
       })}
     >
-      <Paper p="md" h="100%" w="100%">
-        <Stack ta="center">
-          <p>
-            {t(`dates.weekdayNamesShort.${WEEKDAY_VALUES[date.getDay()]}`)}{" "}
-            {dayjs(date).date()}{" "}
-            {t(`dates.monthsLong.${MONTH_VALUES[dayjs(date).month()]}`)}
-          </p>
+      <div className={styles.sidebar}>
+        <Paper p="md" h="100%" w="100%">
+          <Stack ta="center">
+            <p>
+              {t(`dates.weekdayNamesShort.${WEEKDAY_VALUES[date.getDay()]}`)}{" "}
+              {dayjs(date).date()}{" "}
+              {t(`dates.monthsLong.${MONTH_VALUES[dayjs(date).month()]}`)}
+            </p>
 
-          <Button.Group>
-            <Button
-              onClick={() => {
-                ChangeWeek(calendarView !== CALENDARVIEW.DAY ? -7 : -1);
-              }}
-            >
-              <IconArrowBack size={50} />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                onDateChange(now);
-              }}
-              w="100%"
-            >
-              {t("common.today")}
-            </Button>
-            <Button
-              onClick={() => {
-                ChangeWeek(calendarView !== CALENDARVIEW.DAY ? 7 : 1);
-              }}
-            >
-              <IconArrowForward size={50} />
-            </Button>
-          </Button.Group>
+            <Button.Group>
+              <Button
+                onClick={() => {
+                  ChangeWeek(calendarView !== CALENDARVIEW.DAY ? -7 : -1);
+                }}
+              >
+                <IconArrowBack size={50} />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  onDateChange(now);
+                }}
+                w="100%"
+              >
+                {t("common.today")}
+              </Button>
+              <Button
+                onClick={() => {
+                  ChangeWeek(calendarView !== CALENDARVIEW.DAY ? 7 : 1);
+                }}
+              >
+                <IconArrowForward size={50} />
+              </Button>
+            </Button.Group>
 
-          <SegmentedControl
-            data={[
-              { label: t("common.week"), value: CALENDARVIEW.WEEK },
-              {
-                label: t("common.workweek"),
-                value: CALENDARVIEW.WORKWEEK,
-              },
-              { label: t("common.day"), value: CALENDARVIEW.DAY },
-            ]}
-            onChange={(value) => {
-              onCalendarViewChange(value as CalendarView);
-            }}
-            orientation="vertical"
-            size="sm"
-            w="100%"
-          />
-
-          <Group grow align="end">
-            <DateInput
-              value={date}
-              required
+            <SegmentedControl
+              data={[
+                { label: t("common.week"), value: CALENDARVIEW.WEEK },
+                {
+                  label: t("common.workweek"),
+                  value: CALENDARVIEW.WORKWEEK,
+                },
+                { label: t("common.day"), value: CALENDARVIEW.DAY },
+              ]}
               onChange={(value) => {
-                value && onDateChange(new Date(value.setHours(0, 0, 0, 0)));
+                onCalendarViewChange(value as CalendarView);
               }}
+              orientation="vertical"
+              size="sm"
+              w="100%"
             />
-          </Group>
-        </Stack>
-      </Paper>
+
+            <Group grow align="end">
+              <DateInput
+                value={date}
+                required
+                onChange={(value) => {
+                  value && onDateChange(new Date(value.setHours(0, 0, 0, 0)));
+                }}
+              />
+            </Group>
+          </Stack>
+        </Paper>
+      </div>
     </div>
   );
 };
