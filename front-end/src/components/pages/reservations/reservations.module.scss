@@ -3,14 +3,6 @@
   padding: 0 0.5rem;
 }
 
-// .week {
-//     min-width: 500px;
-//     overflow: hidden;
-//     text-overflow: ellipsis;
-//     white-space: nowrap;
-//     padding: 0, 0.5rem;
-// }
-
 .calendarOverview {
   transition: gap 0.2s ease-in;
 }
@@ -44,6 +36,10 @@
 .reservationContainer {
   position: relative;
   margin-top: 6px;
+
+  &:first {
+    padding-left: 6px;
+  }
 }
 
 .reservation {
@@ -53,10 +49,76 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  border: none;
 
-  &.begin {
-    // border-left: solid 10px red;
-    // border gradient?
+  .icon {
+    flex-shrink: 0;
+    flex-grow: 0;
+    width: 20px;
+  }
+
+  .label {
+    // TODO: grow not working
+    white-space: nowrap; /* Prevent the label from wrapping */
+    overflow: hidden; /* Hide overflow */
+    text-overflow: ellipsis; /* Show ellipsis on overflow */
+    flex-grow: 1; /* Allow the label to grow and fill space */
+    margin-left: 10px; /* Space after the left icon */
+    margin-right: 10px; /* Space before the right icon */
+  }
+
+  &.start {
+    background: linear-gradient(
+      90deg,
+      var(--mantine-color-green-6) 0px,
+      var(--mantine-color-blue-6) 15px
+    );
+
+    body[data-theme="dark"] & {
+      background: linear-gradient(
+        90deg,
+        var(--mantine-color-green-8) 0px,
+        var(--mantine-color-blue-8) 15px
+      );
+    }
+  }
+
+  &.end {
+    background: linear-gradient(
+      90deg,
+      var(--mantine-color-blue-6) 0px,
+      var(--mantine-color-blue-6) calc(100% - 15px),
+      var(--mantine-color-red-6) 100%
+    );
+
+    body[data-theme="dark"] & {
+      background: linear-gradient(
+        90deg,
+        var(--mantine-color-blue-8) 0px,
+        var(--mantine-color-blue-8) calc(100% - 15px),
+        var(--mantine-color-red-8) 100%
+      );
+    }
+  }
+
+  &.startEnd {
+    background: linear-gradient(
+      90deg,
+      var(--mantine-color-green-6) 0px,
+      var(--mantine-color-blue-6) 15px,
+      var(--mantine-color-blue-6) calc(100% - 15px),
+      var(--mantine-color-red-6) 100%
+    );
+
+    body[data-theme="dark"] & {
+      background: linear-gradient(
+        90deg,
+        var(--mantine-color-green-8) 0px,
+        var(--mantine-color-blue-8) 15px,
+        var(--mantine-color-blue-8) calc(100% - 15px),
+        var(--mantine-color-red-8) 100%
+      );
+    }
   }
 }
 

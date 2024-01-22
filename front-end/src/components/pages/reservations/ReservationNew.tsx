@@ -35,7 +35,17 @@ export const ReservationNew = ({ rooms, users }: ReservationNewProps) => {
   const onSubmit: SubmitHandler<ReservationInputCreateSchema> = async (
     values,
   ) => {
+    if (values.startDate > values.endDate) {
+      notifications.show({
+        message: t("reservationPage.dateError"),
+        color: "red",
+      });
+
+      return;
+    }
+
     const reservation = await createReservation.mutate({ ...values });
+
     notifications.show({
       message: t("reservationPage.reservationCreated"),
       color: "green",

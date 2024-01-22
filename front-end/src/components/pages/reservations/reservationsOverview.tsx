@@ -11,11 +11,16 @@ import { CALENDARVIEW, CalendarView } from "@/constants/calendarView";
 import { MONTH_VALUES } from "@/constants/months";
 import { WEEKDAY_VALUES } from "@/constants/weekdays";
 import { useTranslation } from "@/hooks/useTranslation";
+import { Position } from "@/types/Position";
 import { RouterOutput } from "@/utils/trpc";
 import { Button, Group, Paper, Stack } from "@mantine/core";
 import {
   IconArrowBarLeft,
   IconArrowBarRight,
+  IconArrowForward,
+  IconArrowMoveLeft,
+  IconArrowMoveRight,
+  IconArrowRightBar,
   IconPlus,
 } from "@tabler/icons-react";
 
@@ -46,18 +51,14 @@ const isDateBetween = (date: Date, startDate: Date, endDate: Date) =>
 const now = new Date();
 now.setHours(0, 0, 0, 0);
 
-// Helper function to calculate the duration of a reservation in days
-const getDurationInDays = (startDate, endDate) => {
-  const start = dayjs(startDate).startOf("day");
-  const end = dayjs(endDate).startOf("day");
-  return end.diff(start, "day") + 1; // +1 to include the start day
-};
-
 // Helper function to update positions array
-const updatePositions = (positions, reservationsForDay) => {
+const updatePositions = (
+  positions: Position[],
+  reservationsForDay: RouterOutput["reservation"]["list"],
+) => {
   // Clean positions array from ended reservations
   positions.forEach((position, index) => {
-    if (!reservationsForDay.some((res) => res.id === position.id)) {
+    if (!reservationsForDay.some((res) => res.id === position?.id)) {
       positions[index] = null; // Mark the position as free
     }
   });
@@ -100,8 +101,7 @@ export const Reservations = ({
           weekDays = [0, 1, 2, 3, 4, 5, 6];
           break;
         case CALENDARVIEW.WORKWEEK:
-          // [1, 2, 3, 4, 5]
-          weekDays = [1, 2];
+          weekDays = [1, 2, 3, 4, 5];
           break;
         default:
           weekDays = [utcDate.getUTCDay()];
@@ -215,7 +215,7 @@ export const Reservations = ({
                     )
                     .map(({ name }) => {
                       let reservationsShown: number[] = [];
-                      let positions = [];
+                      let positions: Position[] = [];
 
                       return (
                         <Group
@@ -299,7 +299,7 @@ export const Reservations = ({
                                     currentWeek.length + 1
                                   })`,
                                   height: `${
-                                    34 * overlappingReservations.length + 4
+                                    34 * overlappingReservations.length
                                   }px`,
                                 }}
                                 className={styles.reservationContainer}
@@ -308,6 +308,15 @@ export const Reservations = ({
                                   (reservation, reservationIndex) => {
                                     let closestEndDate: Date | null =
                                       reservation.endDate;
+
+                                    const correctWidth = isDateBetween(
+                                      currentWeek.at(-1)!,
+                                      reservation.startDate,
+                                      reservation.endDate,
+                                    )
+                                      ? 12
+                                      : 6;
+
                                     const hasStart = currentWeek.some((day) =>
                                       compairDates(day, reservation.startDate),
                                     );
@@ -392,11 +401,6 @@ export const Reservations = ({
                                       reservation.customer.lastName
                                     }`;
 
-                                    const startColor = hasStart
-                                      ? "green"
-                                      : "blue";
-                                    const endColor = hasEnd ? "red" : "blue";
-
                                     positions = updatePositions(
                                       positions,
                                       reservations,
@@ -404,17 +408,20 @@ export const Reservations = ({
 
                                     // Find the first available position
                                     let allocatedPosition = positions.findIndex(
-                                      (pos) => pos.end < reservation.startDate,
+                                      (pos) =>
+                                        pos && pos.end < reservation.startDate,
                                     );
                                     if (allocatedPosition === -1) {
-                                      allocatedPosition = positions.length; // If none, use the next available position
+                                      allocatedPosition = positions.length;
                                     }
+
+                                    const top = allocatedPosition * 34;
 
                                     // Set the reservation's position
                                     positions[allocatedPosition] = {
                                       id: reservation.id,
                                       end: reservation.endDate,
-                                      top: allocatedPosition * 34, // Assuming 34px per reservation
+                                      top: top,
                                     };
 
                                     return (
@@ -422,31 +429,45 @@ export const Reservations = ({
                                         key={`${reservation.room.name}-${reservationIndex}`}
                                         component={Link}
                                         title={title}
-                                        variant="gradient"
-                                        gradient={{
-                                          from: startColor,
-                                          to: endColor,
-                                          deg: 90,
-                                        }}
                                         size="xs"
                                         ta="left"
                                         className={clsx(styles.reservation, {
-                                          [styles.begin]: hasStart,
-                                          [styles.end]: hasEnd,
+                                          [styles.start]: hasStart && !hasEnd,
+                                          [styles.end]: hasEnd && !hasStart,
+                                          [styles.startEnd]: hasStart && hasEnd,
                                         })}
                                         style={{
                                           width: `calc(${
                                             100 * multiplier
-                                          }% - 12px)`,
-                                          top: `${
-                                            allocatedPosition
-                                              ? allocatedPosition * 34 // TODO: set variable
-                                              : 0
-                                          }px`,
+                                          }% - ${correctWidth}px)`,
+                                          top: `${top}px`,
                                         }}
+                                        pr="10px"
+                                        pl="10px"
                                         href={`/reservations/${reservation.id}`}
                                       >
-                                        {title}
+                                        <Group
+                                          grow
+                                          wrap="nowrap"
+                                          justify="space-between"
+                                          align="center"
+                                          w="100%"
+                                        >
+                                          {hasEnd && !hasStart && (
+                                            <IconArrowMoveLeft
+                                              className={styles.icon}
+                                            />
+                                          )}
+                                          <div className={styles.label}>
+                                            Ik heb een hele lange naam
+                                          </div>
+
+                                          {hasStart && !hasEnd && (
+                                            <IconArrowMoveRight
+                                              className={styles.icon}
+                                            />
+                                          )}
+                                        </Group>
                                       </Button>
                                     );
                                   },
