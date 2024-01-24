@@ -17,10 +17,8 @@ import { Button, Group, Paper, Stack } from "@mantine/core";
 import {
   IconArrowBarLeft,
   IconArrowBarRight,
-  IconArrowForward,
   IconArrowMoveLeft,
   IconArrowMoveRight,
-  IconArrowRightBar,
   IconPlus,
 } from "@tabler/icons-react";
 
@@ -431,11 +429,15 @@ export const Reservations = ({
                                         title={title}
                                         size="xs"
                                         ta="left"
-                                        className={clsx(styles.reservation, {
-                                          [styles.start]: hasStart && !hasEnd,
-                                          [styles.end]: hasEnd && !hasStart,
-                                          [styles.startEnd]: hasStart && hasEnd,
-                                        })}
+                                        classNames={{
+                                          root: clsx(styles.reservation, {
+                                            [styles.start]: hasStart && !hasEnd,
+                                            [styles.end]: hasEnd && !hasStart,
+                                            [styles.startEnd]:
+                                              hasStart && hasEnd,
+                                          }),
+                                          label: styles.labelContainer,
+                                        }}
                                         style={{
                                           width: `calc(${
                                             100 * multiplier
@@ -452,8 +454,10 @@ export const Reservations = ({
                                           justify="space-between"
                                           align="center"
                                           w="100%"
+                                          preventGrowOverflow={false}
                                         >
-                                          {hasEnd && !hasStart && (
+                                          {((hasEnd && !hasStart) ||
+                                            (!hasStart && !hasEnd)) && (
                                             <IconArrowMoveLeft
                                               className={styles.icon}
                                             />
@@ -462,7 +466,8 @@ export const Reservations = ({
                                             Ik heb een hele lange naam
                                           </div>
 
-                                          {hasStart && !hasEnd && (
+                                          {((hasStart && !hasEnd) ||
+                                            (!hasStart && !hasEnd)) && (
                                             <IconArrowMoveRight
                                               className={styles.icon}
                                             />
