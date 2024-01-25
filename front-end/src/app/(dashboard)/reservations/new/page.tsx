@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-import { ReservationNew } from "@/components/pages/reservations/ReservationNew";
+import { ReservationNew } from "@/components/entities/reservation/ReservationNew";
 import { setTRPCRefreshToken, trpc } from "@/utils/trpc";
 
 export default async function Page() {

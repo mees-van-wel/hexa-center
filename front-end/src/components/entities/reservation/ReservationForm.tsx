@@ -105,7 +105,6 @@ export const ReservationForm = ({ rooms, users }: ReservationForm) => {
           />
         )}
       />
-      {/* TODO: check props from mantine */}
       <Textarea
         {...register("notes")}
         error={errors.notes?.message}

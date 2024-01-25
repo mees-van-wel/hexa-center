@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import clsx from "clsx";
 import dayjs from "dayjs";
 
@@ -32,10 +33,12 @@ export const CalendarSidebar = ({
 }: CalendarSidebarProps) => {
   const t = useTranslation();
 
-  // TODO: UseMemo?
-  const ChangeWeek = (days: number) => {
-    onDateChange(new Date(date.getTime() + days * 24 * 60 * 60 * 1000));
-  };
+  const ChangeWeek = useMemo(
+    () => (days: number) => {
+      onDateChange(new Date(date.getTime() + days * 24 * 60 * 60 * 1000));
+    },
+    [date, onDateChange],
+  );
 
   return (
     <div
@@ -43,71 +46,69 @@ export const CalendarSidebar = ({
         [styles.closed]: !sideBarToggle,
       })}
     >
-      <div className={styles.sidebar}>
-        <Paper p="md" h="100%" w="100%">
-          <Stack ta="center">
-            <p>
-              {t(`dates.weekdayNamesShort.${WEEKDAY_VALUES[date.getDay()]}`)}{" "}
-              {dayjs(date).date()}{" "}
-              {t(`dates.monthsLong.${MONTH_VALUES[dayjs(date).month()]}`)}
-            </p>
+      <Paper p="md" h="100%" w="100%">
+        <Stack ta="center">
+          <p>
+            {t(`dates.weekdayNamesShort.${WEEKDAY_VALUES[date.getDay()]}`)}{" "}
+            {dayjs(date).date()}{" "}
+            {t(`dates.monthsLong.${MONTH_VALUES[dayjs(date).month()]}`)}
+          </p>
 
-            <Button.Group>
-              <Button
-                onClick={() => {
-                  ChangeWeek(calendarView !== CALENDARVIEW.DAY ? -7 : -1);
-                }}
-              >
-                <IconArrowBack size={50} />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  onDateChange(now);
-                }}
-                w="100%"
-              >
-                {t("common.today")}
-              </Button>
-              <Button
-                onClick={() => {
-                  ChangeWeek(calendarView !== CALENDARVIEW.DAY ? 7 : 1);
-                }}
-              >
-                <IconArrowForward size={50} />
-              </Button>
-            </Button.Group>
-
-            <SegmentedControl
-              data={[
-                { label: t("common.week"), value: CALENDARVIEW.WEEK },
-                {
-                  label: t("common.workweek"),
-                  value: CALENDARVIEW.WORKWEEK,
-                },
-                { label: t("common.day"), value: CALENDARVIEW.DAY },
-              ]}
-              onChange={(value) => {
-                onCalendarViewChange(value as CalendarView);
+          <Button.Group>
+            <Button
+              onClick={() => {
+                ChangeWeek(calendarView !== CALENDARVIEW.DAY ? -7 : -1);
               }}
-              orientation="vertical"
+            >
+              <IconArrowBack size={50} />
+            </Button>
+            <Button
+              variant="outline"
               size="sm"
+              onClick={() => {
+                onDateChange(now);
+              }}
               w="100%"
-            />
+            >
+              {t("common.today")}
+            </Button>
+            <Button
+              onClick={() => {
+                ChangeWeek(calendarView !== CALENDARVIEW.DAY ? 7 : 1);
+              }}
+            >
+              <IconArrowForward size={50} />
+            </Button>
+          </Button.Group>
 
-            <Group grow align="end">
-              <DateInput
-                value={date}
-                required
-                onChange={(value) => {
-                  value && onDateChange(new Date(value.setHours(0, 0, 0, 0)));
-                }}
-              />
-            </Group>
-          </Stack>
-        </Paper>
-      </div>
+          <SegmentedControl
+            data={[
+              { label: t("common.week"), value: CALENDARVIEW.WEEK },
+              {
+                label: t("common.workweek"),
+                value: CALENDARVIEW.WORKWEEK,
+              },
+              { label: t("common.day"), value: CALENDARVIEW.DAY },
+            ]}
+            onChange={(value) => {
+              onCalendarViewChange(value as CalendarView);
+            }}
+            orientation="vertical"
+            size="sm"
+            w="100%"
+          />
+
+          <Group grow align="end">
+            <DateInput
+              value={date}
+              required
+              onChange={(value) => {
+                value && onDateChange(new Date(value.setHours(0, 0, 0, 0)));
+              }}
+            />
+          </Group>
+        </Stack>
+      </Paper>
     </div>
   );
 };

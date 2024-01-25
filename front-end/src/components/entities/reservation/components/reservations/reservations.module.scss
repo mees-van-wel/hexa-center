@@ -1,0 +1,150 @@
+// TODO: fix class names and roots
+
+.weekHidden {
+    width: 150px;
+    padding: 0 0.5rem;
+    flex-grow: 0 !important;
+  }
+  
+  .calendarOverview {
+    transition: gap 0.2s ease-in;
+  }
+  
+  .calendarContainer {
+    flex-grow: 1;
+  }
+  
+  .calendar {
+    position: relative;
+    flex-grow: 1;
+  }
+  
+  .row {
+    border-top: solid 1px rgb(var(--color-background));
+  
+    &:nth-of-type(odd) {
+      background-color: rgb(var(--color-midground));
+    }
+  
+    .room {
+      display: flex;
+      flex-grow: 0 !important;
+      width: 150px;
+      align-items: center;
+      border-right: solid 1px rgb(var(--color-background));
+      color: var(--mantine-color);
+      padding: 0.5rem;
+    }
+  }
+  
+  .reservationContainer {
+    position: relative;
+    margin-top: 6px;
+  
+    &:first {
+      padding-left: 6px;
+    }
+  }
+  
+  .reservation {
+    position: absolute;
+    z-index: 10;
+    margin-left: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    border: none;
+  
+    .labelContainer {
+      width: 100%;
+    }
+  
+    .icon {
+      flex-shrink: 0;
+      flex-grow: 0;
+      width: 20px;
+    }
+  
+    .label {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-left: 5px;
+      margin-right: 5px;
+      text-align: center;
+    }
+  
+    &.start {
+      background: linear-gradient(
+        90deg,
+        var(--mantine-color-green-6) 0px,
+        var(--mantine-color-blue-6) 15px
+      );
+  
+      body[data-theme="dark"] & {
+        background: linear-gradient(
+          90deg,
+          var(--mantine-color-green-8) 0px,
+          var(--mantine-color-blue-8) 15px
+        );
+      }
+    }
+  
+    &.end {
+      background: linear-gradient(
+        90deg,
+        var(--mantine-color-blue-6) 0px,
+        var(--mantine-color-blue-6) calc(100% - 15px),
+        var(--mantine-color-red-6) 100%
+      );
+  
+      body[data-theme="dark"] & {
+        background: linear-gradient(
+          90deg,
+          var(--mantine-color-blue-8) 0px,
+          var(--mantine-color-blue-8) calc(100% - 15px),
+          var(--mantine-color-red-8) 100%
+        );
+      }
+    }
+  
+    &.startEnd {
+      background: linear-gradient(
+        90deg,
+        var(--mantine-color-green-6) 0px,
+        var(--mantine-color-blue-6) 15px,
+        var(--mantine-color-blue-6) calc(100% - 15px),
+        var(--mantine-color-red-6) 100%
+      );
+  
+      body[data-theme="dark"] & {
+        background: linear-gradient(
+          90deg,
+          var(--mantine-color-green-8) 0px,
+          var(--mantine-color-blue-8) 15px,
+          var(--mantine-color-blue-8) calc(100% - 15px),
+          var(--mantine-color-red-8) 100%
+        );
+      }
+    }
+  }
+  
+  .noRooms {
+    border-top: solid rgb(var(--color-background)) 1px;
+    text-align: center;
+  }
+  
+  .sideBarIcon {
+    position: absolute;
+    right: -0.5rem;
+    top: -0.5rem;
+    display: flex;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(var(--color-midground));
+    border: solid 1px rgb(var(--color-background));
+    border-radius: 100%;
+    padding: 0.25rem;
+  }
+  
