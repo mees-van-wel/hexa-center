@@ -8,7 +8,6 @@ import {
 } from "@/constants/sessionDurations";
 import db from "@/db/client";
 import { sessions, users } from "@/db/schema";
-import { SendEmailOtpSchema, SendPhoneOtpSchema } from "@/schemas/auth";
 import { procedure, router } from "@/trpc";
 import { decrypt, encrypt } from "@/utils/encryption";
 import { isProduction } from "@/utils/environment";
@@ -17,6 +16,10 @@ import { sendMail } from "@/utils/mail";
 import { createOtp } from "@/utils/otp";
 import { sendSms } from "@/utils/sms";
 import { wrap } from "@decs/typeschema";
+import {
+  SendEmailOtpSchema,
+  SendPhoneOtpSchema,
+} from "@front-end/schemas/auth";
 import { TRPCError } from "@trpc/server";
 
 const MAX_AGE = {

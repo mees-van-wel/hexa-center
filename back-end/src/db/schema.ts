@@ -158,7 +158,7 @@ export const users = pgTable("User", {
   region: text("region"),
   country: text("country"),
   sex: text("sex"),
-  dateOfBirth: date("dateOfBirth"),
+  dateOfBirth: date("dateOfBirth", { mode: "date" }),
 });
 
 export const usersRelations = relations(users, ({ one, many }) => ({

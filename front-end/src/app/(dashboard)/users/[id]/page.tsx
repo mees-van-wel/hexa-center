@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-import { User } from "@/components/pages/users/User";
+import { UserUpdate } from "@/components/entities/user/UserUpdate";
 import { setTRPCRefreshToken, trpc } from "@/utils/trpc";
 
 type UserPageParams = {
@@ -15,5 +15,5 @@ export default async function Page({ params }: UserPageParams) {
 
   const user = await trpc.user.get.query(parseInt(params.id));
 
-  return <User user={user} />;
+  return <UserUpdate user={user} />;
 }

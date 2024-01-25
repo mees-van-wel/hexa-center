@@ -1,3 +1,6 @@
+import { CountryKey } from "@/constants/countries";
+import { SexKey } from "@/constants/sexes";
+
 export type Translation = {
   common: {
     back: string;
@@ -10,10 +13,37 @@ export type Translation = {
     delete: string;
     name: string;
     areYouSure: string;
+    yes: string;
+    no: string;
+    error: string;
+    oops: string;
     today: string;
     week: string;
     workweek: string;
     day: string;
+  };
+  entities: {
+    user: {
+      name: {
+        singular: string;
+        plural: string;
+      };
+      keys: {
+        firstName: string;
+        lastName: string;
+        email: string;
+        phoneNumber: string;
+        dateOfBirth: string;
+        sex: string;
+      };
+      createdNotification: string;
+      deletedNotification: string;
+      isSelfAlert: {
+        title: string;
+        message: string;
+        button: string;
+      };
+    };
   };
   dates: {
     weekdayNames: {
@@ -139,6 +169,37 @@ export type Translation = {
     calendar: {
       noRooms: string;
     };
+  };
+  components: {
+    address: {
+      streetAndHouseNumber: string;
+      postalCode: string;
+      city: string;
+      region: string;
+      country: string;
+    };
+  };
+  // exceptions: {
+  //   DB_UNIQUE_CONSTRAINT: ({
+  //     entity,
+  //     value,
+  //     column,
+  //   }: {
+  //     entity: string;
+  //     column: string;
+  //     value: string;
+  //   }) => string;
+  //   DB_KEY_CONSTRAINT: ({
+  //     depend,
+  //     entity,
+  //   }: {
+  //     depend: string;
+  //     entity: string;
+  //   }) => string;
+  // };
+  constants: {
+    sexes: Record<SexKey, string>;
+    countries: Record<CountryKey, string>;
   };
 };
 

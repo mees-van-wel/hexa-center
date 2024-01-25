@@ -10,9 +10,12 @@ import {
   CountryKey,
   DEFAULT_COUNTRY,
 } from "@/constants/countries";
-import { Group, Select } from "@mantine/core";
+import { useTranslation } from "@/hooks/useTranslation";
+import { Group } from "@mantine/core";
 import { Input } from "@mantine/core";
 import { useDidUpdate, useId, useLocalStorage } from "@mantine/hooks";
+
+import { Combobox } from "../Combobox";
 
 import styles from "./PhoneInput.module.scss";
 
@@ -21,7 +24,7 @@ type PhoneInputProps = {
   description?: string;
   error?: string;
   required?: boolean;
-  value?: string;
+  value?: string | null;
   defaultValue?: string;
   onChange?: (value: string) => any;
   disabled?: boolean;
@@ -31,8 +34,6 @@ type PhoneInputProps = {
   style?: React.CSSProperties;
 };
 
-// TODO Fix console error Attempted import error: 'parsePhoneNumber' is not exported from 'awesome-phonenumber' (imported as 'parsePhoneNumber').
-// TODO Add country as description to select options
 export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
   (
     {
@@ -52,6 +53,7 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
     ref,
   ) => {
     const id = useId();
+    const t = useTranslation();
     const inputRef = useRef<HTMLInputElement>(null);
     const parsedPhoneNumber = useMemo(
       () => (value ? parsePhoneNumber(value) : undefined),
@@ -80,8 +82,9 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
         COUNTRY_VALUES.map(({ countryCode, callingCode }) => ({
           label: callingCode,
           value: countryCode,
+          description: t(`constants.countries.${countryCode}`),
         })),
-      [],
+      [t],
     );
 
     useDidUpdate(() => {
@@ -102,20 +105,19 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
         style={style}
       >
         <Group gap={0} wrap="nowrap">
-          <Select
+          <Combobox
             searchable
             allowDeselect={false}
             autoComplete="off"
             styles={{
+              root: { flexGrow: 0 },
               input: {
                 width: `${
                   (COUNTRIES[countryCode].callingCode.length - 2) * 10 + 69
                 }px`,
               },
             }}
-            classNames={{
-              input: styles.callingCodeInput,
-            }}
+            classNames={{ input: styles.callingCodeInput }}
             onChange={(value) => {
               if (value) {
                 setRegionCodeState(value as CountryKey);

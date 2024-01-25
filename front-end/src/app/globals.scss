@@ -52,6 +52,10 @@ body {
   color: rgb(var(--color-text));
 }
 
+.mantine-InputWrapper-root {
+  flex-grow: 1;
+}
+
 .mantine-Input-input {
   --_input-bd: transparent;
 
@@ -67,6 +71,16 @@ body {
     background-color: rgb(var(--color-background) / 40%);
     color: rgb(var(--color-text));
     opacity: 1;
+    cursor: text;
+  }
+
+  &[data-error] {
+    border-color: var(--mantine-color-error);
+  }
+
+  &:focus {
+    border-color: var(--mantine-primary-color-filled);
+    color: unset;
   }
 
   body[data-theme="dark"] & {
@@ -99,7 +113,7 @@ body {
 .mantine-Progress-section {
   transition: width var(--transition);
 }
- 
+
 .mantine-Menu-dropdown {
   background-color: rgb(var(--color-midground));
 }

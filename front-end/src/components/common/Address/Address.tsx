@@ -1,11 +1,15 @@
+"use client";
+
 import { useCallback, useMemo } from "react";
 import { useState } from "react";
-import { useFormContext, type UseFormReturn } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 
 import { COUNTRY_VALUES } from "@/constants/countries";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Group, Select, TextInput } from "@mantine/core";
 import { useDidUpdate } from "@mantine/hooks";
+
+import { Combobox } from "../Combobox";
 
 enum AddressKey {
   Street = "street",
@@ -31,44 +35,36 @@ type AutocompleteResponse = {
   }[];
 };
 
-type FormValues = {
-  street: string | null;
-  houseNumber: string | null;
-  postalCode: string | null;
-  city: string | null;
-  region: string | null;
-  country: string | null;
-};
-
-type AddressProps<T extends UseFormReturn> = {
-  form: T;
+type AddressProps = {
   disabled?: boolean;
 };
 
-export const Address = <T extends UseFormReturn>({
-  // form,
-  disabled,
-}: AddressProps<T>) => {
+export const Address = ({ disabled }: AddressProps) => {
   const t = useTranslation();
 
   const {
     register,
+    getValues,
     setValue,
-    reset,
-    watch,
+    control,
     formState: { errors },
-  } = useFormContext<FormValues>();
+  } = useFormContext<{
+    street?: string | null;
+    houseNumber?: string | null;
+    postalCode?: string | null;
+    city?: string | null;
+    region?: string | null;
+    country?: string | null;
+  }>();
 
-  const street = watch("street");
-  const houseNumber = watch("houseNumber");
+  const defaultValue = useMemo(() => {
+    const street = getValues("street");
+    const houseNumber = getValues("houseNumber");
 
-  const defaultValue = useMemo(
-    () =>
-      street && houseNumber
-        ? `${street} ${houseNumber}`
-        : street ?? houseNumber,
-    [street, houseNumber],
-  );
+    return street && houseNumber
+      ? `${street} ${houseNumber}`
+      : street ?? houseNumber;
+  }, [getValues]);
 
   const [searchValue, setSearchValue] = useState(defaultValue);
   const [options, setOptions] = useState<{ label: string; value: string }[]>(
@@ -119,9 +115,7 @@ export const Address = <T extends UseFormReturn>({
           } = address;
           return {
             label: `${street} ${houseNumber}`,
-            description: state
-              ? `${postalCode} ${city} - ${state} ${countryName}`
-              : `${postalCode} ${city} - ${countryName}`,
+            description: `${city} - ${state || postalCode} - ${countryName}`,
             value: JSON.stringify({
               street,
               houseNumber,
@@ -140,8 +134,8 @@ export const Address = <T extends UseFormReturn>({
   const selectHandler = useCallback(
     (option: string | null) => {
       if (!option) {
-        setValue("street", null);
-        setValue("houseNumber", null);
+        setValue("street", null, { shouldDirty: true, shouldTouch: true });
+        setValue("houseNumber", null, { shouldDirty: true, shouldTouch: true });
         return;
       }
 
@@ -149,65 +143,62 @@ export const Address = <T extends UseFormReturn>({
         const addressArray = option.split(/(\d+.*)/) as string[];
         const street = addressArray.shift()?.trim() ?? null;
 
-        let houseNumber: string | null = null;
+        let houseNumber = "";
         if (addressArray.length) houseNumber = addressArray.join("").trim();
 
-        setValue("street", street);
-        setValue("houseNumber", houseNumber);
+        setValue("street", street, { shouldDirty: true, shouldTouch: true });
+        setValue("houseNumber", houseNumber, {
+          shouldDirty: true,
+          shouldTouch: true,
+        });
         return;
       }
 
       const selectedAddress = JSON.parse(option);
 
-      reset(
-        Object.values(AddressKey).reduce((values, key) => {
-          let value = selectedAddress[key];
+      Object.values(AddressKey).forEach((key) => {
+        let value = selectedAddress[key];
 
-          if (key === AddressKey.Country)
-            value = COUNTRY_VALUES.find(
-              (countryObject) => countryObject.isoAlpha3 === value,
-            )?.countryCode;
+        if (key === AddressKey.Country)
+          value = COUNTRY_VALUES.find(
+            (countryObject) => countryObject.isoAlpha3 === value,
+          )?.countryCode;
 
-          return {
-            ...values,
-            [key]: value,
-          };
-        }, {}),
-      );
+        setValue(key, value, { shouldDirty: true, shouldTouch: true });
+      });
     },
-    [reset, setValue],
+    [setValue],
   );
 
   const countryOptions = useMemo(
     () =>
       COUNTRY_VALUES.map((country) => ({
         value: country.countryCode,
-        label: t(`countries.${country.countryCode}`),
+        label: t(`constants.countries.${country.countryCode}`),
       })),
     [t],
   );
 
   return (
     <Group grow>
-      <Select
+      <Combobox
         autoComplete="none"
-        label={t("components.address.field.streetAndHouseNumber")}
+        label={t("components.address.streetAndHouseNumber")}
         onSearchChange={setSearchValue}
         searchValue={searchValue || ""}
         data={options}
-        // itemComponent={SelectItemWithDescription}
         onChange={selectHandler}
         defaultValue={defaultValue}
         disabled={disabled}
         // positionDependencies={[options]}
-        error={errors.street?.message}
-        filter={({ options }) => options}
+        error={errors.street?.message || errors.houseNumber?.message}
+        // filter={({ options }) => options}
         searchable
         clearable
       />
       <TextInput
         {...register("postalCode")}
-        label={t("components.address.field.postalCode")}
+        label={t("components.address.postalCode")}
         error={errors.postalCode?.message}
         autoComplete="none"
         disabled={disabled}
@@ -215,23 +206,32 @@ export const Address = <T extends UseFormReturn>({
       <TextInput
         {...register("city")}
         autoComplete="none"
-        label={t("components.address.field.city")}
+        label={t("components.address.city")}
+        error={errors.city?.message}
         disabled={disabled}
       />
       <TextInput
         {...register("region")}
         autoComplete="none"
-        label={t("components.address.field.region")}
+        label={t("components.address.region")}
+        error={errors.region?.message}
         disabled={disabled}
       />
-      <Select
-        {...register("country")}
-        autoComplete="none"
-        label={t("components.address.field.country")}
-        data={countryOptions}
-        disabled={disabled}
-        searchable
-        clearable
+      <Controller
+        name="country"
+        control={control}
+        render={({ field, fieldState: { error } }) => (
+          <Select
+            {...field}
+            error={error?.message}
+            autoComplete="none"
+            label={t("components.address.country")}
+            data={countryOptions}
+            disabled={disabled}
+            searchable
+            clearable
+          />
+        )}
       />
     </Group>
   );

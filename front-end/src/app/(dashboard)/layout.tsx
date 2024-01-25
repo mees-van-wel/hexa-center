@@ -77,7 +77,7 @@ export default function DashboardLayout({
             </Drawer.Body>
           </Drawer.Content>
         </Drawer.Root>
-        <Group align="stretch" className={styles.layoutContainer}>
+        <Group align="stretch" className={styles.layoutContainer} wrap="nowrap">
           <div className={styles.mobileMenuContainer}>
             <span
               className={styles.mobileMenu}
@@ -92,6 +92,7 @@ export default function DashboardLayout({
             h="100%"
             visibleFrom="md"
             p="md"
+            style={{ flexShrink: 0 }}
           >
             <CompanyTitle />
             <Navigation />
