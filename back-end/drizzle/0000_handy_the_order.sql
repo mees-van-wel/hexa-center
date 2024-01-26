@@ -1,11 +1,17 @@
 DO $$ BEGIN
- CREATE TYPE "invoice_ref_type" AS ENUM('reservation');
+ CREATE TYPE "invoice_log_ref_type" AS ENUM('invoice');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "invoice_state" AS ENUM('draft', 'issued', 'cancelled', 'refunded');
+ CREATE TYPE "invoice_log_type" AS ENUM('issued', 'mailed', 'credited');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ CREATE TYPE "invoice_ref_type" AS ENUM('reservation');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -17,7 +23,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "relation_type" AS ENUM('individual', 'corporate');
+ CREATE TYPE "relation_type" AS ENUM('individual', 'business');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -47,6 +53,17 @@ CREATE TABLE IF NOT EXISTS "invoice_lines" (
 	"total_gross_amount" numeric(10, 2) NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "invoice_logs" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"uuid" uuid DEFAULT gen_random_uuid(),
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_by_id" integer,
+	"invoice_id" integer NOT NULL,
+	"type" "invoice_log_type" NOT NULL,
+	"refType" "invoice_log_type",
+	"ref_id" integer
+);
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "invoices" (
 	"$kind" text DEFAULT 'invoice' NOT NULL,
 	"id" serial PRIMARY KEY NOT NULL,
@@ -57,43 +74,43 @@ CREATE TABLE IF NOT EXISTS "invoices" (
 	"updated_by_id" integer,
 	"ref_type" "invoice_ref_type" NOT NULL,
 	"ref_id" integer NOT NULL,
-	"number" text NOT NULL,
-	"comments" text,
-	"issue_date" date NOT NULL,
-	"due_date" date NOT NULL,
 	"type" "invoice_type" NOT NULL,
-	"state" "invoice_state" NOT NULL,
+	"payment_terms" interval NOT NULL,
 	"discount_amount" numeric(10, 2) NOT NULL,
 	"total_net_amount" numeric(10, 2) NOT NULL,
 	"total_tax_amount" numeric(10, 2) NOT NULL,
 	"total_gross_amount" numeric(10, 2) NOT NULL,
 	"total_discount_amount" numeric(10, 2) NOT NULL,
+	"number" text,
+	"comments" text,
+	"date" date,
+	"due_date" date,
 	"customer_id" integer,
-	"customer_name" text NOT NULL,
+	"customer_name" text,
 	"customer_email_address" text,
 	"customer_phone_number" text,
-	"customer_street" text NOT NULL,
-	"customer_house_number" text NOT NULL,
-	"customer_postal_code" text NOT NULL,
-	"customer_city" text NOT NULL,
-	"customer_region" text NOT NULL,
-	"customer_country" text NOT NULL,
+	"customer_street" text,
+	"customer_house_number" text,
+	"customer_postal_code" text,
+	"customer_city" text,
+	"customer_region" text,
+	"customer_country" text,
 	"customer_vat_number" text,
 	"customer_coc_number" text,
 	"company_id" integer,
-	"company_name" text NOT NULL,
+	"company_name" text,
 	"company_email_address" text,
 	"company_phone_number" text,
-	"company_street" text NOT NULL,
-	"company_house_number" text NOT NULL,
-	"company_postal_code" text NOT NULL,
-	"company_city" text NOT NULL,
-	"company_region" text NOT NULL,
-	"company_country" text NOT NULL,
-	"company_vat_number" text NOT NULL,
-	"company_coc_number" text NOT NULL,
-	"company_iban" text NOT NULL,
-	"company_swift_bic" text NOT NULL
+	"company_street" text,
+	"company_house_number" text,
+	"company_postal_code" text,
+	"company_city" text,
+	"company_region" text,
+	"company_country" text,
+	"company_vat_number" text,
+	"company_coc_number" text,
+	"company_iban" text,
+	"company_swift_bic" text
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "permissions" (
@@ -132,8 +149,8 @@ CREATE TABLE IF NOT EXISTS "relations" (
 	"updated_by_id" integer,
 	"property_id" integer NOT NULL,
 	"role_id" integer NOT NULL,
-	"type" "relation_type",
-	"name" text,
+	"type" "relation_type" NOT NULL,
+	"name" text NOT NULL,
 	"email_address" text,
 	"phone_number" text,
 	"street" text,
@@ -146,9 +163,9 @@ CREATE TABLE IF NOT EXISTS "relations" (
 	"date_of_birth" date,
 	"vat_number" text,
 	"coc_number" text,
-	"corporate_contact_name" text,
-	"corporate_contact_email_address" text,
-	"corporate_contact_phone_number" text,
+	"business_contact_name" text,
+	"business_contact_email_address" text,
+	"business_contact_phone_number" text,
 	CONSTRAINT "relations_email_address_unique" UNIQUE("email_address"),
 	CONSTRAINT "relations_phone_number_unique" UNIQUE("phone_number")
 );
@@ -210,6 +227,18 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "invoice_lines" ADD CONSTRAINT "invoice_lines_invoice_id_invoices_id_fk" FOREIGN KEY ("invoice_id") REFERENCES "invoices"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "invoice_logs" ADD CONSTRAINT "invoice_logs_created_by_id_relations_id_fk" FOREIGN KEY ("created_by_id") REFERENCES "relations"("id") ON DELETE set null ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "invoice_logs" ADD CONSTRAINT "invoice_logs_invoice_id_invoices_id_fk" FOREIGN KEY ("invoice_id") REFERENCES "invoices"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

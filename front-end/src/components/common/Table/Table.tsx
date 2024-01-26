@@ -9,12 +9,13 @@ import { Paper, Table as TableComponent } from "@mantine/core";
 import { SearchBar } from "./SearchBar";
 
 import styles from "./Table.module.scss";
+
 type TableProps<T extends Record<string, any>> = {
   searchBarId?: string;
   columns: {
     selector: keyof T;
     // TODO Typings
-    format?: (value: any) => React.ReactNode;
+    format?: (values: T) => React.ReactNode;
     label: string;
   }[];
   elements: T[];
@@ -64,7 +65,7 @@ export const Table = <T extends Record<string, any>>({
             >
               {columns.map(({ selector, format }) => (
                 <TableComponent.Td key={selector as string}>
-                  {format ? format(element[selector]) : element[selector]}
+                  {format ? format(element) : element[selector]}
                 </TableComponent.Td>
               ))}
             </TableComponent.Tr>

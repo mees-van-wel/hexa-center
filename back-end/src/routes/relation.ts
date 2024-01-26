@@ -33,6 +33,7 @@ export const relationRouter = router({
           createdById: relations.createdById,
           updatedAt: relations.updatedAt,
           updatedById: relations.updatedById,
+          type: relations.type,
           name: relations.name,
           emailAddress: relations.emailAddress,
           phoneNumber: relations.phoneNumber,
@@ -42,8 +43,13 @@ export const relationRouter = router({
           city: relations.city,
           region: relations.region,
           country: relations.country,
-          sex: relations.sex,
           dateOfBirth: relations.dateOfBirth,
+          sex: relations.sex,
+          vatNumber: relations.vatNumber,
+          cocNumber: relations.cocNumber,
+          businessContactName: relations.businessContactName,
+          businessContactEmailAddress: relations.businessContactEmailAddress,
+          businessContactPhoneNumber: relations.businessContactPhoneNumber,
         });
 
       return result[0];
@@ -53,9 +59,11 @@ export const relationRouter = router({
       .select({
         $kind: relations.$kind,
         id: relations.id,
+        type: relations.type,
         name: relations.name,
         emailAddress: relations.emailAddress,
         phoneNumber: relations.phoneNumber,
+        businessContactName: relations.businessContactName,
       })
       .from(relations),
   ),
@@ -64,6 +72,11 @@ export const relationRouter = router({
       .select({
         $kind: relations.$kind,
         id: relations.id,
+        createdAt: relations.createdAt,
+        createdById: relations.createdById,
+        updatedAt: relations.updatedAt,
+        updatedById: relations.updatedById,
+        type: relations.type,
         name: relations.name,
         emailAddress: relations.emailAddress,
         phoneNumber: relations.phoneNumber,
@@ -73,8 +86,13 @@ export const relationRouter = router({
         city: relations.city,
         region: relations.region,
         country: relations.country,
-        sex: relations.sex,
         dateOfBirth: relations.dateOfBirth,
+        sex: relations.sex,
+        vatNumber: relations.vatNumber,
+        cocNumber: relations.cocNumber,
+        businessContactName: relations.businessContactName,
+        businessContactEmailAddress: relations.businessContactEmailAddress,
+        businessContactPhoneNumber: relations.businessContactPhoneNumber,
       })
       .from(relations)
       .where(eq(relations.id, input));
@@ -102,6 +120,7 @@ export const relationRouter = router({
             createdById: relations.createdById,
             updatedAt: relations.updatedAt,
             updatedById: relations.updatedById,
+            type: relations.type,
             name: relations.name,
             emailAddress: relations.emailAddress,
             phoneNumber: relations.phoneNumber,
@@ -111,8 +130,13 @@ export const relationRouter = router({
             city: relations.city,
             region: relations.region,
             country: relations.country,
-            sex: relations.sex,
             dateOfBirth: relations.dateOfBirth,
+            sex: relations.sex,
+            vatNumber: relations.vatNumber,
+            cocNumber: relations.cocNumber,
+            businessContactName: relations.businessContactName,
+            businessContactEmailAddress: relations.businessContactEmailAddress,
+            businessContactPhoneNumber: relations.businessContactPhoneNumber,
           });
 
         return result[0];

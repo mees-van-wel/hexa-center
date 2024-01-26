@@ -1,11 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useRecoilState } from "recoil";
 
-import background from "@/assets/images/bg.jpeg";
 import { CompanyTitle } from "@/components/layouts/dashboard/CompanyTitle";
 import { Navigation } from "@/components/layouts/dashboard/Navigation";
 import { routeHistoryState } from "@/states/routeHistoryState";
@@ -41,7 +39,7 @@ export default function DashboardLayout({
 
   return (
     <>
-      <Image
+      {/* <Image
         suppressHydrationWarning
         className={styles.background}
         placeholder="blur"
@@ -50,7 +48,7 @@ export default function DashboardLayout({
         quality={100}
         sizes="100vw"
         fill
-      />
+      /> */}
       <div
         className={
           typeof window !== "undefined" && window.localStorage.getItem("fade")

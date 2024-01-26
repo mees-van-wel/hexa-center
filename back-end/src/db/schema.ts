@@ -4,6 +4,7 @@ import {
   date,
   doublePrecision,
   integer,
+  interval,
   numeric,
   pgEnum,
   pgTable,
@@ -119,10 +120,9 @@ export const permissionsRelations = relationBuilder(permissions, ({ one }) => ({
 
 export const relationTypeEnum = pgEnum("relation_type", [
   "individual",
-  "corporate",
+  "business",
 ]);
 
-// Rename to relations oid
 export const relations = pgTable("relations", {
   $kind: text("$kind").default("relation").notNull(),
   id: serial("id").primaryKey(),
@@ -165,9 +165,9 @@ export const relations = pgTable("relations", {
   dateOfBirth: date("date_of_birth", { mode: "date" }),
   vatNumber: text("vat_number"),
   cocNumber: text("coc_number"),
-  corporateContactName: text("corporate_contact_name"),
-  corporateContacEmailAddress: text("corporate_contact_email_address"),
-  corporateContacPhoneNumber: text("corporate_contact_phone_number"),
+  businessContactName: text("business_contact_name"),
+  businessContactEmailAddress: text("business_contact_email_address"),
+  businessContactPhoneNumber: text("business_contact_phone_number"),
 });
 
 export const relationsRelations = relationBuilder(
@@ -313,14 +313,7 @@ export const invoiceTypeEnum = pgEnum("invoice_type", [
   "final",
 ]);
 
-// TODO Implement payment provider (Adyen or Stripe) to track payment status?
-export const invoiceStateEnum = pgEnum("invoice_state", [
-  "draft",
-  "issued",
-  "cancelled",
-  "refunded",
-]);
-
+// TODO Implement payment provider (Adyen) to track payment status
 export const invoices = pgTable("invoices", {
   $kind: text("$kind").default("invoice").notNull(),
   id: serial("id").primaryKey(),
@@ -345,12 +338,8 @@ export const invoices = pgTable("invoices", {
   ),
   refType: invoiceRefTypeEnum("ref_type").notNull(),
   refId: integer("ref_id").notNull(),
-  number: text("number").notNull(),
-  comments: text("comments"),
-  issueDate: date("issue_date", { mode: "date" }).notNull(),
-  dueDate: date("due_date", { mode: "date" }).notNull(),
   type: invoiceTypeEnum("type").notNull(),
-  status: invoiceStateEnum("status").notNull(),
+  paymentTerms: interval("payment_terms").notNull(),
   discountAmount: numeric("discount_amount", {
     precision: 10,
     scale: 2,
@@ -371,36 +360,40 @@ export const invoices = pgTable("invoices", {
     precision: 10,
     scale: 2,
   }).notNull(),
+  number: text("number"),
+  comments: text("comments"),
+  date: date("date", { mode: "date" }),
+  dueDate: date("due_date", { mode: "date" }),
   customerId: integer("customer_id").references(() => relations.id, {
     onDelete: "set null",
   }),
-  customerName: text("customer_name").notNull(),
+  customerName: text("customer_name"),
   customerEmailAddress: text("customer_email_address"),
   customerPhoneNumber: text("customer_phone_number"),
-  customerStreet: text("customer_street").notNull(),
-  customerHouseNumber: text("customer_house_number").notNull(),
-  customerPostalCode: text("customer_postal_code").notNull(),
-  customerCity: text("customer_city").notNull(),
-  customerRegion: text("customer_region").notNull(),
-  customerCountry: text("customer_country").notNull(),
+  customerStreet: text("customer_street"),
+  customerHouseNumber: text("customer_house_number"),
+  customerPostalCode: text("customer_postal_code"),
+  customerCity: text("customer_city"),
+  customerRegion: text("customer_region"),
+  customerCountry: text("customer_country"),
   customerVatNumber: text("customer_vat_number"),
   customerCocNumber: text("customer_coc_number"),
   companyId: integer("company_id").references(() => properties.id, {
     onDelete: "set null",
   }),
-  companyName: text("company_name").notNull(),
+  companyName: text("company_name"),
   companyEmailAddress: text("company_email_address"),
   companyPhoneNumber: text("company_phone_number"),
-  companyStreet: text("company_street").notNull(),
-  companyHouseNumber: text("company_house_number").notNull(),
-  companyPostalCode: text("company_postal_code").notNull(),
-  companyCity: text("company_city").notNull(),
-  companyRegion: text("company_region").notNull(),
-  companyCountry: text("company_country").notNull(),
-  companyVatNumber: text("company_vat_number").notNull(),
-  companyCocNumber: text("company_coc_number").notNull(),
-  companyIban: text("company_iban").notNull(),
-  companySwiftBic: text("company_swift_bic").notNull(),
+  companyStreet: text("company_street"),
+  companyHouseNumber: text("company_house_number"),
+  companyPostalCode: text("company_postal_code"),
+  companyCity: text("company_city"),
+  companyRegion: text("company_region"),
+  companyCountry: text("company_country"),
+  companyVatNumber: text("company_vat_number"),
+  companyCocNumber: text("company_coc_number"),
+  companyIban: text("company_iban"),
+  companySwiftBic: text("company_swift_bic"),
 });
 
 export const invoicesRelations = relationBuilder(invoices, ({ one, many }) => ({
@@ -421,6 +414,7 @@ export const invoicesRelations = relationBuilder(invoices, ({ one, many }) => ({
     references: [properties.id],
   }),
   lines: many(invoiceLines),
+  logs: many(invoiceLogs),
 }));
 
 export const invoiceLines = pgTable("invoice_lines", {
@@ -467,3 +461,44 @@ export const invoiceLinesRelations = relationBuilder(
     }),
   }),
 );
+
+export const invoiceLogTypeEnum = pgEnum("invoice_log_type", [
+  "issued",
+  "mailed",
+  "credited",
+]);
+
+export const invoiceLogRefTypeEnum = pgEnum("invoice_log_ref_type", [
+  "invoice",
+]);
+
+export const invoiceLogs = pgTable("invoice_logs", {
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  createdById: integer("created_by_id").references(
+    (): AnyPgColumn => relations.id,
+    {
+      onDelete: "set null",
+    },
+  ),
+  invoiceId: integer("invoice_id")
+    .references(() => invoices.id, { onDelete: "cascade" })
+    .notNull(),
+  type: invoiceLogTypeEnum("type").notNull(),
+  refType: invoiceLogTypeEnum("refType"),
+  refId: integer("ref_id"),
+});
+
+export const invoicLogsRelations = relationBuilder(invoiceLogs, ({ one }) => ({
+  createdBy: one(relations, {
+    fields: [invoiceLogs.createdById],
+    references: [relations.id],
+  }),
+  invoice: one(invoices, {
+    fields: [invoiceLogs.invoiceId],
+    references: [invoices.id],
+  }),
+}));

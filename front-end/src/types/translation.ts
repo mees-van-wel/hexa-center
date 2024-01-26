@@ -1,5 +1,6 @@
 import { CountryKey } from "@/constants/countries";
-import { SexKey } from "@/constants/sexes";
+import { RelationType } from "@/constants/relationTypes";
+import { Sex } from "@/constants/sexes";
 
 export type Translation = {
   common: {
@@ -30,11 +31,17 @@ export type Translation = {
         plural: string;
       };
       keys: {
+        type: string;
         name: string;
         emailAddress: string;
         phoneNumber: string;
         dateOfBirth: string;
         sex: string;
+        vatNumber: string;
+        cocNumber: string;
+        businessContactName: string;
+        businessContactEmailAddress: string;
+        businessContactPhoneNumber: string;
       };
       createdNotification: string;
       deletedNotification: string;
@@ -45,29 +52,20 @@ export type Translation = {
       };
     };
     invoice: {
-      name: {
-        singular: string;
-        plural: string;
-      };
-      keys: {
-        type: {
-          name: string;
-          standard: string;
-          quotation: string;
-          credit: string;
-          final: string;
-        };
-        customerName: string;
-        issueDate: string;
-        totalGrossAmount: string;
-        status: {
-          name: string;
-          draft: string;
-          issued: string;
-          cancelled: string;
-          refunded: string;
-        };
-      };
+      singularName: string;
+      pluralName: string;
+      type: string;
+      standard: string;
+      quotation: string;
+      credit: string;
+      final: string;
+      customerName: string;
+      date: string;
+      totalGrossAmount: string;
+      status: string;
+      draft: string;
+      issued: string;
+      credited: string;
     };
   };
   authLayout: {
@@ -148,7 +146,8 @@ export type Translation = {
   //   }) => string;
   // };
   constants: {
-    sexes: Record<SexKey, string>;
+    sexes: Record<Sex, string>;
+    relationTypes: Record<RelationType, string>;
     countries: Record<CountryKey, string>;
   };
 };

@@ -1,0 +1,28 @@
+.root {
+  position: relative;
+  border: solid 1px rgb(var(--color-neutral));
+  border-radius: 0.5rem;
+  padding: 2rem;
+
+  &FullHeight {
+    height: 100%;
+  }
+}
+
+.titleWrapper {
+  position: absolute;
+  top: 0;
+  left: 1rem;
+  transform: translateY(-50%);
+  background-color: rgb(var(--color-foreground));
+  padding: 0 1rem;
+}
+
+.secondTitleWrapper {
+  position: absolute;
+  top: 0;
+  right: 1rem;
+  transform: translateY(-50%);
+  background-color: rgb(var(--color-foreground));
+  padding: 0 1rem;
+}

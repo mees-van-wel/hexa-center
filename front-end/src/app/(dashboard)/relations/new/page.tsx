@@ -28,6 +28,7 @@ export default function Page() {
   const formMethods = useForm<RelationCreateInputSchema>({
     resolver: valibotResolver(RelationCreateSchema),
     defaultValues: {
+      type: "individual",
       name: "",
       emailAddress: "",
       phoneNumber: "",
@@ -39,6 +40,11 @@ export default function Page() {
       country: null,
       dateOfBirth: null,
       sex: null,
+      vatNumber: "",
+      cocNumber: "",
+      businessContactName: "",
+      businessContactEmailAddress: "",
+      businessContactPhoneNumber: "",
     },
   });
 

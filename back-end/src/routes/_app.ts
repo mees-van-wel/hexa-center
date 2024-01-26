@@ -1,3 +1,5 @@
+import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
+
 import { router } from "../trpc";
 
 import { authRouter } from "./auth";
@@ -11,3 +13,7 @@ export const appRouter = router({
   invoice: invoiceRouter,
   room: roomRouter,
 });
+
+export type AppRouter = typeof appRouter;
+export type RouterInput = inferRouterInputs<AppRouter>;
+export type RouterOutput = inferRouterOutputs<AppRouter>;

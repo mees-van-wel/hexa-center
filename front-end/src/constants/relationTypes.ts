@@ -1,6 +1,6 @@
 export const RELATION_TYPES = {
   INDIVIDUAL: "individual",
-  CORPORATE: "corporate",
+  BUSINESS: "business",
 } as const;
 
 export type RelationTypes = typeof RELATION_TYPES;

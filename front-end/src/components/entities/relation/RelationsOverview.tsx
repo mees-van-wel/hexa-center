@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { useTranslation } from "@/hooks/useTranslation";
 import type { RouterOutput } from "@/utils/trpc";
-import { Button, Stack } from "@mantine/core";
+import { Badge, Button, Stack } from "@mantine/core";
 import { IconPlus, IconUsers } from "@tabler/icons-react";
 
 import { Table } from "../../common/Table";
@@ -45,8 +45,21 @@ export const RelationsOverview = ({ relations }: RelationOverviewProps) => {
         }}
         columns={[
           {
+            selector: "type",
+            label: t("entities.relation.keys.type"),
+            format: ({ type }) => (
+              <Badge variant="light">
+                {t(`constants.relationTypes.${type}`)}
+              </Badge>
+            ),
+          },
+          {
             selector: "name",
             label: t("entities.relation.keys.name"),
+            format: ({ type, name, businessContactName }) =>
+              type === "business" && businessContactName
+                ? `${name} - ${businessContactName}`
+                : name,
           },
           {
             selector: "emailAddress",

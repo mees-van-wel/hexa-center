@@ -1,11 +1,22 @@
 import { eq } from "drizzle-orm";
+import fs from "fs/promises";
+import path from "path";
+import puppeteer from "puppeteer";
+import { fileURLToPath } from "url";
 import { number } from "valibot";
 
 import db from "@/db/client";
 import { invoices } from "@/db/schema";
 import { procedure, router } from "@/trpc";
+import { isProduction } from "@/utils/environment";
 import { wrap } from "@decs/typeschema";
 import { TRPCError } from "@trpc/server";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const basePath = isProduction
+  ? path.join(__dirname, "pdfs")
+  : path.join(__dirname, "..", "src", "pdfs");
 
 export const invoiceRouter = router({
   // create: procedure
@@ -52,58 +63,68 @@ export const invoiceRouter = router({
         type: invoices.type,
         number: invoices.number,
         customerName: invoices.customerName,
-        issueDate: invoices.issueDate,
+        createdAt: invoices.createdAt,
+        date: invoices.date,
         totalGrossAmount: invoices.totalGrossAmount,
-        status: invoices.status,
       })
       .from(invoices),
   ),
   get: procedure.input(wrap(number())).query(async ({ input }) => {
-    const result = await db
-      .select({
-        $kind: invoices.$kind,
-        id: invoices.id,
-        refType: invoices.refType,
-        refId: invoices.refId,
-        type: invoices.type,
-        number: invoices.number,
-        issueDate: invoices.issueDate,
-        totalGrossAmount: invoices.totalGrossAmount,
-        status: invoices.status,
-        comments: invoices.comments,
+    const invoice = await db.query.invoices.findFirst({
+      where: eq(invoices.id, input),
+      with: {
+        lines: true,
+        logs: true,
+      },
+      columns: {
+        $kind: true,
+        id: true,
+        createdAt: true,
+        createdById: true,
+        refType: true,
+        refId: true,
+        number: true,
+        comments: true,
+        // issuedAt: true,
+        // dueAt: true,
+        // creditedAt: true,
+        type: true,
+        discountAmount: true,
+        totalNetAmount: true,
+        totalTaxAmount: true,
+        totalGrossAmount: true,
+        totalDiscountAmount: true,
 
-        customerId: invoices.customerId,
-        customerName: invoices.customerName,
-        customerStreet: invoices.customerStreet,
-        customerHouseNumber: invoices.customerHouseNumber,
-        customerPostalCode: invoices.customerPostalCode,
-        customerCity: invoices.customerCity,
-        customerRegion: invoices.customerRegion,
-        customerCountry: invoices.customerCountry,
-        customerEmailAddress: invoices.customerEmailAddress,
-        customerPhoneNumber: invoices.customerPhoneNumber,
-        customerVatNumber: invoices.customerVatNumber,
-        customerCocNumber: invoices.customerCocNumber,
+        customerId: true,
+        customerName: true,
+        customerStreet: true,
+        customerHouseNumber: true,
+        customerPostalCode: true,
+        customerCity: true,
+        customerRegion: true,
+        customerCountry: true,
+        customerEmailAddress: true,
+        customerPhoneNumber: true,
+        customerVatNumber: true,
+        customerCocNumber: true,
 
-        companyId: invoices.companyId,
-        companyName: invoices.companyName,
-        companyStreet: invoices.companyStreet,
-        companyHouseNumber: invoices.companyHouseNumber,
-        companyPostalCode: invoices.companyPostalCode,
-        companyCity: invoices.companyCity,
-        companyRegion: invoices.companyRegion,
-        companyCountry: invoices.companyCountry,
-        companyEmailAddress: invoices.companyEmailAddress,
-        companyPhoneNumber: invoices.companyPhoneNumber,
-        companyVatNumber: invoices.companyVatNumber,
-        companyCocNumber: invoices.companyCocNumber,
-        companyIban: invoices.companyIban,
-        companySwiftBic: invoices.companySwiftBic,
-      })
-      .from(invoices)
-      .where(eq(invoices.id, input));
+        companyId: true,
+        companyName: true,
+        companyStreet: true,
+        companyHouseNumber: true,
+        companyPostalCode: true,
+        companyCity: true,
+        companyRegion: true,
+        companyCountry: true,
+        companyEmailAddress: true,
+        companyPhoneNumber: true,
+        companyVatNumber: true,
+        companyCocNumber: true,
+        companyIban: true,
+        companySwiftBic: true,
+      },
+    });
 
-    const invoice = result[0];
     if (!invoice) throw new TRPCError({ code: "NOT_FOUND" });
 
     return invoice;
@@ -148,4 +169,20 @@ export const invoiceRouter = router({
   // delete: procedure
   //   .input(wrap(number()))
   //   .mutation(({ input }) => db.delete(users).where(eq(users.id, input))),
+  generatePdf: procedure.input(wrap(number())).mutation(async ({ input }) => {
+    const browser = await puppeteer.launch({ headless: "new" });
+    const page = await browser.newPage();
+
+    const templatePath = path.join(basePath, "invoice.html");
+
+    const htmlContent = await fs.readFile(templatePath, "utf8");
+
+    await page.setContent(htmlContent);
+
+    const pdfBuffer = await page.pdf({ format: "A4" });
+
+    await browser.close();
+
+    return pdfBuffer.toString("base64");
+  }),
 });

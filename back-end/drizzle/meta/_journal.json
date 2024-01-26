@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1705599022727,
-      "tag": "0000_empty_sharon_carter",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1705617341220,
-      "tag": "0001_noisy_gauntlet",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1705681580621,
-      "tag": "0002_previous_mastermind",
+      "when": 1706186184652,
+      "tag": "0000_handy_the_order",
       "breakpoints": true
     }
   ]

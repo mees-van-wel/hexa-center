@@ -71,6 +71,7 @@ export const sendMail = <T extends keyof Mails>({
 
   const templatePath = path.join(basePath, `${template}.mjml`);
   const templateContent = replaceTemplateVariables(
+    // TODO replace with await readFile
     fs.readFileSync(templatePath, "utf8"),
     variables,
   );

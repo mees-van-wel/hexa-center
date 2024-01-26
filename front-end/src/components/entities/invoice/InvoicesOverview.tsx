@@ -24,16 +24,9 @@ export const InvoicesOverview = ({ invoices }: InvoicesOverviewProps) => {
     <Stack>
       <DashboardHeader
         title={[
-          { icon: <IconFileEuro />, label: t("entities.invoice.name.plural") },
+          { icon: <IconFileEuro />, label: t("entities.invoice.pluralName") },
         ]}
       >
-        {/* <Button
-          leftSection={<IconPlus />}
-          component={Link}
-          href="/invoices/new"
-        >
-          {t("common.new")}
-        </Button> */}
         <Table.SearchBar id={searchBarId} />
       </DashboardHeader>
       <Table
@@ -45,44 +38,59 @@ export const InvoicesOverview = ({ invoices }: InvoicesOverviewProps) => {
         columns={[
           {
             selector: "type",
-            label: t("entities.invoice.keys.type.name"),
-            format: (value) => (
-              <Badge variant="light">
-                {t(`entities.invoice.keys.type.${value}`)}
-              </Badge>
+            label: t("entities.invoice.type"),
+            format: ({ type }) => (
+              <Badge variant="light">{t(`entities.invoice.${type}`)}</Badge>
             ),
           },
           {
             selector: "number",
             label: t("common.number"),
+            format: ({ number }) =>
+              number ? (
+                number
+              ) : (
+                <Badge variant="light">{t("entities.invoice.draft")}</Badge>
+              ),
           },
+
+          // {
+          //   selector: "issuedAt",
+          //   label: t("entities.invoice.keys.status.name"),
+          //   format: ({ issuedAt, creditedAt }) =>
+          //     creditedAt ? (
+          //       <Badge variant="light">
+          //         {t("entities.invoice.keys.status.credited")}
+          //       </Badge>
+          //     ) : issuedAt ? (
+          //       <Badge variant="light">
+          //         {t(`entities.invoice.keys.status.issued`)}
+          //       </Badge>
+          //     ) : (
+          //       <Badge variant="light">
+          //         {t(`entities.invoice.keys.status.draft`)}
+          //       </Badge>
+          //     ),
+          // },
           {
-            selector: "issueDate",
-            label: t("entities.invoice.keys.issueDate"),
-            format: (value) => dayjs(value).format("YYYY-MM-DD"),
+            selector: "date",
+            label: t("entities.invoice.date"),
+            format: ({ createdAt, date }) =>
+              dayjs(date || createdAt).format("YYYY-MM-DD"),
           },
           {
             selector: "customerName",
-            label: t("entities.invoice.keys.customerName"),
+            label: t("entities.invoice.customerName"),
           },
           {
             selector: "totalGrossAmount",
-            label: t("entities.invoice.keys.totalGrossAmount"),
-            format: (value) =>
+            label: t("entities.invoice.totalGrossAmount"),
+            format: ({ totalGrossAmount }) =>
               // TODO Support preferences
               Intl.NumberFormat("nl-NL", {
                 style: "currency",
                 currency: "EUR",
-              }).format(value),
-          },
-          {
-            selector: "status",
-            label: t("entities.invoice.keys.status.name"),
-            format: (value) => (
-              <Badge variant="light">
-                {t(`entities.invoice.keys.status.${value}`)}
-              </Badge>
-            ),
+              }).format(parseFloat(totalGrossAmount)),
           },
         ]}
       />

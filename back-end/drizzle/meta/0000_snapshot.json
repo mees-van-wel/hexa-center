@@ -1,5 +1,5 @@
 {
-  "id": "aba57101-e1f0-4c21-ad16-e2f2199c1223",
+  "id": "3a3fda42-2703-4b73-967c-6073aaf26c70",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -168,6 +168,93 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
+    "invoice_logs": {
+      "name": "invoice_logs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "uuid": {
+          "name": "uuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "gen_random_uuid()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "created_by_id": {
+          "name": "created_by_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "invoice_id": {
+          "name": "invoice_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "invoice_log_type",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "refType": {
+          "name": "refType",
+          "type": "invoice_log_type",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ref_id": {
+          "name": "ref_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "invoice_logs_created_by_id_relations_id_fk": {
+          "name": "invoice_logs_created_by_id_relations_id_fk",
+          "tableFrom": "invoice_logs",
+          "tableTo": "relations",
+          "columnsFrom": [
+            "created_by_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "invoice_logs_invoice_id_invoices_id_fk": {
+          "name": "invoice_logs_invoice_id_invoices_id_fk",
+          "tableFrom": "invoice_logs",
+          "tableTo": "invoices",
+          "columnsFrom": [
+            "invoice_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
     "invoices": {
       "name": "invoices",
       "schema": "",
@@ -230,39 +317,15 @@
           "primaryKey": false,
           "notNull": true
         },
-        "number": {
-          "name": "number",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "comments": {
-          "name": "comments",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "issue_date": {
-          "name": "issue_date",
-          "type": "date",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "due_date": {
-          "name": "due_date",
-          "type": "date",
-          "primaryKey": false,
-          "notNull": true
-        },
         "type": {
           "name": "type",
           "type": "invoice_type",
           "primaryKey": false,
           "notNull": true
         },
-        "state": {
-          "name": "state",
-          "type": "invoice_state",
+        "payment_terms": {
+          "name": "payment_terms",
+          "type": "interval",
           "primaryKey": false,
           "notNull": true
         },
@@ -296,6 +359,30 @@
           "primaryKey": false,
           "notNull": true
         },
+        "number": {
+          "name": "number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "comments": {
+          "name": "comments",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date": {
+          "name": "date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "due_date": {
+          "name": "due_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
         "customer_id": {
           "name": "customer_id",
           "type": "integer",
@@ -306,7 +393,7 @@
           "name": "customer_name",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "customer_email_address": {
           "name": "customer_email_address",
@@ -324,37 +411,37 @@
           "name": "customer_street",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "customer_house_number": {
           "name": "customer_house_number",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "customer_postal_code": {
           "name": "customer_postal_code",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "customer_city": {
           "name": "customer_city",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "customer_region": {
           "name": "customer_region",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "customer_country": {
           "name": "customer_country",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "customer_vat_number": {
           "name": "customer_vat_number",
@@ -378,7 +465,7 @@
           "name": "company_name",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "company_email_address": {
           "name": "company_email_address",
@@ -396,61 +483,61 @@
           "name": "company_street",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "company_house_number": {
           "name": "company_house_number",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "company_postal_code": {
           "name": "company_postal_code",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "company_city": {
           "name": "company_city",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "company_region": {
           "name": "company_region",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "company_country": {
           "name": "company_country",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "company_vat_number": {
           "name": "company_vat_number",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "company_coc_number": {
           "name": "company_coc_number",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "company_iban": {
           "name": "company_iban",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "company_swift_bic": {
           "name": "company_swift_bic",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         }
       },
       "indexes": {},
@@ -766,13 +853,13 @@
           "name": "type",
           "type": "relation_type",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "name": {
           "name": "name",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "email_address": {
           "name": "email_address",
@@ -846,20 +933,20 @@
           "primaryKey": false,
           "notNull": false
         },
-        "corporate_contact_name": {
-          "name": "corporate_contact_name",
+        "business_contact_name": {
+          "name": "business_contact_name",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "corporate_contact_email_address": {
-          "name": "corporate_contact_email_address",
+        "business_contact_email_address": {
+          "name": "business_contact_email_address",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "corporate_contact_phone_number": {
-          "name": "corporate_contact_phone_number",
+        "business_contact_phone_number": {
+          "name": "business_contact_phone_number",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -1315,19 +1402,24 @@
     }
   },
   "enums": {
+    "invoice_log_ref_type": {
+      "name": "invoice_log_ref_type",
+      "values": {
+        "invoice": "invoice"
+      }
+    },
+    "invoice_log_type": {
+      "name": "invoice_log_type",
+      "values": {
+        "issued": "issued",
+        "mailed": "mailed",
+        "credited": "credited"
+      }
+    },
     "invoice_ref_type": {
       "name": "invoice_ref_type",
       "values": {
         "reservation": "reservation"
-      }
-    },
-    "invoice_state": {
-      "name": "invoice_state",
-      "values": {
-        "draft": "draft",
-        "issued": "issued",
-        "cancelled": "cancelled",
-        "refunded": "refunded"
       }
     },
     "invoice_type": {
@@ -1343,7 +1435,7 @@
       "name": "relation_type",
       "values": {
         "individual": "individual",
-        "corporate": "corporate"
+        "business": "business"
       }
     }
   },
