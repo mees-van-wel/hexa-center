@@ -1,1 +1,1 @@
-export type Position = { id: number; end: Date; top: number } | null;
+export type Position = { id: number; end: Date; top: number };

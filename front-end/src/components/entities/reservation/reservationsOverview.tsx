@@ -13,6 +13,7 @@ import { WEEKDAY_VALUES } from "@/constants/weekdays";
 import { useTranslation } from "@/hooks/useTranslation";
 import { RouterOutput } from "@/utils/trpc";
 import { Button, Group, Paper, Stack } from "@mantine/core";
+import { useSessionStorage } from "@mantine/hooks";
 import {
   IconArrowBarLeft,
   IconArrowBarRight,
@@ -31,13 +32,6 @@ type ReservationsProps = {
   showAll?: boolean;
 };
 
-// TODO: remove
-export const toUTC = (date: Date) => {
-  return new Date(
-    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()),
-  );
-};
-
 export const isBetween = (
   betweenDate: Dayjs,
   startDate: Dayjs,
@@ -53,24 +47,26 @@ export const isBetween = (
   );
 };
 
-const now = dayjs.utc().startOf("day").toDate();
-
-export const Reservations = ({
+export const ReservationsOverview = ({
   reservations,
   rooms,
   showAll,
 }: ReservationsProps) => {
   const t = useTranslation();
 
+  const [calendarCurrentDay, setCalendarCurrentDay] = useSessionStorage({
+    key: "calendarCurrentDay",
+    defaultValue: dayjs.utc().startOf("day").toISOString(),
+  });
+
   const preferredStartDayIndex: number | "AUTO" = 1;
-  const [date, setDate] = useState(now);
   const [calendarView, setCalendarView] = useState<CalendarView>(
     CALENDARVIEW.WEEK,
   );
   const [sidebarToggle, setSideBarToggle] = useState(true);
 
   const currentWeek = useMemo(() => {
-    let startOfWeek = dayjs(date)
+    let startOfWeek = dayjs(calendarCurrentDay)
       .startOf("week")
       .add(preferredStartDayIndex, "day");
 
@@ -83,7 +79,7 @@ export const Reservations = ({
     if (calendarView === CALENDARVIEW.WORKWEEK) {
       filteredWeek = fullWeek.filter((day) => [1, 2].includes(day.day()));
     } else if (calendarView !== CALENDARVIEW.WEEK) {
-      filteredWeek = [dayjs(date)];
+      filteredWeek = [dayjs(calendarCurrentDay)];
     }
 
     filteredWeek.sort(
@@ -93,7 +89,7 @@ export const Reservations = ({
     );
 
     return filteredWeek;
-  }, [calendarView, date, preferredStartDayIndex]);
+  }, [calendarView, calendarCurrentDay, preferredStartDayIndex]);
 
   const currentRooms = useMemo(
     () =>
@@ -144,8 +140,8 @@ export const Reservations = ({
         h="100%"
         className={styles.calendarOverview}
       >
-        <div className={styles.calendar}>
-          <Paper p={"1rem"} className={styles.calendarContainer}>
+        <div className={styles.calendarContainer}>
+          <Paper p={"1rem"}>
             <Stack>
               <Group wrap="nowrap" grow gap={0} ta="center" fw="700">
                 <span className={styles.weekHidden} />
@@ -182,11 +178,10 @@ export const Reservations = ({
           </Paper>
         </div>
         <CalendarSidebar
-          date={date}
-          now={now}
+          now={dayjs(calendarCurrentDay)}
           sideBarToggle={sidebarToggle}
           onDateChange={(value) => {
-            setDate(toUTC(value));
+            setCalendarCurrentDay(value.toISOString());
           }}
           onCalendarViewChange={(value) => {
             setCalendarView(value);

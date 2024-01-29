@@ -44,6 +44,26 @@ export type Translation = {
         button: string;
       };
     };
+    reservation: {
+      name: {
+        singular: string;
+        plural: string;
+      };
+      keys: {
+        roomId: string;
+        customerId: string;
+        startDate: string;
+        endDate: string;
+        notes: string;
+        guestName: string;
+      };
+      calendar: {
+        noRooms: string;
+      };
+      reservationCreated: string;
+      roomDeleted: string;
+      dateError: string;
+    };
   };
   dates: {
     weekdayNames: {
@@ -154,21 +174,6 @@ export type Translation = {
     confirmDeleteModal: string;
     roomDeleted: string;
     roomCreated: string;
-  };
-  reservationPage: {
-    roomId: string;
-    customerId: string;
-    startDate: string;
-    endDate: string;
-    notes: string;
-    guestName: string;
-    reservationCreated: string;
-    confirmDeleteModal: string;
-    roomDeleted: string;
-    dateError: string;
-    calendar: {
-      noRooms: string;
-    };
   };
   components: {
     address: {

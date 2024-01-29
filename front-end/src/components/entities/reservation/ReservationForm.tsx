@@ -50,7 +50,7 @@ export const ReservationForm = ({ rooms, users }: ReservationForm) => {
             required
             searchable
             error={error?.message}
-            label={t("reservationPage.roomId")}
+            label={t("entities.reservation.keys.roomId")}
             data={roomsOptions}
             onChange={(value) => {
               onChange(Number(value));
@@ -70,7 +70,7 @@ export const ReservationForm = ({ rooms, users }: ReservationForm) => {
             value={value?.toString() ?? ""}
             required
             error={error?.message}
-            label={t("reservationPage.customerId")}
+            label={t("entities.reservation.keys.customerId")}
             data={users.map((user) => ({
               label: `${user.firstName} ${user.lastName}`,
               value: user.id.toString(),
@@ -89,7 +89,7 @@ export const ReservationForm = ({ rooms, users }: ReservationForm) => {
             {...field}
             required
             error={error?.message}
-            label={t("reservationPage.startDate")}
+            label={t("entities.reservation.keys.startDate")}
           />
         )}
       />
@@ -101,19 +101,19 @@ export const ReservationForm = ({ rooms, users }: ReservationForm) => {
             {...field}
             required
             error={error?.message}
-            label={t("reservationPage.endDate")}
+            label={t("entities.reservation.keys.endDate")}
           />
         )}
       />
       <Textarea
         {...register("notes")}
         error={errors.notes?.message}
-        label={t("reservationPage.notes")}
+        label={t("entities.reservation.keys.notes")}
       />
       <TextInput
         {...register("guestName")}
         error={errors.guestName?.message}
-        label={t("reservationPage.guestName")}
+        label={t("entities.reservation.keys.guestName")}
       />
     </Stack>
   );

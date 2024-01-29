@@ -43,6 +43,26 @@ export default {
         button: "Profielpagina",
       },
     },
+    reservation: {
+      name: {
+        singular: "Reservatie",
+        plural: "Reservaties",
+      },
+      keys: {
+        roomId: "Kamer",
+        customerId: "Klant",
+        startDate: "Start datum",
+        endDate: "Eind datum",
+        notes: "Notities",
+        guestName: "Gast naam",
+      },
+      calendar: {
+        noRooms: "Geen Boekingen gevonden",
+      },
+      reservationCreated: "Reservatie succesvol aangemaakt",
+      roomDeleted: "Reservatie succesvol verwijderd",
+      dateError: "De startdatum moet eerder zijn dan de einddatum.",
+    },
   },
   dates: {
     weekdayNames: {
@@ -156,21 +176,6 @@ export default {
     confirmDeleteModal: "Als u doorgaat wordt deze kamer verwijdert.",
     roomDeleted: "Kamer succesvol verwijderd",
     roomCreated: "Kamer succesvol aangemaakt",
-  },
-  reservationPage: {
-    roomId: "Kamer",
-    customerId: "Klant",
-    startDate: "Start datum",
-    endDate: "Eind datum",
-    notes: "Notities",
-    guestName: "Gast naam",
-    reservationCreated: "Reservatie succesvol aangemaakt",
-    confirmDeleteModal: "Als u doorgaat wordt deze reservatie verwijdert.",
-    roomDeleted: "Reservatie succesvol verwijderd",
-    dateError: "De startdatum moet eerder zijn dan de einddatum.",
-    calendar: {
-      noRooms: "Geen Boekingen gevonden",
-    },
   },
   components: {
     address: {

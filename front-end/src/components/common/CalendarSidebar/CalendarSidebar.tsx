@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import clsx from "clsx";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 
 import { CALENDARVIEW, CalendarView } from "@/constants/calendarView";
 import { MONTH_VALUES } from "@/constants/months";
@@ -15,16 +15,14 @@ import { IconArrowBack, IconArrowForward } from "@tabler/icons-react";
 import styles from "./CalendarSidebar.module.scss";
 
 type CalendarSidebarProps = {
-  date: Date;
-  now: Date;
+  now: Dayjs;
   sideBarToggle: boolean;
-  onDateChange: (value: Date) => void;
+  onDateChange: (value: Dayjs) => void;
   onCalendarViewChange: (value: CalendarView) => void;
   calendarView?: string;
 };
 
 export const CalendarSidebar = ({
-  date,
   now,
   onCalendarViewChange,
   sideBarToggle,
@@ -32,12 +30,13 @@ export const CalendarSidebar = ({
   calendarView = CALENDARVIEW.WEEK,
 }: CalendarSidebarProps) => {
   const t = useTranslation();
+  const today = dayjs();
 
   const ChangeWeek = useMemo(
     () => (days: number) => {
-      onDateChange(new Date(date.getTime() + days * 24 * 60 * 60 * 1000));
+      onDateChange(dayjs(now).add(days, "day"));
     },
-    [date, onDateChange],
+    [now, onDateChange],
   );
 
   return (
@@ -49,9 +48,9 @@ export const CalendarSidebar = ({
       <Paper p="md" h="100%" w="100%">
         <Stack ta="center">
           <p>
-            {t(`dates.weekdayNamesShort.${WEEKDAY_VALUES[date.getDay()]}`)}{" "}
-            {dayjs(date).date()}{" "}
-            {t(`dates.monthsLong.${MONTH_VALUES[dayjs(date).month()]}`)}
+            {t(`dates.weekdayNamesShort.${WEEKDAY_VALUES[now.day()]}`)}{" "}
+            {dayjs(now).date()}{" "}
+            {t(`dates.monthsLong.${MONTH_VALUES[dayjs(now).month()]}`)}
           </p>
 
           <Button.Group>
@@ -66,7 +65,7 @@ export const CalendarSidebar = ({
               variant="outline"
               size="sm"
               onClick={() => {
-                onDateChange(now);
+                onDateChange(today);
               }}
               w="100%"
             >
@@ -100,10 +99,17 @@ export const CalendarSidebar = ({
 
           <Group grow align="end">
             <DateInput
-              value={date}
+              value={now.toDate()}
               required
               onChange={(value) => {
-                value && onDateChange(new Date(value.setHours(0, 0, 0, 0)));
+                value &&
+                  onDateChange(
+                    dayjs(value)
+                      .set("hour", 0)
+                      .set("minute", 0)
+                      .set("second", 0)
+                      .set("millisecond", 0),
+                  );
               }}
             />
           </Group>

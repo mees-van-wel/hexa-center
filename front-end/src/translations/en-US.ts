@@ -43,6 +43,26 @@ export default {
         button: "Profile Page",
       },
     },
+    reservation: {
+      name: {
+        singular: "Reservation",
+        plural: "Reservations",
+      },
+      keys: {
+        roomId: "Room",
+        customerId: "Customer",
+        startDate: "Start date",
+        endDate: "End date",
+        notes: "Notes",
+        guestName: "Guest name",
+      },
+      calendar: {
+        noRooms: "No bookings found",
+      },
+      reservationCreated: "Reservation successfully created",
+      roomDeleted: "Reservation successfully deleted",
+      dateError: "Start date must be earlier than the end date.",
+    },
   },
   dates: {
     weekdayNames: {
@@ -154,21 +174,6 @@ export default {
     confirmDeleteModal: "If you continue this room will be deleted.",
     roomDeleted: "Room successfully deleted",
     roomCreated: "Room successfully created",
-  },
-  reservationPage: {
-    roomId: "Room",
-    customerId: "Customer",
-    startDate: "Start date",
-    endDate: "End date",
-    notes: "Notes",
-    guestName: "Guest name",
-    reservationCreated: "Reservation successfully created",
-    confirmDeleteModal: "If you continue this reservation will be deleted.",
-    roomDeleted: "Reservation successfully deleted",
-    dateError: "Start date must be earlier than the end date.",
-    calendar: {
-      noRooms: "No bookings found",
-    },
   },
   components: {
     address: {

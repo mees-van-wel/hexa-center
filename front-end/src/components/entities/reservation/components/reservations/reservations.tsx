@@ -18,18 +18,6 @@ export const compairDates = (firstDate: Dayjs, secondDate: Dayjs) => {
   return firstDate.startOf("day").isSame(secondDate.startOf("day"), "day");
 };
 
-const updatePositions = (
-  positions: Position[],
-  reservationsForDay: RouterOutput["reservation"]["list"],
-) => {
-  positions.forEach((position, index) => {
-    if (!reservationsForDay.some((res) => res.id === position?.id)) {
-      positions[index] = null;
-    }
-  });
-  return positions.filter((pos) => pos !== null);
-};
-
 type reservationsProps = {
   currentRooms: {
     id: number;
@@ -95,8 +83,7 @@ export const ShowReservations = ({
             wrap="nowrap"
           >
             <div className={styles.room}>{name}</div>
-            {/* TODO: Check op improvements */}
-            {currentWeek.map((weekDay) => {
+            {currentWeek.map((weekDay, weekdayIndex) => {
               const overlappingReservations = reservations.filter(
                 (reservation) =>
                   isBetween(
@@ -110,9 +97,11 @@ export const ShowReservations = ({
 
               return (
                 <div
-                  key={name}
+                  key={name + weekdayIndex}
                   style={{
-                    height: `${34 * overlappingReservations.length}px`,
+                    height: `calc(${
+                      34 * overlappingReservations.length
+                    }px + 4px)`,
                   }}
                   className={styles.reservationContainer}
                 >
@@ -131,8 +120,8 @@ export const ShowReservations = ({
                       startDate,
                       endDate,
                     )
-                      ? 12
-                      : 6;
+                      ? 16
+                      : 8;
 
                     const hasStart = currentWeek.some((day) =>
                       compairDates(day, startDate),
@@ -161,20 +150,18 @@ export const ShowReservations = ({
                       );
                     }
 
-                    positions = updatePositions(positions, reservations);
-
-                    // Find the first available position
-                    let allocatedPosition = positions.findIndex(
+                    // TODO: when making calendar make this an hook/export function
+                    let locatedPosition = positions.findIndex(
                       (pos) => pos && pos.end < reservation.startDate,
                     );
-                    if (allocatedPosition === -1) {
-                      allocatedPosition = positions.length;
+
+                    if (locatedPosition === -1) {
+                      locatedPosition = positions.length;
                     }
 
-                    const top = allocatedPosition * 34;
+                    const top = locatedPosition * 34;
 
-                    // Set the reservation's position
-                    positions[allocatedPosition] = {
+                    positions[locatedPosition] = {
                       id: reservation.id,
                       end: reservation.endDate,
                       top: top,
@@ -184,9 +171,10 @@ export const ShowReservations = ({
                       <Button
                         key={`${reservation.room.name}-${reservationIndex}`}
                         component={Link}
+                        // TODO: Bug seemed to be everywhere where you go to single pagination, maybe because of how mantine handles a Link component?
+                        href={`/reservations/${reservation.id}`}
                         title={title}
                         size="xs"
-                        ta="left"
                         classNames={{
                           root: clsx(styles.reservation, {
                             [styles.start]: hasStart && !hasEnd,
@@ -201,27 +189,18 @@ export const ShowReservations = ({
                           }% - ${correctWidth}px)`,
                           top: `${top}px`,
                         }}
-                        pr="10px"
-                        pl="10px"
-                        // TODO: href error
-                        href={`/reservations/${reservation.id}`}
                       >
                         <Group
                           grow
                           wrap="nowrap"
-                          justify="space-between"
-                          align="center"
                           w="100%"
                           preventGrowOverflow={false}
                         >
-                          {((hasEnd && !hasStart) ||
-                            (!hasStart && !hasEnd)) && (
+                          {!hasStart && (
                             <IconArrowMoveLeft className={styles.icon} />
                           )}
                           <div className={styles.label}>{title}</div>
-
-                          {((hasStart && !hasEnd) ||
-                            (!hasStart && !hasEnd)) && (
+                          {!hasEnd && (
                             <IconArrowMoveRight className={styles.icon} />
                           )}
                         </Group>
@@ -236,7 +215,7 @@ export const ShowReservations = ({
       })
   ) : (
     <div className={styles.noRooms}>
-      {t("reservationPage.calendar.noRooms")}
+      {t("entities.reservation.calendar.noRooms")}
     </div>
   );
 };

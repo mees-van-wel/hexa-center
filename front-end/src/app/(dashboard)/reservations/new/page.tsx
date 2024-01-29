@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-import { ReservationNew } from "@/components/entities/reservation/ReservationNew";
+import { ReservationCreate } from "@/components/entities/reservation/ReservationCreate";
 import { setTRPCRefreshToken, trpc } from "@/utils/trpc";
 
 export default async function Page() {
@@ -10,5 +10,5 @@ export default async function Page() {
   const users = await trpc.user.list.query();
   const rooms = await trpc.room.list.query();
 
-  return <ReservationNew rooms={rooms} users={users} />;
+  return <ReservationCreate rooms={rooms} users={users} />;
 }

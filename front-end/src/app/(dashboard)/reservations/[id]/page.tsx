@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-import { Reservation } from "@/components/entities/reservation/reservationUpdate";
+import { ReservationUpdate } from "@/components/entities/reservation/reservationUpdate";
 import { setTRPCRefreshToken, trpc } from "@/utils/trpc";
 
 type ReservationPageParams = {
@@ -17,5 +17,7 @@ export default async function Page({ params }: ReservationPageParams) {
   const rooms = await trpc.room.list.query();
   const reservation = await trpc.reservation.get.query(parseInt(params.id));
 
-  return <Reservation reservation={reservation} rooms={rooms} users={users} />;
+  return (
+    <ReservationUpdate reservation={reservation} rooms={rooms} users={users} />
+  );
 }
