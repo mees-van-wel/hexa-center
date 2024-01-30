@@ -19,10 +19,15 @@ import {
 } from "@/schemas/reservation";
 import { RouterOutput } from "@/utils/trpc";
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { Badge, Button, Loader, Paper, Stack } from "@mantine/core";
+import { Badge, Button, Loader, Stack } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { IconAlertTriangle, IconCheck, IconTrash } from "@tabler/icons-react";
+import {
+  IconAlertTriangle,
+  IconCheck,
+  IconHotelService,
+  IconTrash,
+} from "@tabler/icons-react";
 
 import { ReservationForm } from "./ReservationForm";
 
@@ -69,6 +74,7 @@ export const ReservationUpdate = ({
           backRouteFallback="/reservations"
           title={[
             {
+              icon: <IconHotelService />,
               label: t("dashboardLayout.reservations"),
               href: "/reservations",
             },
@@ -87,9 +93,7 @@ export const ReservationUpdate = ({
           </Button>
           <SaveBadge />
         </DashboardHeader>
-        <Paper p={"1rem"}>
-          <ReservationForm rooms={rooms} users={users} />
-        </Paper>
+        <ReservationForm rooms={rooms} users={users} />
       </Stack>
     </FormProvider>
   );

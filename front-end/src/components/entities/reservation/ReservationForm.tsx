@@ -8,7 +8,7 @@ import {
   ReservationInputUpdateSchema,
 } from "@/schemas/reservation";
 import { RouterOutput } from "@/utils/trpc";
-import { Select, Stack, Textarea, TextInput } from "@mantine/core";
+import { Paper, Select, Stack, Textarea, TextInput } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 
 type ReservationForm = {
@@ -36,85 +36,87 @@ export const ReservationForm = ({ rooms, users }: ReservationForm) => {
         }));
 
   return (
-    <Stack>
-      <Controller
-        name="roomId"
-        control={control}
-        render={({
-          field: { onChange, value, ...restFields },
-          fieldState: { error },
-        }) => (
-          <Select
-            {...restFields}
-            value={value?.toString() ?? ""}
-            required
-            searchable
-            error={error?.message}
-            label={t("entities.reservation.keys.roomId")}
-            data={roomsOptions}
-            onChange={(value) => {
-              onChange(Number(value));
-            }}
-          />
-        )}
-      />
-      <Controller
-        name="customerId"
-        control={control}
-        render={({
-          field: { onChange, value, ...restFields },
-          fieldState: { error },
-        }) => (
-          <Select
-            {...restFields}
-            value={value?.toString() ?? ""}
-            required
-            error={error?.message}
-            label={t("entities.reservation.keys.customerId")}
-            data={users.map((user) => ({
-              label: `${user.firstName} ${user.lastName}`,
-              value: user.id.toString(),
-            }))}
-            onChange={(value) => {
-              onChange(Number(value));
-            }}
-          />
-        )}
-      />
-      <Controller
-        name="startDate"
-        control={control}
-        render={({ field, fieldState: { error } }) => (
-          <DateInput
-            {...field}
-            required
-            error={error?.message}
-            label={t("entities.reservation.keys.startDate")}
-          />
-        )}
-      />
-      <Controller
-        name="endDate"
-        control={control}
-        render={({ field, fieldState: { error } }) => (
-          <DateInput
-            {...field}
-            required
-            error={error?.message}
-            label={t("entities.reservation.keys.endDate")}
-          />
-        )}
-      />
-      <Textarea
-        {...register("notes")}
-        error={errors.notes?.message}
-        label={t("entities.reservation.keys.notes")}
-      />
-      <TextInput
-        {...register("guestName")}
-        error={errors.guestName?.message}
-        label={t("entities.reservation.keys.guestName")}
-      />
-    </Stack>
+    <Paper p={"1rem"}>
+      <Stack>
+        <Controller
+          name="roomId"
+          control={control}
+          render={({
+            field: { onChange, value, ...restFields },
+            fieldState: { error },
+          }) => (
+            <Select
+              {...restFields}
+              value={value?.toString() ?? ""}
+              required
+              searchable
+              error={error?.message}
+              label={t("entities.reservation.keys.roomId")}
+              data={roomsOptions}
+              onChange={(value) => {
+                onChange(Number(value));
+              }}
+            />
+          )}
+        />
+        <Controller
+          name="customerId"
+          control={control}
+          render={({
+            field: { onChange, value, ...restFields },
+            fieldState: { error },
+          }) => (
+            <Select
+              {...restFields}
+              value={value?.toString() ?? ""}
+              required
+              error={error?.message}
+              label={t("entities.reservation.keys.customerId")}
+              data={users.map((user) => ({
+                label: `${user.firstName} ${user.lastName}`,
+                value: user.id.toString(),
+              }))}
+              onChange={(value) => {
+                onChange(Number(value));
+              }}
+            />
+          )}
+        />
+        <Controller
+          name="startDate"
+          control={control}
+          render={({ field, fieldState: { error } }) => (
+            <DateInput
+              {...field}
+              required
+              error={error?.message}
+              label={t("entities.reservation.keys.startDate")}
+            />
+          )}
+        />
+        <Controller
+          name="endDate"
+          control={control}
+          render={({ field, fieldState: { error } }) => (
+            <DateInput
+              {...field}
+              required
+              error={error?.message}
+              label={t("entities.reservation.keys.endDate")}
+            />
+          )}
+        />
+        <Textarea
+          {...register("notes")}
+          error={errors.notes?.message}
+          label={t("entities.reservation.keys.notes")}
+        />
+        <TextInput
+          {...register("guestName")}
+          error={errors.guestName?.message}
+          label={t("entities.reservation.keys.guestName")}
+        />
+      </Stack>
+    </Paper>
   );
 };

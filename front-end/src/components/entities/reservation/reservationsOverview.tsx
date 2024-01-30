@@ -17,6 +17,7 @@ import { useSessionStorage } from "@mantine/hooks";
 import {
   IconArrowBarLeft,
   IconArrowBarRight,
+  IconHotelService,
   IconPlus,
 } from "@tabler/icons-react";
 
@@ -120,6 +121,7 @@ export const ReservationsOverview = ({
       <DashboardHeader
         title={[
           {
+            icon: <IconHotelService />,
             label: t("dashboardLayout.reservations"),
           },
         ]}

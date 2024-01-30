@@ -18,9 +18,9 @@ import {
 } from "@/schemas/reservation";
 import { RouterOutput } from "@/utils/trpc";
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { Button, Paper, Stack } from "@mantine/core";
+import { Button, Stack } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { IconDeviceFloppy } from "@tabler/icons-react";
+import { IconDeviceFloppy, IconHotelService } from "@tabler/icons-react";
 
 import { ReservationForm } from "./ReservationForm";
 
@@ -50,6 +50,7 @@ export const ReservationCreate = ({ rooms, users }: ReservationCreateProps) => {
         <DashboardHeader
           title={[
             {
+              icon: <IconHotelService />,
               label: t("dashboardLayout.reservations"),
               href: "/reservations",
             },
@@ -59,9 +60,7 @@ export const ReservationCreate = ({ rooms, users }: ReservationCreateProps) => {
         >
           <SaveButton />
         </DashboardHeader>
-        <Paper p={"1rem"}>
-          <ReservationForm rooms={rooms} users={users} />
-        </Paper>
+        <ReservationForm rooms={rooms} users={users} />
       </Stack>
     </FormProvider>
   );

@@ -150,7 +150,6 @@ export const ShowReservations = ({
                       );
                     }
 
-                    // TODO: when making calendar make this an hook/export function
                     let locatedPosition = positions.findIndex(
                       (pos) => pos && pos.end < reservation.startDate,
                     );
