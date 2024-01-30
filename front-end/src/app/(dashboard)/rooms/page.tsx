@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-import { Rooms } from "@/components/pages/rooms/Rooms";
+import { Rooms } from "@/components/entities/room/RoomsOverview";
 import { setTRPCRefreshToken, trpc } from "@/utils/trpc";
 
 export default async function Page() {
