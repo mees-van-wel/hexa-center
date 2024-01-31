@@ -64,6 +64,7 @@ export default {
       draft: "Concept",
       issued: "Definitief",
       credited: "Gecrediteerd",
+      mailed: "Gemaild",
     },
   },
   authLayout: {

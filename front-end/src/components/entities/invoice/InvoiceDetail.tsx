@@ -6,6 +6,7 @@ import dayjs from "dayjs";
 
 import { Band } from "@/components/common/Band";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
+import { INVOICE_LOG_TYPE_META } from "@/constants/invoiceLogTypes";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
 import { RouterOutput } from "@/utils/trpc";
@@ -14,6 +15,7 @@ import {
   Button,
   Group,
   Paper,
+  ScrollArea,
   Stack,
   Table,
   Text,
@@ -22,8 +24,8 @@ import {
 } from "@mantine/core";
 import {
   IconDownload,
+  IconExternalLink,
   IconFileArrowLeft,
-  IconFileArrowRight,
   IconFileEuro,
   IconMailFast,
   IconPlus,
@@ -289,54 +291,93 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
         </Paper>
         <Paper p="2rem">
           <Band title={<Title order={3}>Timeline</Title>} fh>
-            <Timeline
-              active={invoice.creditedAt ? 2 : invoice.issuedAt ? 1 : 0}
-              bulletSize="2rem"
-              lineWidth={3}
-            >
-              <Timeline.Item
-                bullet={<IconPlus size="1.3rem" />}
-                title="Created"
+            <ScrollArea h={271} type="always" offsetScrollbars>
+              <Timeline
+                active={invoice.logs.length}
+                bulletSize="2rem"
+                lineWidth={3}
               >
-                <Text c="dimmed" size="sm">
-                  The invoice was created
-                </Text>
-                <Text size="xs" mt={4}>
-                  {dayjs(invoice.createdAt).format("YYYY-MM-DD")}
-                </Text>
-              </Timeline.Item>
+                {invoice.logs
+                  .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+                  .map(
+                    ({ id, type, createdAt, createdById, refType, refId }) => {
+                      const { IconComponent, title } =
+                        INVOICE_LOG_TYPE_META[type];
 
-              <Timeline.Item
-                bullet={<IconFileArrowRight size="1.3rem" />}
-                title="Issued"
-              >
-                <Text c="dimmed" size="sm">
-                  The invoice was issued
-                </Text>
-                <Text size="xs" mt={4}>
-                  {invoice.issuedAt
-                    ? dayjs(invoice.issuedAt).format("YYYY-MM-DD")
-                    : "..."}
-                </Text>
-              </Timeline.Item>
-
-              {invoice.creditedAt && (
+                      return (
+                        <Timeline.Item
+                          bullet={<IconComponent />}
+                          title={
+                            refType && refId ? (
+                              <Group gap="xs">
+                                {t(title)}
+                                <Button
+                                  size="compact-sm"
+                                  component={Link}
+                                  href={`/invoices/${refId}`}
+                                  variant="light"
+                                >
+                                  <IconExternalLink size="1rem" />
+                                </Button>
+                              </Group>
+                            ) : (
+                              t(title)
+                            )
+                          }
+                          key={id}
+                        >
+                          <Text size="sm" c="dimmed">
+                            {"At "}
+                            {dayjs(createdAt).format("YYYY-MM-DD HH:mm")}
+                          </Text>
+                          {createdById && (
+                            <Text size="xs" mt={4}>
+                              {"By "}
+                              <Link href={`/relations/${createdById}`}>
+                                Relation {createdById}
+                              </Link>
+                            </Text>
+                          )}
+                        </Timeline.Item>
+                      );
+                    },
+                  )}
                 <Timeline.Item
-                  title="Credited"
-                  bullet={<IconFileArrowLeft size="1.3rem" />}
+                  bullet={<IconPlus size="1.3rem" />}
+                  title="Created"
                 >
-                  {/* <Text c="dimmed" size="sm">
+                  <Text size="sm" c="dimmed">
+                    {"At "}
+                    {dayjs(invoice.createdAt).format("YYYY-MM-DD HH:mm")}
+                  </Text>
+                  {invoice.createdById && (
+                    <Text size="xs" mt={4}>
+                      {"by "}
+                      <Link href={`/relations/${invoice.createdById}`}>
+                        Relation {invoice.createdById}
+                      </Link>
+                    </Text>
+                  )}
+                </Timeline.Item>
+
+                {invoice.creditedAt && (
+                  <Timeline.Item
+                    title="Credited"
+                    bullet={<IconFileArrowLeft size="1.3rem" />}
+                  >
+                    {/* <Text c="dimmed" size="sm">
                   <Text variant="link" component="span" inherit>
                     Robert Gluesticker
                   </Text>{" "}
                   left a code review on your pull request
                 </Text> */}
-                  <Text size="xs" mt={4}>
-                    {dayjs(invoice.creditedAt).format("YYYY-MM-DD")}
-                  </Text>
-                </Timeline.Item>
-              )}
-            </Timeline>
+                    <Text size="xs" mt={4}>
+                      {dayjs(invoice.creditedAt).format("YYYY-MM-DD")}
+                    </Text>
+                  </Timeline.Item>
+                )}
+              </Timeline>
+            </ScrollArea>
           </Band>
         </Paper>
       </Group>

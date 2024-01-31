@@ -63,7 +63,11 @@ export default {
       status: "Status",
       draft: "Draft",
       issued: "Issued",
+      mailed: "Mailed",
       credited: "Credited",
+      issuedMessage: "The invoice has been issued",
+      mailedMessage: "Mailed",
+      creditedMessage: "Credited",
     },
   },
   authLayout: {

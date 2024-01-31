@@ -6,9 +6,10 @@ import { fileURLToPath } from "url";
 import { number } from "valibot";
 
 import db from "@/db/client";
-import { invoices } from "@/db/schema";
+import { invoices, settings } from "@/db/schema";
 import { procedure, router } from "@/trpc";
 import { isProduction } from "@/utils/environment";
+import { sendMail } from "@/utils/mail";
 import { wrap } from "@decs/typeschema";
 import { TRPCError } from "@trpc/server";
 
@@ -17,6 +18,26 @@ const __dirname = path.dirname(__filename);
 const basePath = isProduction
   ? path.join(__dirname, "pdfs")
   : path.join(__dirname, "..", "src", "pdfs");
+
+const generatePdf = async (
+  templateName: string,
+  variables?: Record<string, any>,
+) => {
+  const browser = await puppeteer.launch({ headless: "new" });
+  const page = await browser.newPage();
+
+  const templatePath = path.join(basePath, templateName + ".html");
+
+  const htmlContent = await fs.readFile(templatePath, "utf8");
+
+  await page.setContent(htmlContent);
+
+  const pdfBuffer = await page.pdf({ format: "A4" });
+
+  await browser.close();
+
+  return pdfBuffer;
+};
 
 export const invoiceRouter = router({
   // create: procedure
@@ -73,8 +94,30 @@ export const invoiceRouter = router({
     const invoice = await db.query.invoices.findFirst({
       where: eq(invoices.id, input),
       with: {
-        lines: true,
-        logs: true,
+        lines: {
+          columns: {
+            id: true,
+            name: true,
+            comments: true,
+            unitNetAmount: true,
+            quantity: true,
+            discountAmount: true,
+            totalNetAmount: true,
+            totalTaxAmount: true,
+            taxPercentage: true,
+            totalGrossAmount: true,
+          },
+        },
+        logs: {
+          columns: {
+            id: true,
+            createdAt: true,
+            createdById: true,
+            type: true,
+            refType: true,
+            refId: true,
+          },
+        },
       },
       columns: {
         $kind: true,
@@ -85,9 +128,6 @@ export const invoiceRouter = router({
         refId: true,
         number: true,
         comments: true,
-        // issuedAt: true,
-        // dueAt: true,
-        // creditedAt: true,
         type: true,
         discountAmount: true,
         totalNetAmount: true,
@@ -170,19 +210,31 @@ export const invoiceRouter = router({
   //   .input(wrap(number()))
   //   .mutation(({ input }) => db.delete(users).where(eq(users.id, input))),
   generatePdf: procedure.input(wrap(number())).mutation(async ({ input }) => {
-    const browser = await puppeteer.launch({ headless: "new" });
-    const page = await browser.newPage();
-
-    const templatePath = path.join(basePath, "invoice.html");
-
-    const htmlContent = await fs.readFile(templatePath, "utf8");
-
-    await page.setContent(htmlContent);
-
-    const pdfBuffer = await page.pdf({ format: "A4" });
-
-    await browser.close();
-
+    const pdfBuffer = await generatePdf("invoice");
     return pdfBuffer.toString("base64");
+  }),
+  maild: procedure.input(wrap(number())).mutation(async ({ input }) => {
+    const pdfBuffer = await generatePdf("invoice");
+
+    const settingsResult = await db.select().from(settings);
+
+    settingsResult.reduce((key) => {}, {});
+
+    await sendMail({
+      title: "Login email code",
+      to: {
+        name: relation.name,
+        emailAddress: input.emailAddress,
+      },
+      template: "otp",
+      variables: {
+        message: `Here is your code to login.`,
+        otp,
+        validity:
+          "This code is valid for 10 minutes. Do not share this code with anyone.",
+      },
+      footer:
+        "If you did not request this, please ignore this email or contact our support department.",
+    });
   }),
 });

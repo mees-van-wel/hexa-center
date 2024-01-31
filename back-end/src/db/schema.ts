@@ -5,6 +5,7 @@ import {
   doublePrecision,
   integer,
   interval,
+  jsonb,
   numeric,
   pgEnum,
   pgTable,
@@ -480,19 +481,17 @@ export const invoiceLogs = pgTable("invoice_logs", {
     .notNull(),
   createdById: integer("created_by_id").references(
     (): AnyPgColumn => relations.id,
-    {
-      onDelete: "set null",
-    },
+    { onDelete: "set null" },
   ),
   invoiceId: integer("invoice_id")
     .references(() => invoices.id, { onDelete: "cascade" })
     .notNull(),
   type: invoiceLogTypeEnum("type").notNull(),
-  refType: invoiceLogTypeEnum("refType"),
+  refType: invoiceLogRefTypeEnum("ref_type"),
   refId: integer("ref_id"),
 });
 
-export const invoicLogsRelations = relationBuilder(invoiceLogs, ({ one }) => ({
+export const invoiceLogsRelations = relationBuilder(invoiceLogs, ({ one }) => ({
   createdBy: one(relations, {
     fields: [invoiceLogs.createdById],
     references: [relations.id],
@@ -500,5 +499,29 @@ export const invoicLogsRelations = relationBuilder(invoiceLogs, ({ one }) => ({
   invoice: one(invoices, {
     fields: [invoiceLogs.invoiceId],
     references: [invoices.id],
+  }),
+}));
+
+export const settingNameEnum = pgEnum("setting_name", [
+  "invoiceEmailTitle",
+  "invoiceEmailContent",
+]);
+
+export const settings = pgTable("settings", {
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+  updatedById: integer("updated_by_id").references(
+    (): AnyPgColumn => relations.id,
+    { onDelete: "set null" },
+  ),
+  name: settingNameEnum("name").notNull(),
+  value: jsonb("value"),
+});
+
+export const settingRelations = relationBuilder(settings, ({ one }) => ({
+  updatedAt: one(relations, {
+    fields: [settings.updatedAt],
+    references: [relations.id],
   }),
 }));

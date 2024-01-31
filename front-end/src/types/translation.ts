@@ -65,7 +65,11 @@ export type Translation = {
       status: string;
       draft: string;
       issued: string;
+      mailed: string;
       credited: string;
+      issuedMessage: string;
+      mailedMessage: string;
+      creditedMessage: string;
     };
   };
   authLayout: {
