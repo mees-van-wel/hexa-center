@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import dayjs from "dayjs";
 
@@ -86,6 +86,36 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
     setPrintLoading(false);
   };
 
+  // const state = useMemo(() => invoice.events.includes(), []);
+
+  // {
+  //   t(
+  //     invoice.creditedAt
+  //       ? "entities.invoice.credited"
+  //       : invoice.issuedAt
+  //         ? "entities.invoice.issued"
+  //         : "entities.invoice.draft",
+  //   );
+  // }
+
+  // const invoiceState = useMemo(() => {
+  //   if (!invoice.events.length) return "draft";
+
+  //   const sortedLogs = [...invoice.events].sort(
+  //     (a, b) =>
+  //       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  //   );
+
+  //   return sortedLogs[0].type;
+  // }, [invoice.events]);
+
+  const canCredit = useMemo(
+    () =>
+      invoice.events.some(({ type }) => type === "issued") &&
+      !invoice.events.some(({ type }) => type === "credited"),
+    [invoice.events],
+  );
+
   return (
     <Stack>
       <DashboardHeader
@@ -96,7 +126,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
             label: t("entities.invoice.pluralName"),
             href: "/invoices",
           },
-          { label: invoice.number },
+          { label: invoice.number || invoice.id.toString() },
         ]}
       >
         <Button
@@ -114,9 +144,11 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
           Print
         </Button>
         <Button leftSection={<IconMailFast />}>Mail</Button>
-        <Button leftSection={<IconFileArrowLeft />} variant="light">
-          Credit
-        </Button>
+        {canCredit && (
+          <Button leftSection={<IconFileArrowLeft />} variant="light">
+            Credit
+          </Button>
+        )}
       </DashboardHeader>
       <Group wrap="nowrap" align="stretch">
         <Paper p="2rem" style={{ flex: 1 }}>
@@ -124,15 +156,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
             title={
               <Group>
                 <Title order={3}>Invoice</Title>
-                <Badge>
-                  {t(
-                    invoice.creditedAt
-                      ? "entities.invoice.credited"
-                      : invoice.issuedAt
-                        ? "entities.invoice.issued"
-                        : "entities.invoice.draft",
-                  )}
-                </Badge>
+                <Badge>{invoice.status}</Badge>
               </Group>
             }
             fh
@@ -293,11 +317,11 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
           <Band title={<Title order={3}>Timeline</Title>} fh>
             <ScrollArea h={271} type="always" offsetScrollbars>
               <Timeline
-                active={invoice.logs.length}
+                active={invoice.events.length}
                 bulletSize="2rem"
                 lineWidth={3}
               >
-                {invoice.logs
+                {invoice.events
                   .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
                   .map(
                     ({ id, type, createdAt, createdById, refType, refId }) => {

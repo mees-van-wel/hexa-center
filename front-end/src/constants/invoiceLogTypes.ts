@@ -19,6 +19,7 @@ export type InvoiceType = InvoiceLogTypes[InvoiceLogTypeKey];
 export const INVOICE_LOG_TYPE_KEYS = Object.keys(
   INVOICE_LOG_TYPES,
 ) as InvoiceLogTypeKey[];
+
 export const INVOICE_LOG_TYPE_VALUES = Object.values(
   INVOICE_LOG_TYPES,
 ) as InvoiceType[];

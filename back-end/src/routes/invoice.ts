@@ -1,43 +1,12 @@
 import { eq } from "drizzle-orm";
-import fs from "fs/promises";
-import path from "path";
-import puppeteer from "puppeteer";
-import { fileURLToPath } from "url";
 import { number } from "valibot";
 
 import db from "@/db/client";
-import { invoices, settings } from "@/db/schema";
+import { invoices } from "@/db/schema";
 import { procedure, router } from "@/trpc";
-import { isProduction } from "@/utils/environment";
-import { sendMail } from "@/utils/mail";
+import { generatePdf } from "@/utils/pdf";
 import { wrap } from "@decs/typeschema";
 import { TRPCError } from "@trpc/server";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const basePath = isProduction
-  ? path.join(__dirname, "pdfs")
-  : path.join(__dirname, "..", "src", "pdfs");
-
-const generatePdf = async (
-  templateName: string,
-  variables?: Record<string, any>,
-) => {
-  const browser = await puppeteer.launch({ headless: "new" });
-  const page = await browser.newPage();
-
-  const templatePath = path.join(basePath, templateName + ".html");
-
-  const htmlContent = await fs.readFile(templatePath, "utf8");
-
-  await page.setContent(htmlContent);
-
-  const pdfBuffer = await page.pdf({ format: "A4" });
-
-  await browser.close();
-
-  return pdfBuffer;
-};
 
 export const invoiceRouter = router({
   // create: procedure
@@ -82,6 +51,7 @@ export const invoiceRouter = router({
         $kind: invoices.$kind,
         id: invoices.id,
         type: invoices.type,
+        status: invoices.status,
         number: invoices.number,
         customerName: invoices.customerName,
         createdAt: invoices.createdAt,
@@ -108,7 +78,7 @@ export const invoiceRouter = router({
             totalGrossAmount: true,
           },
         },
-        logs: {
+        events: {
           columns: {
             id: true,
             createdAt: true,
@@ -129,6 +99,7 @@ export const invoiceRouter = router({
         number: true,
         comments: true,
         type: true,
+        status: true,
         discountAmount: true,
         totalNetAmount: true,
         totalTaxAmount: true,
@@ -210,31 +181,31 @@ export const invoiceRouter = router({
   //   .input(wrap(number()))
   //   .mutation(({ input }) => db.delete(users).where(eq(users.id, input))),
   generatePdf: procedure.input(wrap(number())).mutation(async ({ input }) => {
-    const pdfBuffer = await generatePdf("invoice");
+    const pdfBuffer = await generatePdf("invoice", { name: "Lol" });
     return pdfBuffer.toString("base64");
   }),
-  maild: procedure.input(wrap(number())).mutation(async ({ input }) => {
-    const pdfBuffer = await generatePdf("invoice");
+  // mail: procedure.input(wrap(number())).mutation(async ({ input }) => {
+  //   const pdfBuffer = await generatePdf("invoice");
 
-    const settingsResult = await db.select().from(settings);
+  //   const settingsResult = await db.select().from(settings);
 
-    settingsResult.reduce((key) => {}, {});
+  //   settingsResult.reduce((key) => {}, {});
 
-    await sendMail({
-      title: "Login email code",
-      to: {
-        name: relation.name,
-        emailAddress: input.emailAddress,
-      },
-      template: "otp",
-      variables: {
-        message: `Here is your code to login.`,
-        otp,
-        validity:
-          "This code is valid for 10 minutes. Do not share this code with anyone.",
-      },
-      footer:
-        "If you did not request this, please ignore this email or contact our support department.",
-    });
-  }),
+  //   await sendMail({
+  //     title: "Login email code",
+  //     to: {
+  //       name: relation.name,
+  //       emailAddress: input.emailAddress,
+  //     },
+  //     template: "otp",
+  //     variables: {
+  //       message: `Here is your code to login.`,
+  //       otp,
+  //       validity:
+  //         "This code is valid for 10 minutes. Do not share this code with anyone.",
+  //     },
+  //     footer:
+  //       "If you did not request this, please ignore this email or contact our support department.",
+  //   });
+  // }),
 });

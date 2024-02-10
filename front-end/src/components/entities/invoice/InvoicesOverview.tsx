@@ -53,7 +53,6 @@ export const InvoicesOverview = ({ invoices }: InvoicesOverviewProps) => {
                 <Badge variant="light">{t("entities.invoice.draft")}</Badge>
               ),
           },
-
           // {
           //   selector: "issuedAt",
           //   label: t("entities.invoice.keys.status.name"),
@@ -91,6 +90,13 @@ export const InvoicesOverview = ({ invoices }: InvoicesOverviewProps) => {
                 style: "currency",
                 currency: "EUR",
               }).format(parseFloat(totalGrossAmount)),
+          },
+          {
+            selector: "status",
+            label: t("entities.invoice.status"),
+            format: ({ status }) => (
+              <Badge variant="light">{t(`entities.invoice.${status}`)}</Badge>
+            ),
           },
         ]}
       />

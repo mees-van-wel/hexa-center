@@ -2,10 +2,6 @@ import crypto from "crypto";
 import { and, eq } from "drizzle-orm";
 import { nullable, object, string } from "valibot";
 
-import {
-  SESSION_DURATIONS,
-  type SessionDuration,
-} from "@/constants/sessionDurations";
 import db from "@/db/client";
 import { relations, sessions } from "@/db/schema";
 import { procedure, router } from "@/trpc";
@@ -16,6 +12,10 @@ import { sendMail } from "@/utils/mail";
 import { createOtp } from "@/utils/otp";
 import { sendSms } from "@/utils/sms";
 import { wrap } from "@decs/typeschema";
+import {
+  SESSION_DURATIONS,
+  type SessionDuration,
+} from "@front-end/constants/sessionDurations";
 import {
   SendEmailOtpSchema,
   SendPhoneOtpSchema,

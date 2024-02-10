@@ -1,0 +1,67 @@
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{type}}</title>
+    <style>
+      body { font-family: 'Arial', sans-serif; color: #333; } .invoice-box {
+      max-width: 800px; margin: auto; padding: 30px; border: 1px solid #eee;
+      box-shadow: 0 0 10px rgba(0, 0, 0, .15); } .header-section { text-align:
+      center; margin-bottom: 40px; } .header-section h2 { margin: 0; }
+      .client-info, .invoice-details { margin-bottom: 20px; } .invoice-table {
+      width: 100%; border-collapse: collapse; } .invoice-table th,
+      .invoice-table td { text-align: left; padding: 8px; } .invoice-table th {
+      background-color: #f2f2f2; } .total { text-align: right; } .total th,
+      .total td { padding: 8px; }
+    </style>
+  </head>
+
+  <body>
+    <div class="invoice-box">
+      <div class="header-section">
+        <h2>{{type}}</h2>
+        <p>Invoice #: 123</p>
+        <p>Date: 2024-02-08</p>
+      </div>
+      <div class="client-info">
+        <strong>Bill To:</strong>
+        <p>Client Name<br />Client Address</p>
+      </div>
+      <div class="invoice-details">
+        <strong>From:</strong>
+        <p>Your Name or Company<br />Your Address</p>
+      </div>
+      <table class="invoice-table">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Service/Product 1</td>
+            <td>2</td>
+            <td>$50.00</td>
+            <td>$100.00</td>
+          </tr>
+          <tr>
+            <td>Service/Product 2</td>
+            <td>3</td>
+            <td>$75.00</td>
+            <td>$225.00</td>
+          </tr>
+          <tfoot class="total">
+            <tr>
+              <th colspan="3">Total</th>
+              <td>$325.00</td>
+            </tr>
+          </tfoot>
+        </tbody>
+      </table>
+    </div>
+  </body>
+
+</html>

@@ -314,6 +314,12 @@ export const invoiceTypeEnum = pgEnum("invoice_type", [
   "final",
 ]);
 
+export const invoiceStatusEnum = pgEnum("invoice_status", [
+  "draft",
+  "issued",
+  "credited",
+]);
+
 // TODO Implement payment provider (Adyen) to track payment status
 export const invoices = pgTable("invoices", {
   $kind: text("$kind").default("invoice").notNull(),
@@ -322,16 +328,7 @@ export const invoices = pgTable("invoices", {
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
   createdById: integer("created_by_id").references(
-    (): AnyPgColumn => relations.id,
-    {
-      onDelete: "set null",
-    },
-  ),
-  updatedById: integer("updated_by_id").references(
     (): AnyPgColumn => relations.id,
     {
       onDelete: "set null",
@@ -340,6 +337,7 @@ export const invoices = pgTable("invoices", {
   refType: invoiceRefTypeEnum("ref_type").notNull(),
   refId: integer("ref_id").notNull(),
   type: invoiceTypeEnum("type").notNull(),
+  status: invoiceStatusEnum("status").notNull(),
   paymentTerms: interval("payment_terms").notNull(),
   discountAmount: numeric("discount_amount", {
     precision: 10,
@@ -402,10 +400,6 @@ export const invoicesRelations = relationBuilder(invoices, ({ one, many }) => ({
     fields: [invoices.createdById],
     references: [relations.id],
   }),
-  updatedBy: one(relations, {
-    fields: [invoices.updatedById],
-    references: [relations.id],
-  }),
   customer: one(relations, {
     fields: [invoices.customerId],
     references: [relations.id],
@@ -415,7 +409,7 @@ export const invoicesRelations = relationBuilder(invoices, ({ one, many }) => ({
     references: [properties.id],
   }),
   lines: many(invoiceLines),
-  logs: many(invoiceLogs),
+  events: many(invoiceEvents),
 }));
 
 export const invoiceLines = pgTable("invoice_lines", {
@@ -473,7 +467,7 @@ export const invoiceLogRefTypeEnum = pgEnum("invoice_log_ref_type", [
   "invoice",
 ]);
 
-export const invoiceLogs = pgTable("invoice_logs", {
+export const invoiceEvents = pgTable("invoice_events", {
   id: serial("id").primaryKey(),
   uuid: uuid("uuid").defaultRandom(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -491,16 +485,19 @@ export const invoiceLogs = pgTable("invoice_logs", {
   refId: integer("ref_id"),
 });
 
-export const invoiceLogsRelations = relationBuilder(invoiceLogs, ({ one }) => ({
-  createdBy: one(relations, {
-    fields: [invoiceLogs.createdById],
-    references: [relations.id],
+export const invoiceEventsRelations = relationBuilder(
+  invoiceEvents,
+  ({ one }) => ({
+    createdBy: one(relations, {
+      fields: [invoiceEvents.createdById],
+      references: [relations.id],
+    }),
+    invoice: one(invoices, {
+      fields: [invoiceEvents.invoiceId],
+      references: [invoices.id],
+    }),
   }),
-  invoice: one(invoices, {
-    fields: [invoiceLogs.invoiceId],
-    references: [invoices.id],
-  }),
-}));
+);
 
 export const settingNameEnum = pgEnum("setting_name", [
   "invoiceEmailTitle",
