@@ -43,7 +43,6 @@ type InvoiceDetailProps = {
   invoice: RouterOutput["invoice"]["get"];
 };
 
-// TODO Implement credit Handler
 // TODO Fix type errors
 // TODO Translations
 export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
@@ -51,11 +50,13 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
   const issueInvoice = useMutation("invoice", "issue");
   const generatePdf = useMutation("invoice", "generatePdf");
   const mailInvoice = useMutation("invoice", "mail");
+  const creditInvoice = useMutation("invoice", "credit");
   const [issueLoading, setIssueLoading] = useState(false);
-  const [issueDate, setIssueDate] = useState<Date | null>(now);
+  const [issueDate, setIssueDate] = useState(now);
   const [downloadLoading, setDownloadLoading] = useState(false);
   const [printLoading, setPrintLoading] = useState(false);
   const [mailLoading, setmailLoading] = useState(false);
+  const [creditLoading, setCreditLoading] = useState(false);
   const router = useRouter();
 
   const issueHandler = async () => {
@@ -66,7 +67,9 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
           label="Date"
           withAsterisk
           defaultValue={issueDate}
-          onChange={setIssueDate}
+          onChange={(date) => {
+            if (date) setIssueDate(date);
+          }}
         />
       ),
       labels: { confirm: t("common.yes"), cancel: t("common.no") },
@@ -88,6 +91,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
         } catch (error) {
           notifications.show({
             title: "There was an error while issuing",
+            // @ts-ignore
             message: error?.message || "...",
             color: "red",
           });
@@ -157,6 +161,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
     } catch (error) {
       notifications.show({
         title: "There was an error while mailing",
+        // @ts-ignore
         message: error?.message || "...",
         color: "red",
       });
@@ -165,7 +170,29 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
     setmailLoading(false);
   };
 
-  const creditHandler = async () => {};
+  const creditHandler = async () => {
+    setCreditLoading(true);
+
+    try {
+      const creditInvoiceId = await creditInvoice.mutate(invoice.id);
+
+      router.push(`/invoices/${creditInvoiceId}`);
+
+      notifications.show({
+        message: "Credited successfully",
+        color: "green",
+      });
+    } catch (error) {
+      notifications.show({
+        title: "There was an error while crediting",
+        // @ts-ignore
+        message: error?.message || "...",
+        color: "red",
+      });
+    }
+
+    setCreditLoading(false);
+  };
 
   const canCredit = useMemo(
     () =>
@@ -235,7 +262,11 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
           </>
         )}
         {canCredit && (
-          <Button leftSection={<IconFileArrowLeft />} variant="light">
+          <Button
+            loading={creditLoading}
+            leftSection={<IconFileArrowLeft />}
+            onClick={creditHandler}
+          >
             Credit
           </Button>
         )}
@@ -249,6 +280,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                 <Button
                   component={Link}
                   size="compact-md"
+                  // TODO remove hardcoded s
                   href={`/${invoice.refType}s/${invoice.refId}`}
                   variant="light"
                   rightSection={<IconExternalLink size="1rem" />}
@@ -293,7 +325,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
           </Band>
         </Paper>
         <Paper p="2rem" style={{ flex: 1 }}>
-          <Band.Group align="stretch">
+          <Band.Group>
             <Band
               title={
                 <>
@@ -463,7 +495,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
                   .map(
                     ({ id, type, createdAt, createdById, refType, refId }) => {
-                      const { IconComponent, title } =
+                      const { IconComponent, title, message } =
                         INVOICE_EVENT_TYPE_META[type];
 
                       return (
@@ -488,18 +520,19 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                           }
                           key={id}
                         >
-                          <Text size="sm" c="dimmed">
-                            {"At "}
+                          <Text size="xs" c="dimmed" style={{ maxWidth: 180 }}>
+                            {t(message)}
+                            {" at "}
                             {dayjs(createdAt).format("DD-MM-YYYY HH:mm")}
+                            {createdById && (
+                              <>
+                                {" by "}
+                                <Link href={`/relations/${createdById}`}>
+                                  Relation {createdById}
+                                </Link>
+                              </>
+                            )}
                           </Text>
-                          {createdById && (
-                            <Text size="xs" mt={4}>
-                              {"By "}
-                              <Link href={`/relations/${createdById}`}>
-                                Relation {createdById}
-                              </Link>
-                            </Text>
-                          )}
                         </Timeline.Item>
                       );
                     },
@@ -508,36 +541,19 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   bullet={<IconPlus size="1.3rem" />}
                   title="Created"
                 >
-                  <Text size="sm" c="dimmed">
+                  <Text size="xs" c="dimmed" style={{ maxWidth: 200 }}>
                     {"At "}
                     {dayjs(invoice.createdAt).format("DD-MM-YYYY HH:mm")}
+                    {invoice.createdById && (
+                      <>
+                        {" by "}
+                        <Link href={`/relations/${invoice.createdById}`}>
+                          Relation {invoice.createdById}
+                        </Link>
+                      </>
+                    )}
                   </Text>
-                  {invoice.createdById && (
-                    <Text size="xs" mt={4}>
-                      {"by "}
-                      <Link href={`/relations/${invoice.createdById}`}>
-                        Relation {invoice.createdById}
-                      </Link>
-                    </Text>
-                  )}
                 </Timeline.Item>
-
-                {invoice.creditedAt && (
-                  <Timeline.Item
-                    title="Credited"
-                    bullet={<IconFileArrowLeft size="1.3rem" />}
-                  >
-                    {/* <Text c="dimmed" size="sm">
-                  <Text variant="link" component="span" inherit>
-                    Robert Gluesticker
-                  </Text>{" "}
-                  left a code review on your pull request
-                </Text> */}
-                    <Text size="xs" mt={4}>
-                      {dayjs(invoice.creditedAt).format("DD-MM-YYYY")}
-                    </Text>
-                  </Timeline.Item>
-                )}
               </Timeline>
             </ScrollArea>
           </Band>
@@ -594,7 +610,9 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                       {Intl.NumberFormat("nl-NL", {
                         style: "currency",
                         currency: "EUR",
-                      }).format(parseFloat(discountAmount))}
+                      }).format(
+                        discountAmount ? parseFloat(discountAmount) : 0,
+                      )}
                     </Table.Td>
                     <Table.Td>
                       {Intl.NumberFormat("nl-NL", {
@@ -664,7 +682,11 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   {Intl.NumberFormat("nl-NL", {
                     style: "currency",
                     currency: "EUR",
-                  }).format(parseFloat(invoice.totalDiscountAmount))}
+                  }).format(
+                    invoice.totalDiscountAmount
+                      ? parseFloat(invoice.totalDiscountAmount)
+                      : 0,
+                  )}
                 </Table.Td>
                 <Table.Td
                   style={{

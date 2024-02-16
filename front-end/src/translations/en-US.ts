@@ -59,6 +59,7 @@ export default {
       final: "Final",
       customerName: "Customer",
       date: "Date",
+      dueDate: "Due date",
       totalGrossAmount: "Amount",
       status: "Status",
       draft: "Draft",
@@ -66,8 +67,8 @@ export default {
       mailed: "Mailed",
       credited: "Credited",
       issuedMessage: "The invoice has been issued",
-      mailedMessage: "Mailed",
-      creditedMessage: "Credited",
+      mailedMessage: "The invoice has been mailed",
+      creditedMessage: "The invoice has been credited",
     },
   },
   authLayout: {

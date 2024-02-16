@@ -4,7 +4,13 @@ import { eq, sql } from "drizzle-orm";
 import { date, number, object } from "valibot";
 
 import db from "@/db/client";
-import { invoiceEvents, invoices, properties, relations } from "@/db/schema";
+import {
+  invoiceEvents,
+  invoiceLines,
+  invoices,
+  properties,
+  relations,
+} from "@/db/schema";
 import { generateInvoicePdf, getInvoice } from "@/services/invoice";
 import { getSettings } from "@/services/setting";
 import { procedure, router } from "@/trpc";
@@ -226,5 +232,96 @@ export const invoiceRouter = router({
       invoiceId: input,
       type: "mailed",
     });
+  }),
+  credit: procedure.input(wrap(number())).mutation(async ({ input, ctx }) => {
+    const invoicesResult = await db
+      .select({
+        discountAmount: invoices.discountAmount,
+        totalNetAmount: invoices.totalNetAmount,
+        totalDiscountAmount: invoices.totalDiscountAmount,
+        totalTaxAmount: invoices.totalTaxAmount,
+        totalGrossAmount: invoices.totalGrossAmount,
+        number: invoices.number,
+        comments: invoices.comments,
+        customerId: invoices.customerId,
+        companyId: invoices.companyId,
+      })
+      .from(invoices)
+      .where(eq(invoices.id, input));
+    const invoice = invoicesResult[0];
+
+    if (!invoice) throw new TRPCError({ code: "NOT_FOUND" });
+
+    const [createCreditInvoiceResponse, invoiceLinesResult] = await Promise.all(
+      [
+        db
+          .insert(invoices)
+          .values({
+            createdById: ctx.relation.id,
+            refType: "invoice",
+            refId: input,
+            type: "credit",
+            status: "draft",
+            discountAmount: "-" + invoice.discountAmount,
+            totalNetAmount: "-" + invoice.totalNetAmount,
+            totalDiscountAmount: "-" + invoice.totalDiscountAmount,
+            totalTaxAmount: "-" + invoice.totalTaxAmount,
+            totalGrossAmount: "-" + invoice.totalGrossAmount,
+            number: invoice.number + "-C",
+            comments: invoice.comments,
+            customerId: invoice.customerId,
+            companyId: invoice.companyId,
+          })
+          .returning({ id: invoices.id }),
+        db
+          .select({
+            name: invoiceLines.name,
+            comments: invoiceLines.comments,
+            unitNetAmount: invoiceLines.unitNetAmount,
+            quantity: invoiceLines.quantity,
+            totalNetAmount: invoiceLines.totalNetAmount,
+            discountAmount: invoiceLines.discountAmount,
+            totalTaxAmount: invoiceLines.totalTaxAmount,
+            taxPercentage: invoiceLines.taxPercentage,
+            totalGrossAmount: invoiceLines.totalGrossAmount,
+          })
+          .from(invoiceLines)
+          .where(eq(invoiceLines.invoiceId, input)),
+        db
+          .update(invoices)
+          .set({
+            status: "credited",
+          })
+          .where(eq(invoices.id, input)),
+      ],
+    );
+
+    const creditInvoiceId = createCreditInvoiceResponse[0].id;
+
+    await Promise.all([
+      db.insert(invoiceLines).values(
+        invoiceLinesResult.map((invoiceLine) => ({
+          invoiceId: creditInvoiceId,
+          name: invoiceLine.name,
+          comments: invoiceLine.comments,
+          unitNetAmount: "-" + invoiceLine.unitNetAmount,
+          quantity: invoiceLine.quantity,
+          totalNetAmount: "-" + invoiceLine.totalNetAmount,
+          discountAmount: "-" + invoiceLine.discountAmount,
+          totalTaxAmount: "-" + invoiceLine.totalTaxAmount,
+          taxPercentage: invoiceLine.taxPercentage,
+          totalGrossAmount: "-" + invoiceLine.totalGrossAmount,
+        })),
+      ),
+      db.insert(invoiceEvents).values({
+        invoiceId: input,
+        type: "credited",
+        createdById: ctx.relation.id,
+        refType: "invoice",
+        refId: creditInvoiceId,
+      }),
+    ]);
+
+    return creditInvoiceId;
   }),
 });

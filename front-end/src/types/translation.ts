@@ -61,6 +61,7 @@ export type Translation = {
       final: string;
       customerName: string;
       date: string;
+      dueDate: string;
       totalGrossAmount: string;
       status: string;
       draft: string;
