@@ -6,43 +6,43 @@ import {
   TablerIconsProps,
 } from "@tabler/icons-react";
 
-export const INVOICE_LOG_TYPES = {
+export const INVOICE_EVENT_TYPES = {
   ISSUED: "issued",
   MAILED: "mailed",
   CREDITED: "credited",
 } as const;
 
-export type InvoiceLogTypes = typeof INVOICE_LOG_TYPES;
-export type InvoiceLogTypeKey = keyof InvoiceLogTypes;
-export type InvoiceType = InvoiceLogTypes[InvoiceLogTypeKey];
+export type InvoiceEventTypes = typeof INVOICE_EVENT_TYPES;
+export type InvoiceEventTypeKey = keyof InvoiceEventTypes;
+export type InvoiceEventType = InvoiceEventTypes[InvoiceEventTypeKey];
 
-export const INVOICE_LOG_TYPE_KEYS = Object.keys(
-  INVOICE_LOG_TYPES,
-) as InvoiceLogTypeKey[];
+export const INVOICE_EVENT_TYPE_KEYS = Object.keys(
+  INVOICE_EVENT_TYPES,
+) as InvoiceEventTypeKey[];
 
-export const INVOICE_LOG_TYPE_VALUES = Object.values(
-  INVOICE_LOG_TYPES,
-) as InvoiceType[];
+export const INVOICE_EVENT_TYPE_VALUES = Object.values(
+  INVOICE_EVENT_TYPES,
+) as InvoiceEventType[];
 
-export const INVOICE_LOG_TYPE_META: Record<
-  InvoiceType,
+export const INVOICE_EVENT_TYPE_META: Record<
+  InvoiceEventType,
   {
     IconComponent: (props: TablerIconsProps) => JSX.Element;
     title: keyof TranslationPaths;
     message: keyof TranslationPaths;
   }
 > = {
-  [INVOICE_LOG_TYPES.ISSUED]: {
+  [INVOICE_EVENT_TYPES.ISSUED]: {
     IconComponent: IconFileArrowRight,
     title: "entities.invoice.issued",
     message: "entities.invoice.issuedMessage",
   },
-  [INVOICE_LOG_TYPES.MAILED]: {
+  [INVOICE_EVENT_TYPES.MAILED]: {
     IconComponent: IconMailFast,
     title: "entities.invoice.mailed",
     message: "entities.invoice.mailedMessage",
   },
-  [INVOICE_LOG_TYPES.CREDITED]: {
+  [INVOICE_EVENT_TYPES.CREDITED]: {
     IconComponent: IconFileArrowLeft,
     title: "entities.invoice.credited",
     message: "entities.invoice.creditedMessage",

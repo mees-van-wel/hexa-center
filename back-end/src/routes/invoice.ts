@@ -1,211 +1,230 @@
-import { eq } from "drizzle-orm";
-import { number } from "valibot";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration.js";
+import { eq, sql } from "drizzle-orm";
+import { date, number, object } from "valibot";
 
 import db from "@/db/client";
-import { invoices } from "@/db/schema";
+import { invoiceEvents, invoices, properties, relations } from "@/db/schema";
+import { generateInvoicePdf, getInvoice } from "@/services/invoice";
+import { getSettings } from "@/services/setting";
 import { procedure, router } from "@/trpc";
-import { generatePdf } from "@/utils/pdf";
+import { sendMail } from "@/utils/mail";
 import { wrap } from "@decs/typeschema";
 import { TRPCError } from "@trpc/server";
 
-export const invoiceRouter = router({
-  // create: procedure
-  //   .input(wrap(UserCreateSchema))
-  //   .mutation(async ({ input, ctx }) => {
-  //     const result = await db
-  //       .insert(users)
-  //       .values({
-  //         ...input,
-  //         createdById: ctx.user.id,
-  //         updatedById: ctx.user.id,
-  //         propertyId: 1,
-  //         // Customer role
-  //         roleId: 2,
-  //       })
-  //       .returning({
-  //         $kind: users.$kind,
-  //         id: users.id,
-  //         createdAt: users.createdAt,
-  //         createdById: users.createdById,
-  //         updatedAt: users.updatedAt,
-  //         updatedById: users.updatedById,
-  //         firstName: users.firstName,
-  //         lastName: users.lastName,
-  //         email: users.email,
-  //         phoneNumber: users.phoneNumber,
-  //         street: users.street,
-  //         houseNumber: users.houseNumber,
-  //         postalCode: users.postalCode,
-  //         city: users.city,
-  //         region: users.region,
-  //         country: users.country,
-  //         sex: users.sex,
-  //         dateOfBirth: users.dateOfBirth,
-  //       });
+dayjs.extend(duration);
 
-  //     return result[0];
-  //   }),
+export const invoiceRouter = router({
   list: procedure.query(() =>
-    db
-      .select({
-        $kind: invoices.$kind,
-        id: invoices.id,
-        type: invoices.type,
-        status: invoices.status,
-        number: invoices.number,
-        customerName: invoices.customerName,
-        createdAt: invoices.createdAt,
-        date: invoices.date,
-        totalGrossAmount: invoices.totalGrossAmount,
-      })
-      .from(invoices),
-  ),
-  get: procedure.input(wrap(number())).query(async ({ input }) => {
-    const invoice = await db.query.invoices.findFirst({
-      where: eq(invoices.id, input),
+    db.query.invoices.findMany({
       with: {
-        lines: {
+        customer: {
           columns: {
-            id: true,
             name: true,
-            comments: true,
-            unitNetAmount: true,
-            quantity: true,
-            discountAmount: true,
-            totalNetAmount: true,
-            totalTaxAmount: true,
-            taxPercentage: true,
-            totalGrossAmount: true,
-          },
-        },
-        events: {
-          columns: {
-            id: true,
-            createdAt: true,
-            createdById: true,
-            type: true,
-            refType: true,
-            refId: true,
           },
         },
       },
       columns: {
         $kind: true,
         id: true,
-        createdAt: true,
-        createdById: true,
-        refType: true,
-        refId: true,
-        number: true,
-        comments: true,
         type: true,
         status: true,
-        discountAmount: true,
-        totalNetAmount: true,
-        totalTaxAmount: true,
-        totalGrossAmount: true,
-        totalDiscountAmount: true,
-
-        customerId: true,
+        number: true,
         customerName: true,
-        customerStreet: true,
-        customerHouseNumber: true,
-        customerPostalCode: true,
-        customerCity: true,
-        customerRegion: true,
-        customerCountry: true,
-        customerEmailAddress: true,
-        customerPhoneNumber: true,
-        customerVatNumber: true,
-        customerCocNumber: true,
+        createdAt: true,
+        date: true,
+        totalGrossAmount: true,
+      },
+    }),
+  ),
+  get: procedure
+    .input(wrap(number()))
+    .query(async ({ input }) => getInvoice(input)),
+  issue: procedure
+    .input(
+      wrap(
+        object({
+          invoiceId: number(),
+          date: date(),
+        }),
+      ),
+    )
+    .mutation(async ({ input: { invoiceId, date }, ctx }) => {
+      const invoicesResult = await db
+        .select()
+        .from(invoices)
+        .where(eq(invoices.id, invoiceId));
+      const invoice = invoicesResult[0];
+      if (!invoice)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `invoice ${invoiceId} not found`,
+        });
 
-        companyId: true,
-        companyName: true,
-        companyStreet: true,
-        companyHouseNumber: true,
-        companyPostalCode: true,
-        companyCity: true,
-        companyRegion: true,
-        companyCountry: true,
-        companyEmailAddress: true,
-        companyPhoneNumber: true,
-        companyVatNumber: true,
-        companyCocNumber: true,
-        companyIban: true,
-        companySwiftBic: true,
+      if (!invoice.customerId)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Missing customer id",
+        });
+
+      if (!invoice.companyId)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Missing company id",
+        });
+
+      const [
+        relationsResult,
+        propertiesResult,
+        {
+          companyPaymentTerms,
+          companyVatNumber,
+          companyCocNumber,
+          companyIban,
+          companySwiftBic,
+        },
+        countResult,
+      ] = await Promise.all([
+        db.select().from(relations).where(eq(relations.id, invoice.customerId)),
+        db
+          .select()
+          .from(properties)
+          .where(eq(properties.id, invoice.companyId)),
+        getSettings([
+          "companyPaymentTerms",
+          "companyVatNumber",
+          "companyCocNumber",
+          "companyIban",
+          "companySwiftBic",
+        ]),
+        db
+          .select({
+            count: sql<number>`CAST(COUNT(*) AS INT)`,
+          })
+          .from(invoices)
+          .where(
+            sql`EXTRACT(YEAR FROM ${invoices.date}) = ${date.getFullYear()}`,
+          ),
+      ]);
+
+      const customer = relationsResult[0];
+      if (!customer)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `customer ${invoice.customerId} not found`,
+        });
+
+      const company = propertiesResult[0];
+      if (!company)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `company ${invoice.companyId} not found`,
+        });
+
+      const { count } = countResult[0];
+
+      await db
+        .update(invoices)
+        .set({
+          status: "issued",
+          date,
+          dueDate:
+            invoice.type !== "credit" && invoice.type !== "quotation"
+              ? dayjs(date).add(dayjs.duration(companyPaymentTerms)).toDate()
+              : undefined,
+          number: date.getFullYear() + (count + 1).toString().padStart(4, "0"),
+          customerName: customer.name,
+          customerEmailAddress: customer.emailAddress,
+          customerPhoneNumber: customer.phoneNumber,
+          customerStreet: customer.street,
+          customerHouseNumber: customer.houseNumber,
+          customerPostalCode: customer.postalCode,
+          customerCity: customer.city,
+          customerRegion: customer.region,
+          customerCountry: customer.country,
+          customerVatNumber: customer.vatNumber,
+          customerCocNumber: customer.cocNumber,
+          companyName: company.name,
+          companyEmailAddress: company.emailAddress,
+          companyPhoneNumber: company.phoneNumber,
+          companyStreet: company.street,
+          companyHouseNumber: company.houseNumber,
+          companyPostalCode: company.postalCode,
+          companyCity: company.city,
+          companyRegion: company.region,
+          companyCountry: company.country,
+          companyVatNumber,
+          companyCocNumber,
+          companyIban,
+          companySwiftBic,
+        })
+        .where(eq(invoices.id, invoiceId));
+
+      await db.insert(invoiceEvents).values({
+        createdById: ctx.relation.id,
+        invoiceId,
+        type: "issued",
+      });
+    }),
+  generatePdf: procedure
+    .input(wrap(number()))
+    .mutation(async ({ input }) => (await generateInvoicePdf(input)).base64),
+  mail: procedure.input(wrap(number())).mutation(async ({ input, ctx }) => {
+    const { invoice, base64 } = await generateInvoicePdf(input);
+
+    const { invoiceEmailTitle, invoiceEmailContent } = await getSettings([
+      "invoiceEmailTitle",
+      "invoiceEmailContent",
+    ]);
+
+    if (!invoiceEmailTitle || !invoiceEmailContent)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Missing invoice email settings",
+      });
+
+    const name = invoice.customerName || invoice.customer?.name;
+    const emailAddress =
+      invoice.customerEmailAddress || invoice.customer?.emailAddress;
+
+    if (!name || !emailAddress)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Missing customer name or email address",
+      });
+
+    await sendMail({
+      title: invoiceEmailTitle,
+      to: {
+        name,
+        emailAddress,
+      },
+      attachments: [
+        {
+          Name:
+            (invoice.type === "quotation"
+              ? "Quotation"
+              : invoice.type === "credit"
+                ? "Credit Invoice"
+                : "Invoice") +
+            " " +
+            invoice.number +
+            ".pdf",
+          ContentID: `invoice:${invoice.id}`,
+          Content: base64,
+          ContentType: "application/pdf",
+        },
+      ],
+      template: "invoice",
+      variables: {
+        message: invoiceEmailContent,
       },
     });
 
-    if (!invoice) throw new TRPCError({ code: "NOT_FOUND" });
-
-    return invoice;
+    await db.insert(invoiceEvents).values({
+      createdById: ctx.relation.id,
+      invoiceId: input,
+      type: "mailed",
+    });
   }),
-  // update: procedure
-  //   .input(wrap(UserUpdateSchema))
-  //   .mutation(async ({ input, ctx }) => {
-  //     try {
-  //       const result = await db
-  //         .update(users)
-  //         .set({
-  //           ...input,
-  //           updatedById: ctx.user.id,
-  //         })
-  //         .where(eq(users.id, input.id))
-  //         .returning({
-  //           $kind: users.$kind,
-  //           id: users.id,
-  //           createdAt: users.createdAt,
-  //           createdById: users.createdById,
-  //           updatedAt: users.updatedAt,
-  //           updatedById: users.updatedById,
-  //           firstName: users.firstName,
-  //           lastName: users.lastName,
-  //           email: users.email,
-  //           phoneNumber: users.phoneNumber,
-  //           street: users.street,
-  //           houseNumber: users.houseNumber,
-  //           postalCode: users.postalCode,
-  //           city: users.city,
-  //           region: users.region,
-  //           country: users.country,
-  //           sex: users.sex,
-  //           dateOfBirth: users.dateOfBirth,
-  //         });
-
-  //       return result[0];
-  //     } catch (error) {
-  //       throw createPgException(error);
-  //     }
-  //   }),
-  // delete: procedure
-  //   .input(wrap(number()))
-  //   .mutation(({ input }) => db.delete(users).where(eq(users.id, input))),
-  generatePdf: procedure.input(wrap(number())).mutation(async ({ input }) => {
-    const pdfBuffer = await generatePdf("invoice", { name: "Lol" });
-    return pdfBuffer.toString("base64");
-  }),
-  // mail: procedure.input(wrap(number())).mutation(async ({ input }) => {
-  //   const pdfBuffer = await generatePdf("invoice");
-
-  //   const settingsResult = await db.select().from(settings);
-
-  //   settingsResult.reduce((key) => {}, {});
-
-  //   await sendMail({
-  //     title: "Login email code",
-  //     to: {
-  //       name: relation.name,
-  //       emailAddress: input.emailAddress,
-  //     },
-  //     template: "otp",
-  //     variables: {
-  //       message: `Here is your code to login.`,
-  //       otp,
-  //       validity:
-  //         "This code is valid for 10 minutes. Do not share this code with anyone.",
-  //     },
-  //     footer:
-  //       "If you did not request this, please ignore this email or contact our support department.",
-  //   });
-  // }),
 });

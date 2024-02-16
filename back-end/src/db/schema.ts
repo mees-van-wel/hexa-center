@@ -4,7 +4,6 @@ import {
   date,
   doublePrecision,
   integer,
-  interval,
   jsonb,
   numeric,
   pgEnum,
@@ -305,7 +304,10 @@ export const roomsRelations = relationBuilder(rooms, ({ one }) => ({
   }),
 }));
 
-export const invoiceRefTypeEnum = pgEnum("invoice_ref_type", ["reservation"]);
+export const invoiceRefTypeEnum = pgEnum("invoice_ref_type", [
+  "invoice",
+  "reservation",
+]);
 
 export const invoiceTypeEnum = pgEnum("invoice_type", [
   "standard",
@@ -338,24 +340,23 @@ export const invoices = pgTable("invoices", {
   refId: integer("ref_id").notNull(),
   type: invoiceTypeEnum("type").notNull(),
   status: invoiceStatusEnum("status").notNull(),
-  paymentTerms: interval("payment_terms").notNull(),
   discountAmount: numeric("discount_amount", {
     precision: 10,
     scale: 2,
-  }).notNull(),
+  }),
   totalNetAmount: numeric("total_net_amount", {
     precision: 10,
     scale: 2,
   }).notNull(),
+  totalDiscountAmount: numeric("total_discount_amount", {
+    precision: 10,
+    scale: 2,
+  }),
   totalTaxAmount: numeric("total_tax_amount", {
     precision: 10,
     scale: 2,
   }).notNull(),
   totalGrossAmount: numeric("total_gross_amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
-  totalDiscountAmount: numeric("total_discount_amount", {
     precision: 10,
     scale: 2,
   }).notNull(),
@@ -425,14 +426,14 @@ export const invoiceLines = pgTable("invoice_lines", {
     scale: 2,
   }).notNull(),
   quantity: numeric("quantity", { precision: 10, scale: 2 }).notNull(),
-  discountAmount: numeric("discount_amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
   totalNetAmount: numeric("total_net_amount", {
     precision: 10,
     scale: 2,
   }).notNull(),
+  discountAmount: numeric("discount_amount", {
+    precision: 10,
+    scale: 2,
+  }),
   totalTaxAmount: numeric("total_tax_amount", {
     precision: 10,
     scale: 2,
@@ -457,13 +458,13 @@ export const invoiceLinesRelations = relationBuilder(
   }),
 );
 
-export const invoiceLogTypeEnum = pgEnum("invoice_log_type", [
+export const invoiceEventTypeEnum = pgEnum("invoice_event_type", [
   "issued",
   "mailed",
   "credited",
 ]);
 
-export const invoiceLogRefTypeEnum = pgEnum("invoice_log_ref_type", [
+export const invoiceEventRefTypeEnum = pgEnum("invoice_event_ref_type", [
   "invoice",
 ]);
 
@@ -480,8 +481,8 @@ export const invoiceEvents = pgTable("invoice_events", {
   invoiceId: integer("invoice_id")
     .references(() => invoices.id, { onDelete: "cascade" })
     .notNull(),
-  type: invoiceLogTypeEnum("type").notNull(),
-  refType: invoiceLogRefTypeEnum("ref_type"),
+  type: invoiceEventTypeEnum("type").notNull(),
+  refType: invoiceEventRefTypeEnum("ref_type"),
   refId: integer("ref_id"),
 });
 
@@ -500,8 +501,15 @@ export const invoiceEventsRelations = relationBuilder(
 );
 
 export const settingNameEnum = pgEnum("setting_name", [
+  "companyPaymentTerms",
+  "companyVatNumber",
+  "companyCocNumber",
+  "companyIban",
+  "companySwiftBic",
   "invoiceEmailTitle",
   "invoiceEmailContent",
+  "invoiceHeaderImageSrc",
+  "invoiceFooterImageSrc",
 ]);
 
 export const settings = pgTable("settings", {

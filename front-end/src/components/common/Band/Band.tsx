@@ -7,20 +7,23 @@ import styles from "./Band.module.scss";
 type BandProps = {
   children: React.ReactNode;
   title?: React.ReactNode;
-  secondTitle?: React.ReactNode;
   fh?: boolean;
 };
 
-export const Band = ({ children, title, secondTitle, fh }: BandProps) => {
+export const Band = ({ children, title, fh }: BandProps) => {
   return (
     <div
       className={clsx(styles.root, {
         [styles.rootFullHeight]: fh,
       })}
     >
-      {title && <div className={styles.titleWrapper}>{title}</div>}
-      {title && <div className={styles.secondTitleWrapper}>{secondTitle}</div>}
-      {children}
+      {title && (
+        <div className={styles.titleWrapper}>
+          <div className={styles.headerContent}>{title}</div>
+          <span className={styles.line} />
+        </div>
+      )}
+      <div className={styles.content}>{children}</div>
     </div>
   );
 };

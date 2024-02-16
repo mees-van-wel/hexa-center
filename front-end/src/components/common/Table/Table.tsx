@@ -38,8 +38,8 @@ export const Table = <T extends Record<string, any>>({
 
     const searchLower = val.toLowerCase();
     return elements.filter((element) =>
-      Object.values(element).some((value) =>
-        value.toString().toLowerCase().includes(searchLower),
+      Object.values(element).some(
+        (value) => value?.toString().toLowerCase().includes(searchLower),
       ),
     );
   }, [searchBarId, search, elements]);

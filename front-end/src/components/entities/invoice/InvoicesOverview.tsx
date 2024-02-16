@@ -44,42 +44,29 @@ export const InvoicesOverview = ({ invoices }: InvoicesOverviewProps) => {
             ),
           },
           {
+            selector: "status",
+            label: t("entities.invoice.status"),
+            format: ({ status }) => (
+              <Badge variant="light">{t(`entities.invoice.${status}`)}</Badge>
+            ),
+          },
+          {
             selector: "number",
             label: t("common.number"),
-            format: ({ number }) =>
-              number ? (
-                number
-              ) : (
-                <Badge variant="light">{t("entities.invoice.draft")}</Badge>
-              ),
+            format: ({ id, number }) => number || id,
           },
-          // {
-          //   selector: "issuedAt",
-          //   label: t("entities.invoice.keys.status.name"),
-          //   format: ({ issuedAt, creditedAt }) =>
-          //     creditedAt ? (
-          //       <Badge variant="light">
-          //         {t("entities.invoice.keys.status.credited")}
-          //       </Badge>
-          //     ) : issuedAt ? (
-          //       <Badge variant="light">
-          //         {t(`entities.invoice.keys.status.issued`)}
-          //       </Badge>
-          //     ) : (
-          //       <Badge variant="light">
-          //         {t(`entities.invoice.keys.status.draft`)}
-          //       </Badge>
-          //     ),
-          // },
           {
             selector: "date",
             label: t("entities.invoice.date"),
             format: ({ createdAt, date }) =>
-              dayjs(date || createdAt).format("YYYY-MM-DD"),
+              (date ? "Issued at " : "Created at ") +
+              dayjs(date || createdAt).format("DD-MM-YYYY"),
           },
           {
             selector: "customerName",
             label: t("entities.invoice.customerName"),
+            format: ({ customerName, customer }) =>
+              customerName || customer?.name,
           },
           {
             selector: "totalGrossAmount",
@@ -90,13 +77,6 @@ export const InvoicesOverview = ({ invoices }: InvoicesOverviewProps) => {
                 style: "currency",
                 currency: "EUR",
               }).format(parseFloat(totalGrossAmount)),
-          },
-          {
-            selector: "status",
-            label: t("entities.invoice.status"),
-            format: ({ status }) => (
-              <Badge variant="light">{t(`entities.invoice.${status}`)}</Badge>
-            ),
           },
         ]}
       />

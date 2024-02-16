@@ -2,11 +2,12 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
 
 import { Band } from "@/components/common/Band";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
-import { INVOICE_LOG_TYPE_META } from "@/constants/invoiceLogTypes";
+import { INVOICE_EVENT_TYPE_META } from "@/constants/invoiceEventTypes";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
 import { RouterOutput } from "@/utils/trpc";
@@ -22,25 +23,80 @@ import {
   Timeline,
   Title,
 } from "@mantine/core";
+import { DateInput } from "@mantine/dates";
+import { modals } from "@mantine/modals";
+import { notifications } from "@mantine/notifications";
 import {
-  IconDownload,
   IconExternalLink,
   IconFileArrowLeft,
+  IconFileArrowRight,
   IconFileEuro,
   IconMailFast,
   IconPlus,
   IconPrinter,
 } from "@tabler/icons-react";
+import { IconDownload } from "@tabler/icons-react";
+
+const now = new Date();
 
 type InvoiceDetailProps = {
   invoice: RouterOutput["invoice"]["get"];
 };
 
+// TODO Implement credit Handler
+// TODO Fix type errors
+// TODO Translations
 export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
   const t = useTranslation();
+  const issueInvoice = useMutation("invoice", "issue");
   const generatePdf = useMutation("invoice", "generatePdf");
+  const mailInvoice = useMutation("invoice", "mail");
+  const [issueLoading, setIssueLoading] = useState(false);
+  const [issueDate, setIssueDate] = useState<Date | null>(now);
   const [downloadLoading, setDownloadLoading] = useState(false);
   const [printLoading, setPrintLoading] = useState(false);
+  const [mailLoading, setmailLoading] = useState(false);
+  const router = useRouter();
+
+  const issueHandler = async () => {
+    modals.openConfirmModal({
+      title: t("common.areYouSure"),
+      children: (
+        <DateInput
+          label="Date"
+          withAsterisk
+          defaultValue={issueDate}
+          onChange={setIssueDate}
+        />
+      ),
+      labels: { confirm: t("common.yes"), cancel: t("common.no") },
+      onConfirm: async () => {
+        setIssueLoading(true);
+
+        try {
+          await issueInvoice.mutate({
+            invoiceId: invoice.id,
+            date: issueDate,
+          });
+
+          router.refresh();
+
+          notifications.show({
+            message: "Issued successfully",
+            color: "green",
+          });
+        } catch (error) {
+          notifications.show({
+            title: "There was an error while issuing",
+            message: error?.message || "...",
+            color: "red",
+          });
+        }
+
+        setIssueLoading(false);
+      },
+    });
+  };
 
   const downloadHandler = async () => {
     setDownloadLoading(true);
@@ -86,35 +142,50 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
     setPrintLoading(false);
   };
 
-  // const state = useMemo(() => invoice.events.includes(), []);
+  const mailHandler = async () => {
+    setmailLoading(true);
 
-  // {
-  //   t(
-  //     invoice.creditedAt
-  //       ? "entities.invoice.credited"
-  //       : invoice.issuedAt
-  //         ? "entities.invoice.issued"
-  //         : "entities.invoice.draft",
-  //   );
-  // }
+    try {
+      await mailInvoice.mutate(invoice.id);
 
-  // const invoiceState = useMemo(() => {
-  //   if (!invoice.events.length) return "draft";
+      router.refresh();
 
-  //   const sortedLogs = [...invoice.events].sort(
-  //     (a, b) =>
-  //       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-  //   );
+      notifications.show({
+        message: "Mailed successfully",
+        color: "green",
+      });
+    } catch (error) {
+      notifications.show({
+        title: "There was an error while mailing",
+        message: error?.message || "...",
+        color: "red",
+      });
+    }
 
-  //   return sortedLogs[0].type;
-  // }, [invoice.events]);
+    setmailLoading(false);
+  };
+
+  const creditHandler = async () => {};
 
   const canCredit = useMemo(
     () =>
       invoice.events.some(({ type }) => type === "issued") &&
-      !invoice.events.some(({ type }) => type === "credited"),
+      !invoice.events.some(({ type }) => type === "credited") &&
+      invoice.type !== "credit" &&
+      invoice.type !== "quotation",
+    [invoice.events, invoice.type],
+  );
+
+  const hasBeenMailed = useMemo(
+    () => invoice.events.some(({ type }) => type === "mailed"),
     [invoice.events],
   );
+
+  const customerVatNumber =
+    invoice.customerVatNumber || invoice.customer?.vatNumber;
+
+  const customerCocNumber =
+    invoice.customerCocNumber || invoice.customer?.cocNumber;
 
   return (
     <Stack>
@@ -129,21 +200,40 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
           { label: invoice.number || invoice.id.toString() },
         ]}
       >
-        <Button
-          loading={downloadLoading}
-          leftSection={<IconDownload />}
-          onClick={downloadHandler}
-        >
-          Download
-        </Button>
-        <Button
-          loading={printLoading}
-          leftSection={<IconPrinter />}
-          onClick={printHandler}
-        >
-          Print
-        </Button>
-        <Button leftSection={<IconMailFast />}>Mail</Button>
+        {invoice.status === "draft" ? (
+          <Button
+            loading={issueLoading}
+            leftSection={<IconFileArrowRight />}
+            onClick={issueHandler}
+          >
+            Issue
+          </Button>
+        ) : (
+          <>
+            <Button
+              variant={hasBeenMailed ? "light" : undefined}
+              leftSection={<IconMailFast />}
+              loading={mailLoading}
+              onClick={mailHandler}
+            >
+              {hasBeenMailed ? "Remail" : "Mail"}
+            </Button>
+            <Button
+              loading={downloadLoading}
+              leftSection={<IconDownload />}
+              onClick={downloadHandler}
+            >
+              Download PDF
+            </Button>
+            <Button
+              loading={printLoading}
+              leftSection={<IconPrinter />}
+              onClick={printHandler}
+            >
+              Print
+            </Button>
+          </>
+        )}
         {canCredit && (
           <Button leftSection={<IconFileArrowLeft />} variant="light">
             Credit
@@ -151,21 +241,30 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
         )}
       </DashboardHeader>
       <Group wrap="nowrap" align="stretch">
-        <Paper p="2rem" style={{ flex: 1 }}>
+        <Paper p="2rem">
           <Band
             title={
-              <Group>
+              <>
                 <Title order={3}>Invoice</Title>
+                <Button
+                  component={Link}
+                  size="compact-md"
+                  href={`/${invoice.refType}s/${invoice.refId}`}
+                  variant="light"
+                  rightSection={<IconExternalLink size="1rem" />}
+                >
+                  {invoice.refType} {invoice.refId}
+                </Button>
                 <Badge>{invoice.status}</Badge>
-              </Group>
+              </>
             }
             fh
           >
             <Group align="stretch" justify="space-between" gap="2rem">
-              <Stack>
+              <Stack align="flex-start">
                 <div>
                   <p>
-                    {t("common.number")}: {invoice.number}
+                    {t("common.number")}: {invoice.number || invoice.id}
                   </p>
                   <p>
                     {t("entities.invoice.totalGrossAmount")}:{" "}
@@ -179,23 +278,25 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   <p>
                     {t("entities.invoice.date")}:{" "}
                     {dayjs(invoice.date || invoice.createdAt).format(
-                      "YYYY-MM-DD",
+                      "DD-MM-YYYY",
                     )}
                   </p>
-                  {/* <p>
-                    {t("entities.invoice.dueAt")}:{" "}
-                    {dayjs(invoice.dueAt).format("YYYY-MM-DD")}
-                  </p> */}
+                  {invoice.dueDate && (
+                    <p>
+                      {t("entities.invoice.dueDate")}:{" "}
+                      {dayjs(invoice.dueDate).format("DD-MM-YYYY")}
+                    </p>
+                  )}
                 </div>
               </Stack>
             </Group>
           </Band>
         </Paper>
-        <Paper p="2rem">
+        <Paper p="2rem" style={{ flex: 1 }}>
           <Band.Group align="stretch">
             <Band
               title={
-                <Group>
+                <>
                   <Title order={3}>Customer</Title>
                   <Title order={3}>-</Title>
                   {invoice.customerId ? (
@@ -204,47 +305,65 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                       size="compact-md"
                       href={`/relations/${invoice.customerId}`}
                       variant="light"
+                      rightSection={<IconExternalLink size="1rem" />}
                     >
-                      {invoice.customerName}
+                      {invoice.customerName || invoice.customer?.name}
                     </Button>
                   ) : (
-                    <p>{invoice.customerName}</p>
+                    <p
+                      style={{
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {invoice.customerName}
+                    </p>
                   )}
-                </Group>
+                </>
               }
             >
               <Stack>
                 <div>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    {invoice.customerStreet} {invoice.customerHouseNumber}
+                    {invoice.customerStreet || invoice.customer?.street}{" "}
+                    {invoice.customerHouseNumber ||
+                      invoice.customer?.houseNumber}
                   </p>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    {invoice.customerPostalCode} {invoice.customerCity}
+                    {invoice.customerPostalCode || invoice.customer?.postalCode}{" "}
+                    {invoice.customerCity || invoice.customer?.city}
                   </p>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    {invoice.customerRegion}
+                    {invoice.customerRegion || invoice.customer?.region}
                     {" - "}
-                    {t(`constants.countries.${invoice.customerCountry}`)}
+                    {t(
+                      `constants.countries.${
+                        invoice.customerCountry || invoice.customer?.country
+                      }`,
+                    )}
                   </p>
                 </div>
                 <div>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    Email address: {invoice.customerEmailAddress}
+                    Email address:{" "}
+                    {invoice.customerEmailAddress ||
+                      invoice.customer?.emailAddress}
                   </p>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    Phone number: {invoice.customerPhoneNumber}
+                    Phone number:{" "}
+                    {invoice.customerPhoneNumber ||
+                      invoice.customer?.phoneNumber}
                   </p>
                 </div>
-                {(invoice.customerVatNumber || invoice.customerCocNumber) && (
+                {(customerVatNumber || customerCocNumber) && (
                   <div>
-                    {invoice.customerVatNumber && (
+                    {customerVatNumber && (
                       <p style={{ whiteSpace: "nowrap" }}>
-                        VAT number: {invoice.customerVatNumber}
+                        VAT number: {customerVatNumber}
                       </p>
                     )}
-                    {invoice.customerCocNumber && (
+                    {customerCocNumber && (
                       <p style={{ whiteSpace: "nowrap" }}>
-                        CoC number: {invoice.customerCocNumber}
+                        CoC number: {customerCocNumber}
                       </p>
                     )}
                   </div>
@@ -253,7 +372,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
             </Band>
             <Band
               title={
-                <Group>
+                <>
                   <Title order={3}>Your details</Title>
                   <Title order={3}>-</Title>
                   {invoice.customerId ? (
@@ -262,51 +381,70 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                       size="compact-md"
                       href={`/properties/${invoice.companyId}`}
                       variant="light"
+                      rightSection={<IconExternalLink size="1rem" />}
                     >
-                      {invoice.companyName}
+                      {invoice.companyName || invoice.company?.name}
                     </Button>
                   ) : (
-                    <p>{invoice.customerName}</p>
+                    <p
+                      style={{
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {invoice.companyName}
+                    </p>
                   )}
-                </Group>
+                </>
               }
             >
               <Stack>
                 <div>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    {invoice.companyStreet} {invoice.companyHouseNumber}
+                    {invoice.companyStreet || invoice.company?.street}{" "}
+                    {invoice.companyHouseNumber || invoice.company?.houseNumber}
                   </p>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    {invoice.companyPostalCode} {invoice.companyCity}
+                    {invoice.companyPostalCode || invoice.company?.postalCode}{" "}
+                    {invoice.companyCity || invoice.company?.city}
                   </p>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    {invoice.companyRegion}
+                    {invoice.companyRegion || invoice.company?.region}
                     {" - "}
-                    {t(`constants.countries.${invoice.companyCountry}`)}
+                    {t(
+                      `constants.countries.${
+                        invoice.companyCountry || invoice.company?.country
+                      }`,
+                    )}
                   </p>
                 </div>
                 <div>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    Email address: {invoice.companyEmailAddress}
+                    Email address:{" "}
+                    {invoice.companyEmailAddress ||
+                      invoice.company?.emailAddress}
                   </p>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    Phone number: {invoice.companyPhoneNumber}
-                  </p>
-                </div>
-                <div>
-                  <p style={{ whiteSpace: "nowrap" }}>
-                    VAT number: {invoice.companyVatNumber}
-                  </p>
-                  <p style={{ whiteSpace: "nowrap" }}>
-                    CoC number: {invoice.companyCocNumber}
+                    Phone number:{" "}
+                    {invoice.companyPhoneNumber || invoice.company?.phoneNumber}
                   </p>
                 </div>
                 <div>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    IBAN: {invoice.companyIban}
+                    VAT number:{" "}
+                    {invoice.companyVatNumber || invoice.company?.vatNumber}
                   </p>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    BIC/SWIFT: {invoice.companySwiftBic}
+                    CoC number:{" "}
+                    {invoice.companyCocNumber || invoice.company?.cocNumber}
+                  </p>
+                </div>
+                <div>
+                  <p style={{ whiteSpace: "nowrap" }}>
+                    IBAN: {invoice.companyIban || invoice.company?.iban}
+                  </p>
+                  <p style={{ whiteSpace: "nowrap" }}>
+                    BIC/SWIFT:{" "}
+                    {invoice.companySwiftBic || invoice.company?.swiftBic}
                   </p>
                 </div>
               </Stack>
@@ -326,7 +464,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   .map(
                     ({ id, type, createdAt, createdById, refType, refId }) => {
                       const { IconComponent, title } =
-                        INVOICE_LOG_TYPE_META[type];
+                        INVOICE_EVENT_TYPE_META[type];
 
                       return (
                         <Timeline.Item
@@ -352,7 +490,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                         >
                           <Text size="sm" c="dimmed">
                             {"At "}
-                            {dayjs(createdAt).format("YYYY-MM-DD HH:mm")}
+                            {dayjs(createdAt).format("DD-MM-YYYY HH:mm")}
                           </Text>
                           {createdById && (
                             <Text size="xs" mt={4}>
@@ -372,7 +510,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                 >
                   <Text size="sm" c="dimmed">
                     {"At "}
-                    {dayjs(invoice.createdAt).format("YYYY-MM-DD HH:mm")}
+                    {dayjs(invoice.createdAt).format("DD-MM-YYYY HH:mm")}
                   </Text>
                   {invoice.createdById && (
                     <Text size="xs" mt={4}>
@@ -396,7 +534,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   left a code review on your pull request
                 </Text> */}
                     <Text size="xs" mt={4}>
-                      {dayjs(invoice.creditedAt).format("YYYY-MM-DD")}
+                      {dayjs(invoice.creditedAt).format("DD-MM-YYYY")}
                     </Text>
                   </Timeline.Item>
                 )}

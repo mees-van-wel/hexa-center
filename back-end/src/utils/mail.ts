@@ -1,7 +1,7 @@
-import fs from "fs";
+import fs from "fs/promises";
 import mjml2html from "mjml";
 import path from "path";
-import { ServerClient } from "postmark";
+import { Attachment, ServerClient } from "postmark";
 import { fileURLToPath } from "url";
 
 import { isProduction } from "./environment";
@@ -10,7 +10,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const basePath = isProduction
   ? path.join(__dirname, "emails")
-  : path.join(__dirname, "..", "emails");
+  : path.join(__dirname, "..", "src", "emails");
 
 const serverToken = process.env.POSTMARK_SERVER_TOKEN;
 if (!serverToken)
@@ -23,6 +23,9 @@ type Mails = {
     message: string;
     otp: string;
     validity: string;
+  };
+  invoice: {
+    message: string;
   };
 };
 
@@ -52,9 +55,10 @@ type SendMailProps<T extends keyof Mails> = {
   };
   template: T;
   variables: Mails[T];
+  attachments?: Attachment[];
 };
 
-export const sendMail = <T extends keyof Mails>({
+export const sendMail = async <T extends keyof Mails>({
   title,
   logo = "https://cdn.mcauto-images-production.sendgrid.net/b2afceaeb16d6ede/8d7c73d8-b2dc-4ec3-b181-b719345cabd4/140x163.png",
   company = "Hexa Center",
@@ -66,37 +70,40 @@ export const sendMail = <T extends keyof Mails>({
   to,
   template,
   variables,
+  attachments,
 }: SendMailProps<T>) => {
   variables = { ...variables, title, logo, company };
 
   const templatePath = path.join(basePath, `${template}.mjml`);
-  const templateContent = replaceTemplateVariables(
-    // TODO replace with await readFile
-    fs.readFileSync(templatePath, "utf8"),
-    variables,
-  );
-
   const baseTemplatePath = path.join(basePath, `_base.mjml`);
-  let baseTemplateContent = replaceTemplateVariables(
-    fs.readFileSync(baseTemplatePath, "utf8"),
-    {
-      ...variables,
-      children: templateContent,
-      footer: footer
-        ? replaceTemplateVariables(
-            fs.readFileSync(path.join(basePath, `_footer.mjml`), "utf8"),
-            { children: footer },
-          )
-        : undefined,
-    },
-  );
+
+  const readPromises = [
+    fs.readFile(templatePath, "utf8"),
+    fs.readFile(baseTemplatePath, "utf8"),
+  ];
+
+  if (footer) {
+    const footerPath = path.join(basePath, `_footer.mjml`);
+    readPromises.push(fs.readFile(footerPath, "utf8"));
+  }
+
+  let [templateContent, baseTemplateContent, footerContent] =
+    await Promise.all(readPromises);
+
+  templateContent = replaceTemplateVariables(templateContent, variables);
+  baseTemplateContent = replaceTemplateVariables(baseTemplateContent, {
+    ...variables,
+    children: templateContent,
+    footer: footerContent,
+  });
 
   const { html } = mjml2html(baseTemplateContent.replace(/{{.*?}}/g, ""));
 
-  return postmarkClient.sendEmail({
+  return await postmarkClient.sendEmail({
     From: `${from.name} <${from.emailAddress}>`,
     To: `${to.name} <${to.emailAddress}>`,
     Subject: title,
     HtmlBody: html,
+    Attachments: attachments,
   });
 };

@@ -1,8 +1,8 @@
 .root {
+  flex: 1;
   position: relative;
   border: solid 1px rgb(var(--color-neutral));
   border-radius: 0.5rem;
-  padding: 2rem;
 
   &FullHeight {
     height: 100%;
@@ -10,19 +10,27 @@
 }
 
 .titleWrapper {
-  position: absolute;
-  top: 0;
-  left: 1rem;
-  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-left: 1rem;
+  margin: -1rem 1rem;
   background-color: rgb(var(--color-foreground));
-  padding: 0 1rem;
 }
 
-.secondTitleWrapper {
-  position: absolute;
-  top: 0;
-  right: 1rem;
-  transform: translateY(-50%);
-  background-color: rgb(var(--color-foreground));
-  padding: 0 1rem;
+.headerContent {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+.line {
+  width: 100%;
+  height: 1px;
+  background-color: rgb(var(--color-neutral));
+}
+
+.content {
+  padding: 2rem;
 }

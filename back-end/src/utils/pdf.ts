@@ -1,3 +1,4 @@
+import ejs from "ejs";
 import fs from "fs/promises";
 import path from "path";
 import puppeteer from "puppeteer";
@@ -14,18 +15,20 @@ const basePath = isProduction
   : path.join(__dirname, "..", "src", "pdfs");
 
 export const generatePdf = async <T extends PDFTemplate>(
-  template: T,
+  templateName: T,
   variables: PDFTemplateVariables[T],
 ) => {
   const browser = await puppeteer.launch({ headless: "new" });
   const page = await browser.newPage();
 
-  const templatePath = path.join(basePath, template + ".html");
+  const templatePath = path.join(basePath, `${templateName}.ejs`);
 
-  const htmlContent = await fs.readFile(templatePath, "utf8");
+  let htmlContent = await fs.readFile(templatePath, "utf8");
+  htmlContent = await ejs.render(htmlContent, variables, { async: true });
+
   await page.setContent(htmlContent);
 
-  const pdfBuffer = await page.pdf({ format: "A4" });
+  const pdfBuffer = await page.pdf({ format: "A4", printBackground: true });
 
   await browser.close();
 

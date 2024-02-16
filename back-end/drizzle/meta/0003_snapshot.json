@@ -58,12 +58,8 @@
           "name": "accounts_relation_id_relations_id_fk",
           "tableFrom": "accounts",
           "tableTo": "relations",
-          "columnsFrom": [
-            "relation_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["relation_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -132,12 +128,8 @@
           "name": "invoice_events_created_by_id_relations_id_fk",
           "tableFrom": "invoice_events",
           "tableTo": "relations",
-          "columnsFrom": [
-            "created_by_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -145,12 +137,8 @@
           "name": "invoice_events_invoice_id_invoices_id_fk",
           "tableFrom": "invoice_events",
           "tableTo": "invoices",
-          "columnsFrom": [
-            "invoice_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["invoice_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -242,12 +230,8 @@
           "name": "invoice_lines_invoice_id_invoices_id_fk",
           "tableFrom": "invoice_lines",
           "tableTo": "invoices",
-          "columnsFrom": [
-            "invoice_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["invoice_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -552,12 +536,8 @@
           "name": "invoices_created_by_id_relations_id_fk",
           "tableFrom": "invoices",
           "tableTo": "relations",
-          "columnsFrom": [
-            "created_by_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -565,12 +545,8 @@
           "name": "invoices_updated_by_id_relations_id_fk",
           "tableFrom": "invoices",
           "tableTo": "relations",
-          "columnsFrom": [
-            "updated_by_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["updated_by_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -578,12 +554,8 @@
           "name": "invoices_customer_id_relations_id_fk",
           "tableFrom": "invoices",
           "tableTo": "relations",
-          "columnsFrom": [
-            "customer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["customer_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -591,12 +563,8 @@
           "name": "invoices_company_id_properties_id_fk",
           "tableFrom": "invoices",
           "tableTo": "properties",
-          "columnsFrom": [
-            "company_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["company_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -627,12 +595,8 @@
           "name": "permissions_role_id_properties_id_fk",
           "tableFrom": "permissions",
           "tableTo": "properties",
-          "columnsFrom": [
-            "role_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["role_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -640,10 +604,7 @@
       "compositePrimaryKeys": {
         "permissions_role_id_key_pk": {
           "name": "permissions_role_id_key_pk",
-          "columns": [
-            "role_id",
-            "key"
-          ]
+          "columns": ["role_id", "key"]
         }
       },
       "uniqueConstraints": {}
@@ -759,12 +720,8 @@
           "name": "properties_created_by_id_relations_id_fk",
           "tableFrom": "properties",
           "tableTo": "relations",
-          "columnsFrom": [
-            "created_by_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -772,12 +729,8 @@
           "name": "properties_updated_by_id_relations_id_fk",
           "tableFrom": "properties",
           "tableTo": "relations",
-          "columnsFrom": [
-            "updated_by_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["updated_by_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -787,9 +740,7 @@
         "properties_name_unique": {
           "name": "properties_name_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "name"
-          ]
+          "columns": ["name"]
         }
       }
     },
@@ -964,12 +915,8 @@
           "name": "relations_created_by_id_relations_id_fk",
           "tableFrom": "relations",
           "tableTo": "relations",
-          "columnsFrom": [
-            "created_by_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -977,12 +924,8 @@
           "name": "relations_updated_by_id_relations_id_fk",
           "tableFrom": "relations",
           "tableTo": "relations",
-          "columnsFrom": [
-            "updated_by_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["updated_by_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -990,12 +933,8 @@
           "name": "relations_property_id_properties_id_fk",
           "tableFrom": "relations",
           "tableTo": "properties",
-          "columnsFrom": [
-            "property_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["property_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -1003,12 +942,8 @@
           "name": "relations_role_id_roles_id_fk",
           "tableFrom": "relations",
           "tableTo": "roles",
-          "columnsFrom": [
-            "role_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["role_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -1018,16 +953,12 @@
         "relations_email_address_unique": {
           "name": "relations_email_address_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email_address"
-          ]
+          "columns": ["email_address"]
         },
         "relations_phone_number_unique": {
           "name": "relations_phone_number_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "phone_number"
-          ]
+          "columns": ["phone_number"]
         }
       }
     },
@@ -1094,12 +1025,8 @@
           "name": "roles_created_by_id_relations_id_fk",
           "tableFrom": "roles",
           "tableTo": "relations",
-          "columnsFrom": [
-            "created_by_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -1107,12 +1034,8 @@
           "name": "roles_updated_by_id_relations_id_fk",
           "tableFrom": "roles",
           "tableTo": "relations",
-          "columnsFrom": [
-            "updated_by_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["updated_by_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -1122,9 +1045,7 @@
         "roles_name_unique": {
           "name": "roles_name_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "name"
-          ]
+          "columns": ["name"]
         }
       }
     },
@@ -1203,12 +1124,8 @@
           "name": "rooms_created_by_id_relations_id_fk",
           "tableFrom": "rooms",
           "tableTo": "relations",
-          "columnsFrom": [
-            "created_by_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -1216,12 +1133,8 @@
           "name": "rooms_updated_by_id_relations_id_fk",
           "tableFrom": "rooms",
           "tableTo": "relations",
-          "columnsFrom": [
-            "updated_by_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["updated_by_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -1229,12 +1142,8 @@
           "name": "rooms_property_id_properties_id_fk",
           "tableFrom": "rooms",
           "tableTo": "properties",
-          "columnsFrom": [
-            "property_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["property_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -1244,9 +1153,7 @@
         "rooms_name_unique": {
           "name": "rooms_name_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "name"
-          ]
+          "columns": ["name"]
         }
       }
     },
@@ -1318,12 +1225,8 @@
           "name": "sessions_relation_id_relations_id_fk",
           "tableFrom": "sessions",
           "tableTo": "relations",
-          "columnsFrom": [
-            "relation_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["relation_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1333,9 +1236,7 @@
         "sessions_refresh_token_unique": {
           "name": "sessions_refresh_token_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "refresh_token"
-          ]
+          "columns": ["refresh_token"]
         }
       }
     },
@@ -1388,12 +1289,8 @@
           "name": "settings_updated_by_id_relations_id_fk",
           "tableFrom": "settings",
           "tableTo": "relations",
-          "columnsFrom": [
-            "updated_by_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["updated_by_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -1455,12 +1352,8 @@
           "name": "working_hours_account_id_accounts_id_fk",
           "tableFrom": "working_hours",
           "tableTo": "accounts",
-          "columnsFrom": [
-            "account_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["account_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
