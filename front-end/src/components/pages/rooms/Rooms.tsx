@@ -37,6 +37,11 @@ export const Rooms = ({ rooms }: RoomsProps) => {
           {
             selector: "price",
             label: t("roomsPage.price"),
+            format: ({ price }) =>
+              Intl.NumberFormat("nl-NL", {
+                style: "currency",
+                currency: "EUR",
+              }).format(parseFloat(price)),
           },
           {
             selector: "id",

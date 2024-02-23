@@ -19,12 +19,8 @@ export const compairDates = (firstDate: Dayjs, secondDate: Dayjs) => {
 };
 
 type reservationsProps = {
-  currentRooms: {
-    id: number;
-    name: string;
-    price: number;
-  }[];
   currentWeek: Dayjs[];
+  currentRooms: RouterOutput["room"]["list"];
   reservations: RouterOutput["reservation"]["list"];
 };
 
@@ -111,9 +107,7 @@ export const ShowReservations = ({
 
                     const title = `${
                       reservation.guestName ? `${reservation.guestName} - ` : ""
-                    }${reservation.customer.firstName} ${
-                      reservation.customer.lastName
-                    }`;
+                    }${reservation.customer.name}`;
 
                     const correctWidth = isBetween(
                       currentWeek.at(-1)!,

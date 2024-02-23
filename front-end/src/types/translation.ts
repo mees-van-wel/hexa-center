@@ -1,5 +1,6 @@
 import { CountryKey } from "@/constants/countries";
-import { SexKey } from "@/constants/sexes";
+import { RelationType } from "@/constants/relationTypes";
+import { Sex } from "@/constants/sexes";
 
 export type Translation = {
   common: {
@@ -22,19 +23,29 @@ export type Translation = {
     workweek: string;
     day: string;
   };
+  modules: {
+    essentials: string;
+    sales: string;
+    bookings: string;
+  };
   entities: {
-    user: {
+    relation: {
       name: {
         singular: string;
         plural: string;
       };
       keys: {
-        firstName: string;
-        lastName: string;
-        email: string;
+        type: string;
+        name: string;
+        emailAddress: string;
         phoneNumber: string;
         dateOfBirth: string;
         sex: string;
+        vatNumber: string;
+        cocNumber: string;
+        businessContactName: string;
+        businessContactEmailAddress: string;
+        businessContactPhoneNumber: string;
       };
       createdNotification: string;
       deletedNotification: string;
@@ -63,6 +74,27 @@ export type Translation = {
       reservationCreated: string;
       roomDeleted: string;
       dateError: string;
+    };
+    invoice: {
+      singularName: string;
+      pluralName: string;
+      type: string;
+      standard: string;
+      quotation: string;
+      credit: string;
+      final: string;
+      customerName: string;
+      date: string;
+      dueDate: string;
+      totalGrossAmount: string;
+      status: string;
+      draft: string;
+      issued: string;
+      mailed: string;
+      credited: string;
+      issuedMessage: string;
+      mailedMessage: string;
+      creditedMessage: string;
     };
   };
   dates: {
@@ -118,10 +150,6 @@ export type Translation = {
     version: string;
   };
   dashboardLayout: {
-    modules: {
-      essentials: string;
-      bookings: string;
-    };
     avatar: {
       profile: string;
       preferences: string;
@@ -130,13 +158,12 @@ export type Translation = {
     home: string;
     properties: string;
     roles: string;
-    users: string;
     reservations: string;
     rooms: string;
   };
   loginPage: {
     login: string;
-    email: string;
+    emailAddress: string;
     sendEmailOtp: string;
     emailOtpSent: string;
     emailRequiredError: string;
@@ -203,7 +230,8 @@ export type Translation = {
   //   }) => string;
   // };
   constants: {
-    sexes: Record<SexKey, string>;
+    sexes: Record<Sex, string>;
+    relationTypes: Record<RelationType, string>;
     countries: Record<CountryKey, string>;
   };
 };

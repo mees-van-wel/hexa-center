@@ -5,50 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1701085527527,
-      "tag": "0000_massive_selene",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1701441150651,
-      "tag": "0001_reflective_medusa",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1702381902060,
-      "tag": "0002_wealthy_lockheed",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1702642597050,
-      "tag": "0003_hard_lilandra",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1702653686428,
-      "tag": "0004_gifted_darkstar",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "5",
-      "when": 1703173854975,
-      "tag": "0005_sharp_black_knight",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "5",
-      "when": 1703689762398,
-      "tag": "0006_pretty_big_bertha",
+      "when": 1708703823789,
+      "tag": "0000_free_monster_badoon",
       "breakpoints": true
     }
   ]

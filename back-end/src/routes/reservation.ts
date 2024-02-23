@@ -20,8 +20,8 @@ export const reservationRouter = router({
         .insert(reservations)
         .values({
           ...input,
-          createdById: ctx.user.id,
-          updatedById: ctx.user.id,
+          createdById: ctx.relation.id,
+          updatedById: ctx.relation.id,
         })
         .returning({
           $kind: reservations.$kind,
@@ -71,7 +71,7 @@ export const reservationRouter = router({
         .update(reservations)
         .set({
           ...input,
-          updatedById: ctx.user.id,
+          updatedById: ctx.relation.id,
         })
         .where(eq(reservations.id, input.id))
         .returning({

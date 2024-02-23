@@ -4,11 +4,9 @@ import { useMemo } from "react";
 import clsx from "clsx";
 import dayjs, { Dayjs } from "dayjs";
 
-import { CALENDARVIEW, CalendarView } from "@/constants/calendarView";
-import { MONTH_VALUES } from "@/constants/months";
-import { WEEKDAY_VALUES } from "@/constants/weekdays";
+import { CALENDAR_VIEWS, CalendarView } from "@/constants/calendarViews";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Button, Group, Paper, SegmentedControl, Stack } from "@mantine/core";
+import { Button, Paper, Stack } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { IconArrowBack, IconArrowForward } from "@tabler/icons-react";
 
@@ -24,10 +22,10 @@ type CalendarSidebarProps = {
 
 export const CalendarSidebar = ({
   now,
-  onCalendarViewChange,
+  // onCalendarViewChange,
   sideBarToggle,
   onDateChange,
-  calendarView = CALENDARVIEW.WEEK,
+  calendarView = CALENDAR_VIEWS.WEEK,
 }: CalendarSidebarProps) => {
   const t = useTranslation();
   const today = dayjs();
@@ -47,16 +45,29 @@ export const CalendarSidebar = ({
     >
       <Paper p="md" h="100%" w="100%">
         <Stack ta="center">
-          <p>
+          {/* <p>
             {t(`dates.weekdayNamesShort.${WEEKDAY_VALUES[now.day()]}`)}{" "}
             {dayjs(now).date()}{" "}
             {t(`dates.monthsLong.${MONTH_VALUES[dayjs(now).month()]}`)}
-          </p>
-
+          </p> */}
+          <DateInput
+            value={now.toDate()}
+            required
+            onChange={(value) => {
+              value &&
+                onDateChange(
+                  dayjs(value)
+                    .set("hour", 0)
+                    .set("minute", 0)
+                    .set("second", 0)
+                    .set("millisecond", 0),
+                );
+            }}
+          />
           <Button.Group>
             <Button
               onClick={() => {
-                ChangeWeek(calendarView !== CALENDARVIEW.DAY ? -7 : -1);
+                ChangeWeek(calendarView !== CALENDAR_VIEWS.DAY ? -7 : -1);
               }}
             >
               <IconArrowBack size={50} />
@@ -73,21 +84,20 @@ export const CalendarSidebar = ({
             </Button>
             <Button
               onClick={() => {
-                ChangeWeek(calendarView !== CALENDARVIEW.DAY ? 7 : 1);
+                ChangeWeek(calendarView !== CALENDAR_VIEWS.DAY ? 7 : 1);
               }}
             >
               <IconArrowForward size={50} />
             </Button>
           </Button.Group>
-
-          <SegmentedControl
+          {/* <SegmentedControl
             data={[
-              { label: t("common.week"), value: CALENDARVIEW.WEEK },
+              { label: t("common.week"), value: CALENDAR_VIEWS.WEEK },
               {
                 label: t("common.workweek"),
-                value: CALENDARVIEW.WORKWEEK,
+                value: CALENDAR_VIEWS.WORKWEEK,
               },
-              { label: t("common.day"), value: CALENDARVIEW.DAY },
+              { label: t("common.day"), value: CALENDAR_VIEWS.DAY },
             ]}
             onChange={(value) => {
               onCalendarViewChange(value as CalendarView);
@@ -95,24 +105,7 @@ export const CalendarSidebar = ({
             orientation="vertical"
             size="sm"
             w="100%"
-          />
-
-          <Group grow align="end">
-            <DateInput
-              value={now.toDate()}
-              required
-              onChange={(value) => {
-                value &&
-                  onDateChange(
-                    dayjs(value)
-                      .set("hour", 0)
-                      .set("minute", 0)
-                      .set("second", 0)
-                      .set("millisecond", 0),
-                  );
-              }}
-            />
-          </Group>
+          /> */}
         </Stack>
       </Paper>
     </div>

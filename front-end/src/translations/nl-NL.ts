@@ -21,22 +21,32 @@ export default {
     workweek: "Werkweek",
     day: "Dag",
   },
+  modules: {
+    essentials: "Essentieel",
+    sales: "Verkoop",
+    bookings: "Bookingen",
+  },
   entities: {
-    user: {
+    relation: {
       name: {
-        singular: "Gebruiker",
-        plural: "Gebruikers",
+        singular: "Relatie",
+        plural: "Relaties",
       },
       keys: {
-        firstName: "Voornam",
-        lastName: "Achternaam",
-        email: "E-mail",
+        type: "Type",
+        name: "Naam",
+        emailAddress: "E-mailadres",
         phoneNumber: "Telefoonnummer",
         dateOfBirth: "Geboortedatum",
         sex: "Sekse",
+        vatNumber: "BTW-nummer",
+        cocNumber: "Kamer van Koophandel-nummer",
+        businessContactName: "Naam contactpersoon",
+        businessContactEmailAddress: "E-mailadres contactpersoon",
+        businessContactPhoneNumber: "Telefoonnummer contactpersoon",
       },
-      createdNotification: "Gebruiker succesvol aangemaakt",
-      deletedNotification: "Gebruiker succesvol verwijderd",
+      createdNotification: "Relatie succesvol aangemaakt",
+      deletedNotification: "Relatie succesvol verwijderd",
       isSelfAlert: {
         title: "Je kunt jezelf hier niet bewerken",
         message: "Je eigen persoonlijke gegevens zijn alleen bewerkbaar op de",
@@ -62,6 +72,27 @@ export default {
       reservationCreated: "Reservatie succesvol aangemaakt",
       roomDeleted: "Reservatie succesvol verwijderd",
       dateError: "De startdatum moet eerder zijn dan de einddatum.",
+    },
+    invoice: {
+      singularName: "Factuur",
+      pluralName: "Facturen",
+      type: "Type",
+      standard: "Factuur",
+      quotation: "Offerte",
+      credit: "Creditfactuur",
+      final: "Eindfactuur",
+      customerName: "Klant",
+      date: "Datum",
+      dueDate: "Betalingsvervaldatum",
+      totalGrossAmount: "Bedrag",
+      status: "Status",
+      draft: "Concept",
+      issued: "Definitief",
+      mailed: "Gemaild",
+      credited: "Gecrediteerd",
+      issuedMessage: "De factuur is definitief gemaakt",
+      mailedMessage: "De factuur is gemailed",
+      creditedMessage: "De factuur is gecrediteerd",
     },
   },
   dates: {
@@ -117,10 +148,6 @@ export default {
     version: "Versie",
   },
   dashboardLayout: {
-    modules: {
-      essentials: "Essentiële zaken",
-      bookings: "Bookingen",
-    },
     avatar: {
       profile: "Profile",
       preferences: "Preferences",
@@ -129,13 +156,12 @@ export default {
     home: "Home",
     properties: "Vestigingen",
     roles: "Rollen",
-    users: "Gebruikers",
     reservations: "Reservaties",
     rooms: "Kamers",
   },
   loginPage: {
     login: "Inloggen",
-    email: "E-mailadres",
+    emailAddress: "E-mailadres",
     sendEmailOtp: "Verstuur E-mailcode",
     emailOtpSent:
       "Als het ingevoerde e-mailadres correct is, is er een code verzonden naar",
@@ -198,6 +224,10 @@ export default {
       MALE: "Mannelijk",
       INTERSEX: "Intersekse",
       OTHER: "Overig",
+    },
+    relationTypes: {
+      individual: "Individu",
+      business: "Bedrijf",
     },
     countries: {
       AD: "Andorra",

@@ -22,10 +22,10 @@ export const RememberMe = () => {
   const router = useRouter();
 
   const clickHandler = async () => {
-    const user = await login.mutate({
-      email: loginState.email,
-      emailToken: loginState.emailToken,
-      emailOtp: loginState.emailOtp,
+    const relation = await login.mutate({
+      emailAddress: loginState.emailAddress,
+      emailAddressToken: loginState.emailToken,
+      emailAddressOtp: loginState.emailOtp,
       phoneNumber: loginState.phoneNumber,
       phoneNumberToken: loginState.phoneToken,
       phoneNumberOtp: loginState.phoneOtp,
@@ -37,7 +37,7 @@ export const RememberMe = () => {
     main?.setAttribute("data-fade", "true");
     window.localStorage.setItem("fade", "true");
 
-    setAuth({ ...auth, user });
+    setAuth({ ...auth, relation });
     setLoginState({ step: "SUCCESS" });
 
     setTimeout(() => {

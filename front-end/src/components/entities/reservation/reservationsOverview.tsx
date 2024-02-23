@@ -7,7 +7,7 @@ import utc from "dayjs/plugin/utc";
 
 import { CalendarSidebar } from "@/components/common/CalendarSidebar";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
-import { CALENDARVIEW, CalendarView } from "@/constants/calendarView";
+import { CALENDAR_VIEWS, CalendarView } from "@/constants/calendarViews";
 import { MONTH_VALUES } from "@/constants/months";
 import { WEEKDAY_VALUES } from "@/constants/weekdays";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -62,7 +62,7 @@ export const ReservationsOverview = ({
 
   const preferredStartDayIndex: number | "AUTO" = 1;
   const [calendarView, setCalendarView] = useState<CalendarView>(
-    CALENDARVIEW.WEEK,
+    CALENDAR_VIEWS.WEEK,
   );
   const [sidebarToggle, setSideBarToggle] = useState(true);
 
@@ -77,9 +77,9 @@ export const ReservationsOverview = ({
 
     let filteredWeek = fullWeek;
 
-    if (calendarView === CALENDARVIEW.WORKWEEK) {
+    if (calendarView === CALENDAR_VIEWS.WORKWEEK) {
       filteredWeek = fullWeek.filter((day) => [1, 2].includes(day.day()));
-    } else if (calendarView !== CALENDARVIEW.WEEK) {
+    } else if (calendarView !== CALENDAR_VIEWS.WEEK) {
       filteredWeek = [dayjs(calendarCurrentDay)];
     }
 
@@ -146,7 +146,7 @@ export const ReservationsOverview = ({
           <Paper p={"1rem"}>
             <Stack>
               <Group wrap="nowrap" grow gap={0} ta="center" fw="700">
-                <span className={styles.weekHidden} />
+                <div>Room name</div>
                 {currentWeek.map((weekDay, index) => (
                   <div key={`${weekDay.date()}-${index}`}>
                     {t(
@@ -163,8 +163,8 @@ export const ReservationsOverview = ({
 
               <Stack gap={0} w="100%">
                 <ShowReservations
-                  currentRooms={currentRooms}
                   currentWeek={currentWeek}
+                  currentRooms={currentRooms}
                   reservations={reservations}
                 />
               </Stack>

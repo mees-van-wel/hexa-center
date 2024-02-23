@@ -9,10 +9,13 @@ import { Paper, Table as TableComponent } from "@mantine/core";
 import { SearchBar } from "./SearchBar";
 
 import styles from "./Table.module.scss";
+
 type TableProps<T extends Record<string, any>> = {
   searchBarId?: string;
   columns: {
     selector: keyof T;
+    // TODO Typings
+    format?: (values: T) => React.ReactNode;
     label: string;
   }[];
   elements: T[];
@@ -35,8 +38,8 @@ export const Table = <T extends Record<string, any>>({
 
     const searchLower = val.toLowerCase();
     return elements.filter((element) =>
-      Object.values(element).some((value) =>
-        value.toString().toLowerCase().includes(searchLower),
+      Object.values(element).some(
+        (value) => value?.toString().toLowerCase().includes(searchLower),
       ),
     );
   }, [searchBarId, search, elements]);
@@ -60,9 +63,9 @@ export const Table = <T extends Record<string, any>>({
               className={onClick ? styles.clickableRow : undefined}
               onClick={onClick ? () => onClick(element) : undefined}
             >
-              {columns.map(({ selector }) => (
+              {columns.map(({ selector, format }) => (
                 <TableComponent.Td key={selector as string}>
-                  {element[selector]}
+                  {format ? format(element) : element[selector]}
                 </TableComponent.Td>
               ))}
             </TableComponent.Tr>

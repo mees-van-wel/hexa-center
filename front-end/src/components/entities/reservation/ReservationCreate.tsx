@@ -26,10 +26,13 @@ import { ReservationForm } from "./ReservationForm";
 
 type ReservationCreateProps = {
   rooms: RouterOutput["room"]["list"];
-  users: RouterOutput["user"]["list"];
+  relations: RouterOutput["relation"]["list"];
 };
 
-export const ReservationCreate = ({ rooms, users }: ReservationCreateProps) => {
+export const ReservationCreate = ({
+  rooms,
+  relations,
+}: ReservationCreateProps) => {
   const t = useTranslation();
 
   const formMethods = useForm<ReservationInputCreateSchema>({
@@ -60,14 +63,14 @@ export const ReservationCreate = ({ rooms, users }: ReservationCreateProps) => {
         >
           <SaveButton />
         </DashboardHeader>
-        <ReservationForm rooms={rooms} users={users} />
+        <ReservationForm rooms={rooms} relations={relations} />
       </Stack>
     </FormProvider>
   );
 };
 
 const SaveButton = () => {
-  const createUser = useMutation("reservation", "create");
+  const createReservation = useMutation("reservation", "create");
   const router = useRouter();
   const t = useTranslation();
 
@@ -87,7 +90,7 @@ const SaveButton = () => {
       return;
     }
 
-    const response = await createUser.mutate(values);
+    const response = await createReservation.mutate(values);
 
     notifications.show({
       message: t("entities.reservation.reservationCreated"),
@@ -102,7 +105,7 @@ const SaveButton = () => {
       onClick={handleSubmit(submitHandler)}
       leftSection={<IconDeviceFloppy />}
       disabled={!isDirty}
-      loading={createUser.loading}
+      loading={createReservation.loading}
     >
       {t("common.save")}
     </Button>

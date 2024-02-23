@@ -34,13 +34,13 @@ import { ReservationForm } from "./ReservationForm";
 type ReservationProps = {
   reservation: RouterOutput["reservation"]["get"];
   rooms: RouterOutput["room"]["list"];
-  users: RouterOutput["user"]["list"];
+  relations: RouterOutput["relation"]["list"];
 };
 
 export const ReservationUpdate = ({
   reservation,
   rooms,
-  users,
+  relations,
 }: ReservationProps) => {
   const t = useTranslation();
   const router = useRouter();
@@ -79,7 +79,7 @@ export const ReservationUpdate = ({
               href: "/reservations",
             },
             {
-              label: `${reservation.customer.firstName} ${reservation.customer.lastName}`,
+              label: reservation.customer.name,
             },
           ]}
         >
@@ -93,7 +93,7 @@ export const ReservationUpdate = ({
           </Button>
           <SaveBadge />
         </DashboardHeader>
-        <ReservationForm rooms={rooms} users={users} />
+        <ReservationForm rooms={rooms} relations={relations} />
       </Stack>
     </FormProvider>
   );
@@ -130,8 +130,8 @@ const SaveBadge = () => {
         return;
       }
       const updatedReservation = await updateReservation.mutate({
-        ...values,
         id: getValues("id"),
+        ...values,
       });
 
       reset(updatedReservation);
