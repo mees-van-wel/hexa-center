@@ -2,7 +2,6 @@ import { relations as relationBuilder, sql } from "drizzle-orm";
 import {
   AnyPgColumn,
   date,
-  doublePrecision,
   integer,
   jsonb,
   numeric,
@@ -286,7 +285,10 @@ export const rooms = pgTable("rooms", {
     .references(() => properties.id, { onDelete: "restrict" })
     .notNull(),
   name: text("name").unique().notNull(),
-  price: doublePrecision("price").notNull(),
+  price: numeric("price", {
+    precision: 10,
+    scale: 2,
+  }).notNull(),
 });
 
 export const roomsRelations = relationBuilder(rooms, ({ one }) => ({
@@ -303,6 +305,62 @@ export const roomsRelations = relationBuilder(rooms, ({ one }) => ({
     references: [properties.id],
   }),
 }));
+
+export const reservations = pgTable("reservations", {
+  $kind: text("$kind").default("reservation").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .default(sql`now()`)
+    .notNull(),
+  createdById: integer("created_by_id").references(
+    (): AnyPgColumn => relations.id,
+    {
+      onDelete: "set null",
+    },
+  ),
+  updatedById: integer("updated_by_id").references(
+    (): AnyPgColumn => relations.id,
+    {
+      onDelete: "set null",
+    },
+  ),
+  roomId: integer("room_id")
+    .references(() => rooms.id, { onDelete: "restrict" })
+    .notNull(),
+  customerId: integer("customer_id")
+    .references(() => relations.id, { onDelete: "restrict" })
+    .notNull(),
+  startDate: timestamp("start_date", { withTimezone: true }).notNull(),
+  endDate: timestamp("end_date", { withTimezone: true }).notNull(),
+  notes: text("notes"),
+  guestName: text("guest_name"),
+});
+
+export const reservationsRelations = relationBuilder(
+  reservations,
+  ({ one }) => ({
+    createdBy: one(relations, {
+      fields: [reservations.createdById],
+      references: [relations.id],
+    }),
+    updatedBy: one(relations, {
+      fields: [reservations.updatedById],
+      references: [relations.id],
+    }),
+    customer: one(relations, {
+      fields: [reservations.customerId],
+      references: [relations.id],
+    }),
+    room: one(rooms, {
+      fields: [reservations.roomId],
+      references: [rooms.id],
+    }),
+  }),
+);
 
 export const invoiceRefTypeEnum = pgEnum("invoice_ref_type", [
   "invoice",
@@ -332,9 +390,7 @@ export const invoices = pgTable("invoices", {
     .notNull(),
   createdById: integer("created_by_id").references(
     (): AnyPgColumn => relations.id,
-    {
-      onDelete: "set null",
-    },
+    { onDelete: "set null" },
   ),
   refType: invoiceRefTypeEnum("ref_type").notNull(),
   refId: integer("ref_id").notNull(),

@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration.js";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, or, sql } from "drizzle-orm";
 import { date, number, object } from "valibot";
 
 import db from "@/db/client";
@@ -60,7 +60,9 @@ export const invoiceRouter = router({
         .select()
         .from(invoices)
         .where(eq(invoices.id, invoiceId));
+
       const invoice = invoicesResult[0];
+
       if (!invoice)
         throw new TRPCError({
           code: "NOT_FOUND",
@@ -109,7 +111,10 @@ export const invoiceRouter = router({
           })
           .from(invoices)
           .where(
-            sql`EXTRACT(YEAR FROM ${invoices.date}) = ${date.getFullYear()}`,
+            and(
+              sql`EXTRACT(YEAR FROM ${invoices.date}) = ${date.getFullYear()}`,
+              or(eq(invoices.type, "standard"), eq(invoices.type, "final")),
+            ),
           ),
       ]);
 
@@ -129,6 +134,8 @@ export const invoiceRouter = router({
 
       const { count } = countResult[0];
 
+      // TODO only update when empty (customer/company)
+
       await db
         .update(invoices)
         .set({
@@ -138,7 +145,9 @@ export const invoiceRouter = router({
             invoice.type !== "credit" && invoice.type !== "quotation"
               ? dayjs(date).add(dayjs.duration(companyPaymentTerms)).toDate()
               : undefined,
-          number: date.getFullYear() + (count + 1).toString().padStart(4, "0"),
+          number:
+            invoice.number ||
+            date.getFullYear() + (count + 1).toString().padStart(4, "0"),
           customerName: customer.name,
           customerEmailAddress: customer.emailAddress,
           customerPhoneNumber: customer.phoneNumber,
@@ -262,9 +271,13 @@ export const invoiceRouter = router({
             refId: input,
             type: "credit",
             status: "draft",
-            discountAmount: "-" + invoice.discountAmount,
+            discountAmount: invoice.discountAmount
+              ? "-" + invoice.discountAmount
+              : null,
             totalNetAmount: "-" + invoice.totalNetAmount,
-            totalDiscountAmount: "-" + invoice.totalDiscountAmount,
+            totalDiscountAmount: invoice.totalDiscountAmount
+              ? "-" + invoice.totalDiscountAmount
+              : null,
             totalTaxAmount: "-" + invoice.totalTaxAmount,
             totalGrossAmount: "-" + invoice.totalGrossAmount,
             number: invoice.number + "-C",
@@ -307,7 +320,9 @@ export const invoiceRouter = router({
           unitNetAmount: "-" + invoiceLine.unitNetAmount,
           quantity: invoiceLine.quantity,
           totalNetAmount: "-" + invoiceLine.totalNetAmount,
-          discountAmount: "-" + invoiceLine.discountAmount,
+          discountAmount: invoiceLine.discountAmount
+            ? "-" + invoiceLine.discountAmount
+            : null,
           totalTaxAmount: "-" + invoiceLine.totalTaxAmount,
           taxPercentage: invoiceLine.taxPercentage,
           totalGrossAmount: "-" + invoiceLine.totalGrossAmount,

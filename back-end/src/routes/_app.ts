@@ -5,13 +5,15 @@ import { router } from "../trpc";
 import { authRouter } from "./auth";
 import { invoiceRouter } from "./invoice";
 import { relationRouter } from "./relation";
+import { reservationRouter } from "./reservation";
 import { roomRouter } from "./room";
 
 export const appRouter = router({
   auth: authRouter,
   relation: relationRouter,
-  invoice: invoiceRouter,
   room: roomRouter,
+  reservation: reservationRouter,
+  invoice: invoiceRouter,
 });
 
 export type AppRouter = typeof appRouter;

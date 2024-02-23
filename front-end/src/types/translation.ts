@@ -18,6 +18,10 @@ export type Translation = {
     no: string;
     error: string;
     oops: string;
+    today: string;
+    week: string;
+    workweek: string;
+    day: string;
   };
   modules: {
     essentials: string;
@@ -51,6 +55,26 @@ export type Translation = {
         button: string;
       };
     };
+    reservation: {
+      name: {
+        singular: string;
+        plural: string;
+      };
+      keys: {
+        roomId: string;
+        customerId: string;
+        startDate: string;
+        endDate: string;
+        notes: string;
+        guestName: string;
+      };
+      calendar: {
+        noRooms: string;
+      };
+      reservationCreated: string;
+      roomDeleted: string;
+      dateError: string;
+    };
     invoice: {
       singularName: string;
       pluralName: string;
@@ -71,6 +95,54 @@ export type Translation = {
       issuedMessage: string;
       mailedMessage: string;
       creditedMessage: string;
+    };
+  };
+  dates: {
+    weekdayNames: {
+      FRIDAY: string;
+      MONDAY: string;
+      SATURDAY: string;
+      SUNDAY: string;
+      THURSDAY: string;
+      TUESDAY: string;
+      WEDNESDAY: string;
+    };
+    weekdayNamesShort: {
+      FRIDAY: string;
+      MONDAY: string;
+      SATURDAY: string;
+      SUNDAY: string;
+      THURSDAY: string;
+      TUESDAY: string;
+      WEDNESDAY: string;
+    };
+    monthsLong: {
+      JANUARY: string;
+      FEBRUARY: string;
+      MARCH: string;
+      APRIL: string;
+      MAY: string;
+      JUNE: string;
+      JULY: string;
+      AUGUST: string;
+      SEPTEMBER: string;
+      OCTOBER: string;
+      NOVEMBER: string;
+      DECEMBER: string;
+    };
+    monthsShort: {
+      JANUARY: string;
+      FEBRUARY: string;
+      MARCH: string;
+      APRIL: string;
+      MAY: string;
+      JUNE: string;
+      JULY: string;
+      AUGUST: string;
+      SEPTEMBER: string;
+      OCTOBER: string;
+      NOVEMBER: string;
+      DECEMBER: string;
     };
   };
   authLayout: {
@@ -122,6 +194,13 @@ export type Translation = {
       description: string;
     };
     loggedInSuccess: string;
+  };
+  roomsPage: {
+    price: string;
+    noRooms: string;
+    confirmDeleteModal: string;
+    roomDeleted: string;
+    roomCreated: string;
   };
   components: {
     address: {

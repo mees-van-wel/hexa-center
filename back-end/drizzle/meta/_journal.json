@@ -5,64 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1706186184652,
-      "tag": "0000_handy_the_order",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1706549987576,
-      "tag": "0001_burly_arclight",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1707414341136,
-      "tag": "0002_parched_mach_iv",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1707414403646,
-      "tag": "0003_milky_frog_thor",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1707415421275,
-      "tag": "0004_robust_leech",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "5",
-      "when": 1708021653394,
-      "tag": "0005_bouncy_squirrel_girl",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "5",
-      "when": 1708026630225,
-      "tag": "0006_heavy_cyclops",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "5",
-      "when": 1708040495642,
-      "tag": "0007_previous_absorbing_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "5",
-      "when": 1708044500942,
-      "tag": "0008_amused_gertrude_yorkes",
+      "when": 1708703823789,
+      "tag": "0000_free_monster_badoon",
       "breakpoints": true
     }
   ]

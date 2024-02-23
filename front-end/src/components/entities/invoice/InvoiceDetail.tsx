@@ -7,6 +7,7 @@ import dayjs from "dayjs";
 
 import { Band } from "@/components/common/Band";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
+import { CountryKey } from "@/constants/countries";
 import { INVOICE_EVENT_TYPE_META } from "@/constants/invoiceEventTypes";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -199,9 +200,10 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
 
   const customerVatNumber =
     invoice.customerVatNumber || invoice.customer?.vatNumber;
-
   const customerCocNumber =
     invoice.customerCocNumber || invoice.customer?.cocNumber;
+  const customerCountry = invoice.customerCountry || invoice.customer?.country;
+  const companyCountry = invoice.companyCountry || invoice.company?.country;
 
   return (
     <Stack>
@@ -355,12 +357,13 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   </p>
                   <p style={{ whiteSpace: "nowrap" }}>
                     {invoice.customerRegion || invoice.customer?.region}
-                    {" - "}
-                    {t(
-                      `constants.countries.${
-                        invoice.customerCountry || invoice.customer?.country
-                      }`,
-                    )}
+                    {customerCountry &&
+                      "-" +
+                        t(
+                          `constants.countries.${
+                            customerCountry as CountryKey
+                          }`,
+                        )}
                   </p>
                 </div>
                 <div>
@@ -430,12 +433,11 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   </p>
                   <p style={{ whiteSpace: "nowrap" }}>
                     {invoice.companyRegion || invoice.company?.region}
-                    {" - "}
-                    {t(
-                      `constants.countries.${
-                        invoice.companyCountry || invoice.company?.country
-                      }`,
-                    )}
+                    {companyCountry &&
+                      "-" +
+                        t(
+                          `constants.countries.${companyCountry as CountryKey}`,
+                        )}
                   </p>
                 </div>
                 <div>

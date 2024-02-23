@@ -3,12 +3,10 @@
 import { Controller, useFormContext } from "react-hook-form";
 
 import { useTranslation } from "@/hooks/useTranslation";
-import {
-  RoomInputCreateSchema,
-  RoomInputUpdateSchema,
-} from "@hexa-center/shared/schemas/room";
-import { NumberInput, Stack, TextInput } from "@mantine/core";
- 
+import { RoomInputCreateSchema, RoomInputUpdateSchema } from "@/schemas/room";
+import { Group, NumberInput, TextInput } from "@mantine/core";
+import { IconCurrencyEuro } from "@tabler/icons-react";
+
 export const RoomForm = () => {
   const t = useTranslation();
   const {
@@ -18,7 +16,7 @@ export const RoomForm = () => {
   } = useFormContext<RoomInputCreateSchema | RoomInputUpdateSchema>();
 
   return (
-    <Stack>
+    <Group>
       <TextInput
         {...register("name")}
         error={errors.name?.message}
@@ -32,9 +30,13 @@ export const RoomForm = () => {
             {...field}
             error={error?.message}
             label={t("roomsPage.price")}
+            leftSection={<IconCurrencyEuro size="1rem" />}
+            decimalScale={2}
+            decimalSeparator=","
+            fixedDecimalScale
           />
         )}
       />
-    </Stack>
+    </Group>
   );
 };

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { Table } from "@/components/common/Table";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
@@ -15,6 +16,7 @@ type RoomsProps = {
 
 export const Rooms = ({ rooms }: RoomsProps) => {
   const t = useTranslation();
+  const router = useRouter();
 
   return (
     <Stack>
@@ -24,6 +26,9 @@ export const Rooms = ({ rooms }: RoomsProps) => {
         </Button>
       </DashboardHeader>
       <Table
+        onClick={({ id }) => {
+          router.push(`/rooms/${id}`);
+        }}
         columns={[
           {
             selector: "name",
@@ -32,6 +37,11 @@ export const Rooms = ({ rooms }: RoomsProps) => {
           {
             selector: "price",
             label: t("roomsPage.price"),
+            format: ({ price }) =>
+              Intl.NumberFormat("nl-NL", {
+                style: "currency",
+                currency: "EUR",
+              }).format(parseFloat(price)),
           },
           {
             selector: "id",
