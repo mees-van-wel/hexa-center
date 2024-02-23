@@ -23,7 +23,6 @@ import {
   Timeline,
   Title,
 } from "@mantine/core";
-import { DateInput } from "@mantine/dates";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import {
@@ -37,7 +36,7 @@ import {
 } from "@tabler/icons-react";
 import { IconDownload } from "@tabler/icons-react";
 
-const now = new Date();
+import { IssueModal } from "./IssueModal";
 
 type InvoiceDetailProps = {
   invoice: RouterOutput["invoice"]["get"];
@@ -52,7 +51,6 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
   const mailInvoice = useMutation("invoice", "mail");
   const creditInvoice = useMutation("invoice", "credit");
   const [issueLoading, setIssueLoading] = useState(false);
-  const [issueDate, setIssueDate] = useState(now);
   const [downloadLoading, setDownloadLoading] = useState(false);
   const [printLoading, setPrintLoading] = useState(false);
   const [mailLoading, setmailLoading] = useState(false);
@@ -60,45 +58,36 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
   const router = useRouter();
 
   const issueHandler = async () => {
-    modals.openConfirmModal({
+    const onConfirm = async (issueDate: Date) => {
+      setIssueLoading(true);
+
+      try {
+        await issueInvoice.mutate({
+          invoiceId: invoice.id,
+          date: issueDate,
+        });
+
+        router.refresh();
+
+        notifications.show({
+          message: "Issued successfully",
+          color: "green",
+        });
+      } catch (error) {
+        notifications.show({
+          title: "There was an error while issuing",
+          // @ts-ignore
+          message: error?.message || "...",
+          color: "red",
+        });
+      }
+
+      setIssueLoading(false);
+    };
+
+    modals.open({
       title: t("common.areYouSure"),
-      children: (
-        <DateInput
-          label="Date"
-          withAsterisk
-          defaultValue={issueDate}
-          onChange={(date) => {
-            if (date) setIssueDate(date);
-          }}
-        />
-      ),
-      labels: { confirm: t("common.yes"), cancel: t("common.no") },
-      onConfirm: async () => {
-        setIssueLoading(true);
-
-        try {
-          await issueInvoice.mutate({
-            invoiceId: invoice.id,
-            date: issueDate,
-          });
-
-          router.refresh();
-
-          notifications.show({
-            message: "Issued successfully",
-            color: "green",
-          });
-        } catch (error) {
-          notifications.show({
-            title: "There was an error while issuing",
-            // @ts-ignore
-            message: error?.message || "...",
-            color: "red",
-          });
-        }
-
-        setIssueLoading(false);
-      },
+      children: <IssueModal onConfirm={onConfirm} />,
     });
   };
 

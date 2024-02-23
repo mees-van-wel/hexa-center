@@ -8,7 +8,7 @@ type BandGroupProps = {
 
 export const BandGroup = ({ children }: BandGroupProps) => {
   return (
-    <Group className={styles.root} gap={0} align="stretch">
+    <Group className={styles.root} gap={0} align="stretch" wrap="nowrap">
       {children}
     </Group>
   );
