@@ -2,14 +2,14 @@ import { eq } from "drizzle-orm";
 import { number } from "valibot";
 
 import { wrap } from "@decs/typeschema";
+import {
+  ReservationCreateSchema,
+  ReservationUpdateSchema,
+} from "@front-end/schemas/reservation.js";
 import { TRPCError } from "@trpc/server";
 
 import db from "../db/client.js";
 import { reservations } from "../db/schema.js";
-import {
-  ReservationCreateSchema,
-  ReservationUpdateSchema,
-} from "../schemas/reservation.js";
 import { procedure, router } from "../trpc.js";
 
 export const reservationRouter = router({

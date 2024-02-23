@@ -2,6 +2,7 @@
 
 import { Controller, useFormContext } from "react-hook-form";
 
+import { Band } from "@/components/common/Band";
 import { useTranslation } from "@/hooks/useTranslation";
 import {
   ReservationInputCreateSchema,
@@ -9,14 +10,20 @@ import {
 } from "@/schemas/reservation";
 import { RouterOutput } from "@/utils/trpc";
 import {
+  Badge,
+  Button,
+  Card,
   Group,
   Paper,
   Select,
+  Space,
   Stack,
+  Text,
   Textarea,
   TextInput,
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
+import { IconFileEuro } from "@tabler/icons-react";
 
 type ReservationForm = {
   rooms: RouterOutput["room"]["list"];
@@ -43,7 +50,7 @@ export const ReservationForm = ({ rooms, relations }: ReservationForm) => {
         }));
 
   return (
-    <Paper p={"1rem"}>
+    <Paper p="md">
       <Stack>
         <Group>
           <Controller
@@ -127,6 +134,84 @@ export const ReservationForm = ({ rooms, relations }: ReservationForm) => {
           error={errors.guestName?.message}
           label={t("entities.reservation.keys.guestName")}
         />
+        <Space />
+        <Band title="Invoices">
+          <Group>
+            <Card shadow="sm" padding="lg" radius="md" withBorder maw={300}>
+              <Card.Section
+                style={{
+                  backgroundColor: "rgb(var(--color-background))",
+                  display: "grid",
+                  placeContent: "center",
+                  maxHeight: 100,
+                  overflow: "hidden",
+                }}
+              >
+                <Group p="1rem">
+                  <IconFileEuro
+                    size="1rem"
+                    stroke={1}
+                    style={{
+                      color: "gray",
+                      transform: "rotate(-45deg)",
+                    }}
+                  />
+                  <IconFileEuro
+                    size="2rem"
+                    stroke={1}
+                    style={{
+                      color: "gray",
+                      transform: "rotate(-22deg)",
+                    }}
+                  />
+                  <IconFileEuro
+                    size="5rem"
+                    stroke={1}
+                    style={{
+                      color: "gray",
+                      padding: "0.75rem",
+                      margin: "0",
+                      border: "3px dashed gray",
+                      transition: "margin var(--transition)",
+                      borderRadius: "100%",
+                    }}
+                  />
+                  <IconFileEuro
+                    size="2rem"
+                    stroke={1}
+                    style={{
+                      color: "gray",
+                      transform: "rotate(22deg)",
+                    }}
+                  />
+                  <IconFileEuro
+                    size="1rem"
+                    stroke={1}
+                    style={{
+                      color: "gray",
+                      transform: "rotate(45deg)",
+                    }}
+                  />
+                </Group>
+              </Card.Section>
+
+              <Group justify="space-between" mt="md" mb="xs">
+                <Text fw={500}>Invoice: 20240003</Text>
+                <Badge>Issued</Badge>
+              </Group>
+
+              <Text size="sm" c="dimmed">
+                With Fjord Tours you can explore more of the magical fjord
+                landscapes with tours and activities on and around the fjords of
+                Norway
+              </Text>
+
+              <Button color="blue" fullWidth mt="md" radius="md">
+                Book classic tour now
+              </Button>
+            </Card>
+          </Group>
+        </Band>
       </Stack>
     </Paper>
   );
