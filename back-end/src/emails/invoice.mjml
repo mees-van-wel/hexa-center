@@ -1,0 +1,6 @@
+<mj-column>
+  <mj-text align="center" font-size="20px" font-weight="bold">
+    {{title}}
+  </mj-text>
+  <mj-text align="center" padding="20px">{{message}}</mj-text>
+</mj-column>

@@ -1,12 +1,14 @@
 import { trpcTransformer } from "@/utils/trpcTransformer";
+import type {
+  AppRouter as AR,
+  RouterInput as RI,
+  RouterOutput as RO,
+} from "@back-end/routes/_app";
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
-import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 
-import type { appRouter } from "../../../back-end/src/routes/_app";
-
-export type AppRouter = typeof appRouter;
-export type RouterInput = inferRouterInputs<AppRouter>;
-export type RouterOutput = inferRouterOutputs<AppRouter>;
+export type AppRouter = AR;
+export type RouterInput = RI;
+export type RouterOutput = RO;
 
 let TRPCRefreshToken: string | undefined;
 

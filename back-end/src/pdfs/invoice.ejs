@@ -1,0 +1,243 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title><%= type %> <%= number %></title>
+    <style>
+      @page {
+        margin: 0;
+      }
+
+      * {
+        margin: 0;
+      }
+
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 1rem;
+      }
+
+      .invoice-box {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 2rem;
+        margin: auto;
+        min-height: 100vh;
+      }
+
+      .header-image {
+        width: 100%;
+      }
+
+      .content {
+        flex: 1;
+        justify-content: flex-start;
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+      }
+
+      .header-section {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 0.25rem;
+        font-size: 1.25rem;
+        /* margin: 0 auto; */
+        text-align: left;
+      }
+
+      .detail-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .detail-box {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .detail-box-right {
+        text-align: right;
+      }
+
+      .invoice-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.7rem;
+      }
+
+      .invoice-table th,
+      .invoice-table td {
+        text-align: left;
+        padding: 8px;
+      }
+
+      .invoice-table th {
+        background-color: #f2f2f2;
+      }
+
+      .total {
+        text-align: right;
+      }
+
+      .total td {
+        border-top: solid 1px #f2f2f2;
+      }
+
+      .footer-text {
+        font-size: 0.75rem;
+      }
+
+      .footer-image {
+        width: 100%;
+      }
+
+      @media print {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="invoice-box">
+      <% if (headerImageSrc) { %>
+      <img class="header-image" src="<%= headerImageSrc %>" />
+      <% } %>
+      <div class="content">
+        <div class="header-section">
+          <p>
+            <strong>Type:</strong>
+            <%= type %>
+          </p>
+          <p>
+            <strong>Number:</strong>
+            <%= number %>
+          </p>
+          <p>
+            <strong>Date:</strong>
+            <%= date %>
+          </p>
+        </div>
+        <div class="detail-section">
+          <div class="detail-box">
+            <strong>To:</strong>
+            <div>
+              <p><%= customerName %></p>
+              <p><%= customerStreet %> <%= customerHouseNumber %></p>
+              <p><%= customerPostalCode %> <%= customerCity %></p>
+              <p><%= customerCountry %></p>
+            </div>
+            <div>
+              <p>Email address: <%= customerEmailAddress %></p>
+              <p>Phone number: <%= customerPhoneNumber %></p>
+            </div>
+            <% if (customerCocNumber || customerVatNumber) { %>
+            <div>
+              <% if (customerCocNumber) { %>
+              <p>CoC-number: <%= customerCocNumber %></p>
+              <% } %>
+              <% if (customerVatNumber) { %>
+              <p>VAT tax number: <%= customerVatNumber %></p>
+              <% } %>
+            </div>
+            <% } %>
+          </div>
+          <div class="detail-box detail-box-right">
+            <strong>From:</strong>
+            <div>
+              <p><%= companyName %></p>
+              <p><%= companyStreet %> <%= companyHouseNumber %></p>
+              <p><%= companyPostalCode %> <%= companyCity %></p>
+              <p><%= companyCountry %></p>
+            </div>
+            <div>
+              <p>Email address: <%= companyEmailAddress %></p>
+              <p>Phone number: <%= companyPhoneNumber %></p>
+            </div>
+            <div>
+              <p>CoC-number: <%= companyCocNumber %></p>
+              <p>VAT tax number: <%= companyVatNumber %></p>
+            </div>
+            <div>
+              <p>IBAN: <%= companyIban %></p>
+              <p>SWIFT/BIC Code: <%= companySwiftBic %></p>
+            </div>
+          </div>
+        </div>
+        <% if (comments) { %>
+        <p><%= comments %></p>
+        <% } %>
+        <table class="invoice-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <% if (hasComments) { %>
+              <th>Comments</th>
+              <% } %>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Total net</th>
+              <% if (totalDiscountAmount) { %>
+              <th>Discount</th>
+              <% } %>
+              <th>VAT</th>
+              <th>Total gross</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% lines.forEach(function(line) { %>
+            <tr>
+              <td><%= line.name %></td>
+              <% if (hasComments) { %>
+              <td><%= line.comments %></td>
+              <% } %>
+              <td><%= line.unitNetAmount %></td>
+              <td><%= line.quantity %>x</td>
+              <td><%= line.totalNetAmount %></td>
+              <% if (totalDiscountAmount) { %>
+              <td><%= line.discountAmount %></td>
+              <% } %>
+              <td>
+                <%= line.totalTaxAmount %>
+                (<%= line.taxPercentage %>%)
+              </td>
+              <td><%= line.totalGrossAmount %></td>
+            </tr>
+            <% }); %>
+          </tbody>
+          <tfoot class="total">
+            <tr>
+              <th></th>
+              <% if (hasComments) { %>
+              <th></th>
+              <% } %>
+              <th></th>
+              <th>Total</th>
+              <td><%= totalNetAmount %></td>
+              <% if (totalDiscountAmount) { %>
+              <td><%= totalDiscountAmount %></td>
+              <% } %>
+              <td><%= totalTaxAmount %></td>
+              <td><%= totalGrossAmount %></td>
+            </tr>
+          </tfoot>
+        </table>
+        <% if (dueDate) { %>
+        <p class="footer-text">
+          We kindly request that you transfer the amount due before <%= dueDate
+          %>
+        </p>
+        <% } %>
+      </div>
+      <% if (footerImageSrc) { %>
+      <img class="footer-image" src="<%= footerImageSrc %>" />
+      <% } %>
+    </div>
+  </body>
+</html>
