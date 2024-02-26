@@ -8,6 +8,13 @@
       "when": 1708703823789,
       "tag": "0000_free_monster_badoon",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1708953498493,
+      "tag": "0001_striped_risque",
+      "breakpoints": true
     }
   ]
 }

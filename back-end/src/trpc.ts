@@ -74,6 +74,10 @@ export const createContext = async ({
           theme: true,
           color: true,
           timezone: true,
+          dateFormat: true,
+          decimalSeparator: true,
+          timeFormat: true,
+          firstDayOfWeek: true,
         },
         with: {
           workingHours: {

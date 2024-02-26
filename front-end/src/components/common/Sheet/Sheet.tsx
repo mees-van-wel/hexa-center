@@ -9,13 +9,13 @@ import { IconEye, IconEyeOff } from "@tabler/icons-react";
 
 import styles from "./Sheet.module.scss";
 
-interface SheetProps {
+type SheetProps = {
   title: string;
   showDefault?: boolean;
   children?: React.ReactNode;
-}
+};
 
-export default function Sheet({ title, showDefault, children }: SheetProps) {
+export const Sheet = ({ title, showDefault, children }: SheetProps) => {
   const t = useTranslation();
   const [show, setShow] = useState(
     showDefault === undefined ? true : showDefault,
@@ -28,7 +28,7 @@ export default function Sheet({ title, showDefault, children }: SheetProps) {
           [styles.headerOpen]: show,
         })}
       >
-        <Group>
+        <Group gap={0}>
           <Title order={3} className={styles.title}>
             {title}
           </Title>
@@ -49,4 +49,4 @@ export default function Sheet({ title, showDefault, children }: SheetProps) {
       {show && <Paper className={styles.content}>{children}</Paper>}
     </Stack>
   );
-}
+};

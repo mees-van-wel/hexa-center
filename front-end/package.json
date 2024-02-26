@@ -27,6 +27,7 @@
     "@trpc/client": "^10.44.1",
     "awesome-phonenumber": "^6.2.0",
     "clsx": "^2.0.0",
+    "countries-and-timezones": "^3.6.0",
     "dayjs": "^1.11.10",
     "modern-normalize": "^2.0.0",
     "msgpackr": "^1.10.0",

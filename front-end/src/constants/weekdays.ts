@@ -9,8 +9,8 @@ export const WEEKDAYS = {
 } as const;
 
 export type Weekdays = typeof WEEKDAYS;
-export type WeekdayKeys = keyof Weekdays;
-export type Weekday = Weekdays[WeekdayKeys];
+export type WeekdayKey = keyof Weekdays;
+export type Weekday = Weekdays[WeekdayKey];
 
-export const WEEKDAY_KEYS = Object.keys(WEEKDAYS) as WeekdayKeys[];
+export const WEEKDAY_KEYS = Object.keys(WEEKDAYS) as WeekdayKey[];
 export const WEEKDAY_VALUES = Object.values(WEEKDAYS) as Weekday[];
