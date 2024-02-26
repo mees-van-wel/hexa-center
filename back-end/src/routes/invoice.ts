@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration.js";
-import { and, eq, or, sql } from "drizzle-orm";
+import { and, desc, eq, or, sql } from "drizzle-orm";
 import { date, number, object } from "valibot";
 
 import db from "@/db/client";
@@ -41,6 +41,7 @@ export const invoiceRouter = router({
         date: true,
         totalGrossAmount: true,
       },
+      orderBy: desc(invoices.date),
     }),
   ),
   get: procedure
@@ -245,6 +246,8 @@ export const invoiceRouter = router({
   credit: procedure.input(wrap(number())).mutation(async ({ input, ctx }) => {
     const invoicesResult = await db
       .select({
+        refType: invoices.refType,
+        refId: invoices.refId,
         discountAmount: invoices.discountAmount,
         totalNetAmount: invoices.totalNetAmount,
         totalDiscountAmount: invoices.totalDiscountAmount,
@@ -267,8 +270,8 @@ export const invoiceRouter = router({
           .insert(invoices)
           .values({
             createdById: ctx.relation.id,
-            refType: "invoice",
-            refId: input,
+            refType: invoice.refType,
+            refId: invoice.refId,
             type: "credit",
             status: "draft",
             discountAmount: invoice.discountAmount

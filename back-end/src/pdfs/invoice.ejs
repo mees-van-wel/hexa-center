@@ -112,17 +112,12 @@
       <div class="content">
         <div class="header-section">
           <p>
-            <strong>Type:</strong>
-            <%= type %>
+            <strong>
+              <%= type %>:
+              <%= number %>
+            </strong>
           </p>
-          <p>
-            <strong>Number:</strong>
-            <%= number %>
-          </p>
-          <p>
-            <strong>Date:</strong>
-            <%= date %>
-          </p>
+          <p><%= date %></p>
         </div>
         <div class="detail-section">
           <div class="detail-box">
@@ -182,10 +177,10 @@
               <% } %>
               <th>Price</th>
               <th>Quantity</th>
-              <th>Total net</th>
               <% if (totalDiscountAmount) { %>
               <th>Discount</th>
               <% } %>
+              <th>Total net</th>
               <th>VAT</th>
               <th>Total gross</th>
             </tr>
@@ -199,10 +194,10 @@
               <% } %>
               <td><%= line.unitNetAmount %></td>
               <td><%= line.quantity %>x</td>
-              <td><%= line.totalNetAmount %></td>
               <% if (totalDiscountAmount) { %>
               <td><%= line.discountAmount %></td>
               <% } %>
+              <td><%= line.totalNetAmount %></td>
               <td>
                 <%= line.totalTaxAmount %>
                 (<%= line.taxPercentage %>%)
@@ -219,10 +214,10 @@
               <% } %>
               <th></th>
               <th>Total</th>
-              <td><%= totalNetAmount %></td>
               <% if (totalDiscountAmount) { %>
               <td><%= totalDiscountAmount %></td>
               <% } %>
+              <td><%= totalNetAmount %></td>
               <td><%= totalTaxAmount %></td>
               <td><%= totalGrossAmount %></td>
             </tr>

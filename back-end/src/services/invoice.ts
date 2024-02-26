@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import { eq } from "drizzle-orm";
 
 import db from "@/db/client";
-import { invoices } from "@/db/schema";
+import { invoiceLines, invoices } from "@/db/schema";
 import { generatePdf } from "@/utils/pdf";
 import { TRPCError } from "@trpc/server";
 
@@ -272,4 +272,145 @@ export const generateInvoicePdf = async (invoiceId: number) => {
     base64: pdfBuffer.toString("base64"),
     invoice,
   };
+};
+
+type CreateInvoiceProps = {
+  createdById: number;
+  refType: "reservation" | "invoice";
+  refId: number;
+  type: "standard" | "quotation" | "credit" | "final";
+  customerId: number;
+  companyId: number;
+  lines: {
+    name: string;
+    unitNetAmount: string;
+    quantity: string;
+    taxPercentage: string;
+    discountAmount?: string;
+    comments?: string;
+  }[];
+  discountAmount?: string;
+  comments?: string;
+};
+
+export const createInvoice = async ({
+  createdById,
+  refType,
+  refId,
+  type,
+  customerId,
+  companyId,
+  lines,
+  discountAmount,
+  comments,
+}: CreateInvoiceProps) => {
+  const {
+    totalNetAmount,
+    totalDiscountAmount,
+    totalTaxAmount,
+    totalGrossAmount,
+    lineValues,
+  } = lines.reduce<{
+    totalNetAmount: number;
+    totalDiscountAmount: number;
+    totalTaxAmount: number;
+    totalGrossAmount: number;
+    lineValues: {
+      totalNetAmount: number;
+      totalTaxAmount: number;
+      totalGrossAmount: number;
+    }[];
+  }>(
+    (acc, line) => {
+      const taxPercentage = parseFloat(line.taxPercentage);
+      const unitNetAmount = parseFloat(line.unitNetAmount);
+      const quantity = parseFloat(line.quantity);
+      const discountAmount = line.discountAmount
+        ? parseFloat(line.discountAmount)
+        : 0;
+
+      const totalNetAmount = unitNetAmount * quantity - discountAmount;
+      let totalTaxAmount = (taxPercentage / 100) * totalNetAmount;
+      totalTaxAmount = Math.floor(totalTaxAmount * 100) / 100;
+      const totalGrossAmount = totalNetAmount + totalTaxAmount;
+
+      return {
+        totalNetAmount: acc.totalNetAmount + totalNetAmount,
+        totalDiscountAmount: acc.totalDiscountAmount + discountAmount,
+        totalTaxAmount: acc.totalTaxAmount + totalTaxAmount,
+        totalGrossAmount: acc.totalGrossAmount + totalGrossAmount,
+        lineValues: acc.lineValues.concat([
+          {
+            totalNetAmount,
+            totalTaxAmount,
+            totalGrossAmount,
+          },
+        ]),
+      };
+    },
+    {
+      totalNetAmount: 0,
+      totalDiscountAmount: discountAmount ? parseFloat(discountAmount) : 0,
+      totalTaxAmount: 0,
+      totalGrossAmount: 0,
+      lineValues: [],
+    },
+  );
+
+  const invoiceInsertResult = await db
+    .insert(invoices)
+    .values({
+      createdById,
+      refType,
+      refId,
+      type,
+      status: "draft",
+      discountAmount,
+      totalNetAmount,
+      totalDiscountAmount,
+      totalTaxAmount,
+      totalGrossAmount,
+      customerId,
+      companyId,
+      comments,
+    })
+    .returning({
+      id: invoices.id,
+    });
+
+  const invoice = invoiceInsertResult[0];
+
+  await db.insert(invoiceLines).values(
+    lines.map(
+      (
+        {
+          name,
+          comments,
+          unitNetAmount,
+          quantity,
+          discountAmount,
+          taxPercentage,
+        },
+        index,
+      ) => {
+        const { totalNetAmount, totalTaxAmount, totalGrossAmount } =
+          lineValues[index];
+
+        return {
+          invoiceId: invoice.id,
+          name,
+          comments,
+          unitNetAmount,
+          quantity,
+          totalNetAmount: totalNetAmount.toString(),
+          discountAmount,
+          totalTaxAmount: totalTaxAmount.toString(),
+          taxPercentage,
+          totalGrossAmount: totalGrossAmount.toString(),
+        };
+      },
+    ),
+  );
+
+  return invoice.id;
 };

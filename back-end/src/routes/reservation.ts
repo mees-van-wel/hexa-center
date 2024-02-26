@@ -1,16 +1,17 @@
+import dayjs from "dayjs";
 import { eq } from "drizzle-orm";
-import { number } from "valibot";
+import { date, number, object } from "valibot";
 
+import db from "@/db/client";
+import { reservations, reservationsToInvoices } from "@/db/schema";
+import { createInvoice } from "@/services/invoice";
+import { procedure, router } from "@/trpc";
 import { wrap } from "@decs/typeschema";
 import {
   ReservationCreateSchema,
   ReservationUpdateSchema,
-} from "@front-end/schemas/reservation.js";
+} from "@front-end/schemas/reservation";
 import { TRPCError } from "@trpc/server";
-
-import db from "../db/client.js";
-import { reservations } from "../db/schema.js";
-import { procedure, router } from "../trpc.js";
 
 export const reservationRouter = router({
   create: procedure
@@ -53,11 +54,27 @@ export const reservationRouter = router({
   ),
   get: procedure.input(wrap(number())).query(async ({ input }) => {
     const reservation = await db.query.reservations.findFirst({
-      where: eq(reservations.id, input),
       with: {
         customer: true,
         room: true,
+        reservationsToInvoices: {
+          with: {
+            invoice: {
+              columns: {
+                $kind: true,
+                id: true,
+                createdAt: true,
+                type: true,
+                status: true,
+                number: true,
+                date: true,
+                totalGrossAmount: true,
+              },
+            },
+          },
+        },
       },
+      where: eq(reservations.id, input),
     });
 
     if (!reservation) throw new TRPCError({ code: "NOT_FOUND" });
@@ -99,4 +116,55 @@ export const reservationRouter = router({
     .mutation(({ input }) =>
       db.delete(reservations).where(eq(reservations.id, input)),
     ),
+  invoicePeriod: procedure
+    .input(
+      wrap(
+        object({
+          reservationId: number(),
+          startDate: date(),
+          endDate: date(),
+        }),
+      ),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const reservation = await db.query.reservations.findFirst({
+        with: {
+          room: true,
+        },
+        where: eq(reservations.id, input.reservationId),
+      });
+
+      if (!reservation) throw new TRPCError({ code: "NOT_FOUND" });
+
+      const totalNights = dayjs(input.endDate).diff(
+        dayjs(input.startDate),
+        "days",
+      );
+
+      const invoiceId = await createInvoice({
+        createdById: ctx.relation.id,
+        refType: "reservation",
+        refId: input.reservationId,
+        type: "standard",
+        customerId: reservation.customerId,
+        companyId: ctx.relation.propertyId,
+        lines: [
+          {
+            name: "Overnight Stays",
+            unitNetAmount: reservation.room.price,
+            quantity: totalNights.toString(),
+            taxPercentage: "21",
+          },
+        ],
+      });
+
+      await db.insert(reservationsToInvoices).values({
+        reservationId: reservation.id,
+        invoiceId,
+        startDate: input.startDate,
+        endDate: input.endDate,
+      });
+
+      return invoiceId;
+    }),
 });

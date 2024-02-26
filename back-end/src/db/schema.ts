@@ -103,11 +103,9 @@ export const permissions = pgTable(
       .notNull(),
     key: text("key").notNull(),
   },
-  (table) => {
-    return {
-      pk: primaryKey({ columns: [table.roleId, table.key] }),
-    };
-  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.roleId, t.key] }),
+  }),
 );
 
 export const permissionsRelations = relationBuilder(permissions, ({ one }) => ({
@@ -342,7 +340,7 @@ export const reservations = pgTable("reservations", {
 
 export const reservationsRelations = relationBuilder(
   reservations,
-  ({ one }) => ({
+  ({ one, many }) => ({
     createdBy: one(relations, {
       fields: [reservations.createdById],
       references: [relations.id],
@@ -359,6 +357,7 @@ export const reservationsRelations = relationBuilder(
       fields: [reservations.roomId],
       references: [rooms.id],
     }),
+    reservationsToInvoices: many(reservationsToInvoices),
   }),
 );
 
@@ -467,6 +466,7 @@ export const invoicesRelations = relationBuilder(invoices, ({ one, many }) => ({
   }),
   lines: many(invoiceLines),
   events: many(invoiceEvents),
+  reservationsToInvoices: many(reservationsToInvoices),
 }));
 
 export const invoiceLines = pgTable("invoice_lines", {
@@ -551,6 +551,37 @@ export const invoiceEventsRelations = relationBuilder(
     }),
     invoice: one(invoices, {
       fields: [invoiceEvents.invoiceId],
+      references: [invoices.id],
+    }),
+  }),
+);
+
+export const reservationsToInvoices = pgTable(
+  "reservations_to_invoices",
+  {
+    reservationId: integer("reservation_id")
+      .notNull()
+      .references(() => reservations.id, { onDelete: "cascade" }),
+    invoiceId: integer("invoice_id")
+      .notNull()
+      .references(() => invoices.id, { onDelete: "cascade" }),
+    startDate: timestamp("start_date", { withTimezone: true }).notNull(),
+    endDate: timestamp("end_date", { withTimezone: true }).notNull(),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.reservationId, t.invoiceId] }),
+  }),
+);
+
+export const reservationsToInvoicesRelations = relationBuilder(
+  reservationsToInvoices,
+  ({ one }) => ({
+    reservation: one(reservations, {
+      fields: [reservationsToInvoices.reservationId],
+      references: [reservations.id],
+    }),
+    invoice: one(invoices, {
+      fields: [reservationsToInvoices.invoiceId],
       references: [invoices.id],
     }),
   }),
