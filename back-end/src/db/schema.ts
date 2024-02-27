@@ -378,7 +378,7 @@ export const reservationPriceAdjustmentUnitEnum = pgEnum(
 // TODO Maybe support uponUsage, when invoked show on next invoice only
 export const reservationPriceAdjustmentTimingEnum = pgEnum(
   "reservation_price_adjustment_interval",
-  ["start", "end", "throughoutSpread", "throughoutRepeat"],
+  ["start", "end", "throughout"],
 );
 
 // TODO Add support for perInvoice, perPerson, perPersonPerNight, perItem, perDay and perHour

@@ -163,6 +163,13 @@ export const ReservationUpdate = ({
           ]}
         >
           <Button
+            onClick={invoiceHandler}
+            leftSection={<IconFileEuro />}
+            loading={invoicePeriod.loading}
+          >
+            Invoice period
+          </Button>
+          <Button
             variant="light"
             color="red"
             onClick={deleteHandler}
@@ -194,20 +201,7 @@ export const ReservationUpdate = ({
         </Paper>
         {!!invoices.length && (
           <Paper p="2rem">
-            <Band
-              title={
-                <>
-                  <Title order={3}>Invoices</Title>
-                  <Button
-                    onClick={invoiceHandler}
-                    leftSection={<IconFileEuro />}
-                    loading={invoicePeriod.loading}
-                  >
-                    Invoice period
-                  </Button>
-                </>
-              }
-            >
+            <Band title={<Title order={3}>Invoices</Title>}>
               <ScrollArea>
                 <Group gap="2rem" wrap="nowrap">
                   {invoices.map(({ invoice, startDate, endDate }) => {
