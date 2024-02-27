@@ -10,6 +10,7 @@ import {
   invoices,
   properties,
   relations,
+  reservationsToInvoices,
 } from "@/db/schema";
 import { generateInvoicePdf, getInvoice } from "@/services/invoice";
 import { getSettings } from "@/services/setting";
@@ -340,6 +341,30 @@ export const invoiceRouter = router({
       }),
     ]);
 
+    if (invoice.refType === "reservation") {
+      const reservationsToInvoicesResult = await db
+        .select()
+        .from(reservationsToInvoices)
+        .where(
+          and(
+            eq(reservationsToInvoices.invoiceId, input),
+            eq(reservationsToInvoices.reservationId, invoice.refId),
+          ),
+        );
+
+      const reservationsToInvoice = reservationsToInvoicesResult[0];
+
+      await db.insert(reservationsToInvoices).values({
+        ...reservationsToInvoice,
+        invoiceId: creditInvoiceId,
+      });
+    }
+
     return creditInvoiceId;
   }),
+  delete: procedure
+    .input(wrap(number()))
+    .mutation(async ({ input }) =>
+      db.delete(invoices).where(eq(invoices.id, input)),
+    ),
 });

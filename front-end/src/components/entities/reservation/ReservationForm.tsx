@@ -10,13 +10,14 @@ import {
 import { RouterOutput } from "@/utils/trpc";
 import {
   Group,
+  NumberInput,
   Paper,
   Select,
   Stack,
   Textarea,
-  TextInput,
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
+import { IconCurrencyEuro } from "@tabler/icons-react";
 
 type ReservationForm = {
   rooms: RouterOutput["room"]["list"];
@@ -117,10 +118,25 @@ export const ReservationForm = ({ rooms, relations }: ReservationForm) => {
             )}
           />
         </Group>
-        <TextInput
-          {...register("guestName")}
-          error={errors.guestName?.message}
-          label={t("entities.reservation.keys.guestName")}
+        <Controller
+          name="priceOverride"
+          control={control}
+          render={({ field, fieldState: { error } }) => (
+            <NumberInput
+              {...field}
+              value={field.value || undefined}
+              onChange={(value) => {
+                field.onChange(value || null);
+              }}
+              error={error?.message}
+              label={t("entities.reservation.keys.priceOverride")}
+              leftSection={<IconCurrencyEuro size="1rem" />}
+              decimalScale={2}
+              decimalSeparator=","
+              fixedDecimalScale
+              hideControls
+            />
+          )}
         />
         <Textarea
           {...register("notes")}

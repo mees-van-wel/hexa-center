@@ -63,8 +63,8 @@ export default {
         customerId: "Customer",
         startDate: "Start date",
         endDate: "End date",
+        priceOverride: "Price override",
         notes: "Notes",
-        guestName: "Guest name",
       },
       calendar: {
         noRooms: "No bookings found",
@@ -158,6 +158,7 @@ export default {
     roles: "Roles",
     reservations: "Reservations",
     rooms: "Rooms",
+    priceAdjustments: "Price Adjustments",
   },
   loginPage: {
     login: "Login",

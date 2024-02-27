@@ -1,6 +1,7 @@
 import { relations as relationBuilder, sql } from "drizzle-orm";
 import {
   AnyPgColumn,
+  boolean,
   date,
   integer,
   jsonb,
@@ -18,7 +19,7 @@ import {
 export const properties = pgTable("properties", {
   $kind: text("$kind").default("property").notNull(),
   id: serial("id").primaryKey(),
-  uuid: uuid("uuid").defaultRandom(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -62,7 +63,7 @@ export const propertiesRelations = relationBuilder(properties, ({ one }) => ({
 export const roles = pgTable("roles", {
   $kind: text("$kind").default("role").notNull(),
   id: serial("id").primaryKey(),
-  uuid: uuid("uuid").defaultRandom(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -123,7 +124,7 @@ export const relationTypeEnum = pgEnum("relation_type", [
 export const relations = pgTable("relations", {
   $kind: text("$kind").default("relation").notNull(),
   id: serial("id").primaryKey(),
-  uuid: uuid("uuid").defaultRandom(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -196,7 +197,7 @@ export const relationsRelations = relationBuilder(
 
 export const sessions = pgTable("sessions", {
   id: serial("id").primaryKey(),
-  uuid: uuid("uuid").defaultRandom(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
   issuedAt: timestamp("issued_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -221,7 +222,7 @@ export const sessionsRelations = relationBuilder(sessions, ({ one }) => ({
 
 export const accounts = pgTable("accounts", {
   id: serial("id").primaryKey(),
-  uuid: uuid("uuid").defaultRandom(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
   relationId: integer("relation_id")
     .references(() => relations.id, { onDelete: "cascade" })
     .notNull(),
@@ -237,7 +238,7 @@ export const accountsRelations = relationBuilder(accounts, ({ many }) => ({
 
 export const workingHours = pgTable("working_hours", {
   id: serial("id").primaryKey(),
-  uuid: uuid("uuid").defaultRandom(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
   accountId: integer("account_id")
     .references(() => accounts.id, { onDelete: "cascade" })
     .notNull(),
@@ -260,7 +261,7 @@ export const workingHoursRelations = relationBuilder(
 export const rooms = pgTable("rooms", {
   $kind: text("$kind").default("room").notNull(),
   id: serial("id").primaryKey(),
-  uuid: uuid("uuid").defaultRandom(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -307,7 +308,7 @@ export const roomsRelations = relationBuilder(rooms, ({ one }) => ({
 export const reservations = pgTable("reservations", {
   $kind: text("$kind").default("reservation").notNull(),
   id: serial("id").primaryKey(),
-  uuid: uuid("uuid").defaultRandom(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -334,8 +335,11 @@ export const reservations = pgTable("reservations", {
     .notNull(),
   startDate: timestamp("start_date", { withTimezone: true }).notNull(),
   endDate: timestamp("end_date", { withTimezone: true }).notNull(),
+  priceOverride: numeric("price_override", {
+    precision: 10,
+    scale: 2,
+  }),
   notes: text("notes"),
-  guestName: text("guest_name"),
 });
 
 export const reservationsRelations = relationBuilder(
@@ -357,9 +361,125 @@ export const reservationsRelations = relationBuilder(
       fields: [reservations.roomId],
       references: [rooms.id],
     }),
+    // reservationsToReservationCharges: many(reservationsToReservationCharges),
     reservationsToInvoices: many(reservationsToInvoices),
   }),
 );
+
+export const priceAdjustmentTypeEnum = pgEnum("price_adjustment_type", [
+  "reservation",
+]);
+
+export const reservationPriceAdjustmentUnitEnum = pgEnum(
+  "reservation_price_adjustment_unit",
+  ["currency", "percentage"],
+);
+
+// TODO Maybe support uponUsage, when invoked show on next invoice only
+export const reservationPriceAdjustmentTimingEnum = pgEnum(
+  "reservation_price_adjustment_interval",
+  ["start", "end", "throughoutSpread", "throughoutRepeat"],
+);
+
+// TODO Add support for perInvoice, perPerson, perPersonPerNight, perItem, perDay and perHour
+export const reservationPriceAdjustmentBasisEnum = pgEnum(
+  "reservation_price_adjustment_interval",
+  ["oneTime", "perNight"],
+);
+
+// TODO Maybe other name like "fixed invoice lines" because that's what it is
+export const priceAdjustments = pgTable("price_adjustments", {
+  $kind: text("$kind").default("priceAdjustment").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .default(sql`now()`)
+    .notNull(),
+  createdById: integer("created_by_id").references(
+    (): AnyPgColumn => relations.id,
+    {
+      onDelete: "set null",
+    },
+  ),
+  updatedById: integer("updated_by_id").references(
+    (): AnyPgColumn => relations.id,
+    {
+      onDelete: "set null",
+    },
+  ),
+  type: priceAdjustmentTypeEnum("type").notNull(),
+  name: text("name").notNull(),
+  description: text("description"),
+  amount: numeric("amount", {
+    precision: 10,
+    scale: 2,
+  }).notNull(),
+  unit: reservationPriceAdjustmentUnitEnum("unit").notNull(),
+  timing: reservationPriceAdjustmentTimingEnum("timing").notNull(),
+  basis: reservationPriceAdjustmentBasisEnum("basis").notNull(),
+  taxPercentage: numeric("tax_percentage", {
+    precision: 10,
+    scale: 2,
+  })
+    .default("0")
+    .notNull(),
+  autoAdd: boolean("auto_add").default(false).notNull(),
+});
+
+export const priceAdjustmentsRelations = relationBuilder(
+  priceAdjustments,
+  ({ one }) => ({
+    createdBy: one(relations, {
+      fields: [priceAdjustments.createdById],
+      references: [relations.id],
+    }),
+    updatedBy: one(relations, {
+      fields: [priceAdjustments.updatedById],
+      references: [relations.id],
+    }),
+  }),
+);
+
+// export const reservationsToReservationCharges = pgTable(
+//   "reservations_to_reservation_charges",
+//   {
+//     reservationId: integer("reservation_id")
+//       .notNull()
+//       .references(() => reservations.id, { onDelete: "cascade" }),
+//     reservationChargeId: integer("reservation_charge_id")
+//       .notNull()
+//       .references(() => reservationCharges.id, { onDelete: "cascade" }),
+//     nameOverride: text("name_override"),
+//     priceOverride: numeric("price_override", {
+//       precision: 10,
+//       scale: 2,
+//     }),
+//     taxPercentageOveride: numeric("tax_percentage_override", {
+//       precision: 10,
+//       scale: 2,
+//     }),
+//   },
+//   (t) => ({
+//     pk: primaryKey({ columns: [t.reservationId, t.reservationChargeId] }),
+//   }),
+// );
+
+// export const reservationsToReservationChargesRelations = relationBuilder(
+//   reservationsToReservationCharges,
+//   ({ one }) => ({
+//     reservation: one(reservations, {
+//       fields: [reservationsToReservationCharges.reservationId],
+//       references: [reservations.id],
+//     }),
+//     invoice: one(reservationCharges, {
+//       fields: [reservationsToReservationCharges.reservationChargeId],
+//       references: [reservationCharges.id],
+//     }),
+//   }),
+// );
 
 export const invoiceRefTypeEnum = pgEnum("invoice_ref_type", [
   "invoice",
@@ -380,10 +500,11 @@ export const invoiceStatusEnum = pgEnum("invoice_status", [
 ]);
 
 // TODO Implement payment provider (Adyen) to track payment status
+// TODO Make all curreny columns not null (e.g. discount) populate with .default("0")
 export const invoices = pgTable("invoices", {
   $kind: text("$kind").default("invoice").notNull(),
   id: serial("id").primaryKey(),
-  uuid: uuid("uuid").defaultRandom(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -471,7 +592,7 @@ export const invoicesRelations = relationBuilder(invoices, ({ one, many }) => ({
 
 export const invoiceLines = pgTable("invoice_lines", {
   id: serial("id").primaryKey(),
-  uuid: uuid("uuid").defaultRandom(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
   invoiceId: integer("invoice_id")
     .references(() => invoices.id, { onDelete: "cascade" })
     .notNull(),
@@ -526,7 +647,7 @@ export const invoiceEventRefTypeEnum = pgEnum("invoice_event_ref_type", [
 
 export const invoiceEvents = pgTable("invoice_events", {
   id: serial("id").primaryKey(),
-  uuid: uuid("uuid").defaultRandom(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -601,7 +722,7 @@ export const settingNameEnum = pgEnum("setting_name", [
 
 export const settings = pgTable("settings", {
   id: serial("id").primaryKey(),
-  uuid: uuid("uuid").defaultRandom(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   updatedById: integer("updated_by_id").references(
     (): AnyPgColumn => relations.id,

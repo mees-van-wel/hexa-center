@@ -27,6 +27,7 @@ import {
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import {
+  IconCheck,
   IconExternalLink,
   IconFileArrowLeft,
   IconFileArrowRight,
@@ -34,6 +35,7 @@ import {
   IconMailFast,
   IconPlus,
   IconPrinter,
+  IconTrash,
 } from "@tabler/icons-react";
 import { IconDownload } from "@tabler/icons-react";
 
@@ -43,6 +45,7 @@ type InvoiceDetailProps = {
   invoice: RouterOutput["invoice"]["get"];
 };
 
+// TODO Fix update of credited state after draft credit invoice get's deleted
 // TODO Fix type errors
 // TODO Translations
 export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
@@ -51,6 +54,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
   const generatePdf = useMutation("invoice", "generatePdf");
   const mailInvoice = useMutation("invoice", "mail");
   const creditInvoice = useMutation("invoice", "credit");
+  const deleteInvoice = useMutation("invoice", "delete");
   const [downloadLoading, setDownloadLoading] = useState(false);
   const [printLoading, setPrintLoading] = useState(false);
   const router = useRouter();
@@ -169,6 +173,22 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
     }
   };
 
+  const deleteHandler = async () => {
+    modals.openConfirmModal({
+      title: t("common.areYouSure"),
+      labels: { confirm: t("common.yes"), cancel: t("common.no") },
+      onConfirm: async () => {
+        await deleteInvoice.mutate(invoice.id);
+        router.back();
+
+        notifications.show({
+          message: "Invoice successfully deleted",
+          color: "green",
+        });
+      },
+    });
+  };
+
   const canCredit = useMemo(
     () =>
       invoice.events.some(({ type }) => type === "issued") &&
@@ -204,13 +224,24 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
         ]}
       >
         {invoice.status === "draft" ? (
-          <Button
-            loading={issueInvoice.loading}
-            leftSection={<IconFileArrowRight />}
-            onClick={issueHandler}
-          >
-            Issue
-          </Button>
+          <>
+            <Button
+              loading={issueInvoice.loading}
+              leftSection={<IconFileArrowRight />}
+              onClick={issueHandler}
+            >
+              Issue
+            </Button>
+            <Button
+              color="red"
+              variant="light"
+              loading={deleteInvoice.loading}
+              leftSection={<IconTrash />}
+              onClick={deleteHandler}
+            >
+              {t("common.delete")}
+            </Button>
+          </>
         ) : (
           <>
             <Button
@@ -246,6 +277,14 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
             Credit
           </Button>
         )}
+        <Badge
+          size="lg"
+          color="green"
+          leftSection={<IconCheck size="1rem" />}
+          variant="light"
+        >
+          {t("common.saved")}
+        </Badge>
       </DashboardHeader>
       <Group wrap="nowrap" align="stretch">
         <Paper p="2rem">
@@ -547,12 +586,11 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
           <Table>
             <Table.Thead>
               <Table.Tr>
-                <Table.Th>ID</Table.Th>
                 <Table.Th>Name</Table.Th>
-                <Table.Th>Comments</Table.Th>
+                {/* <Table.Th>Comments</Table.Th> */}
                 <Table.Th>Unit price</Table.Th>
                 <Table.Th>Quantity</Table.Th>
-                <Table.Th>Discount</Table.Th>
+                {/* <Table.Th>Discount</Table.Th> */}
                 <Table.Th>Total net amount</Table.Th>
                 <Table.Th>VAT</Table.Th>
                 <Table.Th>Total gross amount</Table.Th>
@@ -563,19 +601,18 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                 ({
                   id,
                   name,
-                  comments,
+                  // comments,
                   unitNetAmount,
                   quantity,
-                  discountAmount,
+                  // discountAmount,
                   totalNetAmount,
                   totalTaxAmount,
                   taxPercentage,
                   totalGrossAmount,
                 }) => (
                   <Table.Tr key={id}>
-                    <Table.Td>{id}</Table.Td>
                     <Table.Td>{name}</Table.Td>
-                    <Table.Td>{comments}</Table.Td>
+                    {/* <Table.Td>{comments}</Table.Td> */}
                     <Table.Td>
                       {Intl.NumberFormat("nl-NL", {
                         style: "currency",
@@ -583,14 +620,14 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                       }).format(parseFloat(unitNetAmount))}
                     </Table.Td>
                     <Table.Td>{quantity}x</Table.Td>
-                    <Table.Td>
+                    {/* <Table.Td>
                       {Intl.NumberFormat("nl-NL", {
                         style: "currency",
                         currency: "EUR",
                       }).format(
                         discountAmount ? parseFloat(discountAmount) : 0,
                       )}
-                    </Table.Td>
+                    </Table.Td> */}
                     <Table.Td>
                       {Intl.NumberFormat("nl-NL", {
                         style: "currency",
@@ -628,16 +665,11 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                     paddingTop: "1.5rem",
                   }}
                 />
-                <Table.Td
+                {/* <Table.Td
                   style={{
                     paddingTop: "1.5rem",
                   }}
-                />
-                <Table.Td
-                  style={{
-                    paddingTop: "1.5rem",
-                  }}
-                />
+                /> */}
                 <Table.Td
                   style={{
                     paddingTop: "1.5rem",
@@ -647,7 +679,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                     Total
                   </Text>
                 </Table.Td>
-                <Table.Td
+                {/* <Table.Td
                   style={{
                     paddingTop: "1.5rem",
                   }}
@@ -660,7 +692,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                       ? parseFloat(invoice.totalDiscountAmount)
                       : 0,
                   )}
-                </Table.Td>
+                </Table.Td> */}
                 <Table.Td
                   style={{
                     paddingTop: "1.5rem",

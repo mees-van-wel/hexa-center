@@ -15,6 +15,20 @@
       "when": 1708899662486,
       "tag": "0001_nostalgic_scrambler",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1708976593614,
+      "tag": "0002_colorful_puma",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1709035378885,
+      "tag": "0003_opposite_bulldozer",
+      "breakpoints": true
     }
   ]
 }

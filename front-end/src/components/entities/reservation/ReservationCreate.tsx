@@ -42,8 +42,8 @@ export const ReservationCreate = ({
       customerId: undefined,
       startDate: undefined,
       endDate: undefined,
+      priceOverride: undefined,
       notes: "",
-      guestName: "",
     },
   });
 

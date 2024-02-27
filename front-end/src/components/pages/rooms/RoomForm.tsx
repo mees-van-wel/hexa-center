@@ -34,6 +34,7 @@ export const RoomForm = () => {
             decimalScale={2}
             decimalSeparator=","
             fixedDecimalScale
+            hideControls
           />
         )}
       />

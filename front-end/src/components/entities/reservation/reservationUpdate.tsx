@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
+import isBetween from "dayjs/plugin/isBetween";
 import {
   FormProvider,
   useForm,
@@ -44,10 +45,14 @@ import {
   IconFileArrowLeft,
   IconFileEuro,
   IconHotelService,
+  IconPlus,
   IconTrash,
 } from "@tabler/icons-react";
 
+import { InvoicePeriodModal } from "./InvoicePeriodModal";
 import { ReservationForm } from "./ReservationForm";
+
+dayjs.extend(isBetween);
 
 type ReservationProps = {
   reservation: RouterOutput["reservation"]["get"];
@@ -68,9 +73,23 @@ export const ReservationUpdate = ({
   const invoicePeriod = useMutation("reservation", "invoicePeriod");
 
   const formMethods = useForm<ReservationInputUpdateSchema>({
-    defaultValues: reservation,
+    defaultValues: {
+      ...reservation,
+      priceOverride: reservation.priceOverride
+        ? parseFloat(reservation.priceOverride)
+        : undefined,
+    },
     resolver: valibotResolver(ReservationUpdateSchema),
   });
+
+  const invoices = useMemo(
+    () =>
+      reservation.reservationsToInvoices.sort(
+        (a, b) =>
+          b.invoice.createdAt?.getTime() - a.invoice.createdAt?.getTime(),
+      ),
+    [reservation.reservationsToInvoices],
+  );
 
   const deleteHandler = () => {
     modals.openConfirmModal({
@@ -89,18 +108,41 @@ export const ReservationUpdate = ({
   };
 
   const invoiceHandler = async () => {
-    // TODO Date picker modal
-    const invoiceId = await invoicePeriod.mutate({
-      reservationId: reservation.id,
-      startDate: new Date(2024, 1, 1),
-      endDate: new Date(2024, 1, 29),
-    });
+    const lastInvoicedDate = invoices[0]?.endDate;
 
-    router.push(`/invoices/${invoiceId}`);
+    modals.open({
+      title: <Title order={3}>Invoice Period</Title>,
+      size: "xs",
+      children: (
+        <InvoicePeriodModal
+          minDate={reservation.startDate}
+          maxDate={reservation.endDate}
+          excludeDate={(date) =>
+            invoices.some(({ startDate, endDate }) =>
+              dayjs(date).isBetween(startDate, endDate, "day", "[]"),
+            )
+          }
+          defaultDate={
+            lastInvoicedDate
+              ? dayjs(lastInvoicedDate).add(1, "day").toDate()
+              : reservation.startDate
+          }
+          onConfirm={async (startDate, endDate) => {
+            const invoiceId = await invoicePeriod.mutate({
+              reservationId: reservation.id,
+              startDate,
+              endDate,
+            });
 
-    notifications.show({
-      message: t("entities.reservation.periodInvoiced"),
-      color: "green",
+            router.push(`/invoices/${invoiceId}`);
+
+            notifications.show({
+              message: "Period successfully Invoiced",
+              color: "green",
+            });
+          }}
+        />
+      ),
     });
   };
 
@@ -121,13 +163,6 @@ export const ReservationUpdate = ({
           ]}
         >
           <Button
-            onClick={invoiceHandler}
-            leftSection={<IconFileEuro />}
-            loading={invoicePeriod.loading}
-          >
-            Invoice period
-          </Button>
-          <Button
             variant="light"
             color="red"
             onClick={deleteHandler}
@@ -139,138 +174,162 @@ export const ReservationUpdate = ({
           <SaveBadge />
         </DashboardHeader>
         <ReservationForm rooms={rooms} relations={relations} />
-        {!!reservation.reservationsToInvoices.length && (
+        <Paper p="2rem">
+          <Band
+            title={
+              <>
+                <Title order={3}>Price Adjustments</Title>
+                <Button
+                  onClick={invoiceHandler}
+                  leftSection={<IconPlus />}
+                  loading={invoicePeriod.loading}
+                >
+                  Add
+                </Button>
+              </>
+            }
+          >
+            <p>lol</p>
+          </Band>
+        </Paper>
+        {!!invoices.length && (
           <Paper p="2rem">
-            <Band title={<Title order={3}>Invoices</Title>}>
+            <Band
+              title={
+                <>
+                  <Title order={3}>Invoices</Title>
+                  <Button
+                    onClick={invoiceHandler}
+                    leftSection={<IconFileEuro />}
+                    loading={invoicePeriod.loading}
+                  >
+                    Invoice period
+                  </Button>
+                </>
+              }
+            >
               <ScrollArea>
                 <Group gap="2rem" wrap="nowrap">
-                  {reservation.reservationsToInvoices
-                    .sort((a, b) =>
-                      a.invoice.date && b.invoice.date
-                        ? b.invoice.date?.getTime() - a.invoice.date?.getTime()
-                        : b.invoice.createdAt?.getTime() -
-                          a.invoice.createdAt?.getTime(),
-                    )
-                    .map(({ invoice, startDate, endDate }) => {
-                      const Icon =
-                        invoice.type === "credit"
-                          ? IconFileArrowLeft
-                          : IconFileEuro;
+                  {invoices.map(({ invoice, startDate, endDate }) => {
+                    const Icon =
+                      invoice.type === "credit"
+                        ? IconFileArrowLeft
+                        : IconFileEuro;
 
-                      return (
-                        <Card
-                          key={invoice.id}
-                          shadow="sm"
-                          padding="0"
-                          radius="md"
-                          withBorder
-                          maw={300}
+                    return (
+                      <Card
+                        key={invoice.id}
+                        shadow="sm"
+                        padding="0"
+                        radius="md"
+                        withBorder
+                        maw={300}
+                      >
+                        <Card.Section
+                          style={{
+                            backgroundColor: "rgb(var(--color-background))",
+                            display: "grid",
+                            placeContent: "center",
+                            maxHeight: 100,
+                            overflow: "hidden",
+                          }}
                         >
-                          <Card.Section
-                            style={{
-                              backgroundColor: "rgb(var(--color-background))",
-                              display: "grid",
-                              placeContent: "center",
-                              maxHeight: 100,
-                              overflow: "hidden",
-                            }}
-                          >
-                            <Group p="1rem" wrap="nowrap">
-                              <IconFile
-                                size="1rem"
-                                stroke={1}
-                                style={{
-                                  color: "gray",
-                                  transform: "rotate(-45deg)",
-                                }}
-                              />
-                              <IconFile
-                                size="2rem"
-                                stroke={1}
-                                style={{
-                                  color: "gray",
-                                  transform: "rotate(-22deg)",
-                                }}
-                              />
-                              <Icon
-                                size="5rem"
-                                stroke={1}
-                                style={{
-                                  color: "gray",
-                                  padding: "0.75rem",
-                                  margin: "0",
-                                  border: "2px dashed gray",
-                                  transition: "margin var(--transition)",
-                                  borderRadius: "100%",
-                                }}
-                              />
-                              <IconFile
-                                size="2rem"
-                                stroke={1}
-                                style={{
-                                  color: "gray",
-                                  transform: "rotate(22deg)",
-                                }}
-                              />
-                              <IconFile
-                                size="1rem"
-                                stroke={1}
-                                style={{
-                                  color: "gray",
-                                  transform: "rotate(45deg)",
-                                }}
-                              />
-                            </Group>
-                          </Card.Section>
-                          <Stack my="md" px="md">
-                            <Text fw="bold">
-                              {invoice.type === "credit" ? "Credit" : "Invoice"}
-                              : {invoice.number || invoice.id}
-                            </Text>
-                            <Text size="sm">
-                              From: {dayjs(startDate).format("DD-MM-YYYY")}
-                              <br />
-                              To: {dayjs(endDate).format("DD-MM-YYYY")}
-                            </Text>
-                          </Stack>
-                          <Divider />
-                          <Stack my="md" px="md">
-                            <Text size="sm" c="dimmed">
-                              Invoice date:{" "}
-                              {dayjs(invoice.date || invoice.createdAt).format(
-                                "DD-MM-YYYY",
-                              )}
-                              <br />
-                              Amount:{" "}
-                              {Intl.NumberFormat("nl-NL", {
-                                style: "currency",
-                                currency: "EUR",
-                              }).format(parseFloat(invoice.totalGrossAmount))}
-                            </Text>
-                          </Stack>
-                          <Button
-                            fullWidth
-                            component={Link}
-                            href={`/invoices/${invoice.id}`}
-                            radius={0}
-                          >
-                            View Details
-                          </Button>
-                          <Badge
-                            variant="light"
-                            style={{
-                              position: "absolute",
-                              top: 0,
-                              right: 0,
-                              borderRadius: "0rem",
-                              borderBottomLeftRadius: "0.5rem",
-                            }}
-                          >
-                            {invoice.status}
-                          </Badge>
-                        </Card>
-                      );
-                    })}
+                          <Group p="1rem" wrap="nowrap">
+                            <IconFile
+                              size="1rem"
+                              stroke={1}
+                              style={{
+                                color: "gray",
+                                transform: "rotate(-45deg)",
+                              }}
+                            />
+                            <IconFile
+                              size="2rem"
+                              stroke={1}
+                              style={{
+                                color: "gray",
+                                transform: "rotate(-22deg)",
+                              }}
+                            />
+                            <Icon
+                              size="5rem"
+                              stroke={1}
+                              style={{
+                                color: "gray",
+                                padding: "0.75rem",
+                                margin: "0",
+                                border: "2px dashed gray",
+                                transition: "margin var(--transition)",
+                                borderRadius: "100%",
+                              }}
+                            />
+                            <IconFile
+                              size="2rem"
+                              stroke={1}
+                              style={{
+                                color: "gray",
+                                transform: "rotate(22deg)",
+                              }}
+                            />
+                            <IconFile
+                              size="1rem"
+                              stroke={1}
+                              style={{
+                                color: "gray",
+                                transform: "rotate(45deg)",
+                              }}
+                            />
+                          </Group>
+                        </Card.Section>
+                        <Stack my="md" px="md">
+                          <Text fw="bold">
+                            {invoice.type === "credit" ? "Credit" : "Invoice"}:{" "}
+                            {invoice.number || invoice.id}
+                          </Text>
+                          <Text size="sm">
+                            From: {dayjs(startDate).format("DD-MM-YYYY")}
+                            <br />
+                            To: {dayjs(endDate).format("DD-MM-YYYY")}
+                          </Text>
+                        </Stack>
+                        <Divider />
+                        <Stack my="md" px="md">
+                          <Text size="sm" c="dimmed">
+                            Invoice date:{" "}
+                            {dayjs(invoice.date || invoice.createdAt).format(
+                              "DD-MM-YYYY",
+                            )}
+                            <br />
+                            Amount:{" "}
+                            {Intl.NumberFormat("nl-NL", {
+                              style: "currency",
+                              currency: "EUR",
+                            }).format(parseFloat(invoice.totalGrossAmount))}
+                          </Text>
+                        </Stack>
+                        <Button
+                          fullWidth
+                          component={Link}
+                          href={`/invoices/${invoice.id}`}
+                          radius={0}
+                        >
+                          View Details
+                        </Button>
+                        <Badge
+                          variant="light"
+                          style={{
+                            position: "absolute",
+                            top: 0,
+                            right: 0,
+                            borderRadius: "0rem",
+                            borderBottomLeftRadius: "0.5rem",
+                          }}
+                        >
+                          {invoice.status}
+                        </Badge>
+                      </Card>
+                    );
+                  })}
                 </Group>
               </ScrollArea>
             </Band>
@@ -316,7 +375,12 @@ const SaveBadge = () => {
         ...values,
       });
 
-      reset(updatedReservation);
+      reset({
+        ...updatedReservation,
+        priceOverride: updatedReservation.priceOverride
+          ? parseFloat(updatedReservation.priceOverride)
+          : undefined,
+      });
     } catch (error) {
       const { success, json } = isJson((error as any).message);
       if (!success) {

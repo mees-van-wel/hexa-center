@@ -23,6 +23,9 @@ export const reservationRouter = router({
           ...input,
           createdById: ctx.relation.id,
           updatedById: ctx.relation.id,
+          priceOverride: input.priceOverride
+            ? input.priceOverride.toString()
+            : undefined,
         })
         .returning({
           $kind: reservations.$kind,
@@ -35,8 +38,8 @@ export const reservationRouter = router({
           customerId: reservations.customerId,
           startDate: reservations.startDate,
           endDate: reservations.endDate,
+          priceOverride: reservations.priceOverride,
           notes: reservations.notes,
-          guestName: reservations.guestName,
         });
 
       const reservation = result[0];
@@ -89,6 +92,12 @@ export const reservationRouter = router({
         .set({
           ...input,
           updatedById: ctx.relation.id,
+          priceOverride:
+            input.priceOverride === null
+              ? null
+              : input.priceOverride
+                ? input.priceOverride.toString()
+                : undefined,
         })
         .where(eq(reservations.id, input.id))
         .returning({
@@ -102,8 +111,8 @@ export const reservationRouter = router({
           customerId: reservations.customerId,
           startDate: reservations.startDate,
           endDate: reservations.endDate,
+          priceOverride: reservations.priceOverride,
           notes: reservations.notes,
-          guestName: reservations.guestName,
         });
 
       const reservation = result[0];
@@ -153,7 +162,7 @@ export const reservationRouter = router({
             name: "Overnight Stays",
             unitNetAmount: reservation.room.price,
             quantity: totalNights.toString(),
-            taxPercentage: "21",
+            taxPercentage: "9",
           },
         ],
       });
