@@ -64,7 +64,9 @@ export default {
         startDate: "Startdatum",
         endDate: "Einddatum",
         priceOverride: "Aangepaste prijs",
-        notes: "Notities",
+        guestName: "Naam gast",
+        reservationNotes: "Reserveringsnotities",
+        invoiceNotes: "Factuurnotities",
       },
       calendar: {
         noRooms: "Geen Boekingen gevonden",
@@ -158,7 +160,6 @@ export default {
     roles: "Rollen",
     reservations: "Reservaties",
     rooms: "Kamers",
-    priceAdjustments: "Prijsaanpassingen",
   },
   loginPage: {
     login: "Inloggen",

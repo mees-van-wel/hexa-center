@@ -9,7 +9,6 @@ import {
   IconFileEuro,
   IconHome,
   IconHotelService,
-  IconPlusMinus,
   IconUsers,
 } from "@tabler/icons-react";
 
@@ -106,18 +105,6 @@ export const Navigation = () => {
                 justify="left"
               >
                 {t("entities.invoice.pluralName")}
-              </Button>
-              <Button
-                component={Link}
-                href="/price-adjustments"
-                variant={
-                  pathname === "/price-adjustments" ? "filled" : "subtle"
-                }
-                leftSection={<IconPlusMinus />}
-                fullWidth
-                justify="left"
-              >
-                {t("dashboardLayout.priceAdjustments")}
               </Button>
             </Stack>
           </Stack>

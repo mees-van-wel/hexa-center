@@ -66,7 +66,9 @@ export type Translation = {
         startDate: string;
         endDate: string;
         priceOverride: string;
-        notes: string;
+        guestName: string;
+        reservationNotes: string;
+        invoiceNotes: string;
       };
       calendar: {
         noRooms: string;
@@ -160,7 +162,6 @@ export type Translation = {
     roles: string;
     reservations: string;
     rooms: string;
-    priceAdjustments: string;
   };
   loginPage: {
     login: string;

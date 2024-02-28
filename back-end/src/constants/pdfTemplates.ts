@@ -43,11 +43,9 @@ export type PDFTemplateVariables = {
     companyVatNumber: string;
     companyIban: string;
     companySwiftBic: string;
-    hasComments: boolean;
     totalDiscountAmount: string | null;
     lines: {
       name: string;
-      comments: string | null;
       unitNetAmount: string;
       quantity: string;
       totalNetAmount: string;
@@ -59,7 +57,7 @@ export type PDFTemplateVariables = {
     totalNetAmount: string;
     totalTaxAmount: string;
     totalGrossAmount: string;
-    comments: string | null;
+    notes: string | null;
     dueDate: string | null;
   };
 };

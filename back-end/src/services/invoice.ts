@@ -16,7 +16,6 @@ export const getInvoice = async (invoiceId: number) => {
         columns: {
           id: true,
           name: true,
-          comments: true,
           unitNetAmount: true,
           quantity: true,
           discountAmount: true,
@@ -73,7 +72,7 @@ export const getInvoice = async (invoiceId: number) => {
       refType: true,
       refId: true,
       number: true,
-      comments: true,
+      notes: true,
       type: true,
       date: true,
       dueDate: true,
@@ -203,7 +202,6 @@ export const generateInvoicePdf = async (invoiceId: number) => {
       invoice.companyVatNumber || invoice.company?.vatNumber || "",
     companyIban: invoice.companyIban || invoice.company?.iban || "",
     companySwiftBic: invoice.companySwiftBic || invoice.company?.swiftBic || "",
-    hasComments: invoice.lines.some(({ comments }) => comments),
     totalDiscountAmount: invoice.totalDiscountAmount
       ? Intl.NumberFormat("nl-NL", {
           style: "currency",
@@ -213,7 +211,6 @@ export const generateInvoicePdf = async (invoiceId: number) => {
     lines: invoice.lines.map(
       ({
         name,
-        comments,
         unitNetAmount,
         quantity,
         totalNetAmount,
@@ -223,7 +220,6 @@ export const generateInvoicePdf = async (invoiceId: number) => {
         totalGrossAmount,
       }) => ({
         name,
-        comments,
         unitNetAmount: Intl.NumberFormat("nl-NL", {
           style: "currency",
           currency: "EUR",
@@ -262,7 +258,7 @@ export const generateInvoicePdf = async (invoiceId: number) => {
       style: "currency",
       currency: "EUR",
     }).format(parseFloat(invoice.totalGrossAmount)),
-    comments: invoice.comments,
+    notes: invoice.notes,
     dueDate: invoice.dueDate
       ? dayjs(invoice.dueDate).format("DD-MM-YYYY")
       : null,
@@ -287,10 +283,9 @@ type CreateInvoiceProps = {
     quantity: string;
     taxPercentage: string;
     discountAmount?: string;
-    comments?: string;
   }[];
   discountAmount?: string;
-  comments?: string;
+  notes?: string | null;
 };
 
 export const createInvoice = async ({
@@ -302,7 +297,7 @@ export const createInvoice = async ({
   companyId,
   lines,
   discountAmount,
-  comments,
+  notes,
 }: CreateInvoiceProps) => {
   const {
     totalNetAmount,
@@ -372,7 +367,7 @@ export const createInvoice = async ({
       totalGrossAmount,
       customerId,
       companyId,
-      comments,
+      notes,
     })
     .returning({
       id: invoices.id,
@@ -383,14 +378,7 @@ export const createInvoice = async ({
   await db.insert(invoiceLines).values(
     lines.map(
       (
-        {
-          name,
-          comments,
-          unitNetAmount,
-          quantity,
-          discountAmount,
-          taxPercentage,
-        },
+        { name, unitNetAmount, quantity, discountAmount, taxPercentage },
         index,
       ) => {
         const { totalNetAmount, totalTaxAmount, totalGrossAmount } =
@@ -399,7 +387,6 @@ export const createInvoice = async ({
         return {
           invoiceId: invoice.id,
           name,
-          comments,
           unitNetAmount,
           quantity,
           totalNetAmount: totalNetAmount.toString(),

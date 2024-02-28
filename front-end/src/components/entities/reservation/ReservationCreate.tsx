@@ -43,7 +43,9 @@ export const ReservationCreate = ({
       startDate: undefined,
       endDate: undefined,
       priceOverride: undefined,
-      notes: "",
+      guestName: "",
+      reservationNotes: "",
+      invoiceNotes: "",
     },
   });
 

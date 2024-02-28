@@ -60,8 +60,12 @@ type ReservationProps = {
   relations: RouterOutput["relation"]["list"];
 };
 
+// TODO Fix due date when invoice is issued (30 days 2024-03-31T20:59:21.530Z 2024-03-31T20:59:21.530Z)
+
+// TODO Fix allow billable period to be reset after an invoice with that period has ben credited
+
 // TODO Add creation event with link to original invoice when credit
-// TODO Fix credit invoices being added to reservation
+// TODO Fix invoices, somehow set ref back to null when ref entity is deleted
 export const ReservationUpdate = ({
   reservation,
   rooms,
@@ -118,8 +122,10 @@ export const ReservationUpdate = ({
           minDate={reservation.startDate}
           maxDate={reservation.endDate}
           excludeDate={(date) =>
-            invoices.some(({ startDate, endDate }) =>
-              dayjs(date).isBetween(startDate, endDate, "day", "[]"),
+            invoices.some(({ startDate, endDate, invoice: { type } }) =>
+              type === "credit"
+                ? false
+                : dayjs(date).isBetween(startDate, endDate, "day", "[]"),
             )
           }
           defaultDate={
@@ -277,8 +283,10 @@ export const ReservationUpdate = ({
                         </Card.Section>
                         <Stack my="md" px="md">
                           <Text fw="bold">
-                            {invoice.type === "credit" ? "Credit" : "Invoice"}:{" "}
-                            {invoice.number || invoice.id}
+                            {invoice.type === "credit"
+                              ? "Credit Invoice"
+                              : "Invoice"}
+                            : {invoice.number || invoice.id}
                           </Text>
                           <Text size="sm">
                             From: {dayjs(startDate).format("DD-MM-YYYY")}
@@ -309,6 +317,18 @@ export const ReservationUpdate = ({
                         >
                           View Details
                         </Button>
+                        <Badge
+                          variant="light"
+                          style={{
+                            position: "absolute",
+                            left: 0,
+                            right: 0,
+                            borderRadius: "0rem",
+                            borderBottomRightRadius: "0.5rem",
+                          }}
+                        >
+                          {invoice.type}
+                        </Badge>
                         <Badge
                           variant="light"
                           style={{

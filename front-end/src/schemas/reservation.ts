@@ -17,7 +17,9 @@ export const ReservationCreateSchema = object({
   startDate: date(),
   endDate: date(),
   priceOverride: nullable(number()),
-  notes: nullable(string([toNull()])),
+  guestName: string(),
+  reservationNotes: nullable(string([toNull()])),
+  invoiceNotes: nullable(string([toNull()])),
 });
 
 export const ReservationUpdateSchema = object({
@@ -27,7 +29,9 @@ export const ReservationUpdateSchema = object({
   startDate: optional(date()),
   endDate: optional(date()),
   priceOverride: nullish(number()),
-  notes: nullish(string([toNull()])),
+  guestName: optional(string()),
+  reservationNotes: nullish(string([toNull()])),
+  invoiceNotes: nullish(string([toNull()])),
 });
 
 export type ReservationInputCreateSchema = Input<

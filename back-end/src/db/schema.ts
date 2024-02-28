@@ -339,7 +339,9 @@ export const reservations = pgTable("reservations", {
     precision: 10,
     scale: 2,
   }),
-  notes: text("notes"),
+  guestName: text("guest_name").notNull(),
+  reservationNotes: text("reservation_notes"),
+  invoiceNotes: text("invoice_notes"),
 });
 
 export const reservationsRelations = relationBuilder(
@@ -361,125 +363,9 @@ export const reservationsRelations = relationBuilder(
       fields: [reservations.roomId],
       references: [rooms.id],
     }),
-    // reservationsToReservationCharges: many(reservationsToReservationCharges),
     reservationsToInvoices: many(reservationsToInvoices),
   }),
 );
-
-export const priceAdjustmentTypeEnum = pgEnum("price_adjustment_type", [
-  "reservation",
-]);
-
-export const reservationPriceAdjustmentUnitEnum = pgEnum(
-  "reservation_price_adjustment_unit",
-  ["currency", "percentage"],
-);
-
-// TODO Maybe support uponUsage, when invoked show on next invoice only
-export const reservationPriceAdjustmentTimingEnum = pgEnum(
-  "reservation_price_adjustment_interval",
-  ["start", "end", "throughout"],
-);
-
-// TODO Add support for perInvoice, perPerson, perPersonPerNight, perItem, perDay and perHour
-export const reservationPriceAdjustmentBasisEnum = pgEnum(
-  "reservation_price_adjustment_interval",
-  ["oneTime", "perNight"],
-);
-
-// TODO Maybe other name like "fixed invoice lines" because that's what it is
-export const priceAdjustments = pgTable("price_adjustments", {
-  $kind: text("$kind").default("priceAdjustment").notNull(),
-  id: serial("id").primaryKey(),
-  uuid: uuid("uuid").defaultRandom().notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .default(sql`now()`)
-    .notNull(),
-  createdById: integer("created_by_id").references(
-    (): AnyPgColumn => relations.id,
-    {
-      onDelete: "set null",
-    },
-  ),
-  updatedById: integer("updated_by_id").references(
-    (): AnyPgColumn => relations.id,
-    {
-      onDelete: "set null",
-    },
-  ),
-  type: priceAdjustmentTypeEnum("type").notNull(),
-  name: text("name").notNull(),
-  description: text("description"),
-  amount: numeric("amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
-  unit: reservationPriceAdjustmentUnitEnum("unit").notNull(),
-  timing: reservationPriceAdjustmentTimingEnum("timing").notNull(),
-  basis: reservationPriceAdjustmentBasisEnum("basis").notNull(),
-  taxPercentage: numeric("tax_percentage", {
-    precision: 10,
-    scale: 2,
-  })
-    .default("0")
-    .notNull(),
-  autoAdd: boolean("auto_add").default(false).notNull(),
-});
-
-export const priceAdjustmentsRelations = relationBuilder(
-  priceAdjustments,
-  ({ one }) => ({
-    createdBy: one(relations, {
-      fields: [priceAdjustments.createdById],
-      references: [relations.id],
-    }),
-    updatedBy: one(relations, {
-      fields: [priceAdjustments.updatedById],
-      references: [relations.id],
-    }),
-  }),
-);
-
-// export const reservationsToReservationCharges = pgTable(
-//   "reservations_to_reservation_charges",
-//   {
-//     reservationId: integer("reservation_id")
-//       .notNull()
-//       .references(() => reservations.id, { onDelete: "cascade" }),
-//     reservationChargeId: integer("reservation_charge_id")
-//       .notNull()
-//       .references(() => reservationCharges.id, { onDelete: "cascade" }),
-//     nameOverride: text("name_override"),
-//     priceOverride: numeric("price_override", {
-//       precision: 10,
-//       scale: 2,
-//     }),
-//     taxPercentageOveride: numeric("tax_percentage_override", {
-//       precision: 10,
-//       scale: 2,
-//     }),
-//   },
-//   (t) => ({
-//     pk: primaryKey({ columns: [t.reservationId, t.reservationChargeId] }),
-//   }),
-// );
-
-// export const reservationsToReservationChargesRelations = relationBuilder(
-//   reservationsToReservationCharges,
-//   ({ one }) => ({
-//     reservation: one(reservations, {
-//       fields: [reservationsToReservationCharges.reservationId],
-//       references: [reservations.id],
-//     }),
-//     invoice: one(reservationCharges, {
-//       fields: [reservationsToReservationCharges.reservationChargeId],
-//       references: [reservationCharges.id],
-//     }),
-//   }),
-// );
 
 export const invoiceRefTypeEnum = pgEnum("invoice_ref_type", [
   "invoice",
@@ -537,7 +423,7 @@ export const invoices = pgTable("invoices", {
     scale: 2,
   }).notNull(),
   number: text("number"),
-  comments: text("comments"),
+  notes: text("notes"),
   date: date("date", { mode: "date" }),
   dueDate: date("due_date", { mode: "date" }),
   customerId: integer("customer_id").references(() => relations.id, {
@@ -597,7 +483,6 @@ export const invoiceLines = pgTable("invoice_lines", {
     .references(() => invoices.id, { onDelete: "cascade" })
     .notNull(),
   name: text("name").notNull(),
-  comments: text("comments"),
   unitNetAmount: numeric("unit_net_amount", {
     precision: 10,
     scale: 2,
@@ -673,6 +558,128 @@ export const invoiceEventsRelations = relationBuilder(
     invoice: one(invoices, {
       fields: [invoiceEvents.invoiceId],
       references: [invoices.id],
+    }),
+  }),
+);
+
+export const invoiceAdjustmentTypeEnum = pgEnum("invoice_adjustment_type", [
+  "reservation",
+]);
+
+export const invoiceAdjustmentUnitEnum = pgEnum("invoice_adjustment_unit", [
+  "currency",
+  "percentage",
+]);
+
+// TODO Maybe support uponUsage, when invoked show on next invoice only
+export const invoiceAdjustmentTimingEnum = pgEnum("invoice_adjustment_timing", [
+  "start",
+  "end",
+  "throughout",
+]);
+
+// TODO Add support for perInvoice, perPerson, perPersonPerNight, perItem, perDay and perHour
+export const invoiceAdjustmentBasisEnum = pgEnum("invoice_adjustment_basis", [
+  "oneTime",
+  "perNight",
+]);
+
+export const invoiceAdjustmentTemplates = pgTable(
+  "invoice_adjustment_templates",
+  {
+    $kind: text("$kind").default("invoiceAdjustmentTemplate").notNull(),
+    id: serial("id").primaryKey(),
+    uuid: uuid("uuid").defaultRandom().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .default(sql`now()`)
+      .notNull(),
+    createdById: integer("created_by_id").references(
+      (): AnyPgColumn => relations.id,
+      { onDelete: "set null" },
+    ),
+    updatedById: integer("updated_by_id").references(
+      (): AnyPgColumn => relations.id,
+      { onDelete: "set null" },
+    ),
+    type: invoiceAdjustmentTypeEnum("type").notNull(),
+    name: text("name").notNull(),
+    description: text("description"),
+    amount: numeric("amount", {
+      precision: 10,
+      scale: 2,
+    }).notNull(),
+    unit: invoiceAdjustmentUnitEnum("unit").notNull(),
+    timing: invoiceAdjustmentTimingEnum("timing").notNull(),
+    basis: invoiceAdjustmentBasisEnum("basis").notNull(),
+    taxPercentage: numeric("tax_percentage", {
+      precision: 10,
+      scale: 2,
+    })
+      .default("0")
+      .notNull(),
+    autoAdd: boolean("auto_add").default(false).notNull(),
+  },
+);
+
+export const invoiceAdjustmentTemplatesRelations = relationBuilder(
+  invoiceAdjustmentTemplates,
+  ({ one, many }) => ({
+    createdBy: one(relations, {
+      fields: [invoiceAdjustmentTemplates.createdById],
+      references: [relations.id],
+    }),
+    updatedBy: one(relations, {
+      fields: [invoiceAdjustmentTemplates.updatedById],
+      references: [relations.id],
+    }),
+    instances: many(invoiceAdjustmentInstances),
+  }),
+);
+
+export const invoiceAdjustmentInstanceRefTypeEnum = pgEnum(
+  "invoice_adjustment_instance_ref_type",
+  ["reservation"],
+);
+
+export const invoiceAdjustmentInstances = pgTable(
+  "invoice_adjustment_instances",
+  {
+    $kind: text("$kind").default("invoiceAdjustmentInstance").notNull(),
+    id: serial("id").primaryKey(),
+    uuid: uuid("uuid").defaultRandom().notNull(),
+    templateId: integer("template_id")
+      .notNull()
+      .references(() => invoiceAdjustmentTemplates.id, {
+        onDelete: "set null",
+      }),
+    refType: invoiceAdjustmentInstanceRefTypeEnum("ref_type").notNull(),
+    refId: numeric("ref_id").notNull(),
+    name: text("name").notNull(),
+    amount: numeric("amount", {
+      precision: 10,
+      scale: 2,
+    }).notNull(),
+    unit: invoiceAdjustmentUnitEnum("unit").notNull(),
+    timing: invoiceAdjustmentTimingEnum("timing").notNull(),
+    basis: invoiceAdjustmentBasisEnum("basis").notNull(),
+    taxPercentage: numeric("tax_percentage", {
+      precision: 10,
+      scale: 2,
+    })
+      .default("0")
+      .notNull(),
+  },
+);
+
+export const invoiceAdjustmentInstancesRelations = relationBuilder(
+  invoiceAdjustmentInstances,
+  ({ one }) => ({
+    template: one(invoiceAdjustmentTemplates, {
+      fields: [invoiceAdjustmentInstances.templateId],
+      references: [invoiceAdjustmentTemplates.id],
     }),
   }),
 );

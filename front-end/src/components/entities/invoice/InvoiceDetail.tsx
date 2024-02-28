@@ -310,18 +310,21 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
               <Stack align="flex-start">
                 <div>
                   <p>
-                    Type: <Badge variant="light">{invoice.type}</Badge>
+                    <strong>Type:</strong>{" "}
+                    <Badge variant="light">{invoice.type}</Badge>
                   </p>
                   <p>
-                    Status: <Badge variant="light">{invoice.status}</Badge>
+                    <strong>Status:</strong>{" "}
+                    <Badge variant="light">{invoice.status}</Badge>
                   </p>
                 </div>
                 <div>
                   <p>
-                    {t("common.number")}: {invoice.number || invoice.id}
+                    <strong>{t("common.number")}:</strong>{" "}
+                    {invoice.number || invoice.id}
                   </p>
                   <p>
-                    {t("entities.invoice.totalGrossAmount")}:{" "}
+                    <strong>{t("entities.invoice.totalGrossAmount")}:</strong>{" "}
                     {Intl.NumberFormat("nl-NL", {
                       style: "currency",
                       currency: "EUR",
@@ -330,18 +333,23 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                 </div>
                 <div>
                   <p>
-                    {t("entities.invoice.date")}:{" "}
+                    <strong>{t("entities.invoice.date")}:</strong>{" "}
                     {dayjs(invoice.date || invoice.createdAt).format(
                       "DD-MM-YYYY",
                     )}
                   </p>
                   {invoice.dueDate && (
                     <p>
-                      {t("entities.invoice.dueDate")}:{" "}
+                      <strong>{t("entities.invoice.dueDate")}:</strong>{" "}
                       {dayjs(invoice.dueDate).format("DD-MM-YYYY")}
                     </p>
                   )}
                 </div>
+                {invoice.notes && (
+                  <p>
+                    <strong>Notes:</strong> {invoice.notes}
+                  </p>
+                )}
               </Stack>
             </Group>
           </Band>
@@ -587,7 +595,6 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
             <Table.Thead>
               <Table.Tr>
                 <Table.Th>Name</Table.Th>
-                {/* <Table.Th>Comments</Table.Th> */}
                 <Table.Th>Unit price</Table.Th>
                 <Table.Th>Quantity</Table.Th>
                 {/* <Table.Th>Discount</Table.Th> */}
@@ -601,7 +608,6 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                 ({
                   id,
                   name,
-                  // comments,
                   unitNetAmount,
                   quantity,
                   // discountAmount,
@@ -612,7 +618,6 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                 }) => (
                   <Table.Tr key={id}>
                     <Table.Td>{name}</Table.Td>
-                    {/* <Table.Td>{comments}</Table.Td> */}
                     <Table.Td>
                       {Intl.NumberFormat("nl-NL", {
                         style: "currency",
@@ -665,11 +670,6 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                     paddingTop: "1.5rem",
                   }}
                 />
-                {/* <Table.Td
-                  style={{
-                    paddingTop: "1.5rem",
-                  }}
-                /> */}
                 <Table.Td
                   style={{
                     paddingTop: "1.5rem",

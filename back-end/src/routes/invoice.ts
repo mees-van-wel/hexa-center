@@ -255,7 +255,7 @@ export const invoiceRouter = router({
         totalTaxAmount: invoices.totalTaxAmount,
         totalGrossAmount: invoices.totalGrossAmount,
         number: invoices.number,
-        comments: invoices.comments,
+        notes: invoices.notes,
         customerId: invoices.customerId,
         companyId: invoices.companyId,
       })
@@ -285,7 +285,7 @@ export const invoiceRouter = router({
             totalTaxAmount: "-" + invoice.totalTaxAmount,
             totalGrossAmount: "-" + invoice.totalGrossAmount,
             number: invoice.number + "-C",
-            comments: invoice.comments,
+            notes: invoice.notes,
             customerId: invoice.customerId,
             companyId: invoice.companyId,
           })
@@ -293,7 +293,6 @@ export const invoiceRouter = router({
         db
           .select({
             name: invoiceLines.name,
-            comments: invoiceLines.comments,
             unitNetAmount: invoiceLines.unitNetAmount,
             quantity: invoiceLines.quantity,
             totalNetAmount: invoiceLines.totalNetAmount,
@@ -320,7 +319,6 @@ export const invoiceRouter = router({
         invoiceLinesResult.map((invoiceLine) => ({
           invoiceId: creditInvoiceId,
           name: invoiceLine.name,
-          comments: invoiceLine.comments,
           unitNetAmount: "-" + invoiceLine.unitNetAmount,
           quantity: invoiceLine.quantity,
           totalNetAmount: "-" + invoiceLine.totalNetAmount,

@@ -39,7 +39,9 @@ export const reservationRouter = router({
           startDate: reservations.startDate,
           endDate: reservations.endDate,
           priceOverride: reservations.priceOverride,
-          notes: reservations.notes,
+          guestName: reservations.guestName,
+          reservationNotes: reservations.reservationNotes,
+          invoiceNotes: reservations.invoiceNotes,
         });
 
       const reservation = result[0];
@@ -57,6 +59,7 @@ export const reservationRouter = router({
   ),
   get: procedure.input(wrap(number())).query(async ({ input }) => {
     const reservation = await db.query.reservations.findFirst({
+      where: eq(reservations.id, input),
       with: {
         customer: true,
         room: true,
@@ -77,7 +80,22 @@ export const reservationRouter = router({
           },
         },
       },
-      where: eq(reservations.id, input),
+      columns: {
+        $kind: true,
+        id: true,
+        createdAt: true,
+        createdById: true,
+        updatedAt: true,
+        updatedById: true,
+        roomId: true,
+        customerId: true,
+        startDate: true,
+        endDate: true,
+        priceOverride: true,
+        guestName: true,
+        reservationNotes: true,
+        invoiceNotes: true,
+      },
     });
 
     if (!reservation) throw new TRPCError({ code: "NOT_FOUND" });
@@ -112,7 +130,9 @@ export const reservationRouter = router({
           startDate: reservations.startDate,
           endDate: reservations.endDate,
           priceOverride: reservations.priceOverride,
-          notes: reservations.notes,
+          guestName: reservations.guestName,
+          reservationNotes: reservations.reservationNotes,
+          invoiceNotes: reservations.invoiceNotes,
         });
 
       const reservation = result[0];
@@ -157,10 +177,11 @@ export const reservationRouter = router({
         type: "standard",
         customerId: reservation.customerId,
         companyId: ctx.relation.propertyId,
+        notes: reservation.invoiceNotes,
         lines: [
           {
             name: "Overnight Stays",
-            unitNetAmount: reservation.room.price,
+            unitNetAmount: reservation.priceOverride || reservation.room.price,
             quantity: totalNights.toString(),
             taxPercentage: "9",
           },

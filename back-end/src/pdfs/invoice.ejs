@@ -165,16 +165,13 @@
             </div>
           </div>
         </div>
-        <% if (comments) { %>
-        <p><%= comments %></p>
+        <% if (notes) { %>
+        <p><%= notes %></p>
         <% } %>
         <table class="invoice-table">
           <thead>
             <tr>
               <th>Name</th>
-              <% if (hasComments) { %>
-              <th>Comments</th>
-              <% } %>
               <th>Price</th>
               <th>Quantity</th>
               <% if (totalDiscountAmount) { %>
@@ -189,9 +186,6 @@
             <% lines.forEach(function(line) { %>
             <tr>
               <td><%= line.name %></td>
-              <% if (hasComments) { %>
-              <td><%= line.comments %></td>
-              <% } %>
               <td><%= line.unitNetAmount %></td>
               <td><%= line.quantity %>x</td>
               <% if (totalDiscountAmount) { %>
@@ -209,9 +203,6 @@
           <tfoot class="total">
             <tr>
               <th></th>
-              <% if (hasComments) { %>
-              <th></th>
-              <% } %>
               <th></th>
               <th>Total</th>
               <% if (totalDiscountAmount) { %>

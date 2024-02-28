@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 
 import { useTranslation } from "@/hooks/useTranslation";
@@ -15,8 +16,10 @@ import {
   Select,
   Stack,
   Textarea,
+  TextInput,
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
+import { useDidUpdate } from "@mantine/hooks";
 import { IconCurrencyEuro } from "@tabler/icons-react";
 
 type ReservationForm = {
@@ -31,63 +34,83 @@ export const ReservationForm = ({ rooms, relations }: ReservationForm) => {
     register,
     control,
     formState: { errors },
+    watch,
+    getFieldState,
+    setValue,
   } = useFormContext<
     ReservationInputCreateSchema | ReservationInputUpdateSchema
   >();
 
-  const roomsOptions =
-    rooms.length === 0
-      ? [{ value: "no-rooms", label: t("roomsPage.noRooms"), disabled: true }]
-      : rooms.map((room) => ({
-          label: room.name,
-          value: room.id.toString(),
-        }));
+  const customerOptions = useMemo(
+    () =>
+      relations.map((relation) => ({
+        label: relation.name,
+        value: relation.id.toString(),
+      })),
+    [relations],
+  );
+
+  const roomOptions = useMemo(
+    () =>
+      !rooms.length
+        ? [{ value: "no-rooms", label: t("roomsPage.noRooms"), disabled: true }]
+        : rooms.map((room) => ({
+            label: room.name,
+            value: room.id.toString(),
+          })),
+    [rooms, t],
+  );
+
+  const customerId = watch("customerId");
+
+  useDidUpdate(() => {
+    if (getFieldState("guestName").isTouched) return;
+
+    const customer = relations.find(({ id }) => id === customerId);
+    if (!customer) return;
+
+    setValue("guestName", customer.businessContactName || customer.name);
+  }, [customerId]);
 
   return (
     <Paper p="md">
       <Stack>
         <Group>
           <Controller
-            name="roomId"
+            name="customerId"
             control={control}
-            render={({
-              field: { onChange, value, ...restFields },
-              fieldState: { error },
-            }) => (
+            render={({ field, fieldState: { error } }) => (
               <Select
-                {...restFields}
-                value={value?.toString() ?? ""}
+                {...field}
+                value={field.value?.toString() || ""}
+                error={error?.message}
+                label={t("entities.reservation.keys.customerId")}
+                data={customerOptions}
+                onChange={(value) => {
+                  if (value) field.onChange(parseInt(value));
+                }}
                 required
                 searchable
-                error={error?.message}
-                label={t("entities.reservation.keys.roomId")}
-                data={roomsOptions}
-                onChange={(value) => {
-                  onChange(Number(value));
-                }}
+                allowDeselect={false}
               />
             )}
           />
           <Controller
-            name="customerId"
+            name="roomId"
             control={control}
-            render={({
-              field: { onChange, value, ...restFields },
-              fieldState: { error },
-            }) => (
+            render={({ field, fieldState: { error } }) => (
               <Select
-                {...restFields}
-                value={value?.toString() ?? ""}
-                required
+                {...field}
+                value={field.value?.toString() || ""}
                 error={error?.message}
-                label={t("entities.reservation.keys.customerId")}
-                data={relations.map((relation) => ({
-                  label: relation.name,
-                  value: relation.id.toString(),
-                }))}
+                label={t("entities.reservation.keys.roomId")}
+                data={roomOptions}
                 onChange={(value) => {
-                  onChange(Number(value));
+                  if (value) field.onChange(parseInt(value));
                 }}
+                required
+                searchable
+                allowDeselect={false}
               />
             )}
           />
@@ -118,31 +141,58 @@ export const ReservationForm = ({ rooms, relations }: ReservationForm) => {
             )}
           />
         </Group>
-        <Controller
-          name="priceOverride"
-          control={control}
-          render={({ field, fieldState: { error } }) => (
-            <NumberInput
-              {...field}
-              value={field.value || undefined}
-              onChange={(value) => {
-                field.onChange(value || null);
-              }}
-              error={error?.message}
-              label={t("entities.reservation.keys.priceOverride")}
-              leftSection={<IconCurrencyEuro size="1rem" />}
-              decimalScale={2}
-              decimalSeparator=","
-              fixedDecimalScale
-              hideControls
-            />
-          )}
-        />
-        <Textarea
-          {...register("notes")}
-          error={errors.notes?.message}
-          label={t("entities.reservation.keys.notes")}
-        />
+        <Group>
+          <Controller
+            name="guestName"
+            control={control}
+            render={({ field, fieldState: { error } }) => (
+              <TextInput
+                {...field}
+                error={error?.message}
+                label={t("entities.reservation.keys.guestName")}
+                withAsterisk
+              />
+            )}
+          />
+          <Controller
+            name="priceOverride"
+            control={control}
+            render={({ field, fieldState: { error } }) => (
+              <NumberInput
+                {...field}
+                value={field.value || undefined}
+                onChange={(value) => {
+                  field.onChange(value || null);
+                }}
+                error={error?.message}
+                label={t("entities.reservation.keys.priceOverride")}
+                leftSection={<IconCurrencyEuro size="1rem" />}
+                decimalScale={2}
+                decimalSeparator=","
+                fixedDecimalScale
+                hideControls
+              />
+            )}
+          />
+        </Group>
+        <Group align="flex-start">
+          <Textarea
+            {...register("reservationNotes")}
+            error={errors.reservationNotes?.message}
+            label={t("entities.reservation.keys.reservationNotes")}
+            autosize
+            minRows={2}
+            maxRows={6}
+          />
+          <Textarea
+            {...register("invoiceNotes")}
+            error={errors.invoiceNotes?.message}
+            label={t("entities.reservation.keys.invoiceNotes")}
+            autosize
+            minRows={2}
+            maxRows={6}
+          />
+        </Group>
       </Stack>
     </Paper>
   );
