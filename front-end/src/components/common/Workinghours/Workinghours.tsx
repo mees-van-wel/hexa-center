@@ -61,50 +61,53 @@ export const Workinghours = ({ account }: workinghoursProps) => {
                   <IconPlus />
                 </Button>
               </Group>
-              {account.workingHours
-                .filter(
-                  ({ startDay, endDay }) =>
-                    sortedWeekdays.indexOf(sortedWeekdays[startDay]) ===
-                      sortedWeekdays.indexOf(currentWeekday) ||
-                    sortedWeekdays.indexOf(sortedWeekdays[endDay]) ===
-                      sortedWeekdays.indexOf(currentWeekday),
-                )
-                .sort(
-                  (a, b) =>
-                    sortedWeekdays.indexOf(sortedWeekdays[a.startDay]) -
-                      sortedWeekdays.indexOf(sortedWeekdays[b.startDay]) ||
-                    parseInt(a.startTime.slice(0, 5)) -
-                      parseInt(b.endTime.slice(0, 5)),
-                )
-                .map(({ id, startDay, endDay, startTime, endTime }) => (
-                  <div key={id}>
-                    <Group align="flex-end">
-                      {sortedWeekdays.indexOf(sortedWeekdays[startDay]) ===
-                        sortedWeekdays.indexOf(currentWeekday) && (
-                        <TimeInput
-                          label="Start"
-                          value={`${startTime
-                            .toString()
-                            .slice(0, 2)}:${startTime.toString().slice(3, 5)}`}
-                          disabled
-                        />
-                      )}
-                      {sortedWeekdays.indexOf(sortedWeekdays[endDay]) ===
-                        sortedWeekdays.indexOf(currentWeekday) && (
-                        <TimeInput
-                          label="End"
-                          value={`${endTime.toString().slice(0, 2)}:${endTime
-                            .toString()
-                            .slice(3, 5)}`}
-                          disabled
-                        />
-                      )}
-                      <Button variant="light">
-                        <IconMinus />
-                      </Button>
-                    </Group>
-                  </div>
-                ))}
+              {account.workingHours &&
+                account.workingHours
+                  .filter(
+                    ({ startDay, endDay }) =>
+                      sortedWeekdays.indexOf(sortedWeekdays[startDay]) ===
+                        sortedWeekdays.indexOf(currentWeekday) ||
+                      sortedWeekdays.indexOf(sortedWeekdays[endDay]) ===
+                        sortedWeekdays.indexOf(currentWeekday),
+                  )
+                  .sort(
+                    (a, b) =>
+                      sortedWeekdays.indexOf(sortedWeekdays[a.startDay]) -
+                        sortedWeekdays.indexOf(sortedWeekdays[b.startDay]) ||
+                      parseInt(a.startTime.slice(0, 5)) -
+                        parseInt(b.endTime.slice(0, 5)),
+                  )
+                  .map(({ id, startDay, endDay, startTime, endTime }) => (
+                    <div key={id}>
+                      <Group align="flex-end">
+                        {sortedWeekdays.indexOf(sortedWeekdays[startDay]) ===
+                          sortedWeekdays.indexOf(currentWeekday) && (
+                          <TimeInput
+                            label="Start"
+                            value={`${startTime
+                              .toString()
+                              .slice(0, 2)}:${startTime
+                              .toString()
+                              .slice(3, 5)}`}
+                            disabled
+                          />
+                        )}
+                        {sortedWeekdays.indexOf(sortedWeekdays[endDay]) ===
+                          sortedWeekdays.indexOf(currentWeekday) && (
+                          <TimeInput
+                            label="End"
+                            value={`${endTime.toString().slice(0, 2)}:${endTime
+                              .toString()
+                              .slice(3, 5)}`}
+                            disabled
+                          />
+                        )}
+                        <Button variant="light">
+                          <IconMinus />
+                        </Button>
+                      </Group>
+                    </div>
+                  ))}
             </Stack>
           ),
         )}

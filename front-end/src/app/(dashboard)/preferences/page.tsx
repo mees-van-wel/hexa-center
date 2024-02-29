@@ -36,55 +36,66 @@ import { IconSettings } from "@tabler/icons-react";
 
 export default function Preferences() {
   const t = useTranslation();
-  const settings = useAuthRelation().account;
+  const { account } = useAuthRelation();
+
+  const currentAccount = account || {
+    locale: "en-US",
+    theme: "DARK",
+    color: "BLUE",
+    timezone: "CET",
+    dateFormat: "AUTO",
+    decimalSeparator: "AUTO",
+    timeFormat: "AUTO",
+    firstDayOfWeek: "AUTO",
+  };
 
   const datePreview = useMemo(
     () =>
       new Intl.DateTimeFormat(
-        settings.dateFormat === DATE_FORMATS.MDY
+        currentAccount.dateFormat === DATE_FORMATS.MDY
           ? LOCALES.EN_US
-          : settings.dateFormat === DATE_FORMATS.DMY
+          : currentAccount.dateFormat === DATE_FORMATS.DMY
             ? LOCALES.NL_NL
             : undefined,
       ).format(new Date()),
-    [settings.dateFormat],
+    [currentAccount.dateFormat],
   );
 
   const separatorPreview = useMemo(
     () =>
       new Intl.NumberFormat(
-        settings.decimalSeparator === DECIMAL_SEPARATORS.DOT
+        currentAccount.decimalSeparator === DECIMAL_SEPARATORS.DOT
           ? LOCALES.EN_US
-          : settings.decimalSeparator === DECIMAL_SEPARATORS.COMMA
+          : currentAccount.decimalSeparator === DECIMAL_SEPARATORS.COMMA
             ? LOCALES.NL_NL
             : undefined,
       ).format(1234.56),
-    [settings.decimalSeparator],
+    [currentAccount.decimalSeparator],
   );
 
   const timePreview = useMemo(
     () =>
       new Intl.DateTimeFormat(
-        settings.timeFormat === TIME_FORMATS.TWELVE
+        currentAccount.timeFormat === TIME_FORMATS.TWELVE
           ? LOCALES.EN_US
-          : settings.timeFormat === TIME_FORMATS.TWENTYFOUR
+          : currentAccount.timeFormat === TIME_FORMATS.TWENTYFOUR
             ? LOCALES.NL_NL
             : undefined,
         { timeStyle: "short" },
       ).format(new Date()),
-    [settings.timeFormat],
+    [currentAccount.timeFormat],
   );
 
   const firstDayOfTheWeekPreview = useMemo(
     () =>
-      settings.firstDayOfWeek === FIRST_DAYS_OF_THE_WEEK.AUTO
+      currentAccount.firstDayOfWeek === FIRST_DAYS_OF_THE_WEEK.AUTO
         ? dayjs().startOf("week").format("dddd")
         : t(
             `constants.firstDaysOfTheWeek.${
-              settings.firstDayOfWeek as FirstDayOfTheWeek
+              currentAccount.firstDayOfWeek as FirstDayOfTheWeek
             }`,
           ),
-    [settings.firstDayOfWeek, t],
+    [currentAccount.firstDayOfWeek, t],
   );
 
   // TODO: update auth
@@ -104,7 +115,7 @@ export default function Preferences() {
           <Group grow>
             <Select
               label={t("preferencesPage.language")}
-              value={settings.locale}
+              value={currentAccount.locale || "en-US"}
               data={LOCALE_VALUES.map((locale: Locale) => ({
                 label: t(`constants.locales.${locale}`),
                 value: locale,
@@ -115,7 +126,7 @@ export default function Preferences() {
             />
             <Select
               label={t("preferencesPage.theme")}
-              value={settings.theme}
+              value={currentAccount.theme}
               data={THEME_VALUES.map((theme: ThemeKey) => ({
                 label: t(`constants.themes.${theme}`),
                 value: theme,
@@ -126,7 +137,7 @@ export default function Preferences() {
             />
             <Select
               label={t("preferencesPage.timezone")}
-              value={settings.timezone}
+              value={currentAccount.timezone}
               data={TIMEZONES}
               allowDeselect={false}
               searchable
@@ -138,7 +149,7 @@ export default function Preferences() {
             <Stack>
               <Select
                 label={t("preferencesPage.dateFormat")}
-                value={settings.dateFormat}
+                value={currentAccount.dateFormat}
                 data={DATE_FORMAT_VALUES.map((dateformat: DateFormatKey) => ({
                   label: t(`constants.dateFormats.${dateformat}`),
                   value: dateformat,
@@ -152,7 +163,7 @@ export default function Preferences() {
             <Stack>
               <Select
                 label={t("preferencesPage.decimalSeparator")}
-                value={settings.decimalSeparator}
+                value={currentAccount.decimalSeparator}
                 data={DECIMAL_SEPARATOR_VALUES.map(
                   (separator: DecimalSeparatorKey) => ({
                     label: t(`constants.separators.${separator}`),
@@ -168,7 +179,7 @@ export default function Preferences() {
             <Stack>
               <Select
                 label={t("preferencesPage.timeNotation")}
-                value={settings.timeFormat}
+                value={currentAccount.timeFormat}
                 data={TIME_FORMAT_VALUES.map((timeformat: TimeFormat) => ({
                   label: t(`constants.timeFormats.${timeformat}`),
                   value: timeformat,
@@ -182,7 +193,7 @@ export default function Preferences() {
             <Stack>
               <Select
                 label={t("preferencesPage.firstDayOfWeek")}
-                value={settings.firstDayOfWeek}
+                value={currentAccount.firstDayOfWeek}
                 data={FIRST_DAY_OF_THE_WEEK_VALUES.map(
                   (firstDayOfWeek: FirstDayOfTheWeek) => ({
                     label: t(`constants.firstDaysOfTheWeek.${firstDayOfWeek}`),
@@ -199,7 +210,7 @@ export default function Preferences() {
         </Stack>
       </Sheet>
       <Group align="flex-start" grow>
-        <Workinghours account={settings} />
+        <Workinghours account={currentAccount} />
         <Sheet title={t("preferencesPage.storage")}>
           <Group justify="space-between">
             <p>MB</p>
