@@ -1,0 +1,1 @@
+ALTER TABLE "invoice_extra_templates" ADD COLUMN "quantity" numeric(10, 2) DEFAULT '1' NOT NULL;

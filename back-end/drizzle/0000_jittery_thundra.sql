@@ -11,6 +11,36 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
+ CREATE TYPE "invoice_extra_basis" AS ENUM('oneTime', 'perNight');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ CREATE TYPE "invoice_extra_instance_ref_type" AS ENUM('reservation');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ CREATE TYPE "invoice_extra_timing" AS ENUM('start', 'end', 'throughout');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ CREATE TYPE "invoice_extra_type" AS ENUM('reservation');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ CREATE TYPE "invoice_extra_unit" AS ENUM('currency', 'percentage');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  CREATE TYPE "invoice_ref_type" AS ENUM('invoice', 'reservation');
 EXCEPTION
  WHEN duplicate_object THEN null;
@@ -42,7 +72,7 @@ END $$;
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "accounts" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"uuid" uuid DEFAULT gen_random_uuid(),
+	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"relation_id" integer NOT NULL,
 	"locale" text NOT NULL,
 	"theme" text NOT NULL,
@@ -52,7 +82,7 @@ CREATE TABLE IF NOT EXISTS "accounts" (
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "invoice_events" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"uuid" uuid DEFAULT gen_random_uuid(),
+	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"created_by_id" integer,
 	"invoice_id" integer NOT NULL,
@@ -61,12 +91,45 @@ CREATE TABLE IF NOT EXISTS "invoice_events" (
 	"ref_id" integer
 );
 --> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "invoice_extra_instances" (
+	"$kind" text DEFAULT 'invoiceExtraInstance' NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
+	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
+	"template_id" integer,
+	"ref_type" "invoice_extra_instance_ref_type" NOT NULL,
+	"ref_id" integer NOT NULL,
+	"name" text NOT NULL,
+	"amount" numeric(10, 2) NOT NULL,
+	"unit" "invoice_extra_unit" NOT NULL,
+	"basis" "invoice_extra_basis" NOT NULL,
+	"timing" "invoice_extra_timing" NOT NULL,
+	"tax_percentage" numeric(10, 2) DEFAULT '0' NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "invoice_extra_templates" (
+	"$kind" text DEFAULT 'invoiceExtraTemplate' NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
+	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_by_id" integer,
+	"updated_by_id" integer,
+	"type" "invoice_extra_type" NOT NULL,
+	"name" text NOT NULL,
+	"description" text,
+	"amount" numeric(10, 2) NOT NULL,
+	"unit" "invoice_extra_unit" NOT NULL,
+	"basis" "invoice_extra_basis" NOT NULL,
+	"timing" "invoice_extra_timing" NOT NULL,
+	"tax_percentage" numeric(10, 2) DEFAULT '0' NOT NULL,
+	"auto_add" boolean DEFAULT false NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "invoice_lines" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"uuid" uuid DEFAULT gen_random_uuid(),
+	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"invoice_id" integer NOT NULL,
 	"name" text NOT NULL,
-	"comments" text,
 	"unit_net_amount" numeric(10, 2) NOT NULL,
 	"quantity" numeric(10, 2) NOT NULL,
 	"total_net_amount" numeric(10, 2) NOT NULL,
@@ -79,7 +142,7 @@ CREATE TABLE IF NOT EXISTS "invoice_lines" (
 CREATE TABLE IF NOT EXISTS "invoices" (
 	"$kind" text DEFAULT 'invoice' NOT NULL,
 	"id" serial PRIMARY KEY NOT NULL,
-	"uuid" uuid DEFAULT gen_random_uuid(),
+	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"created_by_id" integer,
 	"ref_type" "invoice_ref_type" NOT NULL,
@@ -92,7 +155,7 @@ CREATE TABLE IF NOT EXISTS "invoices" (
 	"total_tax_amount" numeric(10, 2) NOT NULL,
 	"total_gross_amount" numeric(10, 2) NOT NULL,
 	"number" text,
-	"comments" text,
+	"notes" text,
 	"date" date,
 	"due_date" date,
 	"customer_id" integer,
@@ -132,7 +195,7 @@ CREATE TABLE IF NOT EXISTS "permissions" (
 CREATE TABLE IF NOT EXISTS "properties" (
 	"$kind" text DEFAULT 'property' NOT NULL,
 	"id" serial PRIMARY KEY NOT NULL,
-	"uuid" uuid DEFAULT gen_random_uuid(),
+	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	"created_by_id" integer,
@@ -152,7 +215,7 @@ CREATE TABLE IF NOT EXISTS "properties" (
 CREATE TABLE IF NOT EXISTS "relations" (
 	"$kind" text DEFAULT 'relation' NOT NULL,
 	"id" serial PRIMARY KEY NOT NULL,
-	"uuid" uuid DEFAULT gen_random_uuid(),
+	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	"created_by_id" integer,
@@ -183,7 +246,7 @@ CREATE TABLE IF NOT EXISTS "relations" (
 CREATE TABLE IF NOT EXISTS "reservations" (
 	"$kind" text DEFAULT 'reservation' NOT NULL,
 	"id" serial PRIMARY KEY NOT NULL,
-	"uuid" uuid DEFAULT gen_random_uuid(),
+	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"created_by_id" integer,
@@ -192,14 +255,24 @@ CREATE TABLE IF NOT EXISTS "reservations" (
 	"customer_id" integer NOT NULL,
 	"start_date" timestamp with time zone NOT NULL,
 	"end_date" timestamp with time zone NOT NULL,
-	"notes" text,
-	"guest_name" text
+	"price_override" numeric(10, 2),
+	"guest_name" text NOT NULL,
+	"reservation_notes" text,
+	"invoice_notes" text
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "reservations_to_invoices" (
+	"reservation_id" integer NOT NULL,
+	"invoice_id" integer NOT NULL,
+	"start_date" timestamp with time zone NOT NULL,
+	"end_date" timestamp with time zone NOT NULL,
+	CONSTRAINT "reservations_to_invoices_reservation_id_invoice_id_pk" PRIMARY KEY("reservation_id","invoice_id")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "roles" (
 	"$kind" text DEFAULT 'role' NOT NULL,
 	"id" serial PRIMARY KEY NOT NULL,
-	"uuid" uuid DEFAULT gen_random_uuid(),
+	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	"created_by_id" integer,
@@ -211,7 +284,7 @@ CREATE TABLE IF NOT EXISTS "roles" (
 CREATE TABLE IF NOT EXISTS "rooms" (
 	"$kind" text DEFAULT 'room' NOT NULL,
 	"id" serial PRIMARY KEY NOT NULL,
-	"uuid" uuid DEFAULT gen_random_uuid(),
+	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	"created_by_id" integer,
@@ -224,7 +297,7 @@ CREATE TABLE IF NOT EXISTS "rooms" (
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "sessions" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"uuid" uuid DEFAULT gen_random_uuid(),
+	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"issued_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"last_accessed" timestamp with time zone DEFAULT now() NOT NULL,
 	"expires_at" timestamp with time zone,
@@ -237,7 +310,7 @@ CREATE TABLE IF NOT EXISTS "sessions" (
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "settings" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"uuid" uuid DEFAULT gen_random_uuid(),
+	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now(),
 	"updated_by_id" integer,
 	"name" "setting_name" NOT NULL,
@@ -246,7 +319,7 @@ CREATE TABLE IF NOT EXISTS "settings" (
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "working_hours" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"uuid" uuid DEFAULT gen_random_uuid(),
+	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"account_id" integer NOT NULL,
 	"start_day" integer NOT NULL,
 	"end_day" integer NOT NULL,
@@ -268,6 +341,24 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "invoice_events" ADD CONSTRAINT "invoice_events_invoice_id_invoices_id_fk" FOREIGN KEY ("invoice_id") REFERENCES "invoices"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "invoice_extra_instances" ADD CONSTRAINT "invoice_extra_instances_template_id_invoice_extra_templates_id_fk" FOREIGN KEY ("template_id") REFERENCES "invoice_extra_templates"("id") ON DELETE set null ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "invoice_extra_templates" ADD CONSTRAINT "invoice_extra_templates_created_by_id_relations_id_fk" FOREIGN KEY ("created_by_id") REFERENCES "relations"("id") ON DELETE set null ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "invoice_extra_templates" ADD CONSTRAINT "invoice_extra_templates_updated_by_id_relations_id_fk" FOREIGN KEY ("updated_by_id") REFERENCES "relations"("id") ON DELETE set null ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -358,6 +449,18 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "reservations" ADD CONSTRAINT "reservations_customer_id_relations_id_fk" FOREIGN KEY ("customer_id") REFERENCES "relations"("id") ON DELETE restrict ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "reservations_to_invoices" ADD CONSTRAINT "reservations_to_invoices_reservation_id_reservations_id_fk" FOREIGN KEY ("reservation_id") REFERENCES "reservations"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "reservations_to_invoices" ADD CONSTRAINT "reservations_to_invoices_invoice_id_invoices_id_fk" FOREIGN KEY ("invoice_id") REFERENCES "invoices"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

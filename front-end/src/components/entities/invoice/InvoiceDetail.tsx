@@ -296,6 +296,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   component={Link}
                   size="compact-md"
                   // TODO remove hardcoded s
+                  // @ts-ignore Router
                   href={`/${invoice.refType}s/${invoice.refId}`}
                   variant="light"
                   rightSection={<IconExternalLink size="1rem" />}
@@ -328,7 +329,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                     {Intl.NumberFormat("nl-NL", {
                       style: "currency",
                       currency: "EUR",
-                    }).format(parseFloat(invoice.totalGrossAmount))}
+                    }).format(parseFloat(invoice.grossAmount))}
                   </p>
                 </div>
                 <div>
@@ -365,6 +366,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                     <Button
                       component={Link}
                       size="compact-md"
+                      // @ts-ignore Router
                       href={`/relations/${invoice.customerId}`}
                       variant="light"
                       rightSection={<IconExternalLink size="1rem" />}
@@ -442,6 +444,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                     <Button
                       component={Link}
                       size="compact-md"
+                      // @ts-ignore Router
                       href={`/properties/${invoice.companyId}`}
                       variant="light"
                       rightSection={<IconExternalLink size="1rem" />}
@@ -538,6 +541,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                                 <Button
                                   size="compact-sm"
                                   component={Link}
+                                  // @ts-ignore Router
                                   href={`/invoices/${refId}`}
                                   variant="light"
                                 >
@@ -597,7 +601,6 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                 <Table.Th>Name</Table.Th>
                 <Table.Th>Unit price</Table.Th>
                 <Table.Th>Quantity</Table.Th>
-                {/* <Table.Th>Discount</Table.Th> */}
                 <Table.Th>Total net amount</Table.Th>
                 <Table.Th>VAT</Table.Th>
                 <Table.Th>Total gross amount</Table.Th>
@@ -608,13 +611,12 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                 ({
                   id,
                   name,
-                  unitNetAmount,
+                  unitAmount,
                   quantity,
-                  // discountAmount,
-                  totalNetAmount,
-                  totalTaxAmount,
-                  taxPercentage,
-                  totalGrossAmount,
+                  netAmount,
+                  vatAmount,
+                  vatPercentage,
+                  grossAmount,
                 }) => (
                   <Table.Tr key={id}>
                     <Table.Td>{name}</Table.Td>
@@ -622,35 +624,27 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                       {Intl.NumberFormat("nl-NL", {
                         style: "currency",
                         currency: "EUR",
-                      }).format(parseFloat(unitNetAmount))}
+                      }).format(parseFloat(unitAmount))}
                     </Table.Td>
                     <Table.Td>{quantity}x</Table.Td>
-                    {/* <Table.Td>
-                      {Intl.NumberFormat("nl-NL", {
-                        style: "currency",
-                        currency: "EUR",
-                      }).format(
-                        discountAmount ? parseFloat(discountAmount) : 0,
-                      )}
-                    </Table.Td> */}
                     <Table.Td>
                       {Intl.NumberFormat("nl-NL", {
                         style: "currency",
                         currency: "EUR",
-                      }).format(parseFloat(totalNetAmount))}
+                      }).format(parseFloat(netAmount))}
                     </Table.Td>
                     <Table.Td>
                       {Intl.NumberFormat("nl-NL", {
                         style: "currency",
                         currency: "EUR",
-                      }).format(parseFloat(totalTaxAmount))}{" "}
-                      ({taxPercentage}%)
+                      }).format(parseFloat(vatAmount))}{" "}
+                      ({vatPercentage}%)
                     </Table.Td>
                     <Table.Td>
                       {Intl.NumberFormat("nl-NL", {
                         style: "currency",
                         currency: "EUR",
-                      }).format(parseFloat(totalGrossAmount))}
+                      }).format(parseFloat(grossAmount))}
                     </Table.Td>
                   </Table.Tr>
                 ),
@@ -679,20 +673,6 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                     Total
                   </Text>
                 </Table.Td>
-                {/* <Table.Td
-                  style={{
-                    paddingTop: "1.5rem",
-                  }}
-                >
-                  {Intl.NumberFormat("nl-NL", {
-                    style: "currency",
-                    currency: "EUR",
-                  }).format(
-                    invoice.totalDiscountAmount
-                      ? parseFloat(invoice.totalDiscountAmount)
-                      : 0,
-                  )}
-                </Table.Td> */}
                 <Table.Td
                   style={{
                     paddingTop: "1.5rem",
@@ -701,7 +681,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   {Intl.NumberFormat("nl-NL", {
                     style: "currency",
                     currency: "EUR",
-                  }).format(parseFloat(invoice.totalNetAmount))}
+                  }).format(parseFloat(invoice.netAmount))}
                 </Table.Td>
                 <Table.Td
                   style={{
@@ -711,7 +691,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   {Intl.NumberFormat("nl-NL", {
                     style: "currency",
                     currency: "EUR",
-                  }).format(parseFloat(invoice.totalTaxAmount))}
+                  }).format(parseFloat(invoice.vatAmount))}
                 </Table.Td>
                 <Table.Td
                   style={{
@@ -721,7 +701,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   {Intl.NumberFormat("nl-NL", {
                     style: "currency",
                     currency: "EUR",
-                  }).format(parseFloat(invoice.totalGrossAmount))}
+                  }).format(parseFloat(invoice.grossAmount))}
                 </Table.Td>
               </Table.Tr>
             </Table.Tbody>

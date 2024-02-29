@@ -138,7 +138,7 @@
               <p>CoC-number: <%= customerCocNumber %></p>
               <% } %>
               <% if (customerVatNumber) { %>
-              <p>VAT tax number: <%= customerVatNumber %></p>
+              <p>VAT number: <%= customerVatNumber %></p>
               <% } %>
             </div>
             <% } %>
@@ -157,7 +157,7 @@
             </div>
             <div>
               <p>CoC-number: <%= companyCocNumber %></p>
-              <p>VAT tax number: <%= companyVatNumber %></p>
+              <p>VAT number: <%= companyVatNumber %></p>
             </div>
             <div>
               <p>IBAN: <%= companyIban %></p>
@@ -172,31 +172,25 @@
           <thead>
             <tr>
               <th>Name</th>
-              <th>Price</th>
+              <th>Unit amount</th>
               <th>Quantity</th>
-              <% if (totalDiscountAmount) { %>
-              <th>Discount</th>
-              <% } %>
-              <th>Total net</th>
+              <th>Net amount</th>
               <th>VAT</th>
-              <th>Total gross</th>
+              <th>Gross amount</th>
             </tr>
           </thead>
           <tbody>
             <% lines.forEach(function(line) { %>
             <tr>
               <td><%= line.name %></td>
-              <td><%= line.unitNetAmount %></td>
+              <td><%= line.unitAmount %></td>
               <td><%= line.quantity %>x</td>
-              <% if (totalDiscountAmount) { %>
-              <td><%= line.discountAmount %></td>
-              <% } %>
-              <td><%= line.totalNetAmount %></td>
+              <td><%= line.netAmount %></td>
               <td>
-                <%= line.totalTaxAmount %>
-                (<%= line.taxPercentage %>%)
+                <%= line.vatAmount %>
+                (<%= line.vatPercentage %>%)
               </td>
-              <td><%= line.totalGrossAmount %></td>
+              <td><%= line.grossAmount %></td>
             </tr>
             <% }); %>
           </tbody>
@@ -205,12 +199,9 @@
               <th></th>
               <th></th>
               <th>Total</th>
-              <% if (totalDiscountAmount) { %>
-              <td><%= totalDiscountAmount %></td>
-              <% } %>
-              <td><%= totalNetAmount %></td>
-              <td><%= totalTaxAmount %></td>
-              <td><%= totalGrossAmount %></td>
+              <td><%= netAmount %></td>
+              <td><%= vatAmount %></td>
+              <td><%= grossAmount %></td>
             </tr>
           </tfoot>
         </table>

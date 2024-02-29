@@ -33,6 +33,7 @@ import {
   Paper,
   ScrollArea,
   Stack,
+  Table,
   Text,
   Title,
 } from "@mantine/core";
@@ -41,6 +42,7 @@ import { notifications } from "@mantine/notifications";
 import {
   IconAlertTriangle,
   IconCheck,
+  IconEdit,
   IconFile,
   IconFileArrowLeft,
   IconFileEuro,
@@ -49,6 +51,8 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 
+import { CreateInvoiceExtraModal } from "./CreateInvoiceExtraModal";
+import { EditInvoiceExtraModal } from "./EditInvoiceExtraModal";
 import { InvoicePeriodModal } from "./InvoicePeriodModal";
 import { ReservationForm } from "./ReservationForm";
 
@@ -58,23 +62,22 @@ type ReservationProps = {
   reservation: RouterOutput["reservation"]["get"];
   rooms: RouterOutput["room"]["list"];
   relations: RouterOutput["relation"]["list"];
+  invoiceExtraTemplates: RouterOutput["invoiceExtra"]["list"];
 };
 
-// TODO Fix due date when invoice is issued (30 days 2024-03-31T20:59:21.530Z 2024-03-31T20:59:21.530Z)
-
-// TODO Fix allow billable period to be reset after an invoice with that period has ben credited
-
-// TODO Add creation event with link to original invoice when credit
-// TODO Fix invoices, somehow set ref back to null when ref entity is deleted
 export const ReservationUpdate = ({
   reservation,
   rooms,
   relations,
+  invoiceExtraTemplates,
 }: ReservationProps) => {
   const t = useTranslation();
   const router = useRouter();
   const deleteReservation = useMutation("reservation", "delete");
   const invoicePeriod = useMutation("reservation", "invoicePeriod");
+  const createInvoiceExtra = useMutation("reservation", "addInvoiceExtra");
+  const updateInvoiceExtra = useMutation("reservation", "updateInvoiceExtra");
+  const deleteInvoiceExtra = useMutation("invoiceExtra", "deleteInstance");
 
   const formMethods = useForm<ReservationInputUpdateSchema>({
     defaultValues: {
@@ -88,11 +91,11 @@ export const ReservationUpdate = ({
 
   const invoices = useMemo(
     () =>
-      reservation.reservationsToInvoices.sort(
+      reservation.invoicesJunction.sort(
         (a, b) =>
           b.invoice.createdAt?.getTime() - a.invoice.createdAt?.getTime(),
       ),
-    [reservation.reservationsToInvoices],
+    [reservation.invoicesJunction],
   );
 
   const deleteHandler = () => {
@@ -111,7 +114,7 @@ export const ReservationUpdate = ({
     });
   };
 
-  const invoiceHandler = async () => {
+  const invoicePeriodHandler = async () => {
     const lastInvoicedDate = invoices[0]?.endDate;
 
     modals.open({
@@ -152,6 +155,97 @@ export const ReservationUpdate = ({
     });
   };
 
+  const createInvoiceExtraHandler = () => {
+    modals.open({
+      title: <Title order={3}>Add Invoice Extra</Title>,
+      size: "xs",
+      children: (
+        <CreateInvoiceExtraModal
+          templates={invoiceExtraTemplates}
+          onConfirm={async (templateId, overrides) => {
+            await createInvoiceExtra.mutate({
+              reservationId: reservation.id,
+              templateId,
+              ...overrides,
+            });
+
+            router.refresh();
+
+            notifications.show({
+              message: "Invoice extra successfully added",
+              color: "green",
+            });
+          }}
+        />
+      ),
+    });
+  };
+
+  const editInvoiceExtraHandler = async (id: number) => {
+    const invoiceExtra = reservation.invoicesExtrasJunction.find(
+      ({ instance }) => instance.id === id,
+    );
+
+    if (!invoiceExtra) return;
+
+    console.log(invoiceExtra);
+
+    modals.open({
+      title: <Title order={3}>Edit Invoice Extra</Title>,
+      size: "xs",
+      children: (
+        <EditInvoiceExtraModal
+          currentValues={{
+            name: invoiceExtra.instance.name,
+            quantity: invoiceExtra.instance.quantity,
+            amount: invoiceExtra.instance.amount,
+            unit: invoiceExtra.instance.unit,
+            vatPercentage: invoiceExtra.instance.vatPercentage,
+            basis: invoiceExtra.basis,
+            timing: invoiceExtra.timing,
+          }}
+          onConfirm={async (values) => {
+            console.log({
+              reservationId: reservation.id,
+              instanceId: invoiceExtra.instance.id,
+              ...values,
+            });
+
+            await updateInvoiceExtra.mutate({
+              reservationId: reservation.id,
+              instanceId: invoiceExtra.instance.id,
+              ...values,
+            });
+
+            router.refresh();
+
+            notifications.show({
+              message: "Invoice extra successfully edited",
+              color: "green",
+            });
+          }}
+        />
+      ),
+    });
+  };
+
+  const deleteInvoiceExtraHandler = (id: number) => {
+    modals.openConfirmModal({
+      title: t("common.areYouSure"),
+      labels: { confirm: t("common.yes"), cancel: t("common.no") },
+      onConfirm: async () => {
+        await deleteInvoiceExtra.mutate(id);
+
+        router.refresh();
+
+        notifications.show({
+          message: "Invoice extra successfully deleted",
+          color: "green",
+        });
+      },
+    });
+  };
+
   return (
     <FormProvider {...formMethods}>
       <Stack>
@@ -169,7 +263,7 @@ export const ReservationUpdate = ({
           ]}
         >
           <Button
-            onClick={invoiceHandler}
+            onClick={invoicePeriodHandler}
             leftSection={<IconFileEuro />}
             loading={invoicePeriod.loading}
           >
@@ -191,18 +285,88 @@ export const ReservationUpdate = ({
           <Band
             title={
               <>
-                <Title order={3}>Price Adjustments</Title>
+                <Title order={3}>Invoice Extra&apos;s</Title>
                 <Button
-                  onClick={invoiceHandler}
+                  onClick={createInvoiceExtraHandler}
                   leftSection={<IconPlus />}
-                  loading={invoicePeriod.loading}
+                  loading={createInvoiceExtra.loading}
                 >
                   Add
                 </Button>
               </>
             }
           >
-            <p>lol</p>
+            {!reservation.invoicesExtrasJunction.length ? (
+              <p>None added</p>
+            ) : (
+              <Table>
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th>Actions</Table.Th>
+                    <Table.Th>Name</Table.Th>
+                    <Table.Th>Quantity</Table.Th>
+                    <Table.Th>Amount</Table.Th>
+                    <Table.Th>Unit</Table.Th>
+                    <Table.Th>Vat percentage</Table.Th>
+                    <Table.Th>Basis</Table.Th>
+                    <Table.Th>Timing</Table.Th>
+                    <Table.Th>Status</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  {reservation.invoicesExtrasJunction.map(
+                    ({ instance, basis, timing, status }) => (
+                      <Table.Tr key={instance.id}>
+                        <Table.Td>
+                          <Group gap="xs">
+                            <Button
+                              size="compact-md"
+                              variant="light"
+                              onClick={() => {
+                                editInvoiceExtraHandler(instance.id);
+                              }}
+                            >
+                              <IconEdit size="1rem" />
+                            </Button>
+                            <Button
+                              size="compact-md"
+                              variant="light"
+                              color="red"
+                              onClick={() => {
+                                deleteInvoiceExtraHandler(instance.id);
+                              }}
+                            >
+                              <IconTrash size="1rem" />
+                            </Button>
+                          </Group>
+                        </Table.Td>
+                        <Table.Td>{instance.name}</Table.Td>
+                        <Table.Td>{instance.quantity}</Table.Td>
+                        <Table.Td>{instance.amount}</Table.Td>
+                        <Table.Td>{instance.unit}</Table.Td>
+                        <Table.Td>{instance.vatPercentage}%</Table.Td>
+                        <Table.Td>{basis}</Table.Td>
+                        <Table.Td>{timing}</Table.Td>
+                        <Table.Td>
+                          <Badge
+                            variant="light"
+                            color={
+                              status === "notApplied"
+                                ? "red"
+                                : status === "inProgress"
+                                  ? "orange"
+                                  : "green"
+                            }
+                          >
+                            {status}
+                          </Badge>
+                        </Table.Td>
+                      </Table.Tr>
+                    ),
+                  )}
+                </Table.Tbody>
+              </Table>
+            )}
           </Band>
         </Paper>
         {!!invoices.length && (
@@ -306,12 +470,13 @@ export const ReservationUpdate = ({
                             {Intl.NumberFormat("nl-NL", {
                               style: "currency",
                               currency: "EUR",
-                            }).format(parseFloat(invoice.totalGrossAmount))}
+                            }).format(parseFloat(invoice.grossAmount))}
                           </Text>
                         </Stack>
                         <Button
                           fullWidth
                           component={Link}
+                          // @ts-ignore Router
                           href={`/invoices/${invoice.id}`}
                           radius={0}
                         >

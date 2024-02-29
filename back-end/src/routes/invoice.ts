@@ -40,7 +40,7 @@ export const invoiceRouter = router({
         customerName: true,
         createdAt: true,
         date: true,
-        totalGrossAmount: true,
+        grossAmount: true,
       },
       orderBy: desc(invoices.date),
     }),
@@ -244,16 +244,15 @@ export const invoiceRouter = router({
       type: "mailed",
     });
   }),
+  // TOOD Make credit invoice be issued right away
   credit: procedure.input(wrap(number())).mutation(async ({ input, ctx }) => {
     const invoicesResult = await db
       .select({
         refType: invoices.refType,
         refId: invoices.refId,
-        discountAmount: invoices.discountAmount,
-        totalNetAmount: invoices.totalNetAmount,
-        totalDiscountAmount: invoices.totalDiscountAmount,
-        totalTaxAmount: invoices.totalTaxAmount,
-        totalGrossAmount: invoices.totalGrossAmount,
+        netAmount: invoices.netAmount,
+        vatAmount: invoices.vatAmount,
+        grossAmount: invoices.grossAmount,
         number: invoices.number,
         notes: invoices.notes,
         customerId: invoices.customerId,
@@ -275,15 +274,9 @@ export const invoiceRouter = router({
             refId: invoice.refId,
             type: "credit",
             status: "draft",
-            discountAmount: invoice.discountAmount
-              ? "-" + invoice.discountAmount
-              : null,
-            totalNetAmount: "-" + invoice.totalNetAmount,
-            totalDiscountAmount: invoice.totalDiscountAmount
-              ? "-" + invoice.totalDiscountAmount
-              : null,
-            totalTaxAmount: "-" + invoice.totalTaxAmount,
-            totalGrossAmount: "-" + invoice.totalGrossAmount,
+            netAmount: "-" + invoice.netAmount,
+            vatAmount: "-" + invoice.vatAmount,
+            grossAmount: "-" + invoice.grossAmount,
             number: invoice.number + "-C",
             notes: invoice.notes,
             customerId: invoice.customerId,
@@ -293,13 +286,12 @@ export const invoiceRouter = router({
         db
           .select({
             name: invoiceLines.name,
-            unitNetAmount: invoiceLines.unitNetAmount,
+            unitAmount: invoiceLines.unitAmount,
             quantity: invoiceLines.quantity,
-            totalNetAmount: invoiceLines.totalNetAmount,
-            discountAmount: invoiceLines.discountAmount,
-            totalTaxAmount: invoiceLines.totalTaxAmount,
-            taxPercentage: invoiceLines.taxPercentage,
-            totalGrossAmount: invoiceLines.totalGrossAmount,
+            netAmount: invoiceLines.netAmount,
+            vatAmount: invoiceLines.vatAmount,
+            vatPercentage: invoiceLines.vatPercentage,
+            grossAmount: invoiceLines.grossAmount,
           })
           .from(invoiceLines)
           .where(eq(invoiceLines.invoiceId, input)),
@@ -319,15 +311,12 @@ export const invoiceRouter = router({
         invoiceLinesResult.map((invoiceLine) => ({
           invoiceId: creditInvoiceId,
           name: invoiceLine.name,
-          unitNetAmount: "-" + invoiceLine.unitNetAmount,
+          unitAmount: "-" + invoiceLine.unitAmount,
           quantity: invoiceLine.quantity,
-          totalNetAmount: "-" + invoiceLine.totalNetAmount,
-          discountAmount: invoiceLine.discountAmount
-            ? "-" + invoiceLine.discountAmount
-            : null,
-          totalTaxAmount: "-" + invoiceLine.totalTaxAmount,
-          taxPercentage: invoiceLine.taxPercentage,
-          totalGrossAmount: "-" + invoiceLine.totalGrossAmount,
+          netAmount: "-" + invoiceLine.netAmount,
+          vatAmount: "-" + invoiceLine.vatAmount,
+          vatPercentage: invoiceLine.vatPercentage,
+          grossAmount: "-" + invoiceLine.grossAmount,
         })),
       ),
       db.insert(invoiceEvents).values({

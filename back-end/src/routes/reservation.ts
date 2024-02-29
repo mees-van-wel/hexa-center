@@ -1,9 +1,22 @@
 import dayjs from "dayjs";
-import { eq } from "drizzle-orm";
-import { date, number, object } from "valibot";
+import { and, eq } from "drizzle-orm";
+import {
+  date,
+  nullable,
+  number,
+  object,
+  optional,
+  picklist,
+  string,
+} from "valibot";
 
 import db from "@/db/client";
-import { reservations, reservationsToInvoices } from "@/db/schema";
+import {
+  invoiceExtraInstances,
+  reservations,
+  reservationsToInvoiceExtraInstances,
+  reservationsToInvoices,
+} from "@/db/schema";
 import { createInvoice } from "@/services/invoice";
 import { procedure, router } from "@/trpc";
 import { wrap } from "@decs/typeschema";
@@ -63,7 +76,7 @@ export const reservationRouter = router({
       with: {
         customer: true,
         room: true,
-        reservationsToInvoices: {
+        invoicesJunction: {
           with: {
             invoice: {
               columns: {
@@ -74,9 +87,29 @@ export const reservationRouter = router({
                 status: true,
                 number: true,
                 date: true,
-                totalGrossAmount: true,
+                grossAmount: true,
               },
             },
+          },
+        },
+        invoicesExtrasJunction: {
+          with: {
+            instance: {
+              columns: {
+                $kind: true,
+                id: true,
+                name: true,
+                quantity: true,
+                amount: true,
+                unit: true,
+                vatPercentage: true,
+              },
+            },
+          },
+          columns: {
+            basis: true,
+            timing: true,
+            status: true,
           },
         },
       },
@@ -100,7 +133,22 @@ export const reservationRouter = router({
 
     if (!reservation) throw new TRPCError({ code: "NOT_FOUND" });
 
-    return reservation;
+    reservation.invoicesExtrasJunction;
+
+    return {
+      ...reservation,
+      invoicesExtrasJunction: reservation.invoicesExtrasJunction.map(
+        (junction) => ({
+          ...junction,
+          instance: {
+            ...junction.instance,
+            amount: junction.instance.amount.toString(),
+            quantity: junction.instance.quantity.toString(),
+            vatPercentage: junction.instance.vatPercentage.toString(),
+          },
+        }),
+      ),
+    };
   }),
   update: procedure
     .input(wrap(ReservationUpdateSchema))
@@ -159,6 +207,7 @@ export const reservationRouter = router({
       const reservation = await db.query.reservations.findFirst({
         with: {
           room: true,
+          invoicesExtrasJunction: true,
         },
         where: eq(reservations.id, input.reservationId),
       });
@@ -181,10 +230,11 @@ export const reservationRouter = router({
         lines: [
           {
             name: "Overnight Stays",
-            unitNetAmount: reservation.priceOverride || reservation.room.price,
+            unitAmount: reservation.priceOverride || reservation.room.price,
             quantity: totalNights.toString(),
-            taxPercentage: "9",
+            vatPercentage: "9",
           },
+          // ...invoiceExtras.map(({ name, amount }) => ({ name, unitNetAmount })),
         ],
       });
 
@@ -197,4 +247,93 @@ export const reservationRouter = router({
 
       return invoiceId;
     }),
+  addInvoiceExtra: procedure
+    .input(
+      wrap(
+        object({
+          reservationId: number(),
+          templateId: nullable(number()),
+          name: string(),
+          quantity: string(),
+          amount: string(),
+          unit: picklist(["currency"]),
+          basis: picklist(["oneTime", "perNight"]),
+          timing: picklist(["end", "throughout"]),
+          vatPercentage: string(),
+        }),
+      ),
+    )
+    .mutation(async ({ input }) => {
+      const result = await db
+        .insert(invoiceExtraInstances)
+        .values({
+          templateId: input.templateId,
+          name: input.name,
+          quantity: input.quantity,
+          amount: input.amount,
+          unit: input.unit,
+          vatPercentage: input.vatPercentage,
+        })
+        .returning({
+          id: invoiceExtraInstances.id,
+        });
+
+      const instanceId = result[0].id;
+
+      await db.insert(reservationsToInvoiceExtraInstances).values({
+        reservationId: input.reservationId,
+        instanceId,
+        basis: input.basis,
+        timing: input.timing,
+        status: "notApplied",
+      });
+    }),
+  updateInvoiceExtra: procedure
+    .input(
+      wrap(
+        object({
+          reservationId: number(),
+          instanceId: number(),
+          name: optional(string()),
+          quantity: string(),
+          amount: optional(string()),
+          unit: optional(picklist(["currency"])),
+          basis: optional(picklist(["oneTime", "perNight"])),
+          timing: optional(picklist(["end", "throughout"])),
+          vatPercentage: optional(string()),
+        }),
+      ),
+    )
+    .mutation(async ({ input }) =>
+      Promise.all([
+        db
+          .update(invoiceExtraInstances)
+          .set({
+            name: input.name,
+            quantity: input.quantity,
+            amount: input.amount,
+            unit: input.unit,
+            vatPercentage: input.vatPercentage,
+          })
+          .where(eq(invoiceExtraInstances.id, input.instanceId)),
+        db
+          .update(reservationsToInvoiceExtraInstances)
+          .set({
+            basis: input.basis,
+            timing: input.timing,
+          })
+          .where(
+            and(
+              eq(
+                reservationsToInvoiceExtraInstances.reservationId,
+                input.reservationId,
+              ),
+              eq(
+                reservationsToInvoiceExtraInstances.instanceId,
+                input.instanceId,
+              ),
+            ),
+          ),
+      ]),
+    ),
 });

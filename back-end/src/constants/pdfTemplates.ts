@@ -43,20 +43,18 @@ export type PDFTemplateVariables = {
     companyVatNumber: string;
     companyIban: string;
     companySwiftBic: string;
-    totalDiscountAmount: string | null;
     lines: {
       name: string;
-      unitNetAmount: string;
+      unitAmount: string;
       quantity: string;
-      totalNetAmount: string;
-      discountAmount: string | null;
-      totalTaxAmount: string;
-      taxPercentage: string;
-      totalGrossAmount: string;
+      netAmount: string;
+      vatAmount: string;
+      vatPercentage: string;
+      grossAmount: string;
     }[];
-    totalNetAmount: string;
-    totalTaxAmount: string;
-    totalGrossAmount: string;
+    netAmount: string;
+    vatAmount: string;
+    grossAmount: string;
     notes: string | null;
     dueDate: string | null;
   };
