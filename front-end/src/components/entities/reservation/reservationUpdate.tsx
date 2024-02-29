@@ -188,8 +188,6 @@ export const ReservationUpdate = ({
 
     if (!invoiceExtra) return;
 
-    console.log(invoiceExtra);
-
     modals.open({
       title: <Title order={3}>Edit Invoice Extra</Title>,
       size: "xs",
@@ -205,12 +203,6 @@ export const ReservationUpdate = ({
             timing: invoiceExtra.timing,
           }}
           onConfirm={async (values) => {
-            console.log({
-              reservationId: reservation.id,
-              instanceId: invoiceExtra.instance.id,
-              ...values,
-            });
-
             await updateInvoiceExtra.mutate({
               reservationId: reservation.id,
               instanceId: invoiceExtra.instance.id,
