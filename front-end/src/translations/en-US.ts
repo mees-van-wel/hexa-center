@@ -20,6 +20,8 @@ export default {
     week: "Week",
     workweek: "Workweek",
     day: "Day",
+    show: "Show",
+    hide: "Hide",
   },
   modules: {
     essentials: "Essentials",
@@ -208,6 +210,14 @@ export default {
       city: "City",
       region: "Region",
       country: "Country",
+    },
+    metadata: {
+      createdAt: "Created at",
+      createdBy: "Created by",
+      id: "Number",
+      updatedAt: "Updated at",
+      updatedBy: "Updated by",
+      name: "Metadata",
     },
   },
   // exceptions: {

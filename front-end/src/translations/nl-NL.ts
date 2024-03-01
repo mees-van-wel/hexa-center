@@ -20,6 +20,8 @@ export default {
     week: "Week",
     workweek: "Werkweek",
     day: "Dag",
+    show: "Weergeven",
+    hide: "Verbergen",
   },
   modules: {
     essentials: "Essentieel",
@@ -210,6 +212,14 @@ export default {
       city: "Stad",
       region: "Provincie",
       country: "Land",
+    },
+    metadata: {
+      createdAt: "Gemaakt op",
+      createdBy: "Gemaakt door",
+      id: "Nummer",
+      updatedAt: "Bijgewerkt op",
+      updatedBy: "Bijgewerkt door",
+      name: "Metagegevens",
     },
   },
   // exceptions: {

@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 
+import { Metadata } from "@/components/common/Metadata";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -27,11 +28,7 @@ export const Room = ({ room }: RoomProps) => {
   const deleteRoom = useMutation("room", "delete");
 
   const methods = useForm<RoomInputUpdateSchema>({
-    defaultValues: {
-      id: room.id,
-      name: room.name,
-      price: room.price,
-    },
+    defaultValues: room,
     resolver: valibotResolver(RoomUpdateSchema),
   });
 
@@ -96,6 +93,7 @@ export const Room = ({ room }: RoomProps) => {
           <Paper p="md">
             <RoomForm />
           </Paper>
+          <Metadata />
         </Stack>
       </form>
     </FormProvider>

@@ -22,6 +22,8 @@ export type Translation = {
     week: string;
     workweek: string;
     day: string;
+    show: string;
+    hide: string;
   };
   modules: {
     essentials: string;
@@ -209,6 +211,14 @@ export type Translation = {
       city: string;
       region: string;
       country: string;
+    };
+    metadata: {
+      createdAt: string;
+      createdBy: string;
+      id: string;
+      updatedAt: string;
+      updatedBy: string;
+      name: string;
     };
   };
   // exceptions: {

@@ -72,6 +72,7 @@ export const reservationRouter = router({
         .set({
           ...input,
           updatedById: ctx.relation.id,
+          updatedAt: new Date(),
         })
         .where(eq(reservations.id, input.id))
         .returning({
