@@ -15,7 +15,7 @@ type RoomsProps = {
   rooms: RouterOutput["room"]["list"];
 };
 
-export const Rooms = ({ rooms }: RoomsProps) => {
+export const RoomsOverview = ({ rooms }: RoomsProps) => {
   const router = useRouter();
   const searchBarId = useId();
   const t = useTranslation();

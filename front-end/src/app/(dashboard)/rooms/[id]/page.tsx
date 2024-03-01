@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-import { Room } from "@/components/entities/room/RoomUpdate";
+import { RoomUpdate } from "@/components/entities/room/RoomUpdate";
 import { setTRPCRefreshToken, trpc } from "@/utils/trpc";
 
 type RoomPageParams = {
@@ -15,5 +15,5 @@ export default async function Page({ params }: RoomPageParams) {
 
   const room = await trpc.room.get.query(parseInt(params.id));
 
-  return <Room room={room} />;
+  return <RoomUpdate room={room} />;
 }
