@@ -1,5 +1,5 @@
 {
-  "id": "d14924d8-eac5-4c5d-828d-ff7a4a0ec986",
+  "id": "3e65b89f-d69b-4f29-bc93-c4c575853de7",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -47,6 +47,30 @@
         },
         "timezone": {
           "name": "timezone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dateFormat": {
+          "name": "dateFormat",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "decimalSeparator": {
+          "name": "decimalSeparator",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "timeFormat": {
+          "name": "timeFormat",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "firstDayOfWeek": {
+          "name": "firstDayOfWeek",
           "type": "text",
           "primaryKey": false,
           "notNull": true

@@ -65,7 +65,11 @@ CREATE TABLE IF NOT EXISTS "accounts" (
 	"locale" text NOT NULL,
 	"theme" text NOT NULL,
 	"color" text NOT NULL,
-	"timezone" text NOT NULL
+	"timezone" text NOT NULL,
+	"dateFormat" text NOT NULL,
+	"decimalSeparator" text NOT NULL,
+	"timeFormat" text NOT NULL,
+	"firstDayOfWeek" text NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "invoice_events" (
