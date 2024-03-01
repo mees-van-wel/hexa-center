@@ -229,6 +229,10 @@ export const accounts = pgTable("accounts", {
   theme: text("theme").notNull(),
   color: text("color").notNull(),
   timezone: text("timezone").notNull(),
+  dateFormat: text("dateFormat").notNull(),
+  decimalSeparator: text("decimalSeparator").notNull(),
+  timeFormat: text("timeFormat").notNull(),
+  firstDayOfWeek: text("firstDayOfWeek").notNull(),
 });
 
 export const accountsRelations = relationBuilder(accounts, ({ many }) => ({
