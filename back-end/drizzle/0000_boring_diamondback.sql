@@ -1,4 +1,16 @@
 DO $$ BEGIN
+ CREATE TYPE "api_connection_type" AS ENUM('twinfield');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ CREATE TYPE "api_entity_ref_type" AS ENUM('relation');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  CREATE TYPE "invoice_event_ref_type" AS ENUM('invoice');
 EXCEPTION
  WHEN duplicate_object THEN null;
@@ -35,19 +47,31 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
+ CREATE TYPE "log_event" AS ENUM('apiConnect', 'apiRefreshAuth', 'apiSend', 'apiSync', 'apiDisconnect');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ CREATE TYPE "log_type" AS ENUM('info', 'warning', 'error');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  CREATE TYPE "relation_type" AS ENUM('individual', 'business');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "reservations_to_invoice_extra_instances_cycle" AS ENUM('oneTimeOnEnd', 'perNightThroughout', 'perNightOnEnd');
+ CREATE TYPE "reservations_to_invoice_extra_instance_cycle" AS ENUM('oneTimeOnEnd', 'perNightThroughout', 'perNightOnEnd');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "reservations_to_invoice_extra_instances_status" AS ENUM('notApplied', 'partiallyApplied', 'fullyApplied');
+ CREATE TYPE "reservations_to_invoice_extra_instance_status" AS ENUM('notApplied', 'partiallyApplied', 'fullyApplied');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -72,6 +96,24 @@ CREATE TABLE IF NOT EXISTS "accounts" (
 	"firstDayOfWeek" text NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "api_connections" (
+	"$kind" text DEFAULT 'apiConnection' NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
+	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
+	"type" "api_connection_type" NOT NULL,
+	"data" jsonb
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "api_entities" (
+	"$kind" text DEFAULT 'apiEntity' NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
+	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
+	"connection_id" integer,
+	"ref_type" "api_entity_ref_type" NOT NULL,
+	"ref_id" integer NOT NULL,
+	"external_id" text NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "invoice_events" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -93,7 +135,7 @@ CREATE TABLE IF NOT EXISTS "invoice_extra_instances" (
 	"amount" numeric(10, 2) NOT NULL,
 	"unit" "invoice_extra_unit" NOT NULL,
 	"vat_percentage" numeric(10, 2) DEFAULT '0' NOT NULL,
-	"status" "reservations_to_invoice_extra_instances_status" DEFAULT 'notApplied' NOT NULL
+	"status" "reservations_to_invoice_extra_instance_status" DEFAULT 'notApplied' NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "invoice_extra_templates" (
@@ -168,6 +210,17 @@ CREATE TABLE IF NOT EXISTS "invoices" (
 	"company_coc_number" text,
 	"company_iban" text,
 	"company_swift_bic" text
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "logs" (
+	"$kind" text DEFAULT 'log' NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
+	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"relation_id" integer,
+	"type" "log_type" NOT NULL,
+	"event" "log_type" NOT NULL,
+	"data" jsonb
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "permissions" (
@@ -248,7 +301,7 @@ CREATE TABLE IF NOT EXISTS "reservations" (
 CREATE TABLE IF NOT EXISTS "reservations_to_invoice_extra_instances" (
 	"reservation_id" integer NOT NULL,
 	"instance_id" integer NOT NULL,
-	"cycle" "reservations_to_invoice_extra_instances_cycle" NOT NULL,
+	"cycle" "reservations_to_invoice_extra_instance_cycle" NOT NULL,
 	CONSTRAINT "reservations_to_invoice_extra_instances_reservation_id_instance_id_pk" PRIMARY KEY("reservation_id","instance_id")
 );
 --> statement-breakpoint
@@ -300,6 +353,7 @@ CREATE TABLE IF NOT EXISTS "sessions" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "settings" (
+	"$kind" text DEFAULT 'setting' NOT NULL,
 	"id" serial PRIMARY KEY NOT NULL,
 	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now(),
@@ -320,6 +374,12 @@ CREATE TABLE IF NOT EXISTS "working_hours" (
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "accounts" ADD CONSTRAINT "accounts_relation_id_relations_id_fk" FOREIGN KEY ("relation_id") REFERENCES "relations"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "api_entities" ADD CONSTRAINT "api_entities_connection_id_api_connections_id_fk" FOREIGN KEY ("connection_id") REFERENCES "api_connections"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -374,6 +434,12 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "invoices" ADD CONSTRAINT "invoices_company_id_properties_id_fk" FOREIGN KEY ("company_id") REFERENCES "properties"("id") ON DELETE set null ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "logs" ADD CONSTRAINT "logs_relation_id_relations_id_fk" FOREIGN KEY ("relation_id") REFERENCES "relations"("id") ON DELETE set null ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

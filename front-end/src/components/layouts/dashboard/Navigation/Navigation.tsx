@@ -108,6 +108,21 @@ export const Navigation = () => {
               </Button>
             </Stack>
           </Stack>
+          <Stack gap="xs">
+            <Title order={4}>{t("modules.system")}</Title>
+            <Stack gap={0}>
+              <Button
+                component={Link}
+                href="/invoices"
+                variant={pathname === "/invoices" ? "filled" : "subtle"}
+                leftSection={<IconFileEuro />}
+                fullWidth
+                justify="left"
+              >
+                {t("entities.invoice.pluralName")}
+              </Button>
+            </Stack>
+          </Stack>
         </Stack>
       </nav>
       <div className={styles.version}>V1.3.0 (Blue Heron)</div>

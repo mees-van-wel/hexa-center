@@ -1,5 +1,5 @@
 {
-  "id": "3e65b89f-d69b-4f29-bc93-c4c575853de7",
+  "id": "ad8a5f8b-575e-4e10-8a4c-5675b7ec84f2",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -84,6 +84,116 @@
           "tableTo": "relations",
           "columnsFrom": [
             "relation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "api_connections": {
+      "name": "api_connections",
+      "schema": "",
+      "columns": {
+        "$kind": {
+          "name": "$kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'apiConnection'"
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "uuid": {
+          "name": "uuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "type": {
+          "name": "type",
+          "type": "api_connection_type",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "data": {
+          "name": "data",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "api_entities": {
+      "name": "api_entities",
+      "schema": "",
+      "columns": {
+        "$kind": {
+          "name": "$kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'apiEntity'"
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "uuid": {
+          "name": "uuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "connection_id": {
+          "name": "connection_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ref_type": {
+          "name": "ref_type",
+          "type": "api_entity_ref_type",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ref_id": {
+          "name": "ref_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "external_id": {
+          "name": "external_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "api_entities_connection_id_api_connections_id_fk": {
+          "name": "api_entities_connection_id_api_connections_id_fk",
+          "tableFrom": "api_entities",
+          "tableTo": "api_connections",
+          "columnsFrom": [
+            "connection_id"
           ],
           "columnsTo": [
             "id"
@@ -246,7 +356,7 @@
         },
         "status": {
           "name": "status",
-          "type": "reservations_to_invoice_extra_instances_status",
+          "type": "reservations_to_invoice_extra_instance_status",
           "primaryKey": false,
           "notNull": true,
           "default": "'notApplied'"
@@ -771,6 +881,81 @@
           "tableTo": "properties",
           "columnsFrom": [
             "company_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "logs": {
+      "name": "logs",
+      "schema": "",
+      "columns": {
+        "$kind": {
+          "name": "$kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'log'"
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "uuid": {
+          "name": "uuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "relation_id": {
+          "name": "relation_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "type": {
+          "name": "type",
+          "type": "log_type",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "event": {
+          "name": "event",
+          "type": "log_type",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "data": {
+          "name": "data",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "logs_relation_id_relations_id_fk": {
+          "name": "logs_relation_id_relations_id_fk",
+          "tableFrom": "logs",
+          "tableTo": "relations",
+          "columnsFrom": [
+            "relation_id"
           ],
           "columnsTo": [
             "id"
@@ -1384,7 +1569,7 @@
         },
         "cycle": {
           "name": "cycle",
-          "type": "reservations_to_invoice_extra_instances_cycle",
+          "type": "reservations_to_invoice_extra_instance_cycle",
           "primaryKey": false,
           "notNull": true
         }
@@ -1810,6 +1995,13 @@
       "name": "settings",
       "schema": "",
       "columns": {
+        "$kind": {
+          "name": "$kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'setting'"
+        },
         "id": {
           "name": "id",
           "type": "serial",
@@ -1937,6 +2129,18 @@
     }
   },
   "enums": {
+    "api_connection_type": {
+      "name": "api_connection_type",
+      "values": {
+        "twinfield": "twinfield"
+      }
+    },
+    "api_entity_ref_type": {
+      "name": "api_entity_ref_type",
+      "values": {
+        "relation": "relation"
+      }
+    },
     "invoice_event_ref_type": {
       "name": "invoice_event_ref_type",
       "values": {
@@ -1980,6 +2184,24 @@
         "credit": "credit"
       }
     },
+    "log_event": {
+      "name": "log_event",
+      "values": {
+        "apiConnect": "apiConnect",
+        "apiRefreshAuth": "apiRefreshAuth",
+        "apiSend": "apiSend",
+        "apiSync": "apiSync",
+        "apiDisconnect": "apiDisconnect"
+      }
+    },
+    "log_type": {
+      "name": "log_type",
+      "values": {
+        "info": "info",
+        "warning": "warning",
+        "error": "error"
+      }
+    },
     "relation_type": {
       "name": "relation_type",
       "values": {
@@ -1987,16 +2209,16 @@
         "business": "business"
       }
     },
-    "reservations_to_invoice_extra_instances_cycle": {
-      "name": "reservations_to_invoice_extra_instances_cycle",
+    "reservations_to_invoice_extra_instance_cycle": {
+      "name": "reservations_to_invoice_extra_instance_cycle",
       "values": {
         "oneTimeOnEnd": "oneTimeOnEnd",
         "perNightThroughout": "perNightThroughout",
         "perNightOnEnd": "perNightOnEnd"
       }
     },
-    "reservations_to_invoice_extra_instances_status": {
-      "name": "reservations_to_invoice_extra_instances_status",
+    "reservations_to_invoice_extra_instance_status": {
+      "name": "reservations_to_invoice_extra_instance_status",
       "values": {
         "notApplied": "notApplied",
         "partiallyApplied": "partiallyApplied",

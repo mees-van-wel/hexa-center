@@ -36,6 +36,7 @@ export type Translation = {
     essentials: string;
     sales: string;
     bookings: string;
+    system: string;
   };
   entities: {
     relation: {

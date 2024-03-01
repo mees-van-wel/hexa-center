@@ -610,7 +610,7 @@ export const invoiceExtraTemplatesRelations = relationBuilder(
 );
 
 export const reservationsToInvoiceExtraInstancesStatusEnum = pgEnum(
-  "reservations_to_invoice_extra_instances_status",
+  "reservations_to_invoice_extra_instance_status",
   ["notApplied", "partiallyApplied", "fullyApplied"],
 );
 
@@ -659,7 +659,7 @@ export const invoiceExtraInstancesRelations = relationBuilder(
 // TODO Add support for perInvoice, perPerson, perPersonPerNight, perItem, perDay and perHour
 // TODO Add start, Maybe support uponUsage, when invoked show on next invoice only
 export const reservationsToInvoiceExtraInstancesCycleEnum = pgEnum(
-  "reservations_to_invoice_extra_instances_cycle",
+  "reservations_to_invoice_extra_instance_cycle",
   ["oneTimeOnEnd", "perNightThroughout", "perNightOnEnd"],
 );
 
@@ -737,6 +737,7 @@ export const settingNameEnum = pgEnum("setting_name", [
 ]);
 
 export const settings = pgTable("settings", {
+  $kind: text("$kind").default("setting").notNull(),
   id: serial("id").primaryKey(),
   uuid: uuid("uuid").defaultRandom().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
@@ -748,9 +749,75 @@ export const settings = pgTable("settings", {
   value: jsonb("value"),
 });
 
-export const settingRelations = relationBuilder(settings, ({ one }) => ({
-  updatedAt: one(relations, {
-    fields: [settings.updatedAt],
+export const settingsRelations = relationBuilder(settings, ({ one }) => ({
+  updatedBy: one(relations, {
+    fields: [settings.updatedById],
     references: [relations.id],
+  }),
+}));
+
+export const logTypeEnum = pgEnum("log_type", ["info", "warning", "error"]);
+
+export const logEventEnum = pgEnum("log_event", [
+  "apiConnect",
+  "apiRefreshAuth",
+  "apiSend",
+  "apiSync",
+  "apiDisconnect",
+]);
+
+export const logs = pgTable("logs", {
+  $kind: text("$kind").default("log").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  relationId: integer("relation_id").references(
+    (): AnyPgColumn => relations.id,
+    { onDelete: "set null" },
+  ),
+  type: logTypeEnum("type").notNull(),
+  event: logTypeEnum("event").notNull(),
+  data: jsonb("data"),
+});
+
+export const logsRelations = relationBuilder(logs, ({ one }) => ({
+  relation: one(relations, {
+    fields: [logs.relationId],
+    references: [relations.id],
+  }),
+}));
+
+export const apiConnectionTypeEnum = pgEnum("api_connection_type", [
+  "twinfield",
+]);
+
+export const apiConnections = pgTable("api_connections", {
+  $kind: text("$kind").default("apiConnection").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  type: apiConnectionTypeEnum("type").notNull(),
+  data: jsonb("data"),
+});
+
+export const apiEntityRefTypeEnum = pgEnum("api_entity_ref_type", ["relation"]);
+
+export const apiEntities = pgTable("api_entities", {
+  $kind: text("$kind").default("apiEntity").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  connectionId: integer("connection_id").references(() => apiConnections.id, {
+    onDelete: "cascade",
+  }),
+  refType: apiEntityRefTypeEnum("ref_type").notNull(),
+  refId: integer("ref_id").notNull(),
+  externalId: text("external_id").notNull(),
+});
+
+export const apiEntitiesRelations = relationBuilder(apiEntities, ({ one }) => ({
+  connection: one(apiConnections, {
+    fields: [apiEntities.connectionId],
+    references: [apiConnections.id],
   }),
 }));

@@ -27,6 +27,7 @@ export default {
     essentials: "Essentials",
     sales: "Sales",
     bookings: "Bookings",
+    system: "System",
   },
   entities: {
     relation: {
