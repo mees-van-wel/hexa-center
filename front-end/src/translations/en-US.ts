@@ -55,6 +55,18 @@ export default {
         button: "Profile Page",
       },
     },
+    room: {
+      name: {
+        singular: "Room",
+        plural: "Rooms",
+      },
+      keys: {
+        name: "Name",
+        price: "Price",
+      },
+      createdNotification: "Room successfully created",
+      deletedNotification: "Room successfully deleted",
+    },
     reservation: {
       name: {
         singular: "Reservation",

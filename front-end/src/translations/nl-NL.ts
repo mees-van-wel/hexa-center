@@ -55,6 +55,18 @@ export default {
         button: "Profielpagina",
       },
     },
+    room: {
+      name: {
+        singular: "Kamer",
+        plural: "Kamers",
+      },
+      keys: {
+        name: "Naam",
+        price: "Prijs",
+      },
+      createdNotification: "Kamer succesvol aangemaakt",
+      deletedNotification: "Kamer succesvol verwijderd",
+    },
     reservation: {
       name: {
         singular: "Reservatie",

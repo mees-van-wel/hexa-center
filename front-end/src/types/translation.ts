@@ -64,6 +64,18 @@ export type Translation = {
         button: string;
       };
     };
+    room: {
+      name: {
+        singular: string;
+        plural: string;
+      };
+      keys: {
+        name: string;
+        price: string;
+      };
+      createdNotification: string;
+      deletedNotification: string;
+    };
     reservation: {
       name: {
         singular: string;
