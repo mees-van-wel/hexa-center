@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useRecoilValue } from "recoil";
 
-import { useAuthUser } from "@/contexts/AuthContext";
+import { useAuthRelation } from "@/contexts/AuthContext";
 import { useTranslation } from "@/hooks/useTranslation";
 import { routeHistoryState } from "@/states/routeHistoryState";
 import { trpc } from "@/utils/trpc";
@@ -48,7 +48,7 @@ export const DashboardHeader = ({
   const t = useTranslation();
   const router = useRouter();
   const pathName = usePathname();
-  const authUser = useAuthUser();
+  const authRelation = useAuthRelation();
   const routeHistory = useRecoilValue(routeHistoryState);
   const previousRoute = routeHistory.at(-2);
   const showBackButton =
@@ -60,7 +60,7 @@ export const DashboardHeader = ({
   };
 
   return (
-    <Group align="stretch" wrap="nowrap">
+    <Group w="100%" align="stretch" wrap="nowrap">
       {(children || showBackButton) && (
         <Paper component={Group} p="md" wrap="nowrap">
           {showBackButton && (
@@ -68,9 +68,9 @@ export const DashboardHeader = ({
               variant="light"
               leftSection={<IconArrowLeft />}
               onClick={() => {
-                backRouteFallback
-                  ? router.push(backRouteFallback)
-                  : router.back();
+                previousRoute
+                  ? router.back()
+                  : backRouteFallback && router.push(backRouteFallback);
               }}
             >
               {t("common.back")}
@@ -86,7 +86,6 @@ export const DashboardHeader = ({
         justify="center"
         gap="xs"
         p="md"
-        // maw={250}
       >
         {title.map(({ icon, label, href }, index) => {
           const isLast = title.length - 1 === index;
@@ -131,7 +130,7 @@ export const DashboardHeader = ({
                   whiteSpace: "nowrap",
                 }}
               >
-                {authUser.firstName} {authUser.lastName}
+                {authRelation.name}
               </Text>
               <Text
                 size="xs"
@@ -139,7 +138,7 @@ export const DashboardHeader = ({
                   whiteSpace: "nowrap",
                 }}
               >
-                {authUser.email}
+                {authRelation.emailAddress}
               </Text>
             </Stack>
             <Avatar />

@@ -1,0 +1,13 @@
+.root > * {
+  &:first-child {
+    margin-right: -0.5px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  &:last-child {
+    margin-left: -0.5px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+}

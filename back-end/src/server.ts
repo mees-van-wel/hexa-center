@@ -41,6 +41,7 @@ app.use((req, _, next) => {
 
   next();
 });
+
 app.set("trust proxy", true);
 
 app.use(cors(corsOptions));

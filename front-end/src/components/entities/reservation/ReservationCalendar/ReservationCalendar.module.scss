@@ -1,0 +1,109 @@
+.weekHidden {
+  width: 150px;
+  padding: 0 0.5rem;
+  flex-grow: 0 !important;
+}
+
+.row {
+  border-top: solid 1px rgb(var(--color-background));
+
+  .room {
+    display: flex;
+    flex-grow: 0 !important;
+    width: 150px;
+    align-items: center;
+    border-right: solid 1px rgb(var(--color-background));
+    padding: 0.5rem;
+  }
+}
+
+.reservationContainer {
+  position: relative;
+  margin-top: 0.5rem;
+
+  .reservation {
+    position: absolute;
+    z-index: 10;
+    margin-left: 8px;
+    border: none;
+    padding: 0 10px;
+
+    .labelContainer {
+      width: 100%;
+    }
+
+    .icon {
+      flex-shrink: 0;
+      flex-grow: 0;
+      width: 20px;
+    }
+
+    .label {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-left: 5px;
+      margin-right: 5px;
+      text-align: center;
+    }
+
+    &.start {
+      background: linear-gradient(
+        90deg,
+        var(--mantine-color-green-filled) 0px,
+        var(--mantine-color-blue-filled) 15px
+      );
+
+      &:hover {
+        background: linear-gradient(
+          90deg,
+          var(--mantine-color-green-filled-hover) 0px,
+          var(--mantine-primary-color-filled-hover) 15px
+        );
+      }
+    }
+
+    &.end {
+      background: linear-gradient(
+        90deg,
+        var(--mantine-color-blue-filled) 0px,
+        var(--mantine-color-blue-filled) calc(100% - 15px),
+        var(--mantine-color-red-filled) 100%
+      );
+
+      &:hover {
+        background: linear-gradient(
+          90deg,
+          var(--mantine-primary-color-filled-hover) 0px,
+          var(--mantine-primary-color-filled-hover) calc(100% - 15px),
+          var(--mantine-color-red-filled-hover) 100%
+        );
+      }
+    }
+
+    &.startEnd {
+      background: linear-gradient(
+        90deg,
+        var(--mantine-color-green-filled) 0px,
+        var(--mantine-color-blue-filled) 15px,
+        var(--mantine-color-blue-filled) calc(100% - 15px),
+        var(--mantine-color-red-filled) 100%
+      );
+
+      &:hover {
+        background: linear-gradient(
+          90deg,
+          var(--mantine-color-green-filled-hover) 0px,
+          var(--mantine-color-blue-filled-hover) 15px,
+          var(--mantine-color-blue-filled-hover) calc(100% - 15px),
+          var(--mantine-color-red-filled-hover) 100%
+        );
+      }
+    }
+  }
+}
+
+.noRooms {
+  border-top: solid rgb(var(--color-background)) 1px;
+  text-align: center;
+}

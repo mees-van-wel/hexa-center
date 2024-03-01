@@ -6,7 +6,7 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import * as trpcExpress from "@trpc/server/adapters/express";
 
 import db from "./db/client";
-import { sessions, users } from "./db/schema";
+import { relations, sessions } from "./db/schema";
 
 export const createContext = async ({
   req,
@@ -18,14 +18,14 @@ export const createContext = async ({
   if (authHeader && authHeader.startsWith("Bearer "))
     refreshToken = authHeader.substring(7, authHeader.length);
 
-  if (!refreshToken) return { req, res, user: null };
+  if (!refreshToken) return { req, res, relation: null };
 
   const now = new Date();
 
   const sessionsResult = await db
     .select({
       id: sessions.id,
-      userId: sessions.userId,
+      relationId: sessions.relationId,
       expiresAt: sessions.expiresAt,
       ipAddress: sessions.ipAddress,
     })
@@ -48,16 +48,15 @@ export const createContext = async ({
       maxAge: 0,
     });
 
-    return { req, res, user: null };
+    return { req, res, relation: null };
   }
 
-  const user = await db.query.users.findFirst({
-    where: eq(users.id, session.userId),
+  const relation = await db.query.relations.findFirst({
+    where: eq(relations.id, session.relationId),
     columns: {
       id: true,
-      firstName: true,
-      lastName: true,
-      email: true,
+      name: true,
+      emailAddress: true,
       phoneNumber: true,
       street: true,
       houseNumber: true,
@@ -67,6 +66,7 @@ export const createContext = async ({
       country: true,
       sex: true,
       dateOfBirth: true,
+      propertyId: true,
     },
     with: {
       account: {
@@ -75,6 +75,10 @@ export const createContext = async ({
           theme: true,
           color: true,
           timezone: true,
+          dateFormat: true,
+          decimalSeparator: true,
+          timeFormat: true,
+          firstDayOfWeek: true,
         },
         with: {
           workingHours: {
@@ -115,7 +119,7 @@ export const createContext = async ({
       .where(eq(sessions.id, session.id));
   })();
 
-  return { req, res, user: user || null };
+  return { req, res, relation: relation || null };
 };
 
 type Context = Awaited<ReturnType<typeof createContext>>;
@@ -129,10 +133,11 @@ const t = initTRPC.context<Context>().meta<Meta>().create({
 });
 
 const authMiddleware = t.middleware(({ meta, next, ctx }) => {
-  if (!meta?.public && !ctx.user) throw new TRPCError({ code: "UNAUTHORIZED" });
+  if (!meta?.public && !ctx.relation)
+    throw new TRPCError({ code: "UNAUTHORIZED" });
   return next({
     ctx: {
-      user: ctx.user as NonNullable<typeof ctx.user>,
+      relation: ctx.relation as NonNullable<typeof ctx.relation>,
     },
   });
 });
