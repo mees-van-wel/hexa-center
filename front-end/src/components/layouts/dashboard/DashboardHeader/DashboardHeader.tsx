@@ -68,9 +68,9 @@ export const DashboardHeader = ({
               variant="light"
               leftSection={<IconArrowLeft />}
               onClick={() => {
-                backRouteFallback
-                  ? router.push(backRouteFallback)
-                  : router.back();
+                previousRoute
+                  ? router.back()
+                  : backRouteFallback && router.push(backRouteFallback);
               }}
             >
               {t("common.back")}

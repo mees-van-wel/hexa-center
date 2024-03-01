@@ -63,8 +63,10 @@ export default {
         customerId: "Customer",
         startDate: "Start date",
         endDate: "End date",
-        notes: "Notes",
+        priceOverride: "Price override",
         guestName: "Guest name",
+        reservationNotes: "Reservation notes",
+        invoiceNotes: "Invoice notes",
       },
       calendar: {
         noRooms: "No bookings found",

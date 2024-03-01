@@ -66,6 +66,7 @@ export const createContext = async ({
       country: true,
       sex: true,
       dateOfBirth: true,
+      propertyId: true,
     },
     with: {
       account: {

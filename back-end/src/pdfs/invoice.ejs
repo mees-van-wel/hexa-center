@@ -112,17 +112,12 @@
       <div class="content">
         <div class="header-section">
           <p>
-            <strong>Type:</strong>
-            <%= type %>
+            <strong>
+              <%= type %>:
+              <%= number %>
+            </strong>
           </p>
-          <p>
-            <strong>Number:</strong>
-            <%= number %>
-          </p>
-          <p>
-            <strong>Date:</strong>
-            <%= date %>
-          </p>
+          <p><%= date %></p>
         </div>
         <div class="detail-section">
           <div class="detail-box">
@@ -143,7 +138,7 @@
               <p>CoC-number: <%= customerCocNumber %></p>
               <% } %>
               <% if (customerVatNumber) { %>
-              <p>VAT tax number: <%= customerVatNumber %></p>
+              <p>VAT number: <%= customerVatNumber %></p>
               <% } %>
             </div>
             <% } %>
@@ -162,7 +157,7 @@
             </div>
             <div>
               <p>CoC-number: <%= companyCocNumber %></p>
-              <p>VAT tax number: <%= companyVatNumber %></p>
+              <p>VAT number: <%= companyVatNumber %></p>
             </div>
             <div>
               <p>IBAN: <%= companyIban %></p>
@@ -170,61 +165,43 @@
             </div>
           </div>
         </div>
-        <% if (comments) { %>
-        <p><%= comments %></p>
+        <% if (notes) { %>
+        <p><%= notes %></p>
         <% } %>
         <table class="invoice-table">
           <thead>
             <tr>
               <th>Name</th>
-              <% if (hasComments) { %>
-              <th>Comments</th>
-              <% } %>
-              <th>Price</th>
+              <th>Unit amount</th>
               <th>Quantity</th>
-              <th>Total net</th>
-              <% if (totalDiscountAmount) { %>
-              <th>Discount</th>
-              <% } %>
+              <th>Net amount</th>
               <th>VAT</th>
-              <th>Total gross</th>
+              <th>Gross amount</th>
             </tr>
           </thead>
           <tbody>
             <% lines.forEach(function(line) { %>
             <tr>
               <td><%= line.name %></td>
-              <% if (hasComments) { %>
-              <td><%= line.comments %></td>
-              <% } %>
-              <td><%= line.unitNetAmount %></td>
+              <td><%= line.unitAmount %></td>
               <td><%= line.quantity %>x</td>
-              <td><%= line.totalNetAmount %></td>
-              <% if (totalDiscountAmount) { %>
-              <td><%= line.discountAmount %></td>
-              <% } %>
+              <td><%= line.netAmount %></td>
               <td>
-                <%= line.totalTaxAmount %>
-                (<%= line.taxPercentage %>%)
+                <%= line.vatAmount %>
+                (<%= line.vatPercentage %>%)
               </td>
-              <td><%= line.totalGrossAmount %></td>
+              <td><%= line.grossAmount %></td>
             </tr>
             <% }); %>
           </tbody>
           <tfoot class="total">
             <tr>
               <th></th>
-              <% if (hasComments) { %>
-              <th></th>
-              <% } %>
               <th></th>
               <th>Total</th>
-              <td><%= totalNetAmount %></td>
-              <% if (totalDiscountAmount) { %>
-              <td><%= totalDiscountAmount %></td>
-              <% } %>
-              <td><%= totalTaxAmount %></td>
-              <td><%= totalGrossAmount %></td>
+              <td><%= netAmount %></td>
+              <td><%= vatAmount %></td>
+              <td><%= grossAmount %></td>
             </tr>
           </tfoot>
         </table>

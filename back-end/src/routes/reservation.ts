@@ -1,16 +1,31 @@
-import { eq } from "drizzle-orm";
-import { number } from "valibot";
+import dayjs from "dayjs";
+import Decimal from "decimal.js";
+import { and, eq } from "drizzle-orm";
+import {
+  date,
+  nullable,
+  number,
+  object,
+  optional,
+  picklist,
+  string,
+} from "valibot";
 
+import db from "@/db/client";
+import {
+  invoiceExtraInstances,
+  reservations,
+  reservationsToInvoiceExtraInstances,
+  reservationsToInvoices,
+} from "@/db/schema";
+import { createInvoice } from "@/services/invoice";
+import { procedure, router } from "@/trpc";
 import { wrap } from "@decs/typeschema";
-import { TRPCError } from "@trpc/server";
-
-import db from "../db/client.js";
-import { reservations } from "../db/schema.js";
 import {
   ReservationCreateSchema,
   ReservationUpdateSchema,
-} from "../schemas/reservation.js";
-import { procedure, router } from "../trpc.js";
+} from "@front-end/schemas/reservation";
+import { TRPCError } from "@trpc/server";
 
 export const reservationRouter = router({
   create: procedure
@@ -22,6 +37,9 @@ export const reservationRouter = router({
           ...input,
           createdById: ctx.relation.id,
           updatedById: ctx.relation.id,
+          priceOverride: input.priceOverride
+            ? input.priceOverride.toString()
+            : undefined,
         })
         .returning({
           $kind: reservations.$kind,
@@ -34,8 +52,10 @@ export const reservationRouter = router({
           customerId: reservations.customerId,
           startDate: reservations.startDate,
           endDate: reservations.endDate,
-          notes: reservations.notes,
+          priceOverride: reservations.priceOverride,
           guestName: reservations.guestName,
+          reservationNotes: reservations.reservationNotes,
+          invoiceNotes: reservations.invoiceNotes,
         });
 
       const reservation = result[0];
@@ -57,12 +77,78 @@ export const reservationRouter = router({
       with: {
         customer: true,
         room: true,
+        invoicesJunction: {
+          with: {
+            invoice: {
+              columns: {
+                $kind: true,
+                id: true,
+                createdAt: true,
+                type: true,
+                status: true,
+                number: true,
+                date: true,
+                grossAmount: true,
+              },
+            },
+          },
+        },
+        invoicesExtrasJunction: {
+          with: {
+            instance: {
+              columns: {
+                $kind: true,
+                id: true,
+                name: true,
+                quantity: true,
+                amount: true,
+                unit: true,
+                vatPercentage: true,
+                status: true,
+              },
+            },
+          },
+          columns: {
+            cycle: true,
+          },
+        },
+      },
+      columns: {
+        $kind: true,
+        id: true,
+        createdAt: true,
+        createdById: true,
+        updatedAt: true,
+        updatedById: true,
+        roomId: true,
+        customerId: true,
+        startDate: true,
+        endDate: true,
+        priceOverride: true,
+        guestName: true,
+        reservationNotes: true,
+        invoiceNotes: true,
       },
     });
 
     if (!reservation) throw new TRPCError({ code: "NOT_FOUND" });
 
-    return reservation;
+    reservation.invoicesExtrasJunction;
+
+    return {
+      ...reservation,
+      invoicesExtrasJunction: reservation.invoicesExtrasJunction.map(
+        (junction) => ({
+          ...junction,
+          instance: {
+            ...junction.instance,
+            amount: junction.instance.amount.toString(),
+            quantity: junction.instance.quantity.toString(),
+            vatPercentage: junction.instance.vatPercentage.toString(),
+          },
+        }),
+      ),
+    };
   }),
   update: procedure
     .input(wrap(ReservationUpdateSchema))
@@ -72,6 +158,12 @@ export const reservationRouter = router({
         .set({
           ...input,
           updatedById: ctx.relation.id,
+          priceOverride:
+            input.priceOverride === null
+              ? null
+              : input.priceOverride
+                ? input.priceOverride.toString()
+                : undefined,
         })
         .where(eq(reservations.id, input.id))
         .returning({
@@ -85,8 +177,10 @@ export const reservationRouter = router({
           customerId: reservations.customerId,
           startDate: reservations.startDate,
           endDate: reservations.endDate,
-          notes: reservations.notes,
+          priceOverride: reservations.priceOverride,
           guestName: reservations.guestName,
+          reservationNotes: reservations.reservationNotes,
+          invoiceNotes: reservations.invoiceNotes,
         });
 
       const reservation = result[0];
@@ -98,5 +192,197 @@ export const reservationRouter = router({
     .input(wrap(number()))
     .mutation(({ input }) =>
       db.delete(reservations).where(eq(reservations.id, input)),
+    ),
+  invoicePeriod: procedure
+    .input(
+      wrap(
+        object({
+          reservationId: number(),
+          startDate: date(),
+          endDate: date(),
+        }),
+      ),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const reservation = await db.query.reservations.findFirst({
+        with: {
+          room: true,
+          invoicesExtrasJunction: {
+            with: {
+              instance: true,
+            },
+          },
+        },
+        where: eq(reservations.id, input.reservationId),
+      });
+
+      if (!reservation) throw new TRPCError({ code: "NOT_FOUND" });
+
+      const extraLines: {
+        name: string;
+        unitAmount: string;
+        quantity: string;
+        vatPercentage: string;
+      }[] = [];
+      const isFinalInvoice = dayjs(reservation.endDate).isSame(input.endDate);
+      const periodNights = dayjs(input.endDate).diff(input.startDate, "days");
+      const totalNights = dayjs(reservation.endDate).diff(
+        reservation.startDate,
+        "days",
+      );
+
+      await Promise.all(
+        reservation.invoicesExtrasJunction.map(async ({ instance, cycle }) => {
+          if (
+            (cycle === "oneTimeOnEnd" || cycle === "perNightOnEnd") &&
+            !isFinalInvoice
+          )
+            return;
+          let quantity = instance.quantity;
+          let status: "partiallyApplied" | "fullyApplied" = "fullyApplied";
+
+          if (cycle === "perNightThroughout") {
+            quantity = new Decimal(quantity).mul(periodNights).toString();
+            status = isFinalInvoice ? "fullyApplied" : "partiallyApplied";
+          }
+
+          if (cycle === "perNightOnEnd")
+            quantity = new Decimal(quantity).mul(totalNights).toString();
+
+          // TODO what if invoice get's deleted in draft state or credited?
+          await db
+            .update(invoiceExtraInstances)
+            .set({ status })
+            .where(eq(invoiceExtraInstances.id, instance.id));
+
+          extraLines.push({
+            name: instance.name,
+            unitAmount: instance.amount,
+            quantity,
+            vatPercentage: instance.vatPercentage,
+          });
+
+          // TODO Update line status
+        }),
+      );
+
+      const invoiceId = await createInvoice({
+        createdById: ctx.relation.id,
+        refType: "reservation",
+        refId: input.reservationId,
+        type: "standard",
+        customerId: reservation.customerId,
+        companyId: ctx.relation.propertyId,
+        notes: reservation.invoiceNotes,
+        lines: [
+          {
+            name: "Overnight Stays",
+            unitAmount: reservation.priceOverride || reservation.room.price,
+            quantity: periodNights.toString(),
+            vatPercentage: "9",
+          },
+          ...extraLines,
+        ],
+      });
+
+      await db.insert(reservationsToInvoices).values({
+        reservationId: reservation.id,
+        invoiceId,
+        startDate: input.startDate,
+        endDate: input.endDate,
+      });
+
+      return invoiceId;
+    }),
+  addInvoiceExtra: procedure
+    .input(
+      wrap(
+        object({
+          reservationId: number(),
+          templateId: nullable(number()),
+          name: string(),
+          quantity: string(),
+          amount: string(),
+          unit: picklist(["currency"]),
+          vatPercentage: string(),
+          cycle: picklist([
+            "oneTimeOnEnd",
+            "perNightThroughout",
+            "perNightOnEnd",
+          ]),
+        }),
+      ),
+    )
+    .mutation(async ({ input }) => {
+      const result = await db
+        .insert(invoiceExtraInstances)
+        .values({
+          templateId: input.templateId,
+          name: input.name,
+          quantity: input.quantity,
+          amount: input.amount,
+          unit: input.unit,
+          vatPercentage: input.vatPercentage,
+          status: "notApplied",
+        })
+        .returning({
+          id: invoiceExtraInstances.id,
+        });
+
+      const instanceId = result[0].id;
+
+      await db.insert(reservationsToInvoiceExtraInstances).values({
+        reservationId: input.reservationId,
+        instanceId,
+        cycle: input.cycle,
+      });
+    }),
+  updateInvoiceExtra: procedure
+    .input(
+      wrap(
+        object({
+          reservationId: number(),
+          instanceId: number(),
+          name: optional(string()),
+          quantity: string(),
+          amount: optional(string()),
+          unit: optional(picklist(["currency"])),
+          vatPercentage: optional(string()),
+          cycle: picklist([
+            "oneTimeOnEnd",
+            "perNightThroughout",
+            "perNightOnEnd",
+          ]),
+        }),
+      ),
+    )
+    .mutation(async ({ input }) =>
+      Promise.all([
+        db
+          .update(invoiceExtraInstances)
+          .set({
+            name: input.name,
+            quantity: input.quantity,
+            amount: input.amount,
+            unit: input.unit,
+            vatPercentage: input.vatPercentage,
+          })
+          .where(eq(invoiceExtraInstances.id, input.instanceId)),
+        db
+          .update(reservationsToInvoiceExtraInstances)
+          .set({ cycle: input.cycle })
+          .where(
+            and(
+              eq(
+                reservationsToInvoiceExtraInstances.reservationId,
+                input.reservationId,
+              ),
+              eq(
+                reservationsToInvoiceExtraInstances.instanceId,
+                input.instanceId,
+              ),
+            ),
+          ),
+      ]),
     ),
 });

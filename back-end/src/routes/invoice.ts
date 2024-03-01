@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration.js";
-import { and, eq, or, sql } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { date, number, object } from "valibot";
 
 import db from "@/db/client";
@@ -10,6 +10,7 @@ import {
   invoices,
   properties,
   relations,
+  reservationsToInvoices,
 } from "@/db/schema";
 import { generateInvoicePdf, getInvoice } from "@/services/invoice";
 import { getSettings } from "@/services/setting";
@@ -39,8 +40,9 @@ export const invoiceRouter = router({
         customerName: true,
         createdAt: true,
         date: true,
-        totalGrossAmount: true,
+        grossAmount: true,
       },
+      orderBy: desc(invoices.date),
     }),
   ),
   get: procedure
@@ -113,7 +115,7 @@ export const invoiceRouter = router({
           .where(
             and(
               sql`EXTRACT(YEAR FROM ${invoices.date}) = ${date.getFullYear()}`,
-              or(eq(invoices.type, "standard"), eq(invoices.type, "final")),
+              eq(invoices.type, "standard"),
             ),
           ),
       ]);
@@ -242,16 +244,17 @@ export const invoiceRouter = router({
       type: "mailed",
     });
   }),
+  // TOOD Make credit invoice be issued right away
   credit: procedure.input(wrap(number())).mutation(async ({ input, ctx }) => {
     const invoicesResult = await db
       .select({
-        discountAmount: invoices.discountAmount,
-        totalNetAmount: invoices.totalNetAmount,
-        totalDiscountAmount: invoices.totalDiscountAmount,
-        totalTaxAmount: invoices.totalTaxAmount,
-        totalGrossAmount: invoices.totalGrossAmount,
+        refType: invoices.refType,
+        refId: invoices.refId,
+        netAmount: invoices.netAmount,
+        vatAmount: invoices.vatAmount,
+        grossAmount: invoices.grossAmount,
         number: invoices.number,
-        comments: invoices.comments,
+        notes: invoices.notes,
         customerId: invoices.customerId,
         companyId: invoices.companyId,
       })
@@ -267,21 +270,15 @@ export const invoiceRouter = router({
           .insert(invoices)
           .values({
             createdById: ctx.relation.id,
-            refType: "invoice",
-            refId: input,
+            refType: invoice.refType,
+            refId: invoice.refId,
             type: "credit",
             status: "draft",
-            discountAmount: invoice.discountAmount
-              ? "-" + invoice.discountAmount
-              : null,
-            totalNetAmount: "-" + invoice.totalNetAmount,
-            totalDiscountAmount: invoice.totalDiscountAmount
-              ? "-" + invoice.totalDiscountAmount
-              : null,
-            totalTaxAmount: "-" + invoice.totalTaxAmount,
-            totalGrossAmount: "-" + invoice.totalGrossAmount,
+            netAmount: "-" + invoice.netAmount,
+            vatAmount: "-" + invoice.vatAmount,
+            grossAmount: "-" + invoice.grossAmount,
             number: invoice.number + "-C",
-            comments: invoice.comments,
+            notes: invoice.notes,
             customerId: invoice.customerId,
             companyId: invoice.companyId,
           })
@@ -289,14 +286,12 @@ export const invoiceRouter = router({
         db
           .select({
             name: invoiceLines.name,
-            comments: invoiceLines.comments,
-            unitNetAmount: invoiceLines.unitNetAmount,
+            unitAmount: invoiceLines.unitAmount,
             quantity: invoiceLines.quantity,
-            totalNetAmount: invoiceLines.totalNetAmount,
-            discountAmount: invoiceLines.discountAmount,
-            totalTaxAmount: invoiceLines.totalTaxAmount,
-            taxPercentage: invoiceLines.taxPercentage,
-            totalGrossAmount: invoiceLines.totalGrossAmount,
+            netAmount: invoiceLines.netAmount,
+            vatAmount: invoiceLines.vatAmount,
+            vatPercentage: invoiceLines.vatPercentage,
+            grossAmount: invoiceLines.grossAmount,
           })
           .from(invoiceLines)
           .where(eq(invoiceLines.invoiceId, input)),
@@ -316,16 +311,12 @@ export const invoiceRouter = router({
         invoiceLinesResult.map((invoiceLine) => ({
           invoiceId: creditInvoiceId,
           name: invoiceLine.name,
-          comments: invoiceLine.comments,
-          unitNetAmount: "-" + invoiceLine.unitNetAmount,
+          unitAmount: "-" + invoiceLine.unitAmount,
           quantity: invoiceLine.quantity,
-          totalNetAmount: "-" + invoiceLine.totalNetAmount,
-          discountAmount: invoiceLine.discountAmount
-            ? "-" + invoiceLine.discountAmount
-            : null,
-          totalTaxAmount: "-" + invoiceLine.totalTaxAmount,
-          taxPercentage: invoiceLine.taxPercentage,
-          totalGrossAmount: "-" + invoiceLine.totalGrossAmount,
+          netAmount: "-" + invoiceLine.netAmount,
+          vatAmount: "-" + invoiceLine.vatAmount,
+          vatPercentage: invoiceLine.vatPercentage,
+          grossAmount: "-" + invoiceLine.grossAmount,
         })),
       ),
       db.insert(invoiceEvents).values({
@@ -337,6 +328,30 @@ export const invoiceRouter = router({
       }),
     ]);
 
+    if (invoice.refType === "reservation") {
+      const reservationsToInvoicesResult = await db
+        .select()
+        .from(reservationsToInvoices)
+        .where(
+          and(
+            eq(reservationsToInvoices.invoiceId, input),
+            eq(reservationsToInvoices.reservationId, invoice.refId),
+          ),
+        );
+
+      const reservationsToInvoice = reservationsToInvoicesResult[0];
+
+      await db.insert(reservationsToInvoices).values({
+        ...reservationsToInvoice,
+        invoiceId: creditInvoiceId,
+      });
+    }
+
     return creditInvoiceId;
   }),
+  delete: procedure
+    .input(wrap(number()))
+    .mutation(async ({ input }) =>
+      db.delete(invoices).where(eq(invoices.id, input)),
+    ),
 });

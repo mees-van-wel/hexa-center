@@ -65,8 +65,10 @@ export type Translation = {
         customerId: string;
         startDate: string;
         endDate: string;
-        notes: string;
+        priceOverride: string;
         guestName: string;
+        reservationNotes: string;
+        invoiceNotes: string;
       };
       calendar: {
         noRooms: string;

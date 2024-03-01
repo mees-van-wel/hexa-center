@@ -69,21 +69,6 @@ export const Navigation = () => {
             </Stack>
           </Stack>
           <Stack gap="xs">
-            <Title order={4}>{t("modules.sales")}</Title>
-            <Stack gap={0}>
-              <Button
-                component={Link}
-                href="/invoices"
-                variant={pathname === "/invoices" ? "filled" : "subtle"}
-                leftSection={<IconFileEuro />}
-                fullWidth
-                justify="left"
-              >
-                {t("entities.invoice.pluralName")}
-              </Button>
-            </Stack>
-          </Stack>
-          <Stack gap="xs">
             <Title order={4}>{t("modules.bookings")}</Title>
             <Stack gap={0}>
               <Button
@@ -105,6 +90,21 @@ export const Navigation = () => {
                 justify="left"
               >
                 {t("dashboardLayout.rooms")}
+              </Button>
+            </Stack>
+          </Stack>
+          <Stack gap="xs">
+            <Title order={4}>{t("modules.sales")}</Title>
+            <Stack gap={0}>
+              <Button
+                component={Link}
+                href="/invoices"
+                variant={pathname === "/invoices" ? "filled" : "subtle"}
+                leftSection={<IconFileEuro />}
+                fullWidth
+                justify="left"
+              >
+                {t("entities.invoice.pluralName")}
               </Button>
             </Stack>
           </Stack>

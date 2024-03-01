@@ -61,10 +61,12 @@ export default {
       keys: {
         roomId: "Kamer",
         customerId: "Klant",
-        startDate: "Start datum",
-        endDate: "Eind datum",
-        notes: "Notities",
-        guestName: "Gast naam",
+        startDate: "Startdatum",
+        endDate: "Einddatum",
+        priceOverride: "Aangepaste prijs",
+        guestName: "Naam gast",
+        reservationNotes: "Reserveringsnotities",
+        invoiceNotes: "Factuurnotities",
       },
       calendar: {
         noRooms: "Geen Boekingen gevonden",

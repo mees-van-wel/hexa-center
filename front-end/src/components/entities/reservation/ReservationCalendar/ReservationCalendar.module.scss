@@ -7,10 +7,6 @@
 .row {
   border-top: solid 1px rgb(var(--color-background));
 
-  &:nth-of-type(odd) {
-    background-color: rgb(var(--color-midground));
-  }
-
   .room {
     display: flex;
     flex-grow: 0 !important;

@@ -9,13 +9,17 @@ import {
   string,
 } from "valibot";
 
+import { toNull } from "@/valibotPipes/toNull";
+
 export const ReservationCreateSchema = object({
   roomId: number(),
   customerId: number(),
   startDate: date(),
   endDate: date(),
-  notes: nullable(string()),
-  guestName: nullable(string()),
+  priceOverride: nullable(number()),
+  guestName: string(),
+  reservationNotes: nullable(string([toNull()])),
+  invoiceNotes: nullable(string([toNull()])),
 });
 
 export const ReservationUpdateSchema = object({
@@ -24,8 +28,10 @@ export const ReservationUpdateSchema = object({
   customerId: optional(number()),
   startDate: optional(date()),
   endDate: optional(date()),
-  notes: nullish(string()),
-  guestName: nullish(string()),
+  priceOverride: nullish(number()),
+  guestName: optional(string()),
+  reservationNotes: nullish(string([toNull()])),
+  invoiceNotes: nullish(string([toNull()])),
 });
 
 export type ReservationInputCreateSchema = Input<

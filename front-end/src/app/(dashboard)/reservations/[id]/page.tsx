@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-import { ReservationUpdate } from "@/components/entities/reservation/reservationUpdate";
+import { ReservationUpdate } from "@/components/entities/reservation/ReservationUpdate";
 import { setTRPCRefreshToken, trpc } from "@/utils/trpc";
 
 type ReservationPageParams = {
@@ -13,15 +13,22 @@ export default async function Page({ params }: ReservationPageParams) {
   const refreshToken = cookies().get("refreshToken")?.value;
   if (refreshToken) setTRPCRefreshToken(refreshToken);
 
-  const relations = await trpc.relation.list.query();
-  const rooms = await trpc.room.list.query();
-  const reservation = await trpc.reservation.get.query(parseInt(params.id));
+  const reservationId = parseInt(params.id);
+
+  const [reservation, relations, rooms, invoiceExtraTemplates] =
+    await Promise.all([
+      trpc.reservation.get.query(reservationId),
+      trpc.relation.list.query(),
+      trpc.room.list.query(),
+      trpc.invoiceExtra.list.query(),
+    ]);
 
   return (
     <ReservationUpdate
       reservation={reservation}
       rooms={rooms}
       relations={relations}
+      invoiceExtraTemplates={invoiceExtraTemplates}
     />
   );
 }
