@@ -11,31 +11,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "invoice_extra_basis" AS ENUM('oneTime', 'perNight');
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- CREATE TYPE "invoice_extra_instance_ref_type" AS ENUM('reservation');
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- CREATE TYPE "invoice_extra_timing" AS ENUM('start', 'end', 'throughout');
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- CREATE TYPE "invoice_extra_type" AS ENUM('reservation');
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- CREATE TYPE "invoice_extra_unit" AS ENUM('currency', 'percentage');
+ CREATE TYPE "invoice_extra_unit" AS ENUM('currency');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -53,13 +29,25 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "invoice_type" AS ENUM('standard', 'quotation', 'credit', 'final');
+ CREATE TYPE "invoice_type" AS ENUM('standard', 'quotation', 'credit');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  CREATE TYPE "relation_type" AS ENUM('individual', 'business');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ CREATE TYPE "reservations_to_invoice_extra_instances_cycle" AS ENUM('oneTimeOnEnd', 'perNightThroughout', 'perNightOnEnd');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ CREATE TYPE "reservations_to_invoice_extra_instances_status" AS ENUM('notApplied', 'partiallyApplied', 'fullyApplied');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -96,14 +84,12 @@ CREATE TABLE IF NOT EXISTS "invoice_extra_instances" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"template_id" integer,
-	"ref_type" "invoice_extra_instance_ref_type" NOT NULL,
-	"ref_id" integer NOT NULL,
 	"name" text NOT NULL,
+	"quantity" numeric(10, 2) DEFAULT '1' NOT NULL,
 	"amount" numeric(10, 2) NOT NULL,
 	"unit" "invoice_extra_unit" NOT NULL,
-	"basis" "invoice_extra_basis" NOT NULL,
-	"timing" "invoice_extra_timing" NOT NULL,
-	"tax_percentage" numeric(10, 2) DEFAULT '0' NOT NULL
+	"vat_percentage" numeric(10, 2) DEFAULT '0' NOT NULL,
+	"status" "reservations_to_invoice_extra_instances_status" DEFAULT 'notApplied' NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "invoice_extra_templates" (
@@ -114,15 +100,12 @@ CREATE TABLE IF NOT EXISTS "invoice_extra_templates" (
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"created_by_id" integer,
 	"updated_by_id" integer,
-	"type" "invoice_extra_type" NOT NULL,
 	"name" text NOT NULL,
+	"quantity" numeric(10, 2) DEFAULT '1' NOT NULL,
 	"description" text,
 	"amount" numeric(10, 2) NOT NULL,
 	"unit" "invoice_extra_unit" NOT NULL,
-	"basis" "invoice_extra_basis" NOT NULL,
-	"timing" "invoice_extra_timing" NOT NULL,
-	"tax_percentage" numeric(10, 2) DEFAULT '0' NOT NULL,
-	"auto_add" boolean DEFAULT false NOT NULL
+	"vat_percentage" numeric(10, 2) DEFAULT '0' NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "invoice_lines" (
@@ -130,13 +113,12 @@ CREATE TABLE IF NOT EXISTS "invoice_lines" (
 	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"invoice_id" integer NOT NULL,
 	"name" text NOT NULL,
-	"unit_net_amount" numeric(10, 2) NOT NULL,
+	"unit_amount" numeric(10, 2) NOT NULL,
 	"quantity" numeric(10, 2) NOT NULL,
-	"total_net_amount" numeric(10, 2) NOT NULL,
-	"discount_amount" numeric(10, 2),
-	"total_tax_amount" numeric(10, 2) NOT NULL,
-	"tax_percentage" numeric(10, 2) NOT NULL,
-	"total_gross_amount" numeric(10, 2) NOT NULL
+	"net_amount" numeric(10, 2) NOT NULL,
+	"vat_amount" numeric(10, 2) NOT NULL,
+	"vat_percentage" numeric(10, 2) NOT NULL,
+	"gross_amount" numeric(10, 2) NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "invoices" (
@@ -149,11 +131,9 @@ CREATE TABLE IF NOT EXISTS "invoices" (
 	"ref_id" integer NOT NULL,
 	"type" "invoice_type" NOT NULL,
 	"status" "invoice_status" NOT NULL,
-	"discount_amount" numeric(10, 2),
-	"total_net_amount" numeric(10, 2) NOT NULL,
-	"total_discount_amount" numeric(10, 2),
-	"total_tax_amount" numeric(10, 2) NOT NULL,
-	"total_gross_amount" numeric(10, 2) NOT NULL,
+	"net_amount" numeric(10, 2) NOT NULL,
+	"vat_amount" numeric(10, 2) NOT NULL,
+	"gross_amount" numeric(10, 2) NOT NULL,
 	"number" text,
 	"notes" text,
 	"date" date,
@@ -259,6 +239,13 @@ CREATE TABLE IF NOT EXISTS "reservations" (
 	"guest_name" text NOT NULL,
 	"reservation_notes" text,
 	"invoice_notes" text
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "reservations_to_invoice_extra_instances" (
+	"reservation_id" integer NOT NULL,
+	"instance_id" integer NOT NULL,
+	"cycle" "reservations_to_invoice_extra_instances_cycle" NOT NULL,
+	CONSTRAINT "reservations_to_invoice_extra_instances_reservation_id_instance_id_pk" PRIMARY KEY("reservation_id","instance_id")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "reservations_to_invoices" (
@@ -449,6 +436,18 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "reservations" ADD CONSTRAINT "reservations_customer_id_relations_id_fk" FOREIGN KEY ("customer_id") REFERENCES "relations"("id") ON DELETE restrict ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "reservations_to_invoice_extra_instances" ADD CONSTRAINT "reservations_to_invoice_extra_instances_reservation_id_reservations_id_fk" FOREIGN KEY ("reservation_id") REFERENCES "reservations"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "reservations_to_invoice_extra_instances" ADD CONSTRAINT "reservations_to_invoice_extra_instances_instance_id_invoice_extra_instances_id_fk" FOREIGN KEY ("instance_id") REFERENCES "invoice_extra_instances"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import Decimal from "decimal.js";
 import { and, eq } from "drizzle-orm";
 import {
   date,
@@ -103,13 +104,12 @@ export const reservationRouter = router({
                 amount: true,
                 unit: true,
                 vatPercentage: true,
+                status: true,
               },
             },
           },
           columns: {
-            basis: true,
-            timing: true,
-            status: true,
+            cycle: true,
           },
         },
       },
@@ -207,16 +207,63 @@ export const reservationRouter = router({
       const reservation = await db.query.reservations.findFirst({
         with: {
           room: true,
-          invoicesExtrasJunction: true,
+          invoicesExtrasJunction: {
+            with: {
+              instance: true,
+            },
+          },
         },
         where: eq(reservations.id, input.reservationId),
       });
 
       if (!reservation) throw new TRPCError({ code: "NOT_FOUND" });
 
-      const totalNights = dayjs(input.endDate).diff(
-        dayjs(input.startDate),
+      const extraLines: {
+        name: string;
+        unitAmount: string;
+        quantity: string;
+        vatPercentage: string;
+      }[] = [];
+      const isFinalInvoice = dayjs(reservation.endDate).isSame(input.endDate);
+      const periodNights = dayjs(input.endDate).diff(input.startDate, "days");
+      const totalNights = dayjs(reservation.endDate).diff(
+        reservation.startDate,
         "days",
+      );
+
+      await Promise.all(
+        reservation.invoicesExtrasJunction.map(async ({ instance, cycle }) => {
+          if (
+            (cycle === "oneTimeOnEnd" || cycle === "perNightOnEnd") &&
+            !isFinalInvoice
+          )
+            return;
+          let quantity = instance.quantity;
+          let status: "partiallyApplied" | "fullyApplied" = "fullyApplied";
+
+          if (cycle === "perNightThroughout") {
+            quantity = new Decimal(quantity).mul(periodNights).toString();
+            status = isFinalInvoice ? "fullyApplied" : "partiallyApplied";
+          }
+
+          if (cycle === "perNightOnEnd")
+            quantity = new Decimal(quantity).mul(totalNights).toString();
+
+          // TODO what if invoice get's deleted in draft state or credited?
+          await db
+            .update(invoiceExtraInstances)
+            .set({ status })
+            .where(eq(invoiceExtraInstances.id, instance.id));
+
+          extraLines.push({
+            name: instance.name,
+            unitAmount: instance.amount,
+            quantity,
+            vatPercentage: instance.vatPercentage,
+          });
+
+          // TODO Update line status
+        }),
       );
 
       const invoiceId = await createInvoice({
@@ -231,10 +278,10 @@ export const reservationRouter = router({
           {
             name: "Overnight Stays",
             unitAmount: reservation.priceOverride || reservation.room.price,
-            quantity: totalNights.toString(),
+            quantity: periodNights.toString(),
             vatPercentage: "9",
           },
-          // ...invoiceExtras.map(({ name, amount }) => ({ name, unitNetAmount })),
+          ...extraLines,
         ],
       });
 
@@ -257,9 +304,12 @@ export const reservationRouter = router({
           quantity: string(),
           amount: string(),
           unit: picklist(["currency"]),
-          basis: picklist(["oneTime", "perNight"]),
-          timing: picklist(["end", "throughout"]),
           vatPercentage: string(),
+          cycle: picklist([
+            "oneTimeOnEnd",
+            "perNightThroughout",
+            "perNightOnEnd",
+          ]),
         }),
       ),
     )
@@ -273,6 +323,7 @@ export const reservationRouter = router({
           amount: input.amount,
           unit: input.unit,
           vatPercentage: input.vatPercentage,
+          status: "notApplied",
         })
         .returning({
           id: invoiceExtraInstances.id,
@@ -283,9 +334,7 @@ export const reservationRouter = router({
       await db.insert(reservationsToInvoiceExtraInstances).values({
         reservationId: input.reservationId,
         instanceId,
-        basis: input.basis,
-        timing: input.timing,
-        status: "notApplied",
+        cycle: input.cycle,
       });
     }),
   updateInvoiceExtra: procedure
@@ -298,9 +347,12 @@ export const reservationRouter = router({
           quantity: string(),
           amount: optional(string()),
           unit: optional(picklist(["currency"])),
-          basis: optional(picklist(["oneTime", "perNight"])),
-          timing: optional(picklist(["end", "throughout"])),
           vatPercentage: optional(string()),
+          cycle: picklist([
+            "oneTimeOnEnd",
+            "perNightThroughout",
+            "perNightOnEnd",
+          ]),
         }),
       ),
     )
@@ -318,10 +370,7 @@ export const reservationRouter = router({
           .where(eq(invoiceExtraInstances.id, input.instanceId)),
         db
           .update(reservationsToInvoiceExtraInstances)
-          .set({
-            basis: input.basis,
-            timing: input.timing,
-          })
+          .set({ cycle: input.cycle })
           .where(
             and(
               eq(

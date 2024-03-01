@@ -3,8 +3,8 @@ import { useMemo, useState } from "react";
 import { RouterOutput } from "@back-end/routes/_app";
 import {
   Button,
+  ButtonGroup,
   Divider,
-  Group,
   NumberInput,
   Select,
   SimpleGrid,
@@ -19,8 +19,7 @@ export type ReservationInvoiceExtraValues = {
   quantity: string;
   amount: string;
   unit: "currency";
-  basis: "oneTime" | "perNight";
-  timing: "throughout" | "end";
+  cycle: "oneTimeOnEnd" | "perNightThroughout" | "perNightOnEnd";
   vatPercentage: string;
 };
 
@@ -49,8 +48,7 @@ export const CreateInvoiceExtraModal = ({
     quantity: "1",
     amount: "",
     unit: "currency",
-    basis: "oneTime",
-    timing: "end",
+    cycle: "",
     vatPercentage: "21",
   });
 
@@ -138,40 +136,30 @@ export const CreateInvoiceExtraModal = ({
           withAsterisk
         />
         <Select
-          label="Basis"
-          data={["oneTime", "perNight"]}
-          value={values.basis}
-          onChange={(basis) => {
-            if (basis) changeHandler({ basis });
+          label="Cycle"
+          data={["oneTimeOnEnd", "perNightThroughout", "perNightOnEnd"]}
+          value={values.cycle}
+          onChange={(cycle) => {
+            if (cycle) changeHandler({ cycle });
           }}
           allowDeselect={false}
           withAsterisk
         />
-        <Select
-          label="Timing"
-          data={["end", "throughout"]}
-          value={values.timing}
-          onChange={(timing) => {
-            if (timing) changeHandler({ timing });
+        <NumberInput
+          label="VAT Percentage"
+          value={values.vatPercentage}
+          onChange={(vatPercentage) => {
+            changeHandler({ vatPercentage: vatPercentage.toString() });
           }}
-          allowDeselect={false}
+          decimalScale={2}
+          decimalSeparator=","
+          fixedDecimalScale
+          hideControls
           withAsterisk
+          rightSection="%"
         />
       </SimpleGrid>
-      <NumberInput
-        label="VAT Percentage"
-        value={values.vatPercentage}
-        onChange={(vatPercentage) => {
-          changeHandler({ vatPercentage: vatPercentage.toString() });
-        }}
-        decimalScale={2}
-        decimalSeparator=","
-        fixedDecimalScale
-        hideControls
-        withAsterisk
-        rightSection="%"
-      />
-      <Group justify="space-evenly" w="100%" wrap="nowrap">
+      <ButtonGroup>
         <Button
           variant="light"
           onClick={() => {
@@ -182,13 +170,18 @@ export const CreateInvoiceExtraModal = ({
           Back
         </Button>
         <Button
-          disabled={!values.name || !values.amount || !values.vatPercentage}
+          disabled={
+            !values.name ||
+            !values.cycle ||
+            !values.amount ||
+            !values.vatPercentage
+          }
           onClick={confirmHandler}
           fullWidth
         >
           Apply
         </Button>
-      </Group>
+      </ButtonGroup>
     </Stack>
   );
 };

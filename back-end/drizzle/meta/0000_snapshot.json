@@ -1,5 +1,5 @@
 {
-  "id": "0967fa9f-c5b7-417a-927a-9de550b69d43",
+  "id": "d14924d8-eac5-4c5d-828d-ff7a4a0ec986",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -188,23 +188,18 @@
           "primaryKey": false,
           "notNull": false
         },
-        "ref_type": {
-          "name": "ref_type",
-          "type": "invoice_extra_instance_ref_type",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "ref_id": {
-          "name": "ref_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
         "name": {
           "name": "name",
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'1'"
         },
         "amount": {
           "name": "amount",
@@ -218,24 +213,19 @@
           "primaryKey": false,
           "notNull": true
         },
-        "basis": {
-          "name": "basis",
-          "type": "invoice_extra_basis",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "timing": {
-          "name": "timing",
-          "type": "invoice_extra_timing",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "tax_percentage": {
-          "name": "tax_percentage",
+        "vat_percentage": {
+          "name": "vat_percentage",
           "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true,
           "default": "'0'"
+        },
+        "status": {
+          "name": "status",
+          "type": "reservations_to_invoice_extra_instances_status",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'notApplied'"
         }
       },
       "indexes": {},
@@ -307,17 +297,18 @@
           "primaryKey": false,
           "notNull": false
         },
-        "type": {
-          "name": "type",
-          "type": "invoice_extra_type",
-          "primaryKey": false,
-          "notNull": true
-        },
         "name": {
           "name": "name",
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'1'"
         },
         "description": {
           "name": "description",
@@ -337,31 +328,12 @@
           "primaryKey": false,
           "notNull": true
         },
-        "basis": {
-          "name": "basis",
-          "type": "invoice_extra_basis",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "timing": {
-          "name": "timing",
-          "type": "invoice_extra_timing",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "tax_percentage": {
-          "name": "tax_percentage",
+        "vat_percentage": {
+          "name": "vat_percentage",
           "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true,
           "default": "'0'"
-        },
-        "auto_add": {
-          "name": "auto_add",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
         }
       },
       "indexes": {},
@@ -425,8 +397,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "unit_net_amount": {
-          "name": "unit_net_amount",
+        "unit_amount": {
+          "name": "unit_amount",
           "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true
@@ -437,32 +409,26 @@
           "primaryKey": false,
           "notNull": true
         },
-        "total_net_amount": {
-          "name": "total_net_amount",
+        "net_amount": {
+          "name": "net_amount",
           "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true
         },
-        "discount_amount": {
-          "name": "discount_amount",
-          "type": "numeric(10, 2)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "total_tax_amount": {
-          "name": "total_tax_amount",
+        "vat_amount": {
+          "name": "vat_amount",
           "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true
         },
-        "tax_percentage": {
-          "name": "tax_percentage",
+        "vat_percentage": {
+          "name": "vat_percentage",
           "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true
         },
-        "total_gross_amount": {
-          "name": "total_gross_amount",
+        "gross_amount": {
+          "name": "gross_amount",
           "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true
@@ -548,32 +514,20 @@
           "primaryKey": false,
           "notNull": true
         },
-        "discount_amount": {
-          "name": "discount_amount",
-          "type": "numeric(10, 2)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "total_net_amount": {
-          "name": "total_net_amount",
+        "net_amount": {
+          "name": "net_amount",
           "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true
         },
-        "total_discount_amount": {
-          "name": "total_discount_amount",
-          "type": "numeric(10, 2)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "total_tax_amount": {
-          "name": "total_tax_amount",
+        "vat_amount": {
+          "name": "vat_amount",
           "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true
         },
-        "total_gross_amount": {
-          "name": "total_gross_amount",
+        "gross_amount": {
+          "name": "gross_amount",
           "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true
@@ -1388,6 +1342,69 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
+    "reservations_to_invoice_extra_instances": {
+      "name": "reservations_to_invoice_extra_instances",
+      "schema": "",
+      "columns": {
+        "reservation_id": {
+          "name": "reservation_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "instance_id": {
+          "name": "instance_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cycle": {
+          "name": "cycle",
+          "type": "reservations_to_invoice_extra_instances_cycle",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "reservations_to_invoice_extra_instances_reservation_id_reservations_id_fk": {
+          "name": "reservations_to_invoice_extra_instances_reservation_id_reservations_id_fk",
+          "tableFrom": "reservations_to_invoice_extra_instances",
+          "tableTo": "reservations",
+          "columnsFrom": [
+            "reservation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "reservations_to_invoice_extra_instances_instance_id_invoice_extra_instances_id_fk": {
+          "name": "reservations_to_invoice_extra_instances_instance_id_invoice_extra_instances_id_fk",
+          "tableFrom": "reservations_to_invoice_extra_instances",
+          "tableTo": "invoice_extra_instances",
+          "columnsFrom": [
+            "instance_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "reservations_to_invoice_extra_instances_reservation_id_instance_id_pk": {
+          "name": "reservations_to_invoice_extra_instances_reservation_id_instance_id_pk",
+          "columns": [
+            "reservation_id",
+            "instance_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
     "reservations_to_invoices": {
       "name": "reservations_to_invoices",
       "schema": "",
@@ -1910,38 +1927,10 @@
         "credited": "credited"
       }
     },
-    "invoice_extra_basis": {
-      "name": "invoice_extra_basis",
-      "values": {
-        "oneTime": "oneTime",
-        "perNight": "perNight"
-      }
-    },
-    "invoice_extra_instance_ref_type": {
-      "name": "invoice_extra_instance_ref_type",
-      "values": {
-        "reservation": "reservation"
-      }
-    },
-    "invoice_extra_timing": {
-      "name": "invoice_extra_timing",
-      "values": {
-        "start": "start",
-        "end": "end",
-        "throughout": "throughout"
-      }
-    },
-    "invoice_extra_type": {
-      "name": "invoice_extra_type",
-      "values": {
-        "reservation": "reservation"
-      }
-    },
     "invoice_extra_unit": {
       "name": "invoice_extra_unit",
       "values": {
-        "currency": "currency",
-        "percentage": "percentage"
+        "currency": "currency"
       }
     },
     "invoice_ref_type": {
@@ -1964,8 +1953,7 @@
       "values": {
         "standard": "standard",
         "quotation": "quotation",
-        "credit": "credit",
-        "final": "final"
+        "credit": "credit"
       }
     },
     "relation_type": {
@@ -1973,6 +1961,22 @@
       "values": {
         "individual": "individual",
         "business": "business"
+      }
+    },
+    "reservations_to_invoice_extra_instances_cycle": {
+      "name": "reservations_to_invoice_extra_instances_cycle",
+      "values": {
+        "oneTimeOnEnd": "oneTimeOnEnd",
+        "perNightThroughout": "perNightThroughout",
+        "perNightOnEnd": "perNightOnEnd"
+      }
+    },
+    "reservations_to_invoice_extra_instances_status": {
+      "name": "reservations_to_invoice_extra_instances_status",
+      "values": {
+        "notApplied": "notApplied",
+        "partiallyApplied": "partiallyApplied",
+        "fullyApplied": "fullyApplied"
       }
     },
     "setting_name": {

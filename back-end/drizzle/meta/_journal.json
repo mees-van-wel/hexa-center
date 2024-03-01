@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1709206383530,
-      "tag": "0000_jittery_thundra",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1709211710065,
-      "tag": "0001_mean_madrox",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1709224323375,
-      "tag": "0002_broad_blazing_skull",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1709238018817,
-      "tag": "0003_lovely_shiva",
+      "when": 1709289092439,
+      "tag": "0000_low_mach_iv",
       "breakpoints": true
     }
   ]

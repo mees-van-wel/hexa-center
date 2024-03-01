@@ -137,13 +137,13 @@ export const ReservationUpdate = ({
               : reservation.startDate
           }
           onConfirm={async (startDate, endDate) => {
-            const invoiceId = await invoicePeriod.mutate({
+            await invoicePeriod.mutate({
               reservationId: reservation.id,
               startDate,
               endDate,
             });
 
-            router.push(`/invoices/${invoiceId}`);
+            router.refresh();
 
             notifications.show({
               message: "Period successfully Invoiced",
@@ -158,7 +158,7 @@ export const ReservationUpdate = ({
   const createInvoiceExtraHandler = () => {
     modals.open({
       title: <Title order={3}>Add Invoice Extra</Title>,
-      size: "xs",
+      // size: "sm",
       children: (
         <CreateInvoiceExtraModal
           templates={invoiceExtraTemplates}
@@ -190,7 +190,7 @@ export const ReservationUpdate = ({
 
     modals.open({
       title: <Title order={3}>Edit Invoice Extra</Title>,
-      size: "xs",
+      // size: "sm",
       children: (
         <EditInvoiceExtraModal
           currentValues={{
@@ -199,8 +199,7 @@ export const ReservationUpdate = ({
             amount: invoiceExtra.instance.amount,
             unit: invoiceExtra.instance.unit,
             vatPercentage: invoiceExtra.instance.vatPercentage,
-            basis: invoiceExtra.basis,
-            timing: invoiceExtra.timing,
+            cycle: invoiceExtra.cycle,
           }}
           onConfirm={async (values) => {
             await updateInvoiceExtra.mutate({
@@ -300,14 +299,13 @@ export const ReservationUpdate = ({
                     <Table.Th>Amount</Table.Th>
                     <Table.Th>Unit</Table.Th>
                     <Table.Th>Vat percentage</Table.Th>
-                    <Table.Th>Basis</Table.Th>
-                    <Table.Th>Timing</Table.Th>
+                    <Table.Th>Cycle</Table.Th>
                     <Table.Th>Status</Table.Th>
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
                   {reservation.invoicesExtrasJunction.map(
-                    ({ instance, basis, timing, status }) => (
+                    ({ instance, cycle }) => (
                       <Table.Tr key={instance.id}>
                         <Table.Td>
                           <Group gap="xs">
@@ -337,20 +335,19 @@ export const ReservationUpdate = ({
                         <Table.Td>{instance.amount}</Table.Td>
                         <Table.Td>{instance.unit}</Table.Td>
                         <Table.Td>{instance.vatPercentage}%</Table.Td>
-                        <Table.Td>{basis}</Table.Td>
-                        <Table.Td>{timing}</Table.Td>
+                        <Table.Td>{cycle}</Table.Td>
                         <Table.Td>
                           <Badge
                             variant="light"
                             color={
-                              status === "notApplied"
+                              instance.status === "notApplied"
                                 ? "red"
-                                : status === "inProgress"
+                                : instance.status === "partiallyApplied"
                                   ? "orange"
                                   : "green"
                             }
                           >
-                            {status}
+                            {instance.status}
                           </Badge>
                         </Table.Td>
                       </Table.Tr>
@@ -371,6 +368,10 @@ export const ReservationUpdate = ({
                       invoice.type === "credit"
                         ? IconFileArrowLeft
                         : IconFileEuro;
+
+                    const isFinalInvoice = dayjs(reservation.endDate).isSame(
+                      endDate,
+                    );
 
                     return (
                       <Card
@@ -441,7 +442,9 @@ export const ReservationUpdate = ({
                           <Text fw="bold">
                             {invoice.type === "credit"
                               ? "Credit Invoice"
-                              : "Invoice"}
+                              : isFinalInvoice
+                                ? "Final Invoice"
+                                : "Invoice"}
                             : {invoice.number || invoice.id}
                           </Text>
                           <Text size="sm">
@@ -484,7 +487,7 @@ export const ReservationUpdate = ({
                             borderBottomRightRadius: "0.5rem",
                           }}
                         >
-                          {invoice.type}
+                          {isFinalInvoice ? "Final" : invoice.type}
                         </Badge>
                         <Badge
                           variant="light"

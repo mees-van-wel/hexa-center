@@ -276,7 +276,7 @@ type CreateInvoiceProps = {
   createdById: number;
   refType: "reservation" | "invoice";
   refId: number;
-  type: "standard" | "quotation" | "credit" | "final";
+  type: "standard" | "quotation" | "credit";
   customerId: number;
   companyId: number;
   lines: {
@@ -335,15 +335,14 @@ export const createInvoice = async ({
   const invoiceInsertResult = await db
     .insert(invoices)
     .values({
-      // @ts-ignore ???
       createdById,
       refType,
       refId,
       type,
       status: "draft",
-      netAmount,
-      vatAmount,
-      grossAmount,
+      netAmount: roundDecimal(netAmount),
+      vatAmount: roundDecimal(vatAmount),
+      grossAmount: roundDecimal(grossAmount),
       customerId,
       companyId,
       notes,

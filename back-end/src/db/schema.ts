@@ -376,7 +376,6 @@ export const invoiceTypeEnum = pgEnum("invoice_type", [
   "standard",
   "quotation",
   "credit",
-  "final",
 ]);
 
 export const invoiceStatusEnum = pgEnum("invoice_status", [
@@ -606,6 +605,11 @@ export const invoiceExtraTemplatesRelations = relationBuilder(
   }),
 );
 
+export const reservationsToInvoiceExtraInstancesStatusEnum = pgEnum(
+  "reservations_to_invoice_extra_instances_status",
+  ["notApplied", "partiallyApplied", "fullyApplied"],
+);
+
 export const invoiceExtraInstances = pgTable("invoice_extra_instances", {
   $kind: text("$kind").default("invoiceExtraInstance").notNull(),
   id: serial("id").primaryKey(),
@@ -632,6 +636,9 @@ export const invoiceExtraInstances = pgTable("invoice_extra_instances", {
   })
     .default("0")
     .notNull(),
+  status: reservationsToInvoiceExtraInstancesStatusEnum("status")
+    .default("notApplied")
+    .notNull(),
 });
 
 export const invoiceExtraInstancesRelations = relationBuilder(
@@ -646,20 +653,10 @@ export const invoiceExtraInstancesRelations = relationBuilder(
 );
 
 // TODO Add support for perInvoice, perPerson, perPersonPerNight, perItem, perDay and perHour
-export const reservationsToInvoiceExtraInstancesBasisEnum = pgEnum(
-  "reservations_to_invoice_extra_instances_basis",
-  ["oneTime", "perNight"],
-);
-
 // TODO Add start, Maybe support uponUsage, when invoked show on next invoice only
-export const reservationsToInvoiceExtraInstancesTimingEnum = pgEnum(
-  "reservations_to_invoice_extra_instances_timing",
-  ["throughout", "end"],
-);
-
-export const reservationsToInvoiceExtraInstancesStatusEnum = pgEnum(
-  "reservations_to_invoice_extra_instances_status",
-  ["notApplied", "inProgress", "applied"],
+export const reservationsToInvoiceExtraInstancesCycleEnum = pgEnum(
+  "reservations_to_invoice_extra_instances_cycle",
+  ["oneTimeOnEnd", "perNightThroughout", "perNightOnEnd"],
 );
 
 export const reservationsToInvoiceExtraInstances = pgTable(
@@ -671,11 +668,7 @@ export const reservationsToInvoiceExtraInstances = pgTable(
     instanceId: integer("instance_id")
       .references(() => invoiceExtraInstances.id, { onDelete: "cascade" })
       .notNull(),
-    basis: reservationsToInvoiceExtraInstancesBasisEnum("basis").notNull(),
-    timing: reservationsToInvoiceExtraInstancesTimingEnum("timing").notNull(),
-    status: reservationsToInvoiceExtraInstancesStatusEnum("status")
-      .default("notApplied")
-      .notNull(),
+    cycle: reservationsToInvoiceExtraInstancesCycleEnum("cycle").notNull(),
   },
   (t) => ({
     pk: primaryKey({ columns: [t.reservationId, t.instanceId] }),

@@ -2,9 +2,10 @@ import { useState } from "react";
 
 import {
   Button,
-  Group,
+  ButtonGroup,
   NumberInput,
   Select,
+  SimpleGrid,
   Stack,
   TextInput,
 } from "@mantine/core";
@@ -24,8 +25,7 @@ export const EditInvoiceExtraModal = ({
     quantity: currentValues.quantity,
     amount: currentValues.amount,
     unit: currentValues.unit,
-    basis: currentValues.basis,
-    timing: currentValues.timing,
+    cycle: currentValues.cycle,
     vatPercentage: currentValues.vatPercentage,
   });
 
@@ -39,8 +39,8 @@ export const EditInvoiceExtraModal = ({
   };
 
   return (
-    <Stack>
-      <Group wrap="nowrap">
+    <Stack gap="xl">
+      <SimpleGrid cols={2} verticalSpacing="xs">
         <TextInput
           label="Name"
           value={values.name}
@@ -61,8 +61,6 @@ export const EditInvoiceExtraModal = ({
           hideControls
           withAsterisk
         />
-      </Group>
-      <Group wrap="nowrap">
         <NumberInput
           label="Amount"
           value={values.amount}
@@ -85,43 +83,31 @@ export const EditInvoiceExtraModal = ({
           allowDeselect={false}
           withAsterisk
         />
-      </Group>
-      <Group wrap="nowrap">
         <Select
-          label="Basis"
-          data={["oneTime", "perNight"]}
-          value={values.basis}
-          onChange={(basis) => {
-            if (basis) changeHandler({ basis });
+          label="Cycle"
+          data={["oneTimeOnEnd", "perNightThroughout", "perNightOnEnd"]}
+          value={values.cycle}
+          onChange={(cycle) => {
+            if (cycle) changeHandler({ cycle });
           }}
           allowDeselect={false}
           withAsterisk
         />
-        <Select
-          label="Timing"
-          data={["end", "throughout"]}
-          value={values.timing}
-          onChange={(timing) => {
-            if (timing) changeHandler({ timing });
+        <NumberInput
+          label="VAT Percentage"
+          value={values.vatPercentage}
+          onChange={(vatPercentage) => {
+            changeHandler({ vatPercentage: vatPercentage.toString() });
           }}
-          allowDeselect={false}
+          decimalScale={2}
+          decimalSeparator=","
+          fixedDecimalScale
+          hideControls
           withAsterisk
+          rightSection="%"
         />
-      </Group>
-      <NumberInput
-        label="VAT Percentage"
-        value={values.vatPercentage}
-        onChange={(vatPercentage) => {
-          changeHandler({ vatPercentage: vatPercentage.toString() });
-        }}
-        decimalScale={2}
-        decimalSeparator=","
-        fixedDecimalScale
-        hideControls
-        withAsterisk
-        rightSection="%"
-      />
-      <Group justify="space-evenly" w="100%" wrap="nowrap">
+      </SimpleGrid>
+      <ButtonGroup>
         <Button
           variant="light"
           onClick={() => {
@@ -134,7 +120,7 @@ export const EditInvoiceExtraModal = ({
         <Button onClick={confirmHandler} fullWidth>
           Save
         </Button>
-      </Group>
+      </ButtonGroup>
     </Stack>
   );
 };

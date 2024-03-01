@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration.js";
-import { and, desc, eq, or, sql } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { date, number, object } from "valibot";
 
 import db from "@/db/client";
@@ -115,7 +115,7 @@ export const invoiceRouter = router({
           .where(
             and(
               sql`EXTRACT(YEAR FROM ${invoices.date}) = ${date.getFullYear()}`,
-              or(eq(invoices.type, "standard"), eq(invoices.type, "final")),
+              eq(invoices.type, "standard"),
             ),
           ),
       ]);
