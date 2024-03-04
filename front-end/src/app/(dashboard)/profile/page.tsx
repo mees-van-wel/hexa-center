@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
 import { Address } from "@/components/common/Address";
@@ -28,6 +29,15 @@ export default function Profile() {
     defaultValues: authUser,
   });
 
+  const sexOptions = useMemo(
+    () =>
+      SEX_VALUES.map((sex: SexKey) => ({
+        label: t(`constants.sexes.${sex}`),
+        value: sex,
+      })),
+    [t],
+  );
+
   return (
     <FormProvider {...formMethods}>
       <Stack>
@@ -38,33 +48,23 @@ export default function Profile() {
         ></DashboardHeader>
         <Paper p="md">
           <Stack>
-            <Group>
+            <Group align="end">
               <Avatar size="lg" />
-              <Group
-                grow
-                style={{
-                  flex: 1,
-                }}
-              >
-                <TextInput
-                  label={t("entities.relation.keys.name")}
-                  value={authUser.name}
-                  required
-                />
-                <DateInput
-                  label={t("entities.relation.keys.dateOfBirth")}
-                  value={authUser.dateOfBirth}
-                />
-                <Select
-                  label={t("entities.relation.keys.sex")}
-                  data={SEX_VALUES.map((sex: SexKey) => ({
-                    label: t(`constants.sexes.${sex}`),
-                    value: sex,
-                  }))}
-                  value={authUser.sex}
-                  allowDeselect={false}
-                />
-              </Group>
+              <TextInput
+                label={t("entities.relation.keys.name")}
+                value={authUser.name}
+                required
+              />
+              <DateInput
+                label={t("entities.relation.keys.dateOfBirth")}
+                value={authUser.dateOfBirth}
+              />
+              <Select
+                label={t("entities.relation.keys.sex")}
+                data={sexOptions}
+                value={authUser.sex}
+                allowDeselect={false}
+              />
             </Group>
             <Address disabled={false} />
           </Stack>
