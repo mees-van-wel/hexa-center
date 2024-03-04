@@ -218,6 +218,15 @@ export type Translation = {
     };
     loggedInSuccess: string;
   };
+  homePage: {
+    goodMorning: string;
+    goodAfternoon: string;
+    goodEvening: string;
+    welcome: string;
+    news: string;
+    title: string;
+    read: string;
+  };
   preferencesPage: {
     title: string;
     name: string;

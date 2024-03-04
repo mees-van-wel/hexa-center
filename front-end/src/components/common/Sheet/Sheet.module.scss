@@ -8,7 +8,7 @@
 }
 
 .title {
-  padding: 0 1rem;
+  padding: 0.25rem 1rem;
 }
 
 .button {
@@ -22,4 +22,10 @@
   border-top-left-radius: 0;
   padding: 1rem;
   width: 100%;
+}
+
+.glass {
+  box-shadow: 0 4px 30px rgb(0 0 0 / 50%);
+  background-color: rgb(from var(--color-foreground) r g b / 50%);
+  backdrop-filter: saturate(1.5) blur(8px);
 }

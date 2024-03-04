@@ -210,6 +210,15 @@ export default {
     },
     loggedInSuccess: "You're logged in successfully",
   },
+  homePage: {
+    goodMorning: "Good morning",
+    goodAfternoon: "Good afternoon",
+    goodEvening: "Good evening",
+    welcome: "Welcome",
+    news: "News",
+    title: "Home",
+    read: "Read the full article",
+  },
   preferencesPage: {
     title: "Preferences",
     name: "Preferences",
