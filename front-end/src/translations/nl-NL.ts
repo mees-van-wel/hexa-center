@@ -241,6 +241,7 @@ export default {
       TUESDAY: "Dinsdag",
       WEDNESDAY: "Woensdag",
     },
+    authentication: "Authenticatie",
   },
   roomsPage: {
     price: "Prijs",
