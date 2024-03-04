@@ -63,7 +63,7 @@ const data = [
   },
 ];
 
-export default function Home() {
+export default function Page() {
   const t = useTranslation();
   const authUser = useAuthRelation();
   const greeting = useMemo(() => {
