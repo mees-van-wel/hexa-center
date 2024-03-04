@@ -240,6 +240,16 @@ export default {
       WEDNESDAY: "Wednesday",
     },
   },
+  propertiesPage: {
+    name: "Name",
+    email: "Email",
+    phoneNumber: "Phone number",
+    street: "Street",
+    houseNumber: "House number",
+    deleteProperty: "Are you sure you want to delete this property?",
+    deletedNotification: "Property deleted",
+    propertyCreated: "Property created",
+  },
   roomsPage: {
     price: "Price",
     noRooms: "Please add a room first",

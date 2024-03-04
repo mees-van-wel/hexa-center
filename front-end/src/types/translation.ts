@@ -248,6 +248,16 @@ export type Translation = {
       WEDNESDAY: string;
     };
   };
+  propertiesPage: {
+    name: string;
+    email: string;
+    phoneNumber: string;
+    street: string;
+    houseNumber: string;
+    deleteProperty: string;
+    deletedNotification: string;
+    propertyCreated: string;
+  };
   roomsPage: {
     price: string;
     noRooms: string;
