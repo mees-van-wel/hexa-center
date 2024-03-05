@@ -798,7 +798,7 @@ export const apiConnections = pgTable("api_connections", {
   id: serial("id").primaryKey(),
   uuid: uuid("uuid").defaultRandom().notNull(),
   type: apiConnectionTypeEnum("type").notNull(),
-  data: jsonb("data"),
+  data: jsonb("data").notNull(),
 });
 
 export const apiEntityRefTypeEnum = pgEnum("api_entity_ref_type", ["relation"]);
