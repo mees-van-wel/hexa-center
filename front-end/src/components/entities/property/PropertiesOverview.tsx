@@ -33,7 +33,7 @@ export const PropertiesOverview = ({ properties }: PropertiesPageProps) => {
           component={Link}
           href="/properties/new"
         >
-          New
+          {t("common.new")}
         </Button>
         <Table.SearchBar id={searchBarId} />
       </DashboardHeader>
@@ -45,19 +45,19 @@ export const PropertiesOverview = ({ properties }: PropertiesPageProps) => {
         columns={[
           {
             selector: "name",
-            label: "Name",
+            label: t("entities.property.keys.name"),
           },
           {
-            selector: "email",
-            label: "Email",
+            selector: "emailAddress",
+            label: t("entities.property.keys.email"),
           },
           {
             selector: "phoneNumber",
-            label: "Phone number",
+            label: t("entities.property.keys.phoneNumber"),
           },
           {
             selector: "id",
-            label: "Number",
+            label: t("common.number"),
           },
         ]}
         elements={properties}

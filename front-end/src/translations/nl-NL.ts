@@ -55,6 +55,21 @@ export default {
         button: "Profielpagina",
       },
     },
+    property: {
+      name: {
+        singular: "Vestiging",
+        plural: "Vestigingen",
+      },
+      keys: {
+        name: "Naam",
+        email: "Email",
+        phoneNumber: "Telefoonnummer",
+        street: "Straat",
+        houseNumber: "Huisnummer",
+      },
+      createdNotification: "Vestiging succesvol aangemaakt",
+      deletedNotification: "Vestiging succesvol verwijderd",
+    },
     room: {
       name: {
         singular: "Kamer",
@@ -241,16 +256,6 @@ export default {
       TUESDAY: "Dinsdag",
       WEDNESDAY: "Woensdag",
     },
-  },
-  propertiesPage: {
-    name: "Naam",
-    email: "Email",
-    phoneNumber: "Telefoonnummer",
-    street: "Straat",
-    houseNumber: "Huisnummer",
-    deleteProperty: "Weet u zeker dat u deze vestiging wilt verwijderen?",
-    deletedNotification: "Vestiging verwijderd",
-    propertyCreated: "Vestiging aangemaakt",
   },
   roomsPage: {
     price: "Prijs",

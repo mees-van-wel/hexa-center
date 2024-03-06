@@ -41,7 +41,7 @@ export default function Page() {
   const onSubmit = async (values: PropertyCreateInputSchema) => {
     const response = await createProperty.mutate(values);
     notifications.show({
-      message: t("propertiesPage.propertyCreated"),
+      message: t("entities.property.createdNotification"),
       color: "green",
     });
     router.push(`/properties/${response.id}`);

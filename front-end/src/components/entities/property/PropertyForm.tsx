@@ -27,14 +27,14 @@ export const PropertyForm = ({ disabled }: PropertyFormProps) => {
         <Group align="end">
           <TextInput
             {...register("name")}
-            label={t("propertiesPage.name")}
+            label={t("entities.property.keys.name")}
             error={formState.errors.name?.message}
             disabled={disabled}
             required
           />
           <TextInput
             {...register("emailAddress")}
-            label={t("propertiesPage.email")}
+            label={t("entities.property.keys.email")}
             error={formState.errors.emailAddress?.message}
             type="email"
             disabled={disabled}
@@ -45,7 +45,7 @@ export const PropertyForm = ({ disabled }: PropertyFormProps) => {
             render={({ field, fieldState: { error } }) => (
               <PhoneInput
                 {...field}
-                label={t("propertiesPage.phoneNumber")}
+                label={t("entities.property.keys.phoneNumber")}
                 error={error?.message}
                 disabled={disabled}
               />

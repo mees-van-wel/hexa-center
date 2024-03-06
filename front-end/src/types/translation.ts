@@ -64,6 +64,21 @@ export type Translation = {
         button: string;
       };
     };
+    property: {
+      name: {
+        singular: string;
+        plural: string;
+      };
+      keys: {
+        name: string;
+        email: string;
+        phoneNumber: string;
+        street: string;
+        houseNumber: string;
+      };
+      deletedNotification: string;
+      createdNotification: string;
+    };
     room: {
       name: {
         singular: string;
@@ -247,16 +262,6 @@ export type Translation = {
       TUESDAY: string;
       WEDNESDAY: string;
     };
-  };
-  propertiesPage: {
-    name: string;
-    email: string;
-    phoneNumber: string;
-    street: string;
-    houseNumber: string;
-    deleteProperty: string;
-    deletedNotification: string;
-    propertyCreated: string;
   };
   roomsPage: {
     price: string;

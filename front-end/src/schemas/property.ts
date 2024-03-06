@@ -1,5 +1,4 @@
 import {
-  email,
   Input,
   minLength,
   nullable,
@@ -10,9 +9,12 @@ import {
   string,
 } from "valibot";
 
+import { nullableEmail } from "@/valibotPipes/nullableEmail";
+import { toNull } from "@/valibotPipes/toNull";
+
 export const PropertyCreateSchema = object({
   name: string([minLength(2)]),
-  emailAddress: nullable(string([email()])),
+  emailAddress: nullable(string([toNull(), nullableEmail()])),
   phoneNumber: nullable(string()),
   street: nullable(string()),
   houseNumber: nullable(string()),
@@ -25,7 +27,7 @@ export const PropertyCreateSchema = object({
 export const PropertyUpdateSchema = object({
   id: number(),
   name: optional(string([minLength(2)])),
-  emailAddress: nullish(string([email()])),
+  emailAddress: nullish(string([toNull(), nullableEmail()])),
   phoneNumber: nullish(string()),
   street: nullish(string()),
   houseNumber: nullish(string()),
