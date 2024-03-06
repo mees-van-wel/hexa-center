@@ -247,6 +247,7 @@ export type Translation = {
       TUESDAY: string;
       WEDNESDAY: string;
     };
+    authentication: string;
   };
   roomsPage: {
     price: string;

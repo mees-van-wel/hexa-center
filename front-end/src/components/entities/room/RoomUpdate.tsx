@@ -33,7 +33,7 @@ type RoomProps = {
   room: RouterOutput["room"]["get"];
 };
 
-export const Room = ({ room }: RoomProps) => {
+export const RoomUpdate = ({ room }: RoomProps) => {
   const t = useTranslation();
   const router = useRouter();
   const deleteRoom = useMutation("room", "delete");
