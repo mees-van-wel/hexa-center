@@ -1,6 +1,7 @@
 "use client";
 
-import { Controller, useFormContext } from "react-hook-form";
+import { useMemo } from "react";
+import { useFormContext } from "react-hook-form";
 
 import { useTranslation } from "@/hooks/useTranslation";
 import { Group, TextInput } from "@mantine/core";
@@ -15,49 +16,39 @@ type MetadataProps = {
 export const Metadata = ({ showDefault }: MetadataProps) => {
   const t = useTranslation();
 
-  const { register, control } = useFormContext();
+  const { watch, getValues } = useFormContext();
+
+  const updatedAt = watch("updatedAt");
+
+  const { id, createdAt, createdById, updatedById } = useMemo(
+    () => getValues(),
+    [getValues],
+  );
 
   return (
     <Sheet
-      title={t("components.metadata.createdAt")}
+      title={t("components.metadata.name")}
       showDefault={showDefault || false}
     >
       <Group>
-        <TextInput
-          {...register("id")}
-          label={t("components.metadata.id")}
+        <TextInput value={id} label={t("components.metadata.id")} disabled />
+        <DateTimePicker
+          value={createdAt}
+          label={t("components.metadata.createdAt")}
           disabled
         />
-        <Controller
-          name="createdAt"
-          control={control}
-          render={({ field }) => (
-            <DateTimePicker
-              {...field}
-              label={t("components.metadata.createdAt")}
-              disabled
-            />
-          )}
-        />
-
         <TextInput
-          {...register("createdById")}
+          value={createdById}
           label={t("components.metadata.createdBy")}
           disabled
         />
-        <Controller
-          name="updatedAt"
-          control={control}
-          render={({ field }) => (
-            <DateTimePicker
-              {...field}
-              label={t("components.metadata.updatedAt")}
-              disabled
-            />
-          )}
+        <DateTimePicker
+          value={updatedAt}
+          label={t("components.metadata.updatedAt")}
+          disabled
         />
         <TextInput
-          {...register("updatedById")}
+          value={updatedById}
           label={t("components.metadata.updatedBy")}
           disabled
         />
