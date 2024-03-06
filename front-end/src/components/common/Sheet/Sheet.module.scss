@@ -26,6 +26,6 @@
 
 .glass {
   box-shadow: 0 4px 30px rgb(0 0 0 / 50%);
-  background-color: rgb(from var(--color-foreground) r g b / 50%);
-  backdrop-filter: saturate(1.5) blur(8px);
+  backdrop-filter: saturate(1.5), blur(8px);
+  background-color: rgb(var(--color-foreground) / 50%);
 }
