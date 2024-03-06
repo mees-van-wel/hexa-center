@@ -13,9 +13,10 @@ type SheetProps = {
   title: string;
   showDefault?: boolean;
   children?: React.ReactNode;
+  glass?: boolean;
 };
 
-export const Sheet = ({ title, showDefault, children }: SheetProps) => {
+export const Sheet = ({ title, showDefault, children, glass }: SheetProps) => {
   const t = useTranslation();
   const [show, setShow] = useState(
     showDefault === undefined ? true : showDefault,
@@ -26,6 +27,7 @@ export const Sheet = ({ title, showDefault, children }: SheetProps) => {
       <Paper
         className={clsx(styles.header, {
           [styles.headerOpen]: show,
+          [styles.glass]: glass,
         })}
       >
         <Group gap={0}>
@@ -46,7 +48,11 @@ export const Sheet = ({ title, showDefault, children }: SheetProps) => {
           )}
         </Group>
       </Paper>
-      {show && <Paper className={styles.content}>{children}</Paper>}
+      {show && (
+        <Paper className={clsx(styles.content, { [styles.glass]: glass })}>
+          {children}
+        </Paper>
+      )}
     </Stack>
   );
 };

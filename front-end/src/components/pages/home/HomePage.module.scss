@@ -1,0 +1,12 @@
+.news {
+  width: 350px;
+  position: relative;
+  min-height: 150px;
+  background-color: rgb(var(--color-foreground));
+  justify-content: space-between;
+
+  .newsDate {
+    flex: 0;
+    min-width: 85px;
+  }
+}

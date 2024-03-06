@@ -212,6 +212,15 @@ export default {
     },
     loggedInSuccess: "U bent succesvol ingelogd",
   },
+  homePage: {
+    goodMorning: "Goedemorgen",
+    goodAfternoon: "Goedemiddag",
+    goodEvening: "Goedenavond",
+    welcome: "Welkom",
+    news: "Nieuws",
+    title: "Home",
+    read: "Lees het volledige artikel",
+  },
   preferencesPage: {
     title: "Voorkeuren",
     name: "Instellingen",
