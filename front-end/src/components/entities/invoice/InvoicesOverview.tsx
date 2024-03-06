@@ -69,14 +69,14 @@ export const InvoicesOverview = ({ invoices }: InvoicesOverviewProps) => {
               customerName || customer?.name,
           },
           {
-            selector: "totalGrossAmount",
+            selector: "grossAmount",
             label: t("entities.invoice.totalGrossAmount"),
-            format: ({ totalGrossAmount }) =>
+            format: ({ grossAmount }) =>
               // TODO Support preferences
               Intl.NumberFormat("nl-NL", {
                 style: "currency",
                 currency: "EUR",
-              }).format(parseFloat(totalGrossAmount)),
+              }).format(parseFloat(grossAmount)),
           },
         ]}
       />

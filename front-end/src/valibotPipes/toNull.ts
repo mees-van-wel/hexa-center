@@ -1,5 +1,6 @@
 import { toCustom } from "valibot";
 
+// TODO support numbers
 export const toNull = () =>
   toCustom<string>((input) => {
     if (typeof input !== "string") {

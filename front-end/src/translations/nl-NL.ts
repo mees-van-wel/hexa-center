@@ -55,6 +55,18 @@ export default {
         button: "Profielpagina",
       },
     },
+    room: {
+      name: {
+        singular: "Kamer",
+        plural: "Kamers",
+      },
+      keys: {
+        name: "Naam",
+        price: "Prijs",
+      },
+      createdNotification: "Kamer succesvol aangemaakt",
+      deletedNotification: "Kamer succesvol verwijderd",
+    },
     reservation: {
       name: {
         singular: "Reservatie",
@@ -63,10 +75,12 @@ export default {
       keys: {
         roomId: "Kamer",
         customerId: "Klant",
-        startDate: "Start datum",
-        endDate: "Eind datum",
-        notes: "Notities",
-        guestName: "Gast naam",
+        startDate: "Startdatum",
+        endDate: "Einddatum",
+        priceOverride: "Aangepaste prijs",
+        guestName: "Naam gast",
+        reservationNotes: "Reserveringsnotities",
+        invoiceNotes: "Factuurnotities",
       },
       calendar: {
         noRooms: "Geen Boekingen gevonden",
@@ -198,6 +212,36 @@ export default {
     },
     loggedInSuccess: "U bent succesvol ingelogd",
   },
+  preferencesPage: {
+    title: "Voorkeuren",
+    name: "Instellingen",
+    system: "Systeem",
+    dateFormat: "Datumnotatie",
+    timeFormat: "Tijdsindeling",
+    decimalSeparator: "Decimaalteken",
+    firstDayOfWeek: "Eerste dag van de week",
+    language: "Taal",
+    theme: "Thema",
+    timezone: "Tijdzone",
+    storage: "Opslag",
+    timeNotation: "Tijdsindeling",
+    workingHours: {
+      name: "Werkuren",
+      invalid: "De gegeven tijd is ongeldig",
+      overlaps: "De gegeven tijd overlapt",
+    },
+  },
+  generic: {
+    weekdayNames: {
+      FRIDAY: "Vrijdag",
+      MONDAY: "Maandag",
+      SATURDAY: "Zaterdag",
+      SUNDAY: "Zondag",
+      THURSDAY: "Donderdag",
+      TUESDAY: "Dinsdag",
+      WEDNESDAY: "Woensdag",
+    },
+  },
   roomsPage: {
     price: "Prijs",
     noRooms: "Voeg eerst een kamer toe",
@@ -238,6 +282,49 @@ export default {
     relationTypes: {
       individual: "Individu",
       business: "Bedrijf",
+    },
+    dateFormats: {
+      AUTO: "Auto",
+      DMY: "DD-MM-YYYY",
+      MDY: "MM/DD/YYYY",
+    },
+    separators: {
+      AUTO: "Auto",
+      DOT: "Punt",
+      COMMA: "Komma",
+    },
+    timeFormats: {
+      AUTO: "Auto",
+      TWELVE: "12-uur (AM/PM)",
+      TWENTYFOUR: "24-uur",
+    },
+    firstDaysOfTheWeek: {
+      AUTO: "Auto",
+      MONDAY: "Maandag",
+      TUESDAY: "Dinsdag",
+      WEDNESDAY: "Woensdag",
+      THURSDAY: "Donderdag",
+      FRIDAY: "Vrijdag",
+      SATURDAY: "Zaterdag",
+      SUNDAY: "Zondag",
+    },
+    weekdays: {
+      MONDAY: "Maandag",
+      TUESDAY: "Dinsdag",
+      WEDNESDAY: "Woensdag",
+      THURSDAY: "Donderdag",
+      FRIDAY: "Vrijdag",
+      SATURDAY: "Zaterdag",
+      SUNDAY: "Zondag",
+    },
+    locales: {
+      "en-US": "Engels (VS) - English (US)",
+      "nl-NL": "Nederlands",
+    },
+    themes: {
+      DARK: "Donker",
+      LIGHT: "Licht",
+      AUTO: "Auto",
     },
     countries: {
       AD: "Andorra",

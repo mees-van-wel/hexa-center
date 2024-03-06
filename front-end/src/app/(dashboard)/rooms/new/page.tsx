@@ -1,58 +1,81 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import {
+  FormProvider,
+  SubmitHandler,
+  useForm,
+  useFormContext,
+  useFormState,
+} from "react-hook-form";
 
+import { RoomForm } from "@/components/entities/room/RoomForm";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
-import { RoomForm } from "@/components/pages/rooms/RoomForm";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
 import { RoomCreateSchema, RoomInputCreateSchema } from "@/schemas/room";
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { Button, Paper, Stack } from "@mantine/core";
+import { Button, Stack } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { IconPlus } from "@tabler/icons-react";
+import { IconDeviceFloppy } from "@tabler/icons-react";
 
 export default function Page() {
   const t = useTranslation();
-  const createRoom = useMutation("room", "create");
-  const router = useRouter();
 
-  const methods = useForm<RoomInputCreateSchema>({
+  const formMethods = useForm<RoomInputCreateSchema>({
     resolver: valibotResolver(RoomCreateSchema),
+    defaultValues: {
+      name: "",
+      price: undefined,
+    },
   });
 
-  const onSubmit: SubmitHandler<RoomInputCreateSchema> = async ({
-    name,
-    price,
-  }) => {
-    const room = await createRoom.mutate({ name, price });
-    notifications.show({
-      message: t("roomsPage.roomCreated"),
-      color: "green",
-    });
-    router.push(`/rooms/${room.id}`);
-  };
-
   return (
-    <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(onSubmit)}>
-        <Stack>
-          <DashboardHeader
-            title={[
-              { label: t("dashboardLayout.rooms"), href: "/rooms" },
-              { label: t("common.new") },
-            ]}
-          >
-            <Button type="submit" leftSection={<IconPlus />}>
-              {t("common.create")}
-            </Button>
-          </DashboardHeader>
-          <Paper p="md">
-            <RoomForm />
-          </Paper>
-        </Stack>
-      </form>
+    <FormProvider {...formMethods}>
+      <Stack>
+        <DashboardHeader
+          title={[
+            { label: t("dashboardLayout.rooms"), href: "/rooms" },
+            { label: t("common.new") },
+          ]}
+        >
+          <SaveButton />
+        </DashboardHeader>
+        <RoomForm />
+      </Stack>
     </FormProvider>
   );
 }
+
+const SaveButton = () => {
+  const createRoom = useMutation("room", "create");
+  const router = useRouter();
+  const t = useTranslation();
+
+  const { control, handleSubmit } = useFormContext<RoomInputCreateSchema>();
+  const { isDirty } = useFormState({ control });
+
+  const submitHandler: SubmitHandler<RoomInputCreateSchema> = async (
+    values,
+  ) => {
+    const response = await createRoom.mutate(values);
+
+    notifications.show({
+      message: t("entities.room.createdNotification"),
+      color: "green",
+    });
+
+    router.push(`/rooms/${response.id}`);
+  };
+
+  return (
+    <Button
+      onClick={handleSubmit(submitHandler)}
+      leftSection={<IconDeviceFloppy />}
+      disabled={!isDirty}
+      loading={createRoom.loading}
+    >
+      {t("common.save")}
+    </Button>
+  );
+};

@@ -1,8 +1,9 @@
 import dayjs from "dayjs";
+import Decimal from "decimal.js";
 import { eq } from "drizzle-orm";
 
 import db from "@/db/client";
-import { invoices } from "@/db/schema";
+import { invoiceLines, invoices } from "@/db/schema";
 import { generatePdf } from "@/utils/pdf";
 import { TRPCError } from "@trpc/server";
 
@@ -16,14 +17,12 @@ export const getInvoice = async (invoiceId: number) => {
         columns: {
           id: true,
           name: true,
-          comments: true,
-          unitNetAmount: true,
+          unitAmount: true,
           quantity: true,
-          discountAmount: true,
-          totalNetAmount: true,
-          totalTaxAmount: true,
-          taxPercentage: true,
-          totalGrossAmount: true,
+          netAmount: true,
+          vatAmount: true,
+          vatPercentage: true,
+          grossAmount: true,
         },
       },
       events: {
@@ -73,16 +72,14 @@ export const getInvoice = async (invoiceId: number) => {
       refType: true,
       refId: true,
       number: true,
-      comments: true,
+      notes: true,
       type: true,
       date: true,
       dueDate: true,
       status: true,
-      discountAmount: true,
-      totalNetAmount: true,
-      totalTaxAmount: true,
-      totalGrossAmount: true,
-      totalDiscountAmount: true,
+      netAmount: true,
+      vatAmount: true,
+      grossAmount: true,
 
       customerId: true,
       customerName: true,
@@ -203,66 +200,50 @@ export const generateInvoicePdf = async (invoiceId: number) => {
       invoice.companyVatNumber || invoice.company?.vatNumber || "",
     companyIban: invoice.companyIban || invoice.company?.iban || "",
     companySwiftBic: invoice.companySwiftBic || invoice.company?.swiftBic || "",
-    hasComments: invoice.lines.some(({ comments }) => comments),
-    totalDiscountAmount: invoice.totalDiscountAmount
-      ? Intl.NumberFormat("nl-NL", {
-          style: "currency",
-          currency: "EUR",
-        }).format(parseFloat(invoice.totalDiscountAmount))
-      : null,
     lines: invoice.lines.map(
       ({
         name,
-        comments,
-        unitNetAmount,
+        unitAmount,
         quantity,
-        totalNetAmount,
-        discountAmount,
-        totalTaxAmount,
-        taxPercentage,
-        totalGrossAmount,
+        netAmount,
+        vatAmount,
+        vatPercentage,
+        grossAmount,
       }) => ({
         name,
-        comments,
-        unitNetAmount: Intl.NumberFormat("nl-NL", {
+        unitAmount: Intl.NumberFormat("nl-NL", {
           style: "currency",
           currency: "EUR",
-        }).format(parseFloat(unitNetAmount)),
+        }).format(parseFloat(unitAmount)),
         quantity,
-        totalNetAmount: Intl.NumberFormat("nl-NL", {
+        netAmount: Intl.NumberFormat("nl-NL", {
           style: "currency",
           currency: "EUR",
-        }).format(parseFloat(totalNetAmount)),
-        discountAmount: discountAmount
-          ? Intl.NumberFormat("nl-NL", {
-              style: "currency",
-              currency: "EUR",
-            }).format(parseFloat(discountAmount))
-          : null,
-        totalTaxAmount: Intl.NumberFormat("nl-NL", {
+        }).format(parseFloat(netAmount)),
+        vatAmount: Intl.NumberFormat("nl-NL", {
           style: "currency",
           currency: "EUR",
-        }).format(parseFloat(totalTaxAmount)),
-        taxPercentage,
-        totalGrossAmount: Intl.NumberFormat("nl-NL", {
+        }).format(parseFloat(vatAmount)),
+        vatPercentage,
+        grossAmount: Intl.NumberFormat("nl-NL", {
           style: "currency",
           currency: "EUR",
-        }).format(parseFloat(totalGrossAmount)),
+        }).format(parseFloat(grossAmount)),
       }),
     ),
-    totalNetAmount: Intl.NumberFormat("nl-NL", {
+    netAmount: Intl.NumberFormat("nl-NL", {
       style: "currency",
       currency: "EUR",
-    }).format(parseFloat(invoice.totalNetAmount)),
-    totalTaxAmount: Intl.NumberFormat("nl-NL", {
+    }).format(parseFloat(invoice.netAmount)),
+    vatAmount: Intl.NumberFormat("nl-NL", {
       style: "currency",
       currency: "EUR",
-    }).format(parseFloat(invoice.totalTaxAmount)),
-    totalGrossAmount: Intl.NumberFormat("nl-NL", {
+    }).format(parseFloat(invoice.vatAmount)),
+    grossAmount: Intl.NumberFormat("nl-NL", {
       style: "currency",
       currency: "EUR",
-    }).format(parseFloat(invoice.totalGrossAmount)),
-    comments: invoice.comments,
+    }).format(parseFloat(invoice.grossAmount)),
+    notes: invoice.notes,
     dueDate: invoice.dueDate
       ? dayjs(invoice.dueDate).format("DD-MM-YYYY")
       : null,
@@ -272,4 +253,122 @@ export const generateInvoicePdf = async (invoiceId: number) => {
     base64: pdfBuffer.toString("base64"),
     invoice,
   };
+};
+
+export const calculateAmounts = (
+  amount: string,
+  quantity: string,
+  vatPercentage: string,
+) => {
+  const netAmount = new Decimal(amount).mul(quantity);
+  const vatAmount = netAmount.mul(vatPercentage).div(100);
+  const grossAmount = netAmount.plus(vatAmount);
+
+  // .toDecimalPlaces(2, Decimal.ROUND_HALF_UP)
+
+  return { netAmount, vatAmount, grossAmount };
+};
+
+export const roundDecimal = (decimal: number | string | Decimal) =>
+  new Decimal(decimal).toDecimalPlaces(2, Decimal.ROUND_HALF_UP).toString();
+
+type CreateInvoiceProps = {
+  createdById: number;
+  refType: "reservation" | "invoice";
+  refId: number;
+  type: "standard" | "quotation" | "credit";
+  customerId: number;
+  companyId: number;
+  lines: {
+    name: string;
+    unitAmount: string;
+    quantity: string;
+    vatPercentage: string;
+  }[];
+  notes?: string | null;
+};
+
+export const createInvoice = async ({
+  createdById,
+  refType,
+  refId,
+  type,
+  customerId,
+  companyId,
+  lines,
+  notes,
+}: CreateInvoiceProps) => {
+  const { netAmount, vatAmount, grossAmount, lineValues } = lines.reduce<{
+    netAmount: Decimal;
+    vatAmount: Decimal;
+    grossAmount: Decimal;
+    lineValues: {
+      netAmount: Decimal;
+      vatAmount: Decimal;
+      grossAmount: Decimal;
+    }[];
+  }>(
+    (acc, line) => {
+      const { netAmount, vatAmount, grossAmount } = calculateAmounts(
+        line.unitAmount,
+        line.quantity,
+        line.vatPercentage,
+      );
+
+      return {
+        netAmount: acc.netAmount.plus(netAmount),
+        vatAmount: acc.vatAmount.plus(vatAmount),
+        grossAmount: acc.grossAmount.plus(grossAmount),
+        lineValues: acc.lineValues.concat([
+          { netAmount, vatAmount, grossAmount },
+        ]),
+      };
+    },
+    {
+      netAmount: new Decimal(0),
+      vatAmount: new Decimal(0),
+      grossAmount: new Decimal(0),
+      lineValues: [],
+    },
+  );
+
+  const invoiceInsertResult = await db
+    .insert(invoices)
+    .values({
+      createdById,
+      refType,
+      refId,
+      type,
+      status: "draft",
+      netAmount: roundDecimal(netAmount),
+      vatAmount: roundDecimal(vatAmount),
+      grossAmount: roundDecimal(grossAmount),
+      customerId,
+      companyId,
+      notes,
+    })
+    .returning({
+      id: invoices.id,
+    });
+
+  const invoice = invoiceInsertResult[0];
+
+  await db.insert(invoiceLines).values(
+    lines.map(({ name, unitAmount, quantity, vatPercentage }, index) => {
+      const { netAmount, vatAmount, grossAmount } = lineValues[index];
+
+      return {
+        invoiceId: invoice.id,
+        name,
+        unitAmount,
+        quantity,
+        netAmount: roundDecimal(netAmount),
+        vatAmount: roundDecimal(vatAmount),
+        vatPercentage,
+        grossAmount: roundDecimal(grossAmount),
+      };
+    }),
+  );
+
+  return invoice.id;
 };

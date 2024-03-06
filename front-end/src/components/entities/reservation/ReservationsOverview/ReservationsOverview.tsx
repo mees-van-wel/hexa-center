@@ -21,9 +21,9 @@ import {
   IconPlus,
 } from "@tabler/icons-react";
 
-import { ShowReservations } from "./components/reservations/reservations";
+import { ReservationCalendar } from "../ReservationCalendar";
 
-import styles from "./reservations.module.scss";
+import styles from "./ReservationsOverview.module.scss";
 
 dayjs.extend(utc);
 
@@ -162,7 +162,7 @@ export const ReservationsOverview = ({
               </Group>
 
               <Stack gap={0} w="100%">
-                <ShowReservations
+                <ReservationCalendar
                   currentWeek={currentWeek}
                   currentRooms={currentRooms}
                   reservations={reservations}

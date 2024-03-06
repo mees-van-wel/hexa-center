@@ -55,6 +55,18 @@ export default {
         button: "Profile Page",
       },
     },
+    room: {
+      name: {
+        singular: "Room",
+        plural: "Rooms",
+      },
+      keys: {
+        name: "Name",
+        price: "Price",
+      },
+      createdNotification: "Room successfully created",
+      deletedNotification: "Room successfully deleted",
+    },
     reservation: {
       name: {
         singular: "Reservation",
@@ -65,8 +77,10 @@ export default {
         customerId: "Customer",
         startDate: "Start date",
         endDate: "End date",
-        notes: "Notes",
+        priceOverride: "Price override",
         guestName: "Guest name",
+        reservationNotes: "Reservation notes",
+        invoiceNotes: "Invoice notes",
       },
       calendar: {
         noRooms: "No bookings found",
@@ -196,6 +210,36 @@ export default {
     },
     loggedInSuccess: "You're logged in successfully",
   },
+  preferencesPage: {
+    title: "Preferences",
+    name: "Preferences",
+    system: "System",
+    dateFormat: "Date format",
+    timeFormat: "Time format",
+    decimalSeparator: "Decimal separator",
+    firstDayOfWeek: "First day of the week",
+    language: "Language",
+    theme: "Theme",
+    timezone: "Timezone",
+    storage: "Storage",
+    timeNotation: "Time notation",
+    workingHours: {
+      name: "Working hours",
+      invalid: "The given time is invalid",
+      overlaps: "The given time overlaps",
+    },
+  },
+  generic: {
+    weekdayNames: {
+      FRIDAY: "Friday",
+      MONDAY: "Monday",
+      SATURDAY: "Saturday",
+      SUNDAY: "Sunday",
+      THURSDAY: "Thursday",
+      TUESDAY: "Tuesday",
+      WEDNESDAY: "Wednesday",
+    },
+  },
   roomsPage: {
     price: "Price",
     noRooms: "Please add a room first",
@@ -236,6 +280,49 @@ export default {
     relationTypes: {
       individual: "Individual",
       business: "Business",
+    },
+    dateFormats: {
+      AUTO: "Auto",
+      DMY: "DD-MM-YYYY",
+      MDY: "MM/DD/YYYY",
+    },
+    separators: {
+      AUTO: "Auto",
+      DOT: "Dot",
+      COMMA: "Comma",
+    },
+    timeFormats: {
+      AUTO: "Auto",
+      TWELVE: "12-hour (AM/PM)",
+      TWENTYFOUR: "24-hour",
+    },
+    firstDaysOfTheWeek: {
+      AUTO: "Auto",
+      MONDAY: "Monday",
+      TUESDAY: "Tuesday",
+      WEDNESDAY: "Wednesday",
+      THURSDAY: "Thursday",
+      FRIDAY: "Friday",
+      SATURDAY: "Saturday",
+      SUNDAY: "Sunday",
+    },
+    locales: {
+      "en-US": "English (US)",
+      "nl-NL": "Dutch - Nederlands",
+    },
+    themes: {
+      DARK: "Dark",
+      LIGHT: "Light",
+      AUTO: "Auto",
+    },
+    weekdays: {
+      MONDAY: "Monday",
+      TUESDAY: "Tuesday",
+      WEDNESDAY: "Wednesday",
+      THURSDAY: "Thursday",
+      FRIDAY: "Friday",
+      SATURDAY: "Saturday",
+      SUNDAY: "Sunday",
     },
     countries: {
       AD: "Andorra",

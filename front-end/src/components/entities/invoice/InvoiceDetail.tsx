@@ -27,6 +27,7 @@ import {
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import {
+  IconCheck,
   IconExternalLink,
   IconFileArrowLeft,
   IconFileArrowRight,
@@ -34,6 +35,7 @@ import {
   IconMailFast,
   IconPlus,
   IconPrinter,
+  IconTrash,
 } from "@tabler/icons-react";
 import { IconDownload } from "@tabler/icons-react";
 
@@ -43,6 +45,7 @@ type InvoiceDetailProps = {
   invoice: RouterOutput["invoice"]["get"];
 };
 
+// TODO Fix update of credited state after draft credit invoice get's deleted
 // TODO Fix type errors
 // TODO Translations
 export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
@@ -51,17 +54,13 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
   const generatePdf = useMutation("invoice", "generatePdf");
   const mailInvoice = useMutation("invoice", "mail");
   const creditInvoice = useMutation("invoice", "credit");
-  const [issueLoading, setIssueLoading] = useState(false);
+  const deleteInvoice = useMutation("invoice", "delete");
   const [downloadLoading, setDownloadLoading] = useState(false);
   const [printLoading, setPrintLoading] = useState(false);
-  const [mailLoading, setmailLoading] = useState(false);
-  const [creditLoading, setCreditLoading] = useState(false);
   const router = useRouter();
 
   const issueHandler = async () => {
     const onConfirm = async (issueDate: Date) => {
-      setIssueLoading(true);
-
       try {
         await issueInvoice.mutate({
           invoiceId: invoice.id,
@@ -82,8 +81,6 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
           color: "red",
         });
       }
-
-      setIssueLoading(false);
     };
 
     modals.open({
@@ -137,8 +134,6 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
   };
 
   const mailHandler = async () => {
-    setmailLoading(true);
-
     try {
       await mailInvoice.mutate(invoice.id);
 
@@ -156,13 +151,9 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
         color: "red",
       });
     }
-
-    setmailLoading(false);
   };
 
   const creditHandler = async () => {
-    setCreditLoading(true);
-
     try {
       const creditInvoiceId = await creditInvoice.mutate(invoice.id);
 
@@ -180,8 +171,22 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
         color: "red",
       });
     }
+  };
 
-    setCreditLoading(false);
+  const deleteHandler = async () => {
+    modals.openConfirmModal({
+      title: t("common.areYouSure"),
+      labels: { confirm: t("common.yes"), cancel: t("common.no") },
+      onConfirm: async () => {
+        await deleteInvoice.mutate(invoice.id);
+        router.back();
+
+        notifications.show({
+          message: "Invoice successfully deleted",
+          color: "green",
+        });
+      },
+    });
   };
 
   const canCredit = useMemo(
@@ -219,19 +224,30 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
         ]}
       >
         {invoice.status === "draft" ? (
-          <Button
-            loading={issueLoading}
-            leftSection={<IconFileArrowRight />}
-            onClick={issueHandler}
-          >
-            Issue
-          </Button>
+          <>
+            <Button
+              loading={issueInvoice.loading}
+              leftSection={<IconFileArrowRight />}
+              onClick={issueHandler}
+            >
+              Issue
+            </Button>
+            <Button
+              color="red"
+              variant="light"
+              loading={deleteInvoice.loading}
+              leftSection={<IconTrash />}
+              onClick={deleteHandler}
+            >
+              {t("common.delete")}
+            </Button>
+          </>
         ) : (
           <>
             <Button
               variant={hasBeenMailed ? "light" : undefined}
               leftSection={<IconMailFast />}
-              loading={mailLoading}
+              loading={mailInvoice.loading}
               onClick={mailHandler}
             >
               {hasBeenMailed ? "Remail" : "Mail"}
@@ -254,13 +270,21 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
         )}
         {canCredit && (
           <Button
-            loading={creditLoading}
+            loading={creditInvoice.loading}
             leftSection={<IconFileArrowLeft />}
             onClick={creditHandler}
           >
             Credit
           </Button>
         )}
+        <Badge
+          size="lg"
+          color="green"
+          leftSection={<IconCheck size="1rem" />}
+          variant="light"
+        >
+          {t("common.saved")}
+        </Badge>
       </DashboardHeader>
       <Group wrap="nowrap" align="stretch">
         <Paper p="2rem">
@@ -272,13 +296,13 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   component={Link}
                   size="compact-md"
                   // TODO remove hardcoded s
+                  // @ts-ignore Router
                   href={`/${invoice.refType}s/${invoice.refId}`}
                   variant="light"
                   rightSection={<IconExternalLink size="1rem" />}
                 >
                   {invoice.refType} {invoice.refId}
                 </Button>
-                <Badge>{invoice.status}</Badge>
               </>
             }
             fh
@@ -287,30 +311,46 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
               <Stack align="flex-start">
                 <div>
                   <p>
-                    {t("common.number")}: {invoice.number || invoice.id}
+                    <strong>Type:</strong>{" "}
+                    <Badge variant="light">{invoice.type}</Badge>
                   </p>
                   <p>
-                    {t("entities.invoice.totalGrossAmount")}:{" "}
-                    {Intl.NumberFormat("nl-NL", {
-                      style: "currency",
-                      currency: "EUR",
-                    }).format(parseFloat(invoice.totalGrossAmount))}
+                    <strong>Status:</strong>{" "}
+                    <Badge variant="light">{invoice.status}</Badge>
                   </p>
                 </div>
                 <div>
                   <p>
-                    {t("entities.invoice.date")}:{" "}
+                    <strong>{t("common.number")}:</strong>{" "}
+                    {invoice.number || invoice.id}
+                  </p>
+                  <p>
+                    <strong>{t("entities.invoice.totalGrossAmount")}:</strong>{" "}
+                    {Intl.NumberFormat("nl-NL", {
+                      style: "currency",
+                      currency: "EUR",
+                    }).format(parseFloat(invoice.grossAmount))}
+                  </p>
+                </div>
+                <div>
+                  <p>
+                    <strong>{t("entities.invoice.date")}:</strong>{" "}
                     {dayjs(invoice.date || invoice.createdAt).format(
                       "DD-MM-YYYY",
                     )}
                   </p>
                   {invoice.dueDate && (
                     <p>
-                      {t("entities.invoice.dueDate")}:{" "}
+                      <strong>{t("entities.invoice.dueDate")}:</strong>{" "}
                       {dayjs(invoice.dueDate).format("DD-MM-YYYY")}
                     </p>
                   )}
                 </div>
+                {invoice.notes && (
+                  <p>
+                    <strong>Notes:</strong> {invoice.notes}
+                  </p>
+                )}
               </Stack>
             </Group>
           </Band>
@@ -326,6 +366,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                     <Button
                       component={Link}
                       size="compact-md"
+                      // @ts-ignore Router
                       href={`/relations/${invoice.customerId}`}
                       variant="light"
                       rightSection={<IconExternalLink size="1rem" />}
@@ -358,7 +399,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   <p style={{ whiteSpace: "nowrap" }}>
                     {invoice.customerRegion || invoice.customer?.region}
                     {customerCountry &&
-                      "-" +
+                      " - " +
                         t(
                           `constants.countries.${
                             customerCountry as CountryKey
@@ -403,6 +444,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                     <Button
                       component={Link}
                       size="compact-md"
+                      // @ts-ignore Router
                       href={`/properties/${invoice.companyId}`}
                       variant="light"
                       rightSection={<IconExternalLink size="1rem" />}
@@ -434,7 +476,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   <p style={{ whiteSpace: "nowrap" }}>
                     {invoice.companyRegion || invoice.company?.region}
                     {companyCountry &&
-                      "-" +
+                      " - " +
                         t(
                           `constants.countries.${companyCountry as CountryKey}`,
                         )}
@@ -499,6 +541,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                                 <Button
                                   size="compact-sm"
                                   component={Link}
+                                  // @ts-ignore Router
                                   href={`/invoices/${refId}`}
                                   variant="light"
                                 >
@@ -555,13 +598,10 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
           <Table>
             <Table.Thead>
               <Table.Tr>
-                <Table.Th>ID</Table.Th>
                 <Table.Th>Name</Table.Th>
-                <Table.Th>Comments</Table.Th>
                 <Table.Th>Unit price</Table.Th>
                 <Table.Th>Quantity</Table.Th>
                 <Table.Th>Total net amount</Table.Th>
-                <Table.Th>Discount</Table.Th>
                 <Table.Th>VAT</Table.Th>
                 <Table.Th>Total gross amount</Table.Th>
               </Table.Tr>
@@ -571,52 +611,40 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                 ({
                   id,
                   name,
-                  comments,
-                  unitNetAmount,
+                  unitAmount,
                   quantity,
-                  discountAmount,
-                  totalNetAmount,
-                  totalTaxAmount,
-                  taxPercentage,
-                  totalGrossAmount,
+                  netAmount,
+                  vatAmount,
+                  vatPercentage,
+                  grossAmount,
                 }) => (
                   <Table.Tr key={id}>
-                    <Table.Td>{id}</Table.Td>
                     <Table.Td>{name}</Table.Td>
-                    <Table.Td>{comments}</Table.Td>
                     <Table.Td>
                       {Intl.NumberFormat("nl-NL", {
                         style: "currency",
                         currency: "EUR",
-                      }).format(parseFloat(unitNetAmount))}
+                      }).format(parseFloat(unitAmount))}
                     </Table.Td>
                     <Table.Td>{quantity}x</Table.Td>
                     <Table.Td>
                       {Intl.NumberFormat("nl-NL", {
                         style: "currency",
                         currency: "EUR",
-                      }).format(parseFloat(totalNetAmount))}
+                      }).format(parseFloat(netAmount))}
                     </Table.Td>
                     <Table.Td>
                       {Intl.NumberFormat("nl-NL", {
                         style: "currency",
                         currency: "EUR",
-                      }).format(
-                        discountAmount ? parseFloat(discountAmount) : 0,
-                      )}
+                      }).format(parseFloat(vatAmount))}{" "}
+                      ({vatPercentage}%)
                     </Table.Td>
                     <Table.Td>
                       {Intl.NumberFormat("nl-NL", {
                         style: "currency",
                         currency: "EUR",
-                      }).format(parseFloat(totalTaxAmount))}{" "}
-                      ({taxPercentage}%)
-                    </Table.Td>
-                    <Table.Td>
-                      {Intl.NumberFormat("nl-NL", {
-                        style: "currency",
-                        currency: "EUR",
-                      }).format(parseFloat(totalGrossAmount))}
+                      }).format(parseFloat(grossAmount))}
                     </Table.Td>
                   </Table.Tr>
                 ),
@@ -626,16 +654,6 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   fontSize: "1.25rem",
                 }}
               >
-                <Table.Td
-                  style={{
-                    paddingTop: "1.5rem",
-                  }}
-                />
-                <Table.Td
-                  style={{
-                    paddingTop: "1.5rem",
-                  }}
-                />
                 <Table.Td
                   style={{
                     paddingTop: "1.5rem",
@@ -663,7 +681,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   {Intl.NumberFormat("nl-NL", {
                     style: "currency",
                     currency: "EUR",
-                  }).format(parseFloat(invoice.totalNetAmount))}
+                  }).format(parseFloat(invoice.netAmount))}
                 </Table.Td>
                 <Table.Td
                   style={{
@@ -673,11 +691,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   {Intl.NumberFormat("nl-NL", {
                     style: "currency",
                     currency: "EUR",
-                  }).format(
-                    invoice.totalDiscountAmount
-                      ? parseFloat(invoice.totalDiscountAmount)
-                      : 0,
-                  )}
+                  }).format(parseFloat(invoice.vatAmount))}
                 </Table.Td>
                 <Table.Td
                   style={{
@@ -687,17 +701,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   {Intl.NumberFormat("nl-NL", {
                     style: "currency",
                     currency: "EUR",
-                  }).format(parseFloat(invoice.totalTaxAmount))}
-                </Table.Td>
-                <Table.Td
-                  style={{
-                    paddingTop: "1.5rem",
-                  }}
-                >
-                  {Intl.NumberFormat("nl-NL", {
-                    style: "currency",
-                    currency: "EUR",
-                  }).format(parseFloat(invoice.totalGrossAmount))}
+                  }).format(parseFloat(invoice.grossAmount))}
                 </Table.Td>
               </Table.Tr>
             </Table.Tbody>

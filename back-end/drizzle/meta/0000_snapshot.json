@@ -1,5 +1,5 @@
 {
-  "id": "8815a006-fc78-415a-a596-6dc117ebdd0d",
+  "id": "3e65b89f-d69b-4f29-bc93-c4c575853de7",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -18,7 +18,7 @@
           "name": "uuid",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "gen_random_uuid()"
         },
         "relation_id": {
@@ -47,6 +47,30 @@
         },
         "timezone": {
           "name": "timezone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dateFormat": {
+          "name": "dateFormat",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "decimalSeparator": {
+          "name": "decimalSeparator",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "timeFormat": {
+          "name": "timeFormat",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "firstDayOfWeek": {
+          "name": "firstDayOfWeek",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -85,7 +109,7 @@
           "name": "uuid",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "gen_random_uuid()"
         },
         "created_at": {
@@ -158,6 +182,216 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
+    "invoice_extra_instances": {
+      "name": "invoice_extra_instances",
+      "schema": "",
+      "columns": {
+        "$kind": {
+          "name": "$kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'invoiceExtraInstance'"
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "uuid": {
+          "name": "uuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "template_id": {
+          "name": "template_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'1'"
+        },
+        "amount": {
+          "name": "amount",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "unit": {
+          "name": "unit",
+          "type": "invoice_extra_unit",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "vat_percentage": {
+          "name": "vat_percentage",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "status": {
+          "name": "status",
+          "type": "reservations_to_invoice_extra_instances_status",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'notApplied'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "invoice_extra_instances_template_id_invoice_extra_templates_id_fk": {
+          "name": "invoice_extra_instances_template_id_invoice_extra_templates_id_fk",
+          "tableFrom": "invoice_extra_instances",
+          "tableTo": "invoice_extra_templates",
+          "columnsFrom": [
+            "template_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "invoice_extra_templates": {
+      "name": "invoice_extra_templates",
+      "schema": "",
+      "columns": {
+        "$kind": {
+          "name": "$kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'invoiceExtraTemplate'"
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "uuid": {
+          "name": "uuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "created_by_id": {
+          "name": "created_by_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_by_id": {
+          "name": "updated_by_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'1'"
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "amount": {
+          "name": "amount",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "unit": {
+          "name": "unit",
+          "type": "invoice_extra_unit",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "vat_percentage": {
+          "name": "vat_percentage",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "invoice_extra_templates_created_by_id_relations_id_fk": {
+          "name": "invoice_extra_templates_created_by_id_relations_id_fk",
+          "tableFrom": "invoice_extra_templates",
+          "tableTo": "relations",
+          "columnsFrom": [
+            "created_by_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "invoice_extra_templates_updated_by_id_relations_id_fk": {
+          "name": "invoice_extra_templates_updated_by_id_relations_id_fk",
+          "tableFrom": "invoice_extra_templates",
+          "tableTo": "relations",
+          "columnsFrom": [
+            "updated_by_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
     "invoice_lines": {
       "name": "invoice_lines",
       "schema": "",
@@ -172,7 +406,7 @@
           "name": "uuid",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "gen_random_uuid()"
         },
         "invoice_id": {
@@ -187,14 +421,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "comments": {
-          "name": "comments",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "unit_net_amount": {
-          "name": "unit_net_amount",
+        "unit_amount": {
+          "name": "unit_amount",
           "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true
@@ -205,32 +433,26 @@
           "primaryKey": false,
           "notNull": true
         },
-        "total_net_amount": {
-          "name": "total_net_amount",
+        "net_amount": {
+          "name": "net_amount",
           "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true
         },
-        "discount_amount": {
-          "name": "discount_amount",
-          "type": "numeric(10, 2)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "total_tax_amount": {
-          "name": "total_tax_amount",
+        "vat_amount": {
+          "name": "vat_amount",
           "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true
         },
-        "tax_percentage": {
-          "name": "tax_percentage",
+        "vat_percentage": {
+          "name": "vat_percentage",
           "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true
         },
-        "total_gross_amount": {
-          "name": "total_gross_amount",
+        "gross_amount": {
+          "name": "gross_amount",
           "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true
@@ -276,7 +498,7 @@
           "name": "uuid",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "gen_random_uuid()"
         },
         "created_at": {
@@ -316,32 +538,20 @@
           "primaryKey": false,
           "notNull": true
         },
-        "discount_amount": {
-          "name": "discount_amount",
-          "type": "numeric(10, 2)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "total_net_amount": {
-          "name": "total_net_amount",
+        "net_amount": {
+          "name": "net_amount",
           "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true
         },
-        "total_discount_amount": {
-          "name": "total_discount_amount",
-          "type": "numeric(10, 2)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "total_tax_amount": {
-          "name": "total_tax_amount",
+        "vat_amount": {
+          "name": "vat_amount",
           "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true
         },
-        "total_gross_amount": {
-          "name": "total_gross_amount",
+        "gross_amount": {
+          "name": "gross_amount",
           "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true
@@ -352,8 +562,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "comments": {
-          "name": "comments",
+        "notes": {
+          "name": "notes",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -637,7 +847,7 @@
           "name": "uuid",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "gen_random_uuid()"
         },
         "created_at": {
@@ -782,7 +992,7 @@
           "name": "uuid",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "gen_random_uuid()"
         },
         "created_at": {
@@ -1020,7 +1230,7 @@
           "name": "uuid",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "gen_random_uuid()"
         },
         "created_at": {
@@ -1073,14 +1283,26 @@
           "primaryKey": false,
           "notNull": true
         },
-        "notes": {
-          "name": "notes",
-          "type": "text",
+        "price_override": {
+          "name": "price_override",
+          "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": false
         },
         "guest_name": {
           "name": "guest_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "reservation_notes": {
+          "name": "reservation_notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "invoice_notes": {
+          "name": "invoice_notes",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -1144,6 +1366,138 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
+    "reservations_to_invoice_extra_instances": {
+      "name": "reservations_to_invoice_extra_instances",
+      "schema": "",
+      "columns": {
+        "reservation_id": {
+          "name": "reservation_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "instance_id": {
+          "name": "instance_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cycle": {
+          "name": "cycle",
+          "type": "reservations_to_invoice_extra_instances_cycle",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "reservations_to_invoice_extra_instances_reservation_id_reservations_id_fk": {
+          "name": "reservations_to_invoice_extra_instances_reservation_id_reservations_id_fk",
+          "tableFrom": "reservations_to_invoice_extra_instances",
+          "tableTo": "reservations",
+          "columnsFrom": [
+            "reservation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "reservations_to_invoice_extra_instances_instance_id_invoice_extra_instances_id_fk": {
+          "name": "reservations_to_invoice_extra_instances_instance_id_invoice_extra_instances_id_fk",
+          "tableFrom": "reservations_to_invoice_extra_instances",
+          "tableTo": "invoice_extra_instances",
+          "columnsFrom": [
+            "instance_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "reservations_to_invoice_extra_instances_reservation_id_instance_id_pk": {
+          "name": "reservations_to_invoice_extra_instances_reservation_id_instance_id_pk",
+          "columns": [
+            "reservation_id",
+            "instance_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "reservations_to_invoices": {
+      "name": "reservations_to_invoices",
+      "schema": "",
+      "columns": {
+        "reservation_id": {
+          "name": "reservation_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "invoice_id": {
+          "name": "invoice_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "start_date": {
+          "name": "start_date",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "end_date": {
+          "name": "end_date",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "reservations_to_invoices_reservation_id_reservations_id_fk": {
+          "name": "reservations_to_invoices_reservation_id_reservations_id_fk",
+          "tableFrom": "reservations_to_invoices",
+          "tableTo": "reservations",
+          "columnsFrom": [
+            "reservation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "reservations_to_invoices_invoice_id_invoices_id_fk": {
+          "name": "reservations_to_invoices_invoice_id_invoices_id_fk",
+          "tableFrom": "reservations_to_invoices",
+          "tableTo": "invoices",
+          "columnsFrom": [
+            "invoice_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "reservations_to_invoices_reservation_id_invoice_id_pk": {
+          "name": "reservations_to_invoices_reservation_id_invoice_id_pk",
+          "columns": [
+            "reservation_id",
+            "invoice_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
     "roles": {
       "name": "roles",
       "schema": "",
@@ -1165,7 +1519,7 @@
           "name": "uuid",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "gen_random_uuid()"
         },
         "created_at": {
@@ -1262,7 +1616,7 @@
           "name": "uuid",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "gen_random_uuid()"
         },
         "created_at": {
@@ -1377,7 +1731,7 @@
           "name": "uuid",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "gen_random_uuid()"
         },
         "issued_at": {
@@ -1466,7 +1820,7 @@
           "name": "uuid",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "gen_random_uuid()"
         },
         "updated_at": {
@@ -1528,7 +1882,7 @@
           "name": "uuid",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "gen_random_uuid()"
         },
         "account_id": {
@@ -1597,6 +1951,12 @@
         "credited": "credited"
       }
     },
+    "invoice_extra_unit": {
+      "name": "invoice_extra_unit",
+      "values": {
+        "currency": "currency"
+      }
+    },
     "invoice_ref_type": {
       "name": "invoice_ref_type",
       "values": {
@@ -1617,8 +1977,7 @@
       "values": {
         "standard": "standard",
         "quotation": "quotation",
-        "credit": "credit",
-        "final": "final"
+        "credit": "credit"
       }
     },
     "relation_type": {
@@ -1626,6 +1985,22 @@
       "values": {
         "individual": "individual",
         "business": "business"
+      }
+    },
+    "reservations_to_invoice_extra_instances_cycle": {
+      "name": "reservations_to_invoice_extra_instances_cycle",
+      "values": {
+        "oneTimeOnEnd": "oneTimeOnEnd",
+        "perNightThroughout": "perNightThroughout",
+        "perNightOnEnd": "perNightOnEnd"
+      }
+    },
+    "reservations_to_invoice_extra_instances_status": {
+      "name": "reservations_to_invoice_extra_instances_status",
+      "values": {
+        "notApplied": "notApplied",
+        "partiallyApplied": "partiallyApplied",
+        "fullyApplied": "fullyApplied"
       }
     },
     "setting_name": {

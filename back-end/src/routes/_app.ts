@@ -4,6 +4,7 @@ import { router } from "../trpc";
 
 import { authRouter } from "./auth";
 import { invoiceRouter } from "./invoice";
+import { invoiceExtraRouter } from "./invoiceExtra";
 import { relationRouter } from "./relation";
 import { reservationRouter } from "./reservation";
 import { roomRouter } from "./room";
@@ -14,6 +15,7 @@ export const appRouter = router({
   room: roomRouter,
   reservation: reservationRouter,
   invoice: invoiceRouter,
+  invoiceExtra: invoiceExtraRouter,
 });
 
 export type AppRouter = typeof appRouter;

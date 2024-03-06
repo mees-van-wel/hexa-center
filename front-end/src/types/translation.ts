@@ -1,6 +1,13 @@
 import { CountryKey } from "@/constants/countries";
+import { DateFormatKey } from "@/constants/dateFormats";
+import { DecimalSeparatorKey } from "@/constants/decimalSeparators";
+import { FirstDayOfTheWeekKey } from "@/constants/firstDayOfTheWeek";
+import { Locale } from "@/constants/locales";
 import { RelationType } from "@/constants/relationTypes";
 import { Sex } from "@/constants/sexes";
+import { ThemeKey } from "@/constants/themes";
+import { TimeFormatKey } from "@/constants/timeFormats";
+import { Weekday } from "@/constants/weekdays";
 
 export type Translation = {
   common: {
@@ -57,6 +64,18 @@ export type Translation = {
         button: string;
       };
     };
+    room: {
+      name: {
+        singular: string;
+        plural: string;
+      };
+      keys: {
+        name: string;
+        price: string;
+      };
+      createdNotification: string;
+      deletedNotification: string;
+    };
     reservation: {
       name: {
         singular: string;
@@ -67,8 +86,10 @@ export type Translation = {
         customerId: string;
         startDate: string;
         endDate: string;
-        notes: string;
+        priceOverride: string;
         guestName: string;
+        reservationNotes: string;
+        invoiceNotes: string;
       };
       calendar: {
         noRooms: string;
@@ -197,6 +218,36 @@ export type Translation = {
     };
     loggedInSuccess: string;
   };
+  preferencesPage: {
+    title: string;
+    name: string;
+    system: string;
+    dateFormat: string;
+    timeFormat: string;
+    decimalSeparator: string;
+    firstDayOfWeek: string;
+    language: string;
+    theme: string;
+    timezone: string;
+    timeNotation: string;
+    storage: string;
+    workingHours: {
+      name: string;
+      invalid: string;
+      overlaps: string;
+    };
+  };
+  generic: {
+    weekdayNames: {
+      FRIDAY: string;
+      MONDAY: string;
+      SATURDAY: string;
+      SUNDAY: string;
+      THURSDAY: string;
+      TUESDAY: string;
+      WEDNESDAY: string;
+    };
+  };
   roomsPage: {
     price: string;
     noRooms: string;
@@ -242,6 +293,13 @@ export type Translation = {
   constants: {
     sexes: Record<Sex, string>;
     relationTypes: Record<RelationType, string>;
+    dateFormats: Record<DateFormatKey, string>;
+    separators: Record<DecimalSeparatorKey, string>;
+    timeFormats: Record<TimeFormatKey, string>;
+    firstDaysOfTheWeek: Record<FirstDayOfTheWeekKey, string>;
+    weekdays: Record<Weekday, string>;
+    locales: Record<Locale, string>;
+    themes: Record<ThemeKey, string>;
     countries: Record<CountryKey, string>;
   };
 };
