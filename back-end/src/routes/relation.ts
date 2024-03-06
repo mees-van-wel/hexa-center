@@ -110,6 +110,7 @@ export const relationRouter = router({
           .update(relations)
           .set({
             ...input,
+            updatedAt: new Date(),
             updatedById: ctx.relation.id,
           })
           .where(eq(relations.id, input.id))

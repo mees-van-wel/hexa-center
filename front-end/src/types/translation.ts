@@ -264,6 +264,14 @@ export type Translation = {
       region: string;
       country: string;
     };
+    metadata: {
+      createdAt: string;
+      createdBy: string;
+      id: string;
+      updatedAt: string;
+      updatedBy: string;
+      name: string;
+    };
   };
   // exceptions: {
   //   DB_UNIQUE_CONSTRAINT: ({
