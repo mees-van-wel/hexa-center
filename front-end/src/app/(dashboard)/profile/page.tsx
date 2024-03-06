@@ -54,19 +54,22 @@ export default function Profile() {
                 label={t("entities.relation.keys.name")}
                 value={authUser.name}
                 required
+                disabled
               />
               <DateInput
                 label={t("entities.relation.keys.dateOfBirth")}
                 value={authUser.dateOfBirth}
+                disabled
               />
               <Select
                 label={t("entities.relation.keys.sex")}
                 data={sexOptions}
                 value={authUser.sex}
                 allowDeselect={false}
+                disabled
               />
             </Group>
-            <Address disabled={false} />
+            <Address disabled />
           </Stack>
         </Paper>
         <Sheet title={t("generic.authentication")}>
