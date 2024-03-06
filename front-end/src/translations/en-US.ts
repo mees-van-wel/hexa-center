@@ -255,6 +255,14 @@ export default {
       region: "Region",
       country: "Country",
     },
+    metadata: {
+      createdAt: "Created at",
+      createdBy: "Created by",
+      id: "Number",
+      updatedAt: "Updated at",
+      updatedBy: "Updated by",
+      name: "Metadata",
+    },
   },
   // exceptions: {
   //   DB_UNIQUE_CONSTRAINT: ({ entity, value, column }) =>

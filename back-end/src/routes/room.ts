@@ -53,6 +53,10 @@ export const roomRouter = router({
         id: rooms.id,
         name: rooms.name,
         price: rooms.price,
+        createdAt: rooms.createdAt,
+        createdById: rooms.createdById,
+        updatedAt: rooms.updatedAt,
+        updatedById: rooms.updatedById,
       })
       .from(rooms)
       .where(eq(rooms.id, input));
@@ -71,6 +75,7 @@ export const roomRouter = router({
           ...input,
           price: input.price ? input.price.toString() : undefined,
           updatedById: ctx.relation.id,
+          updatedAt: new Date(),
         })
         .where(eq(rooms.id, input.id))
         .returning({

@@ -257,6 +257,14 @@ export default {
       region: "Provincie",
       country: "Land",
     },
+    metadata: {
+      createdAt: "Gemaakt op",
+      createdBy: "Gemaakt door",
+      id: "Nummer",
+      updatedAt: "Bijgewerkt op",
+      updatedBy: "Bijgewerkt door",
+      name: "Metagegevens",
+    },
   },
   // exceptions: {
   //   DB_UNIQUE_CONSTRAINT: ({ entity, value, column }) =>

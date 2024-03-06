@@ -9,6 +9,7 @@ import {
   useFormState,
 } from "react-hook-form";
 
+import { Metadata } from "@/components/common/Metadata";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { useAutosave } from "@/hooks/useAutosave";
 import { useMutation } from "@/hooks/useMutation";
@@ -82,6 +83,7 @@ export const Room = ({ room }: RoomProps) => {
           <SaveBadge />
         </DashboardHeader>
         <RoomForm />
+        <Metadata />
       </Stack>
     </FormProvider>
   );
