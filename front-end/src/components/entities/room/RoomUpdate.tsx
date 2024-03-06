@@ -9,6 +9,7 @@ import {
   useFormState,
 } from "react-hook-form";
 
+import { Metadata } from "@/components/common/Metadata";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { useAutosave } from "@/hooks/useAutosave";
 import { useMutation } from "@/hooks/useMutation";
@@ -32,7 +33,7 @@ type RoomProps = {
   room: RouterOutput["room"]["get"];
 };
 
-export const Room = ({ room }: RoomProps) => {
+export const RoomUpdate = ({ room }: RoomProps) => {
   const t = useTranslation();
   const router = useRouter();
   const deleteRoom = useMutation("room", "delete");
@@ -82,6 +83,7 @@ export const Room = ({ room }: RoomProps) => {
           <SaveBadge />
         </DashboardHeader>
         <RoomForm />
+        <Metadata />
       </Stack>
     </FormProvider>
   );

@@ -250,6 +250,7 @@ export default {
       TUESDAY: "Dinsdag",
       WEDNESDAY: "Woensdag",
     },
+    authentication: "Authenticatie",
   },
   roomsPage: {
     price: "Prijs",
@@ -265,6 +266,14 @@ export default {
       city: "Stad",
       region: "Provincie",
       country: "Land",
+    },
+    metadata: {
+      createdAt: "Gemaakt op",
+      createdBy: "Gemaakt door",
+      id: "Nummer",
+      updatedAt: "Bijgewerkt op",
+      updatedBy: "Bijgewerkt door",
+      name: "Metagegevens",
     },
   },
   // exceptions: {

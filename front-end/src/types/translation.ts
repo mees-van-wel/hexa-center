@@ -256,6 +256,7 @@ export type Translation = {
       TUESDAY: string;
       WEDNESDAY: string;
     };
+    authentication: string;
   };
   roomsPage: {
     price: string;
@@ -271,6 +272,14 @@ export type Translation = {
       city: string;
       region: string;
       country: string;
+    };
+    metadata: {
+      createdAt: string;
+      createdBy: string;
+      id: string;
+      updatedAt: string;
+      updatedBy: string;
+      name: string;
     };
   };
   // exceptions: {

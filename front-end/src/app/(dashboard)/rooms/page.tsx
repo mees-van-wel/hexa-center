@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-import { Rooms } from "@/components/entities/room/RoomsOverview";
+import { RoomsOverview } from "@/components/entities/room/RoomsOverview";
 import { setTRPCRefreshToken, trpc } from "@/utils/trpc";
 
 export default async function Page() {
@@ -9,5 +9,5 @@ export default async function Page() {
 
   const rooms = await trpc.room.list.query();
 
-  return <Rooms rooms={rooms} />;
+  return <RoomsOverview rooms={rooms} />;
 }
