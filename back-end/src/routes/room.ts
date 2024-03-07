@@ -17,7 +17,6 @@ export const roomRouter = router({
         .insert(rooms)
         .values({
           ...input,
-          price: input.price.toString(),
           createdById: ctx.relation.id,
           updatedById: ctx.relation.id,
           propertyId: 1,
@@ -75,7 +74,6 @@ export const roomRouter = router({
           ...input,
           updatedAt: new Date(),
           updatedById: ctx.relation.id,
-          price: input.price ? input.price.toString() : undefined,
         })
         .where(eq(rooms.id, input.id))
         .returning({
