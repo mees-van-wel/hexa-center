@@ -111,7 +111,7 @@ export const RelationDetail = ({ relation }: RelationDetailProps) => {
           </Alert>
         )}
         <RelationForm disabled={isSelf} />
-        <Metadata />
+        {!isSelf && <Metadata />}
       </Stack>
     </FormProvider>
   );

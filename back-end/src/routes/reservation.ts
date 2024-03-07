@@ -157,8 +157,8 @@ export const reservationRouter = router({
         .update(reservations)
         .set({
           ...input,
-          updatedById: ctx.relation.id,
           updatedAt: new Date(),
+          updatedById: ctx.relation.id,
           priceOverride:
             input.priceOverride === null
               ? null

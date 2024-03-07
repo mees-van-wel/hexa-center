@@ -58,6 +58,10 @@ export const propertyRouter = router({
       .select({
         $kind: properties.$kind,
         id: properties.id,
+        createdAt: properties.createdAt,
+        createdById: properties.createdById,
+        updatedAt: properties.updatedAt,
+        updatedById: properties.updatedById,
         name: properties.name,
         emailAddress: properties.emailAddress,
         phoneNumber: properties.phoneNumber,
@@ -84,6 +88,7 @@ export const propertyRouter = router({
         .update(properties)
         .set({
           ...input,
+          updatedAt: new Date(),
           updatedById: ctx.relation.id,
         })
         .where(eq(properties.id, input.id))
