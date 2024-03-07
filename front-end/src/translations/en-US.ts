@@ -225,6 +225,15 @@ export default {
     },
     loggedInSuccess: "You're logged in successfully",
   },
+  homePage: {
+    goodMorning: "Good morning",
+    goodAfternoon: "Good afternoon",
+    goodEvening: "Good evening",
+    welcome: "Welcome",
+    news: "News",
+    title: "Home",
+    read: "Read the full article",
+  },
   preferencesPage: {
     title: "Preferences",
     name: "Preferences",
@@ -254,6 +263,7 @@ export default {
       TUESDAY: "Tuesday",
       WEDNESDAY: "Wednesday",
     },
+    authentication: "Authentication",
   },
   roomsPage: {
     price: "Price",
@@ -269,6 +279,14 @@ export default {
       city: "City",
       region: "Region",
       country: "Country",
+    },
+    metadata: {
+      createdAt: "Created at",
+      createdBy: "Created by",
+      id: "Number",
+      updatedAt: "Updated at",
+      updatedBy: "Updated by",
+      name: "Metadata",
     },
   },
   // exceptions: {

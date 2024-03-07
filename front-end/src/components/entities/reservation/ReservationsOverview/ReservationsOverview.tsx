@@ -143,7 +143,7 @@ export const ReservationsOverview = ({
         className={styles.calendarOverview}
       >
         <div className={styles.calendarContainer}>
-          <Paper p={"1rem"}>
+          <Paper p="1rem">
             <Stack>
               <Group wrap="nowrap" grow gap={0} ta="center" fw="700">
                 <div>Room name</div>

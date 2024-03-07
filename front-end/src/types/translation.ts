@@ -233,6 +233,15 @@ export type Translation = {
     };
     loggedInSuccess: string;
   };
+  homePage: {
+    goodMorning: string;
+    goodAfternoon: string;
+    goodEvening: string;
+    welcome: string;
+    news: string;
+    title: string;
+    read: string;
+  };
   preferencesPage: {
     title: string;
     name: string;
@@ -262,6 +271,7 @@ export type Translation = {
       TUESDAY: string;
       WEDNESDAY: string;
     };
+    authentication: string;
   };
   roomsPage: {
     price: string;
@@ -277,6 +287,14 @@ export type Translation = {
       city: string;
       region: string;
       country: string;
+    };
+    metadata: {
+      createdAt: string;
+      createdBy: string;
+      id: string;
+      updatedAt: string;
+      updatedBy: string;
+      name: string;
     };
   };
   // exceptions: {

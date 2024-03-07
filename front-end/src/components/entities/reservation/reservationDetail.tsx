@@ -13,6 +13,7 @@ import {
 } from "react-hook-form";
 
 import { Band } from "@/components/common/Band";
+import { Metadata } from "@/components/common/Metadata";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { useAutosave } from "@/hooks/useAutosave";
 import { useMutation } from "@/hooks/useMutation";
@@ -509,6 +510,7 @@ export const ReservationDetail = ({
             </Band>
           </Paper>
         )}
+        <Metadata />
       </Stack>
     </FormProvider>
   );
