@@ -16,7 +16,7 @@ export const invoiceExtraRouter = router({
         quantity: invoiceExtraTemplates.quantity,
         amount: invoiceExtraTemplates.amount,
         unit: invoiceExtraTemplates.unit,
-        vatPercentage: invoiceExtraTemplates.vatPercentage,
+        vatRate: invoiceExtraTemplates.vatRate,
       })
       .from(invoiceExtraTemplates),
   ),

@@ -1,13 +1,20 @@
 import dayjs from "dayjs";
 import Decimal from "decimal.js";
-import { eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 
 import db from "@/db/client";
-import { invoiceLines, invoices } from "@/db/schema";
+import {
+  invoiceEvents,
+  invoiceLines,
+  invoices,
+  properties,
+  relations,
+} from "@/db/schema";
 import { generatePdf } from "@/utils/pdf";
+import { Settings } from "@front-end/constants/settings";
 import { TRPCError } from "@trpc/server";
 
-import { getSettings } from "./setting";
+import { getSetting, getSettings } from "./setting";
 
 export const getInvoice = async (invoiceId: number) => {
   const invoice = await db.query.invoices.findFirst({
@@ -21,7 +28,7 @@ export const getInvoice = async (invoiceId: number) => {
           quantity: true,
           netAmount: true,
           vatAmount: true,
-          vatPercentage: true,
+          vatRate: true,
           grossAmount: true,
         },
       },
@@ -207,7 +214,7 @@ export const generateInvoicePdf = async (invoiceId: number) => {
         quantity,
         netAmount,
         vatAmount,
-        vatPercentage,
+        vatRate,
         grossAmount,
       }) => ({
         name,
@@ -224,7 +231,7 @@ export const generateInvoicePdf = async (invoiceId: number) => {
           style: "currency",
           currency: "EUR",
         }).format(parseFloat(vatAmount)),
-        vatPercentage,
+        vatRate,
         grossAmount: Intl.NumberFormat("nl-NL", {
           style: "currency",
           currency: "EUR",
@@ -255,22 +262,79 @@ export const generateInvoicePdf = async (invoiceId: number) => {
   };
 };
 
-export const calculateAmounts = (
-  amount: string,
-  quantity: string,
-  vatPercentage: string,
+export const calculateVatFromNetAmount = (
+  netAmount: Decimal | number | string,
+  vatRate: Decimal | number | string,
 ) => {
-  const netAmount = new Decimal(amount).mul(quantity);
-  const vatAmount = netAmount.mul(vatPercentage).div(100);
-  const grossAmount = netAmount.plus(vatAmount);
+  const net = new Decimal(netAmount);
+  const rate = new Decimal(vatRate).div(100);
+  return net.mul(rate);
+};
 
-  // .toDecimalPlaces(2, Decimal.ROUND_HALF_UP)
-
-  return { netAmount, vatAmount, grossAmount };
+export const extractVatFromGrossAmount = (
+  grossAmount: Decimal | number | string,
+  vatRate: Decimal | number | string,
+) => {
+  const gross = new Decimal(grossAmount);
+  const rate = new Decimal(vatRate).div(100);
+  return gross.sub(gross.div(rate.add(1)));
 };
 
 export const roundDecimal = (decimal: number | string | Decimal) =>
-  new Decimal(decimal).toDecimalPlaces(2, Decimal.ROUND_HALF_UP).toString();
+  new Decimal(decimal).toDecimalPlaces(2, Decimal.ROUND_HALF_UP);
+
+export const calculateInvoiceAmounts = (
+  lines: {
+    unitAmount: Decimal | number | string;
+    quantity: Decimal | number | string;
+    vatRate: Decimal | number | string;
+  }[],
+  priceEntryMode: Settings["priceEntryMode"],
+) => {
+  let totalNetAmount = new Decimal(0);
+  let totalVatAmount = new Decimal(0);
+  let totalGrossAmount = new Decimal(0);
+
+  const calculatedLines = lines.map((line) => {
+    let unitAmount = new Decimal(line.unitAmount);
+    const quantity = new Decimal(line.quantity);
+    const vatRate = new Decimal(line.vatRate).div(100);
+
+    let netAmount: Decimal;
+    let vatAmount: Decimal;
+    let grossAmount: Decimal;
+
+    if (priceEntryMode === "gross") {
+      grossAmount = roundDecimal(unitAmount.mul(quantity));
+      vatAmount = roundDecimal(
+        grossAmount.sub(grossAmount.div(vatRate.add(1))),
+      );
+      netAmount = roundDecimal(grossAmount.sub(vatAmount));
+      unitAmount = roundDecimal(netAmount.div(quantity));
+    } else {
+      netAmount = roundDecimal(unitAmount.mul(quantity));
+      vatAmount = roundDecimal(netAmount.mul(vatRate));
+      grossAmount = roundDecimal(netAmount.add(vatAmount));
+    }
+
+    unitAmount = roundDecimal(unitAmount);
+    netAmount = roundDecimal(netAmount);
+    vatAmount = roundDecimal(vatAmount);
+    grossAmount = roundDecimal(grossAmount);
+
+    totalNetAmount = totalNetAmount.add(netAmount);
+    totalVatAmount = totalVatAmount.add(vatAmount);
+    totalGrossAmount = totalGrossAmount.add(grossAmount);
+
+    return { unitAmount, netAmount, vatAmount, grossAmount };
+  });
+
+  totalNetAmount = roundDecimal(totalNetAmount);
+  totalVatAmount = roundDecimal(totalVatAmount);
+  totalGrossAmount = roundDecimal(totalGrossAmount);
+
+  return { totalNetAmount, totalVatAmount, totalGrossAmount, calculatedLines };
+};
 
 type CreateInvoiceProps = {
   createdById: number;
@@ -283,7 +347,7 @@ type CreateInvoiceProps = {
     name: string;
     unitAmount: string;
     quantity: string;
-    vatPercentage: string;
+    vatRate: string;
   }[];
   notes?: string | null;
 };
@@ -298,39 +362,10 @@ export const createInvoice = async ({
   lines,
   notes,
 }: CreateInvoiceProps) => {
-  const { netAmount, vatAmount, grossAmount, lineValues } = lines.reduce<{
-    netAmount: Decimal;
-    vatAmount: Decimal;
-    grossAmount: Decimal;
-    lineValues: {
-      netAmount: Decimal;
-      vatAmount: Decimal;
-      grossAmount: Decimal;
-    }[];
-  }>(
-    (acc, line) => {
-      const { netAmount, vatAmount, grossAmount } = calculateAmounts(
-        line.unitAmount,
-        line.quantity,
-        line.vatPercentage,
-      );
+  const priceEntryMode = await getSetting("priceEntryMode");
 
-      return {
-        netAmount: acc.netAmount.plus(netAmount),
-        vatAmount: acc.vatAmount.plus(vatAmount),
-        grossAmount: acc.grossAmount.plus(grossAmount),
-        lineValues: acc.lineValues.concat([
-          { netAmount, vatAmount, grossAmount },
-        ]),
-      };
-    },
-    {
-      netAmount: new Decimal(0),
-      vatAmount: new Decimal(0),
-      grossAmount: new Decimal(0),
-      lineValues: [],
-    },
-  );
+  const { totalNetAmount, totalVatAmount, totalGrossAmount, calculatedLines } =
+    calculateInvoiceAmounts(lines, priceEntryMode);
 
   const invoiceInsertResult = await db
     .insert(invoices)
@@ -340,9 +375,9 @@ export const createInvoice = async ({
       refId,
       type,
       status: "draft",
-      netAmount: roundDecimal(netAmount),
-      vatAmount: roundDecimal(vatAmount),
-      grossAmount: roundDecimal(grossAmount),
+      netAmount: roundDecimal(totalNetAmount).toString(),
+      vatAmount: roundDecimal(totalVatAmount).toString(),
+      grossAmount: roundDecimal(totalGrossAmount).toString(),
       customerId,
       companyId,
       notes,
@@ -354,21 +389,150 @@ export const createInvoice = async ({
   const invoice = invoiceInsertResult[0];
 
   await db.insert(invoiceLines).values(
-    lines.map(({ name, unitAmount, quantity, vatPercentage }, index) => {
-      const { netAmount, vatAmount, grossAmount } = lineValues[index];
+    lines.map(({ name, quantity, vatRate }, index) => {
+      const { unitAmount, netAmount, vatAmount, grossAmount } =
+        calculatedLines[index];
 
       return {
         invoiceId: invoice.id,
         name,
-        unitAmount,
+        unitAmount: roundDecimal(unitAmount).toString(),
         quantity,
-        netAmount: roundDecimal(netAmount),
-        vatAmount: roundDecimal(vatAmount),
-        vatPercentage,
-        grossAmount: roundDecimal(grossAmount),
+        netAmount: roundDecimal(netAmount).toString(),
+        vatAmount: roundDecimal(vatAmount).toString(),
+        vatRate,
+        grossAmount: roundDecimal(grossAmount).toString(),
       };
     }),
   );
 
   return invoice.id;
+};
+
+export const issueInvoice = async (
+  invoiceId: number,
+  date: Date,
+  relationId: number,
+) => {
+  const invoicesResult = await db
+    .select()
+    .from(invoices)
+    .where(eq(invoices.id, invoiceId));
+
+  const invoice = invoicesResult[0];
+
+  if (!invoice)
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: `invoice ${invoiceId} not found`,
+    });
+
+  if (!invoice.customerId)
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Missing customer id",
+    });
+
+  if (!invoice.companyId)
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Missing company id",
+    });
+
+  const [
+    relationsResult,
+    propertiesResult,
+    {
+      companyPaymentTerms,
+      companyVatNumber,
+      companyCocNumber,
+      companyIban,
+      companySwiftBic,
+    },
+    countResult,
+  ] = await Promise.all([
+    db.select().from(relations).where(eq(relations.id, invoice.customerId)),
+    db.select().from(properties).where(eq(properties.id, invoice.companyId)),
+    getSettings([
+      "companyPaymentTerms",
+      "companyVatNumber",
+      "companyCocNumber",
+      "companyIban",
+      "companySwiftBic",
+    ]),
+    db
+      .select({
+        count: sql<number>`CAST(COUNT(*) AS INT)`,
+      })
+      .from(invoices)
+      .where(
+        and(
+          sql`EXTRACT(YEAR FROM ${invoices.date}) = ${date.getFullYear()}`,
+          eq(invoices.type, "standard"),
+        ),
+      ),
+  ]);
+
+  const customer = relationsResult[0];
+  if (!customer)
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: `customer ${invoice.customerId} not found`,
+    });
+
+  const company = propertiesResult[0];
+  if (!company)
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: `company ${invoice.companyId} not found`,
+    });
+
+  const { count } = countResult[0];
+
+  // TODO only update when empty (customer/company)
+
+  await db
+    .update(invoices)
+    .set({
+      status: "issued",
+      date,
+      dueDate:
+        invoice.type !== "credit" && invoice.type !== "quotation"
+          ? dayjs(date).add(dayjs.duration(companyPaymentTerms)).toDate()
+          : undefined,
+      number:
+        invoice.number ||
+        date.getFullYear() + (count + 1).toString().padStart(4, "0"),
+      customerName: customer.name,
+      customerEmailAddress: customer.emailAddress,
+      customerPhoneNumber: customer.phoneNumber,
+      customerStreet: customer.street,
+      customerHouseNumber: customer.houseNumber,
+      customerPostalCode: customer.postalCode,
+      customerCity: customer.city,
+      customerRegion: customer.region,
+      customerCountry: customer.country,
+      customerVatNumber: customer.vatNumber,
+      customerCocNumber: customer.cocNumber,
+      companyName: company.name,
+      companyEmailAddress: company.emailAddress,
+      companyPhoneNumber: company.phoneNumber,
+      companyStreet: company.street,
+      companyHouseNumber: company.houseNumber,
+      companyPostalCode: company.postalCode,
+      companyCity: company.city,
+      companyRegion: company.region,
+      companyCountry: company.country,
+      companyVatNumber,
+      companyCocNumber,
+      companyIban,
+      companySwiftBic,
+    })
+    .where(eq(invoices.id, invoiceId));
+
+  await db.insert(invoiceEvents).values({
+    createdById: relationId,
+    invoiceId,
+    type: "issued",
+  });
 };

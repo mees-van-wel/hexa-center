@@ -199,7 +199,7 @@ export const ReservationDetail = ({
             quantity: invoiceExtra.instance.quantity,
             amount: invoiceExtra.instance.amount,
             unit: invoiceExtra.instance.unit,
-            vatPercentage: invoiceExtra.instance.vatPercentage,
+            vatRate: invoiceExtra.instance.vatRate,
             cycle: invoiceExtra.cycle,
           }}
           onConfirm={async (values) => {
@@ -299,7 +299,7 @@ export const ReservationDetail = ({
                     <Table.Th>Quantity</Table.Th>
                     <Table.Th>Amount</Table.Th>
                     <Table.Th>Unit</Table.Th>
-                    <Table.Th>Vat percentage</Table.Th>
+                    <Table.Th>Vat Rate</Table.Th>
                     <Table.Th>Cycle</Table.Th>
                     <Table.Th>Status</Table.Th>
                   </Table.Tr>
@@ -335,7 +335,7 @@ export const ReservationDetail = ({
                         <Table.Td>{instance.quantity}</Table.Td>
                         <Table.Td>{instance.amount}</Table.Td>
                         <Table.Td>{instance.unit}</Table.Td>
-                        <Table.Td>{instance.vatPercentage}%</Table.Td>
+                        <Table.Td>{instance.vatRate}%</Table.Td>
                         <Table.Td>{cycle}</Table.Td>
                         <Table.Td>
                           <Badge
