@@ -5,12 +5,14 @@ import { router } from "../trpc";
 import { authRouter } from "./auth";
 import { invoiceRouter } from "./invoice";
 import { invoiceExtraRouter } from "./invoiceExtra";
+import { propertyRouter } from "./property";
 import { relationRouter } from "./relation";
 import { reservationRouter } from "./reservation";
 import { roomRouter } from "./room";
 
 export const appRouter = router({
   auth: authRouter,
+  property: propertyRouter,
   relation: relationRouter,
   room: roomRouter,
   reservation: reservationRouter,

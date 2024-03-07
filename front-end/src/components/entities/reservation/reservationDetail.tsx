@@ -66,7 +66,7 @@ type ReservationProps = {
   invoiceExtraTemplates: RouterOutput["invoiceExtra"]["list"];
 };
 
-export const ReservationUpdate = ({
+export const ReservationDetail = ({
   reservation,
   rooms,
   relations,

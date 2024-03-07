@@ -55,6 +55,21 @@ export default {
         button: "Profielpagina",
       },
     },
+    property: {
+      name: {
+        singular: "Vestiging",
+        plural: "Vestigingen",
+      },
+      keys: {
+        name: "Naam",
+        email: "Email",
+        phoneNumber: "Telefoonnummer",
+        street: "Straat",
+        houseNumber: "Huisnummer",
+      },
+      createdNotification: "Vestiging succesvol aangemaakt",
+      deletedNotification: "Vestiging succesvol verwijderd",
+    },
     room: {
       name: {
         singular: "Kamer",

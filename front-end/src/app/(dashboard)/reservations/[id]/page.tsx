@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-import { ReservationUpdate } from "@/components/entities/reservation/ReservationUpdate";
+import { ReservationDetail } from "@/components/entities/reservation/reservationDetail";
 import { setTRPCRefreshToken, trpc } from "@/utils/trpc";
 
 type ReservationPageParams = {
@@ -24,7 +24,7 @@ export default async function Page({ params }: ReservationPageParams) {
     ]);
 
   return (
-    <ReservationUpdate
+    <ReservationDetail
       reservation={reservation}
       rooms={rooms}
       relations={relations}

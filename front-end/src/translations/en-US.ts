@@ -55,6 +55,21 @@ export default {
         button: "Profile Page",
       },
     },
+    property: {
+      name: {
+        singular: "Property",
+        plural: "Properties",
+      },
+      keys: {
+        name: "Name",
+        email: "Email",
+        phoneNumber: "Phone number",
+        street: "Street",
+        houseNumber: "House number",
+      },
+      createdNotification: "Property successfully created",
+      deletedNotification: "Property successfully deleted",
+    },
     room: {
       name: {
         singular: "Room",

@@ -37,21 +37,25 @@ export const Metadata = ({ showDefault }: MetadataProps) => {
           label={t("components.metadata.createdAt")}
           disabled
         />
-        <TextInput
-          value={createdById}
-          label={t("components.metadata.createdBy")}
-          disabled
-        />
+        {createdById && (
+          <TextInput
+            value={createdById}
+            label={t("components.metadata.createdBy")}
+            disabled
+          />
+        )}
         <DateTimePicker
           value={updatedAt}
           label={t("components.metadata.updatedAt")}
           disabled
         />
-        <TextInput
-          value={updatedById}
-          label={t("components.metadata.updatedBy")}
-          disabled
-        />
+        {updatedById && (
+          <TextInput
+            value={updatedById}
+            label={t("components.metadata.updatedBy")}
+            disabled
+          />
+        )}
       </Group>
     </Sheet>
   );
