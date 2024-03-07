@@ -56,6 +56,21 @@ export default {
         button: "Profielpagina",
       },
     },
+    property: {
+      name: {
+        singular: "Vestiging",
+        plural: "Vestigingen",
+      },
+      keys: {
+        name: "Naam",
+        email: "Email",
+        phoneNumber: "Telefoonnummer",
+        street: "Straat",
+        houseNumber: "Huisnummer",
+      },
+      createdNotification: "Vestiging succesvol aangemaakt",
+      deletedNotification: "Vestiging succesvol verwijderd",
+    },
     room: {
       name: {
         singular: "Kamer",
@@ -213,6 +228,15 @@ export default {
     },
     loggedInSuccess: "U bent succesvol ingelogd",
   },
+  homePage: {
+    goodMorning: "Goedemorgen",
+    goodAfternoon: "Goedemiddag",
+    goodEvening: "Goedenavond",
+    welcome: "Welkom",
+    news: "Nieuws",
+    title: "Home",
+    read: "Lees het volledige artikel",
+  },
   preferencesPage: {
     title: "Voorkeuren",
     name: "Instellingen",
@@ -242,6 +266,7 @@ export default {
       TUESDAY: "Dinsdag",
       WEDNESDAY: "Woensdag",
     },
+    authentication: "Authenticatie",
   },
   roomsPage: {
     price: "Prijs",
@@ -257,6 +282,14 @@ export default {
       city: "Stad",
       region: "Provincie",
       country: "Land",
+    },
+    metadata: {
+      createdAt: "Gemaakt op",
+      createdBy: "Gemaakt door",
+      id: "Nummer",
+      updatedAt: "Bijgewerkt op",
+      updatedBy: "Bijgewerkt door",
+      name: "Metagegevens",
     },
   },
   // exceptions: {

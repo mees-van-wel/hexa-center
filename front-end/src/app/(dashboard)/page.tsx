@@ -1,23 +1,21 @@
-"use client";
+import axios from "axios";
 
-import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
-import { useTranslation } from "@/hooks/useTranslation";
-import { Badge, Button, Paper, Stack, Title } from "@mantine/core";
+import HomePage from "@/components/pages/home/HomePage";
 
-export default function Page() {
-  const t = useTranslation();
+export interface NewsItem {
+  slug: string;
+  html: string;
+  data: {
+    title: string;
+    date: string;
+    image?: string;
+  };
+}
 
-  return (
-    <Stack h="100%">
-      <DashboardHeader title={[{ label: "Home" }]}>
-        <Button>{t("common.create")}</Button>
-        <Badge size="lg" color="green">
-          {t("common.saved")}
-        </Badge>
-      </DashboardHeader>
-      <Paper p="md">
-        <Title>Content</Title>
-      </Paper>
-    </Stack>
+export default async function Page() {
+  const { data } = await axios<NewsItem[]>(
+    "https://www.hexa.center/api/v1/news",
   );
+
+  return <HomePage newsItems={data} />;
 }

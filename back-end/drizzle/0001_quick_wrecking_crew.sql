@@ -1,1 +1,0 @@
-ALTER TABLE "api_connections" ALTER COLUMN "data" SET NOT NULL;

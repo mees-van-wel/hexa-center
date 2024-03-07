@@ -10,6 +10,7 @@ import {
   useFormState,
 } from "react-hook-form";
 
+import { Metadata } from "@/components/common/Metadata";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { useAuthRelation } from "@/contexts/AuthContext";
 import { useAutosave } from "@/hooks/useAutosave";
@@ -110,6 +111,7 @@ export const RelationDetail = ({ relation }: RelationDetailProps) => {
           </Alert>
         )}
         <RelationForm disabled={isSelf} />
+        {!isSelf && <Metadata />}
       </Stack>
     </FormProvider>
   );

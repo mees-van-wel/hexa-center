@@ -1,5 +1,5 @@
 {
-  "id": "346bd788-db97-4160-abe4-0af33efa3d9b",
+  "id": "f134d8dd-4629-46d9-9a52-3d4008adcfec",
   "prevId": "ad8a5f8b-575e-4e10-8a4c-5675b7ec84f2",
   "version": "5",
   "dialect": "pg",
@@ -347,8 +347,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "vat_percentage": {
-          "name": "vat_percentage",
+        "vat_rate": {
+          "name": "vat_rate",
           "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true,
@@ -462,8 +462,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "vat_percentage": {
-          "name": "vat_percentage",
+        "vat_rate": {
+          "name": "vat_rate",
           "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true,
@@ -555,8 +555,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "vat_percentage": {
-          "name": "vat_percentage",
+        "vat_rate": {
+          "name": "vat_rate",
           "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true
@@ -2236,7 +2236,8 @@
         "invoiceEmailTitle": "invoiceEmailTitle",
         "invoiceEmailContent": "invoiceEmailContent",
         "invoiceHeaderImageSrc": "invoiceHeaderImageSrc",
-        "invoiceFooterImageSrc": "invoiceFooterImageSrc"
+        "invoiceFooterImageSrc": "invoiceFooterImageSrc",
+        "priceEntryMode": "priceEntryMode"
       }
     }
   },

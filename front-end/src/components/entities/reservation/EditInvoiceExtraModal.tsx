@@ -26,7 +26,7 @@ export const EditInvoiceExtraModal = ({
     amount: currentValues.amount,
     unit: currentValues.unit,
     cycle: currentValues.cycle,
-    vatPercentage: currentValues.vatPercentage,
+    vatRate: currentValues.vatRate,
   });
 
   const changeHandler = (newValues: Partial<typeof currentValues>) => {
@@ -94,10 +94,10 @@ export const EditInvoiceExtraModal = ({
           withAsterisk
         />
         <NumberInput
-          label="VAT Percentage"
-          value={values.vatPercentage}
-          onChange={(vatPercentage) => {
-            changeHandler({ vatPercentage: vatPercentage.toString() });
+          label="VAT Rate"
+          value={values.vatRate}
+          onChange={(vatRate) => {
+            changeHandler({ vatRate: vatRate.toString() });
           }}
           decimalScale={2}
           decimalSeparator=","

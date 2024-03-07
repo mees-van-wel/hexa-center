@@ -14,33 +14,36 @@ import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader"
 import { useAutosave } from "@/hooks/useAutosave";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
-import { RoomInputUpdateSchema, RoomUpdateSchema } from "@/schemas/room";
-import { RouterOutput } from "@/utils/trpc";
+import {
+  PropertyUpdateInputSchema,
+  PropertyUpdateSchema,
+} from "@/schemas/property";
+import { type RouterOutput } from "@/utils/trpc";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Badge, Button, Loader, Stack } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import {
   IconAlertTriangle,
-  IconBed,
+  IconBuilding,
   IconCheck,
   IconTrash,
 } from "@tabler/icons-react";
 
-import { RoomForm } from "./RoomForm";
+import { PropertyForm } from "./PropertyForm";
 
-type RoomProps = {
-  room: RouterOutput["room"]["get"];
+type PropertyPageProps = {
+  property: RouterOutput["property"]["get"];
 };
 
-export const RoomUpdate = ({ room }: RoomProps) => {
+export const PropertyDetail = ({ property }: PropertyPageProps) => {
   const t = useTranslation();
   const router = useRouter();
-  const deleteRoom = useMutation("room", "delete");
+  const deleteProperty = useMutation("property", "delete");
 
-  const formMethods = useForm({
-    defaultValues: room,
-    resolver: valibotResolver(RoomUpdateSchema),
+  const formMethods = useForm<PropertyUpdateInputSchema>({
+    defaultValues: property,
+    resolver: valibotResolver(PropertyUpdateSchema),
   });
 
   const deletehandler = () => {
@@ -48,13 +51,14 @@ export const RoomUpdate = ({ room }: RoomProps) => {
       title: t("common.areYouSure"),
       labels: { confirm: t("common.yes"), cancel: t("common.no") },
       onConfirm: async () => {
-        await deleteRoom.mutate(room.id);
+        await deleteProperty.mutate(property.id);
 
         notifications.show({
-          message: t("entities.room.deletedNotification"),
+          message: t("entities.property.deletedNotification"),
           color: "green",
         });
-        router.push("/rooms");
+
+        router.push("/properties");
       },
     });
   };
@@ -63,18 +67,19 @@ export const RoomUpdate = ({ room }: RoomProps) => {
     <FormProvider {...formMethods}>
       <Stack>
         <DashboardHeader
-          backRouteFallback="/rooms"
+          backRouteFallback="/properties"
           title={[
             {
-              icon: <IconBed />,
-              label: t("dashboardLayout.rooms"),
-              href: "/rooms",
+              icon: <IconBuilding />,
+              label: t("dashboardLayout.properties"),
+              href: "/properties",
             },
-            { label: room.name },
+            { label: property.name },
           ]}
         >
           <Button
             color="red"
+            variant="light"
             onClick={deletehandler}
             leftSection={<IconTrash />}
           >
@@ -82,7 +87,7 @@ export const RoomUpdate = ({ room }: RoomProps) => {
           </Button>
           <SaveBadge />
         </DashboardHeader>
-        <RoomForm />
+        <PropertyForm />
         <Metadata />
       </Stack>
     </FormProvider>
@@ -90,11 +95,11 @@ export const RoomUpdate = ({ room }: RoomProps) => {
 };
 
 const SaveBadge = () => {
-  const updateRoom = useMutation("room", "update");
+  const updateProperty = useMutation("property", "update");
   const t = useTranslation();
 
   const { control, getValues, reset, setError } =
-    useFormContext<RoomInputUpdateSchema>();
+    useFormContext<PropertyUpdateInputSchema>();
   const { isDirty, errors } = useFormState({ control });
   const isError = useMemo(() => !!Object.keys(errors).length, [errors]);
 
@@ -110,12 +115,12 @@ const SaveBadge = () => {
     }
 
     try {
-      const updatedRoom = await updateRoom.mutate({
+      const updatedProperty = await updateProperty.mutate({
         ...values,
         id: getValues("id"),
       });
 
-      reset(updatedRoom);
+      reset(updatedProperty);
     } catch (error) {
       const { success, json } = isJson((error as any).message);
       if (!success) {
@@ -133,7 +138,7 @@ const SaveBadge = () => {
 
       if (exception === "DB_UNIQUE_CONSTRAINT") {
         setError(data.column, {
-          message: `${t("entities.room.name.singular")} - ${getValues(
+          message: `${t("entities.property.name.singular")} - ${getValues(
             data.column,
           )} - ${data.column}`,
         });
@@ -145,12 +150,12 @@ const SaveBadge = () => {
     <Badge
       size="lg"
       color={
-        isError ? "red" : isDirty || updateRoom.loading ? "orange" : "green"
+        isError ? "red" : isDirty || updateProperty.loading ? "orange" : "green"
       }
       leftSection={
         isError ? (
           <IconAlertTriangle size="1rem" />
-        ) : isDirty || updateRoom.loading ? (
+        ) : isDirty || updateProperty.loading ? (
           <Loader color="orange" variant="oval" size="1rem" />
         ) : (
           <IconCheck size="1rem" />
@@ -160,7 +165,7 @@ const SaveBadge = () => {
     >
       {isError
         ? t("common.error")
-        : isDirty || updateRoom.loading
+        : isDirty || updateProperty.loading
           ? t("common.saving")
           : t("common.saved")}
     </Badge>

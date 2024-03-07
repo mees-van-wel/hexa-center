@@ -103,7 +103,7 @@ export const reservationRouter = router({
                 quantity: true,
                 amount: true,
                 unit: true,
-                vatPercentage: true,
+                vatRate: true,
                 status: true,
               },
             },
@@ -144,7 +144,7 @@ export const reservationRouter = router({
             ...junction.instance,
             amount: junction.instance.amount.toString(),
             quantity: junction.instance.quantity.toString(),
-            vatPercentage: junction.instance.vatPercentage.toString(),
+            vatRate: junction.instance.vatRate.toString(),
           },
         }),
       ),
@@ -157,6 +157,7 @@ export const reservationRouter = router({
         .update(reservations)
         .set({
           ...input,
+          updatedAt: new Date(),
           updatedById: ctx.relation.id,
           priceOverride:
             input.priceOverride === null
@@ -222,7 +223,7 @@ export const reservationRouter = router({
         name: string;
         unitAmount: string;
         quantity: string;
-        vatPercentage: string;
+        vatRate: string;
       }[] = [];
       const isFinalInvoice = dayjs(reservation.endDate).isSame(input.endDate);
       const periodNights = dayjs(input.endDate).diff(input.startDate, "days");
@@ -259,7 +260,7 @@ export const reservationRouter = router({
             name: instance.name,
             unitAmount: instance.amount,
             quantity,
-            vatPercentage: instance.vatPercentage,
+            vatRate: instance.vatRate,
           });
 
           // TODO Update line status
@@ -279,7 +280,7 @@ export const reservationRouter = router({
             name: "Overnight Stays",
             unitAmount: reservation.priceOverride || reservation.room.price,
             quantity: periodNights.toString(),
-            vatPercentage: "9",
+            vatRate: "9",
           },
           ...extraLines,
         ],
@@ -304,7 +305,7 @@ export const reservationRouter = router({
           quantity: string(),
           amount: string(),
           unit: picklist(["currency"]),
-          vatPercentage: string(),
+          vatRate: string(),
           cycle: picklist([
             "oneTimeOnEnd",
             "perNightThroughout",
@@ -322,7 +323,7 @@ export const reservationRouter = router({
           quantity: input.quantity,
           amount: input.amount,
           unit: input.unit,
-          vatPercentage: input.vatPercentage,
+          vatRate: input.vatRate,
           status: "notApplied",
         })
         .returning({
@@ -347,7 +348,7 @@ export const reservationRouter = router({
           quantity: string(),
           amount: optional(string()),
           unit: optional(picklist(["currency"])),
-          vatPercentage: optional(string()),
+          vatRate: optional(string()),
           cycle: picklist([
             "oneTimeOnEnd",
             "perNightThroughout",
@@ -365,7 +366,7 @@ export const reservationRouter = router({
             quantity: input.quantity,
             amount: input.amount,
             unit: input.unit,
-            vatPercentage: input.vatPercentage,
+            vatRate: input.vatRate,
           })
           .where(eq(invoiceExtraInstances.id, input.instanceId)),
         db

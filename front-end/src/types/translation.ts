@@ -65,6 +65,21 @@ export type Translation = {
         button: string;
       };
     };
+    property: {
+      name: {
+        singular: string;
+        plural: string;
+      };
+      keys: {
+        name: string;
+        email: string;
+        phoneNumber: string;
+        street: string;
+        houseNumber: string;
+      };
+      deletedNotification: string;
+      createdNotification: string;
+    };
     room: {
       name: {
         singular: string;
@@ -219,6 +234,15 @@ export type Translation = {
     };
     loggedInSuccess: string;
   };
+  homePage: {
+    goodMorning: string;
+    goodAfternoon: string;
+    goodEvening: string;
+    welcome: string;
+    news: string;
+    title: string;
+    read: string;
+  };
   preferencesPage: {
     title: string;
     name: string;
@@ -248,6 +272,7 @@ export type Translation = {
       TUESDAY: string;
       WEDNESDAY: string;
     };
+    authentication: string;
   };
   roomsPage: {
     price: string;
@@ -263,6 +288,14 @@ export type Translation = {
       city: string;
       region: string;
       country: string;
+    };
+    metadata: {
+      createdAt: string;
+      createdBy: string;
+      id: string;
+      updatedAt: string;
+      updatedBy: string;
+      name: string;
     };
   };
   // exceptions: {

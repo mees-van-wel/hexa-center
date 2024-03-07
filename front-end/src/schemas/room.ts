@@ -2,13 +2,13 @@ import { Input, minLength, number, object, optional, string } from "valibot";
 
 export const RoomCreateSchema = object({
   name: string([minLength(2)]),
-  price: number(),
+  price: string(),
 });
 
 export const RoomUpdateSchema = object({
   id: number(),
   name: optional(string([minLength(2)])),
-  price: optional(number()),
+  price: optional(string()),
 });
 
 export type RoomInputCreateSchema = Input<typeof RoomCreateSchema>;
