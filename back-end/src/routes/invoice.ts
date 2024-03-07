@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration.js";
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { date, number, object } from "valibot";
 
 import db from "@/db/client";
@@ -8,11 +8,13 @@ import {
   invoiceEvents,
   invoiceLines,
   invoices,
-  properties,
-  relations,
   reservationsToInvoices,
 } from "@/db/schema";
-import { generateInvoicePdf, getInvoice } from "@/services/invoice";
+import {
+  generateInvoicePdf,
+  getInvoice,
+  issueInvoice,
+} from "@/services/invoice";
 import { getSettings } from "@/services/setting";
 import { procedure, router } from "@/trpc";
 import { sendMail } from "@/utils/mail";
@@ -57,132 +59,9 @@ export const invoiceRouter = router({
         }),
       ),
     )
-    .mutation(async ({ input: { invoiceId, date }, ctx }) => {
-      const invoicesResult = await db
-        .select()
-        .from(invoices)
-        .where(eq(invoices.id, invoiceId));
-
-      const invoice = invoicesResult[0];
-
-      if (!invoice)
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `invoice ${invoiceId} not found`,
-        });
-
-      if (!invoice.customerId)
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Missing customer id",
-        });
-
-      if (!invoice.companyId)
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Missing company id",
-        });
-
-      const [
-        relationsResult,
-        propertiesResult,
-        {
-          companyPaymentTerms,
-          companyVatNumber,
-          companyCocNumber,
-          companyIban,
-          companySwiftBic,
-        },
-        countResult,
-      ] = await Promise.all([
-        db.select().from(relations).where(eq(relations.id, invoice.customerId)),
-        db
-          .select()
-          .from(properties)
-          .where(eq(properties.id, invoice.companyId)),
-        getSettings([
-          "companyPaymentTerms",
-          "companyVatNumber",
-          "companyCocNumber",
-          "companyIban",
-          "companySwiftBic",
-        ]),
-        db
-          .select({
-            count: sql<number>`CAST(COUNT(*) AS INT)`,
-          })
-          .from(invoices)
-          .where(
-            and(
-              sql`EXTRACT(YEAR FROM ${invoices.date}) = ${date.getFullYear()}`,
-              eq(invoices.type, "standard"),
-            ),
-          ),
-      ]);
-
-      const customer = relationsResult[0];
-      if (!customer)
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `customer ${invoice.customerId} not found`,
-        });
-
-      const company = propertiesResult[0];
-      if (!company)
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `company ${invoice.companyId} not found`,
-        });
-
-      const { count } = countResult[0];
-
-      // TODO only update when empty (customer/company)
-
-      await db
-        .update(invoices)
-        .set({
-          status: "issued",
-          date,
-          dueDate:
-            invoice.type !== "credit" && invoice.type !== "quotation"
-              ? dayjs(date).add(dayjs.duration(companyPaymentTerms)).toDate()
-              : undefined,
-          number:
-            invoice.number ||
-            date.getFullYear() + (count + 1).toString().padStart(4, "0"),
-          customerName: customer.name,
-          customerEmailAddress: customer.emailAddress,
-          customerPhoneNumber: customer.phoneNumber,
-          customerStreet: customer.street,
-          customerHouseNumber: customer.houseNumber,
-          customerPostalCode: customer.postalCode,
-          customerCity: customer.city,
-          customerRegion: customer.region,
-          customerCountry: customer.country,
-          customerVatNumber: customer.vatNumber,
-          customerCocNumber: customer.cocNumber,
-          companyName: company.name,
-          companyEmailAddress: company.emailAddress,
-          companyPhoneNumber: company.phoneNumber,
-          companyStreet: company.street,
-          companyHouseNumber: company.houseNumber,
-          companyPostalCode: company.postalCode,
-          companyCity: company.city,
-          companyRegion: company.region,
-          companyCountry: company.country,
-          companyVatNumber,
-          companyCocNumber,
-          companyIban,
-          companySwiftBic,
-        })
-        .where(eq(invoices.id, invoiceId));
-
-      await db.insert(invoiceEvents).values({
-        createdById: ctx.relation.id,
-        invoiceId,
-        type: "issued",
-      });
-    }),
+    .mutation(({ input: { invoiceId, date }, ctx }) =>
+      issueInvoice(invoiceId, date, ctx.relation.id),
+    ),
   generatePdf: procedure
     .input(wrap(number()))
     .mutation(async ({ input }) => (await generateInvoicePdf(input)).base64),
@@ -290,7 +169,7 @@ export const invoiceRouter = router({
             quantity: invoiceLines.quantity,
             netAmount: invoiceLines.netAmount,
             vatAmount: invoiceLines.vatAmount,
-            vatPercentage: invoiceLines.vatPercentage,
+            vatRate: invoiceLines.vatRate,
             grossAmount: invoiceLines.grossAmount,
           })
           .from(invoiceLines)
@@ -315,7 +194,7 @@ export const invoiceRouter = router({
           quantity: invoiceLine.quantity,
           netAmount: "-" + invoiceLine.netAmount,
           vatAmount: "-" + invoiceLine.vatAmount,
-          vatPercentage: invoiceLine.vatPercentage,
+          vatRate: invoiceLine.vatRate,
           grossAmount: "-" + invoiceLine.grossAmount,
         })),
       ),
@@ -346,6 +225,8 @@ export const invoiceRouter = router({
         invoiceId: creditInvoiceId,
       });
     }
+
+    await issueInvoice(creditInvoiceId, new Date(), ctx.relation.id);
 
     return creditInvoiceId;
   }),

@@ -30,6 +30,9 @@ export const RoomForm = () => {
           render={({ field, fieldState: { error } }) => (
             <NumberInput
               {...field}
+              onChange={(test) => {
+                field.onChange(test.toString());
+              }}
               error={error?.message}
               label={t("entities.room.keys.price")}
               leftSection={<IconCurrencyEuro size="1rem" />}

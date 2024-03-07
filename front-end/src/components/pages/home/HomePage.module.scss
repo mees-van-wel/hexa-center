@@ -5,8 +5,14 @@
   background-color: rgb(var(--color-foreground));
   justify-content: space-between;
 
-  .newsDate {
+  &Date {
     flex: 0;
     min-width: 85px;
+  }
+
+  &Text {
+    padding: 0 1rem;
+    font-size: 0.8rem;
+    opacity: 0.8;
   }
 }

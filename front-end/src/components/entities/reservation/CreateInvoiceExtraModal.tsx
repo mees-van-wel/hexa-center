@@ -20,7 +20,7 @@ export type ReservationInvoiceExtraValues = {
   amount: string;
   unit: "currency";
   cycle: "oneTimeOnEnd" | "perNightThroughout" | "perNightOnEnd";
-  vatPercentage: string;
+  vatRate: string;
 };
 
 type CreateInvoiceExtraModalProps = {
@@ -49,13 +49,13 @@ export const CreateInvoiceExtraModal = ({
     amount: "",
     unit: "currency",
     cycle: "",
-    vatPercentage: "21",
+    vatRate: "21",
   });
 
   useDidUpdate(() => {
     if (!template) return;
 
-    const { name, quantity, amount, unit, vatPercentage } = template;
+    const { name, quantity, amount, unit, vatRate } = template;
 
     setValues({
       ...values,
@@ -63,7 +63,7 @@ export const CreateInvoiceExtraModal = ({
       quantity,
       amount,
       unit,
-      vatPercentage,
+      vatRate,
     });
   }, [template]);
 
@@ -146,10 +146,10 @@ export const CreateInvoiceExtraModal = ({
           withAsterisk
         />
         <NumberInput
-          label="VAT Percentage"
-          value={values.vatPercentage}
-          onChange={(vatPercentage) => {
-            changeHandler({ vatPercentage: vatPercentage.toString() });
+          label="VAT Rate"
+          value={values.vatRate}
+          onChange={(vatRate) => {
+            changeHandler({ vatRate: vatRate.toString() });
           }}
           decimalScale={2}
           decimalSeparator=","
@@ -171,10 +171,7 @@ export const CreateInvoiceExtraModal = ({
         </Button>
         <Button
           disabled={
-            !values.name ||
-            !values.cycle ||
-            !values.amount ||
-            !values.vatPercentage
+            !values.name || !values.cycle || !values.amount || !values.vatRate
           }
           onClick={confirmHandler}
           fullWidth

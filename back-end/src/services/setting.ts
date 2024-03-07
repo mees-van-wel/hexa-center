@@ -2,12 +2,15 @@ import { eq, inArray } from "drizzle-orm";
 
 import db from "@/db/client";
 import { settings } from "@/db/schema";
+import { Settings } from "@front-end/constants/settings";
 
 // TODO Better error handling
 
-export const getSetting = async (
-  name: (typeof settings.name.enumValues)[number],
-) => {
+export const getSetting = async <
+  T extends (typeof settings.name.enumValues)[number],
+>(
+  name: T,
+): Promise<Settings[T]> => {
   const settingsResult = await db
     .select()
     .from(settings)
@@ -23,7 +26,7 @@ export const getSettings = async <
   T extends (typeof settings.name.enumValues)[number],
 >(
   names: T[],
-): Promise<Record<T, any>> => {
+): Promise<Record<T, Settings[T]>> => {
   const settingsResult = await db
     .select()
     .from(settings)

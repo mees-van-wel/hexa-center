@@ -49,7 +49,7 @@ export type PDFTemplateVariables = {
       quantity: string;
       netAmount: string;
       vatAmount: string;
-      vatPercentage: string;
+      vatRate: string;
       grossAmount: string;
     }[];
     netAmount: string;

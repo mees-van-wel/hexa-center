@@ -16,7 +16,6 @@ import {
   Group,
   ScrollArea,
   Stack,
-  Text,
   Title,
 } from "@mantine/core";
 import { IconHome } from "@tabler/icons-react";
@@ -79,9 +78,9 @@ export default function HomePage({ newsItems }: { newsItems: NewsItem[] }) {
                         {new Date(date).toLocaleDateString("nl-NL")}
                       </Badge>
                     </Group>
-                    <Text size="xs" px="md">
+                    <div className={styles.newsText}>
                       {parse(`${html.substring(0, 100)}...`)}
-                    </Text>
+                    </div>
                   </Stack>
                   <Button
                     style={{

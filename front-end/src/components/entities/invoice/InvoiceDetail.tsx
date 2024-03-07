@@ -179,7 +179,8 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
       labels: { confirm: t("common.yes"), cancel: t("common.no") },
       onConfirm: async () => {
         await deleteInvoice.mutate(invoice.id);
-        router.back();
+
+        router.replace("/invoices");
 
         notifications.show({
           message: "Invoice successfully deleted",
@@ -615,7 +616,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   quantity,
                   netAmount,
                   vatAmount,
-                  vatPercentage,
+                  vatRate,
                   grossAmount,
                 }) => (
                   <Table.Tr key={id}>
@@ -638,7 +639,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                         style: "currency",
                         currency: "EUR",
                       }).format(parseFloat(vatAmount))}{" "}
-                      ({vatPercentage}%)
+                      ({vatRate}%)
                     </Table.Td>
                     <Table.Td>
                       {Intl.NumberFormat("nl-NL", {

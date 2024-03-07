@@ -490,7 +490,7 @@ export const invoiceLines = pgTable("invoice_lines", {
     precision: 10,
     scale: 2,
   }).notNull(),
-  vatPercentage: numeric("vat_percentage", {
+  vatRate: numeric("vat_rate", {
     precision: 10,
     scale: 2,
   }).notNull(),
@@ -586,7 +586,7 @@ export const invoiceExtraTemplates = pgTable("invoice_extra_templates", {
     scale: 2,
   }).notNull(),
   unit: invoiceExtraUnitEnum("unit").notNull(),
-  vatPercentage: numeric("vat_percentage", {
+  vatRate: numeric("vat_rate", {
     precision: 10,
     scale: 2,
   })
@@ -634,7 +634,7 @@ export const invoiceExtraInstances = pgTable("invoice_extra_instances", {
     scale: 2,
   }).notNull(),
   unit: invoiceExtraUnitEnum("unit").notNull(),
-  vatPercentage: numeric("vat_percentage", {
+  vatRate: numeric("vat_rate", {
     precision: 10,
     scale: 2,
   })
@@ -734,6 +734,7 @@ export const settingNameEnum = pgEnum("setting_name", [
   "invoiceEmailContent",
   "invoiceHeaderImageSrc",
   "invoiceFooterImageSrc",
+  "priceEntryMode",
 ]);
 
 export const settings = pgTable("settings", {
