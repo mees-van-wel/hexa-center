@@ -262,6 +262,9 @@ export const generateInvoicePdf = async (invoiceId: number) => {
   };
 };
 
+export const invertDecimalString = (decimalString: string) =>
+  (-parseFloat(decimalString)).toString();
+
 export const calculateVatFromNetAmount = (
   netAmount: Decimal | number | string,
   vatRate: Decimal | number | string,

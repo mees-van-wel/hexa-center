@@ -20,6 +20,14 @@ export const invoiceExtraRouter = router({
       })
       .from(invoiceExtraTemplates),
   ),
+  resetInstance: procedure.input(wrap(number())).mutation(async ({ input }) =>
+    db
+      .update(invoiceExtraInstances)
+      .set({
+        status: "notApplied",
+      })
+      .where(eq(invoiceExtraInstances.id, input)),
+  ),
   deleteInstance: procedure
     .input(wrap(number()))
     .mutation(async ({ input }) =>
