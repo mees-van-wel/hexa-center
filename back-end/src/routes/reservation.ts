@@ -235,10 +235,12 @@ export const reservationRouter = router({
       await Promise.all(
         reservation.invoicesExtrasJunction.map(async ({ instance, cycle }) => {
           if (
-            (cycle === "oneTimeOnEnd" || cycle === "perNightOnEnd") &&
-            !isFinalInvoice
+            instance.status === "fullyApplied" ||
+            ((cycle === "oneTimeOnEnd" || cycle === "perNightOnEnd") &&
+              !isFinalInvoice)
           )
             return;
+
           let quantity = instance.quantity;
           let status: "partiallyApplied" | "fullyApplied" = "fullyApplied";
 
@@ -250,7 +252,6 @@ export const reservationRouter = router({
           if (cycle === "perNightOnEnd")
             quantity = new Decimal(quantity).mul(totalNights).toString();
 
-          // TODO what if invoice get's deleted in draft state or credited?
           await db
             .update(invoiceExtraInstances)
             .set({ status })
@@ -262,8 +263,6 @@ export const reservationRouter = router({
             quantity,
             vatRate: instance.vatRate,
           });
-
-          // TODO Update line status
         }),
       );
 
@@ -307,6 +306,7 @@ export const reservationRouter = router({
           unit: picklist(["currency"]),
           vatRate: string(),
           cycle: picklist([
+            "oneTimeOnNext",
             "oneTimeOnEnd",
             "perNightThroughout",
             "perNightOnEnd",
@@ -350,6 +350,7 @@ export const reservationRouter = router({
           unit: optional(picklist(["currency"])),
           vatRate: optional(string()),
           cycle: picklist([
+            "oneTimeOnNext",
             "oneTimeOnEnd",
             "perNightThroughout",
             "perNightOnEnd",

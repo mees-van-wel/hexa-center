@@ -660,7 +660,7 @@ export const invoiceExtraInstancesRelations = relationBuilder(
 // TODO Add start, Maybe support uponUsage, when invoked show on next invoice only
 export const reservationsToInvoiceExtraInstancesCycleEnum = pgEnum(
   "reservations_to_invoice_extra_instances_cycle",
-  ["oneTimeOnEnd", "perNightThroughout", "perNightOnEnd"],
+  ["oneTimeOnNext", "oneTimeOnEnd", "perNightThroughout", "perNightOnEnd"],
 );
 
 export const reservationsToInvoiceExtraInstances = pgTable(

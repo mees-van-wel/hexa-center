@@ -19,7 +19,11 @@ export type ReservationInvoiceExtraValues = {
   quantity: string;
   amount: string;
   unit: "currency";
-  cycle: "oneTimeOnEnd" | "perNightThroughout" | "perNightOnEnd";
+  cycle:
+    | "oneTimeOnNext"
+    | "oneTimeOnEnd"
+    | "perNightThroughout"
+    | "perNightOnEnd";
   vatRate: string;
 };
 
@@ -137,7 +141,12 @@ export const CreateInvoiceExtraModal = ({
         />
         <Select
           label="Cycle"
-          data={["oneTimeOnEnd", "perNightThroughout", "perNightOnEnd"]}
+          data={[
+            "oneTimeOnNext",
+            "oneTimeOnEnd",
+            "perNightThroughout",
+            "perNightOnEnd",
+          ]}
           value={values.cycle}
           onChange={(cycle) => {
             if (cycle) changeHandler({ cycle });

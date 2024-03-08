@@ -51,6 +51,7 @@ import {
   IconPlus,
   IconTrash,
 } from "@tabler/icons-react";
+import { IconRotate } from "@tabler/icons-react";
 
 import { CreateInvoiceExtraModal } from "./CreateInvoiceExtraModal";
 import { EditInvoiceExtraModal } from "./EditInvoiceExtraModal";
@@ -78,6 +79,7 @@ export const ReservationDetail = ({
   const invoicePeriod = useMutation("reservation", "invoicePeriod");
   const createInvoiceExtra = useMutation("reservation", "addInvoiceExtra");
   const updateInvoiceExtra = useMutation("reservation", "updateInvoiceExtra");
+  const resetInvoiceExtra = useMutation("invoiceExtra", "resetInstance");
   const deleteInvoiceExtra = useMutation("invoiceExtra", "deleteInstance");
 
   const formMethods = useForm<ReservationInputUpdateSchema>({
@@ -221,6 +223,23 @@ export const ReservationDetail = ({
     });
   };
 
+  const resetInvoiceExtraHandler = (id: number) => {
+    modals.openConfirmModal({
+      title: t("common.areYouSure"),
+      labels: { confirm: t("common.yes"), cancel: t("common.no") },
+      onConfirm: async () => {
+        await resetInvoiceExtra.mutate(id);
+
+        router.refresh();
+
+        notifications.show({
+          message: "Invoice extra status successfully resetted",
+          color: "green",
+        });
+      },
+    });
+  };
+
   const deleteInvoiceExtraHandler = (id: number) => {
     modals.openConfirmModal({
       title: t("common.areYouSure"),
@@ -294,7 +313,6 @@ export const ReservationDetail = ({
               <Table>
                 <Table.Thead>
                   <Table.Tr>
-                    <Table.Th>Actions</Table.Th>
                     <Table.Th>Name</Table.Th>
                     <Table.Th>Quantity</Table.Th>
                     <Table.Th>Amount</Table.Th>
@@ -302,35 +320,13 @@ export const ReservationDetail = ({
                     <Table.Th>Vat Rate</Table.Th>
                     <Table.Th>Cycle</Table.Th>
                     <Table.Th>Status</Table.Th>
+                    <Table.Th>Actions</Table.Th>
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
                   {reservation.invoicesExtrasJunction.map(
                     ({ instance, cycle }) => (
                       <Table.Tr key={instance.id}>
-                        <Table.Td>
-                          <Group gap="xs">
-                            <Button
-                              size="compact-md"
-                              variant="light"
-                              onClick={() => {
-                                editInvoiceExtraHandler(instance.id);
-                              }}
-                            >
-                              <IconEdit size="1rem" />
-                            </Button>
-                            <Button
-                              size="compact-md"
-                              variant="light"
-                              color="red"
-                              onClick={() => {
-                                deleteInvoiceExtraHandler(instance.id);
-                              }}
-                            >
-                              <IconTrash size="1rem" />
-                            </Button>
-                          </Group>
-                        </Table.Td>
                         <Table.Td>{instance.name}</Table.Td>
                         <Table.Td>{instance.quantity}</Table.Td>
                         <Table.Td>{instance.amount}</Table.Td>
@@ -351,6 +347,44 @@ export const ReservationDetail = ({
                             {instance.status}
                           </Badge>
                         </Table.Td>
+                        <Table.Td>
+                          <Group gap="xs">
+                            <Button
+                              size="compact-md"
+                              title="Edit"
+                              variant="light"
+                              onClick={() => {
+                                editInvoiceExtraHandler(instance.id);
+                              }}
+                            >
+                              <IconEdit size="1rem" />
+                            </Button>
+                            {instance.status !== "notApplied" && (
+                              <Button
+                                size="compact-md"
+                                title="Reset status"
+                                variant="light"
+                                color="orange"
+                                onClick={() => {
+                                  resetInvoiceExtraHandler(instance.id);
+                                }}
+                              >
+                                <IconRotate size="1rem" />
+                              </Button>
+                            )}
+                            <Button
+                              size="compact-md"
+                              title="Delete"
+                              variant="light"
+                              color="red"
+                              onClick={() => {
+                                deleteInvoiceExtraHandler(instance.id);
+                              }}
+                            >
+                              <IconTrash size="1rem" />
+                            </Button>
+                          </Group>
+                        </Table.Td>
                       </Table.Tr>
                     ),
                   )}
@@ -363,7 +397,7 @@ export const ReservationDetail = ({
           <Paper p="2rem">
             <Band title={<Title order={3}>Invoices</Title>}>
               <ScrollArea>
-                <Group gap="2rem" wrap="nowrap">
+                <Group gap="2rem" p="md" wrap="nowrap">
                   {invoices.map(({ invoice, startDate, endDate }) => {
                     const Icon =
                       invoice.type === "credit"
@@ -374,21 +408,32 @@ export const ReservationDetail = ({
                       endDate,
                     );
 
+                    const color =
+                      invoice.type === "credit"
+                        ? "orange-8"
+                        : invoice.status === "draft"
+                          ? "red-8"
+                          : isFinalInvoice
+                            ? "green-8"
+                            : "blue-8";
+
                     return (
                       <Card
                         key={invoice.id}
                         shadow="sm"
-                        padding="0"
+                        padding={0}
                         radius="md"
                         withBorder
-                        maw={300}
+                        style={{
+                          border: "none",
+                          boxShadow: `0px 0px 10px 0px var(--mantine-color-${color})`,
+                        }}
                       >
                         <Card.Section
                           style={{
                             backgroundColor: "rgb(var(--color-background))",
                             display: "grid",
                             placeContent: "center",
-                            maxHeight: 100,
                             overflow: "hidden",
                           }}
                         >
@@ -488,7 +533,11 @@ export const ReservationDetail = ({
                             borderBottomRightRadius: "0.5rem",
                           }}
                         >
-                          {isFinalInvoice ? "Final" : invoice.type}
+                          {invoice.type === "credit"
+                            ? "Credit"
+                            : isFinalInvoice
+                              ? "Final"
+                              : invoice.type}
                         </Badge>
                         <Badge
                           variant="light"

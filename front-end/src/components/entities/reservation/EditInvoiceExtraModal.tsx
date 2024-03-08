@@ -85,7 +85,12 @@ export const EditInvoiceExtraModal = ({
         />
         <Select
           label="Cycle"
-          data={["oneTimeOnEnd", "perNightThroughout", "perNightOnEnd"]}
+          data={[
+            "oneTimeOnNext",
+            "oneTimeOnEnd",
+            "perNightThroughout",
+            "perNightOnEnd",
+          ]}
           value={values.cycle}
           onChange={(cycle) => {
             if (cycle) changeHandler({ cycle });

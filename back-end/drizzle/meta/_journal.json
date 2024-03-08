@@ -15,6 +15,13 @@
       "when": 1709809872703,
       "tag": "0001_normal_havok",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1709903863608,
+      "tag": "0002_sturdy_jetstream",
+      "breakpoints": true
     }
   ]
 }
