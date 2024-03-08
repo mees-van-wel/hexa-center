@@ -3,6 +3,7 @@
 import Link from "next/link";
 import clsx from "clsx";
 import dayjs, { Dayjs } from "dayjs";
+import isBetween from "dayjs/plugin/isBetween";
 
 import { useTranslation } from "@/hooks/useTranslation";
 import { Position } from "@/types/Position";
@@ -10,13 +11,13 @@ import { RouterOutput } from "@/utils/trpc";
 import { Button, Group } from "@mantine/core";
 import { IconArrowMoveLeft, IconArrowMoveRight } from "@tabler/icons-react";
 
-import { isBetween } from "../ReservationsOverview";
-
 import styles from "./ReservationCalendar.module.scss";
 
 export const compareDates = (firstDate: Dayjs, secondDate: Dayjs) => {
   return firstDate.startOf("day").isSame(secondDate.startOf("day"), "day");
 };
+
+dayjs.extend(isBetween);
 
 type ReservationCalendarProps = {
   currentWeek: Dayjs[];
@@ -53,7 +54,12 @@ export const ReservationCalendar = ({
 
       const startDate = dayjs(reservation.startDate);
       const endDate = dayjs(reservation.endDate);
-      const isWithinCurrentWeek = isBetween(weekDay, startDate, endDate);
+      const isWithinCurrentWeek = weekDay.isBetween(
+        startDate,
+        endDate,
+        "day",
+        "[]",
+      );
       const shouldShow = isWithinCurrentWeek;
 
       if (shouldShow) {
@@ -88,10 +94,11 @@ export const ReservationCalendar = ({
           {currentWeek.map((weekDay, weekdayIndex) => {
             const overlappingReservations = reservations.filter(
               (reservation) =>
-                isBetween(
-                  weekDay,
+                weekDay.isBetween(
                   dayjs(reservation.startDate),
                   dayjs(reservation.endDate),
+                  "day",
+                  "[]",
                 ) && id === reservation.roomId,
             );
 
@@ -117,11 +124,9 @@ export const ReservationCalendar = ({
 
                   const title = reservation.customer.name;
 
-                  const correctWidth = isBetween(
-                    currentWeek.at(-1)!,
-                    startDate,
-                    endDate,
-                  )
+                  const correctWidth = currentWeek
+                    .at(-1)!
+                    .isBetween(startDate, endDate, "day", "[]")
                     ? 16
                     : 8;
 

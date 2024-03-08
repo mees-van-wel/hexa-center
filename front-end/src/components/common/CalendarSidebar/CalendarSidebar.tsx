@@ -6,8 +6,8 @@ import dayjs, { Dayjs } from "dayjs";
 
 import { CALENDAR_VIEWS, CalendarView } from "@/constants/calendarViews";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Button, Paper, Stack } from "@mantine/core";
-import { DateInput } from "@mantine/dates";
+import { Button, Paper, SegmentedControl, Stack } from "@mantine/core";
+import { DatePicker } from "@mantine/dates";
 import { IconArrowBack, IconArrowForward } from "@tabler/icons-react";
 
 import styles from "./CalendarSidebar.module.scss";
@@ -22,7 +22,7 @@ type CalendarSidebarProps = {
 
 export const CalendarSidebar = ({
   now,
-  // onCalendarViewChange,
+  onCalendarViewChange,
   sideBarToggle,
   onDateChange,
   calendarView = CALENDAR_VIEWS.WEEK,
@@ -45,25 +45,6 @@ export const CalendarSidebar = ({
     >
       <Paper p="md" h="100%" w="100%">
         <Stack ta="center">
-          {/* <p>
-            {t(`dates.weekdayNamesShort.${WEEKDAY_VALUES[now.day()]}`)}{" "}
-            {dayjs(now).date()}{" "}
-            {t(`dates.monthsLong.${MONTH_VALUES[dayjs(now).month()]}`)}
-          </p> */}
-          <DateInput
-            value={now.toDate()}
-            required
-            onChange={(value) => {
-              value &&
-                onDateChange(
-                  dayjs(value)
-                    .set("hour", 0)
-                    .set("minute", 0)
-                    .set("second", 0)
-                    .set("millisecond", 0),
-                );
-            }}
-          />
           <Button.Group>
             <Button
               onClick={() => {
@@ -90,7 +71,31 @@ export const CalendarSidebar = ({
               <IconArrowForward size={50} />
             </Button>
           </Button.Group>
-          {/* <SegmentedControl
+          <DatePicker
+            value={now.toDate()}
+            date={now.toDate()}
+            onChange={(value) => {
+              value &&
+                onDateChange(
+                  dayjs(value)
+                    .set("hour", 0)
+                    .set("minute", 0)
+                    .set("second", 0)
+                    .set("millisecond", 0),
+                );
+            }}
+            onDateChange={(value) => {
+              value &&
+                onDateChange(
+                  dayjs(value)
+                    .set("hour", 0)
+                    .set("minute", 0)
+                    .set("second", 0)
+                    .set("millisecond", 0),
+                );
+            }}
+          />
+          <SegmentedControl
             data={[
               { label: t("common.week"), value: CALENDAR_VIEWS.WEEK },
               {
@@ -105,7 +110,7 @@ export const CalendarSidebar = ({
             orientation="vertical"
             size="sm"
             w="100%"
-          /> */}
+          />
         </Stack>
       </Paper>
     </div>

@@ -83,11 +83,14 @@ export default {
         invoiceNotes: "Invoice notes",
       },
       calendar: {
+        roomName: "Room name",
         noRooms: "No bookings found",
       },
       reservationCreated: "Reservation successfully created",
       roomDeleted: "Reservation successfully deleted",
       dateError: "Start date must be earlier than the end date.",
+      overlapError:
+        "The room is already booked on this date, do you want to continue?",
     },
     invoice: {
       singularName: "Invoice",

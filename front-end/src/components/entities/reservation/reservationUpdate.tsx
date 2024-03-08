@@ -55,6 +55,7 @@ import {
 import { CreateInvoiceExtraModal } from "./CreateInvoiceExtraModal";
 import { EditInvoiceExtraModal } from "./EditInvoiceExtraModal";
 import { InvoicePeriodModal } from "./InvoicePeriodModal";
+import { overlapDates } from "./ReservationCreate";
 import { ReservationForm } from "./ReservationForm";
 
 dayjs.extend(isBetween);
@@ -64,6 +65,7 @@ type ReservationProps = {
   rooms: RouterOutput["room"]["list"];
   relations: RouterOutput["relation"]["list"];
   invoiceExtraTemplates: RouterOutput["invoiceExtra"]["list"];
+  reservations: RouterOutput["reservation"]["list"];
 };
 
 export const ReservationUpdate = ({
@@ -71,6 +73,7 @@ export const ReservationUpdate = ({
   rooms,
   relations,
   invoiceExtraTemplates,
+  reservations,
 }: ReservationProps) => {
   const t = useTranslation();
   const router = useRouter();
@@ -270,7 +273,7 @@ export const ReservationUpdate = ({
           >
             {t("common.delete")}
           </Button>
-          <SaveBadge />
+          <SaveBadge reservation={reservation} reservations={reservations} />
         </DashboardHeader>
         <ReservationForm rooms={rooms} relations={relations} />
         <Paper p="2rem">
@@ -516,7 +519,12 @@ export const ReservationUpdate = ({
   );
 };
 
-const SaveBadge = () => {
+type SaveButtonProps = {
+  reservation: RouterOutput["reservation"]["get"];
+  reservations: RouterOutput["reservation"]["list"];
+};
+
+const SaveBadge = ({ reservation, reservations }: SaveButtonProps) => {
   const updateReservation = useMutation("reservation", "update");
   const t = useTranslation();
 
@@ -526,6 +534,19 @@ const SaveBadge = () => {
   const isError = useMemo(() => !!Object.keys(errors).length, [errors]);
 
   useAutosave(control, async (values) => {
+    // TODO: check does not work yet
+    const overlaps = reservations.some(({ startDate, endDate, roomId }) => {
+      if (getValues("roomId") || reservation.roomId !== roomId) return;
+      console.log("FDDF");
+
+      return overlapDates(
+        getValues("startDate") || reservation.startDate,
+        getValues("endDate") || reservation.endDate,
+        startDate,
+        endDate,
+      );
+    });
+
     function isJson(str: string) {
       if (!str) return { success: false, json: undefined };
 
@@ -545,18 +566,20 @@ const SaveBadge = () => {
 
         reset();
         return;
+      } else if (overlaps) {
+        modals.openConfirmModal({
+          title: t("common.areYouSure"),
+          children: <div>{t("entities.reservation.overlapError")}</div>,
+          labels: { confirm: t("common.yes"), cancel: t("common.no") },
+          onConfirm: async () => {
+            updateHandler(values);
+            return;
+          },
+        });
       }
-      const updatedReservation = await updateReservation.mutate({
-        id: getValues("id"),
-        ...values,
-      });
 
-      reset({
-        ...updatedReservation,
-        priceOverride: updatedReservation.priceOverride
-          ? parseFloat(updatedReservation.priceOverride)
-          : undefined,
-      });
+      updateHandler(values);
+      return;
     } catch (error) {
       const { success, json } = isJson((error as any).message);
       if (!success) {
@@ -581,6 +604,20 @@ const SaveBadge = () => {
       }
     }
   });
+
+  const updateHandler = async (values: ReservationInputUpdateSchema) => {
+    const updatedReservation = await updateReservation.mutate({
+      ...values,
+      id: getValues("id"),
+    });
+
+    reset({
+      ...updatedReservation,
+      priceOverride: updatedReservation.priceOverride
+        ? parseFloat(updatedReservation.priceOverride)
+        : undefined,
+    });
+  };
 
   return (
     <Badge

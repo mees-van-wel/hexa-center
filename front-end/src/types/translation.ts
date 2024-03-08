@@ -92,11 +92,13 @@ export type Translation = {
         invoiceNotes: string;
       };
       calendar: {
+        roomName: string;
         noRooms: string;
       };
       reservationCreated: string;
       roomDeleted: string;
       dateError: string;
+      overlapError: string;
     };
     invoice: {
       singularName: string;

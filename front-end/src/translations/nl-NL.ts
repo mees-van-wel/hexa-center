@@ -83,11 +83,13 @@ export default {
         invoiceNotes: "Factuurnotities",
       },
       calendar: {
+        roomName: "Kamer naam",
         noRooms: "Geen Boekingen gevonden",
       },
       reservationCreated: "Reservatie succesvol aangemaakt",
       roomDeleted: "Reservatie succesvol verwijderd",
       dateError: "De startdatum moet eerder zijn dan de einddatum.",
+      overlapError: "De kamer is al geboekt op deze datum, wil je doorgaan?",
     },
     invoice: {
       singularName: "Factuur",
