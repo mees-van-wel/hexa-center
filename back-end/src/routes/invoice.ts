@@ -13,6 +13,7 @@ import {
 import {
   generateInvoicePdf,
   getInvoice,
+  invertDecimalString,
   issueInvoice,
 } from "@/services/invoice";
 import { getSettings } from "@/services/setting";
@@ -153,9 +154,9 @@ export const invoiceRouter = router({
             refId: invoice.refId,
             type: "credit",
             status: "draft",
-            netAmount: "-" + invoice.netAmount,
-            vatAmount: "-" + invoice.vatAmount,
-            grossAmount: "-" + invoice.grossAmount,
+            netAmount: invertDecimalString(invoice.netAmount),
+            vatAmount: invertDecimalString(invoice.vatAmount),
+            grossAmount: invertDecimalString(invoice.grossAmount),
             number: invoice.number + "-C",
             notes: invoice.notes,
             customerId: invoice.customerId,
@@ -190,12 +191,12 @@ export const invoiceRouter = router({
         invoiceLinesResult.map((invoiceLine) => ({
           invoiceId: creditInvoiceId,
           name: invoiceLine.name,
-          unitAmount: "-" + invoiceLine.unitAmount,
+          unitAmount: invertDecimalString(invoiceLine.unitAmount),
           quantity: invoiceLine.quantity,
-          netAmount: "-" + invoiceLine.netAmount,
-          vatAmount: "-" + invoiceLine.vatAmount,
+          netAmount: invertDecimalString(invoiceLine.netAmount),
+          vatAmount: invertDecimalString(invoiceLine.vatAmount),
           vatRate: invoiceLine.vatRate,
-          grossAmount: "-" + invoiceLine.grossAmount,
+          grossAmount: invertDecimalString(invoiceLine.grossAmount),
         })),
       ),
       db.insert(invoiceEvents).values({
