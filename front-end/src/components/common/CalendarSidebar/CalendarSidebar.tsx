@@ -75,24 +75,10 @@ export const CalendarSidebar = ({
             value={now.toDate()}
             date={now.toDate()}
             onChange={(value) => {
-              value &&
-                onDateChange(
-                  dayjs(value)
-                    .set("hour", 0)
-                    .set("minute", 0)
-                    .set("second", 0)
-                    .set("millisecond", 0),
-                );
+              value && onDateChange(dayjs(value).utc(true));
             }}
             onDateChange={(value) => {
-              value &&
-                onDateChange(
-                  dayjs(value)
-                    .set("hour", 0)
-                    .set("minute", 0)
-                    .set("second", 0)
-                    .set("millisecond", 0),
-                );
+              value && onDateChange(dayjs(value).utc(true));
             }}
           />
           <SegmentedControl

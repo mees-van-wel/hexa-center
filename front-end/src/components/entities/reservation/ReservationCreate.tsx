@@ -65,7 +65,7 @@ export const ReservationCreate = ({
       customerId: undefined,
       startDate: undefined,
       endDate: undefined,
-      priceOverride: undefined,
+      priceOverride: null,
       guestName: "",
       reservationNotes: "",
       invoiceNotes: "",

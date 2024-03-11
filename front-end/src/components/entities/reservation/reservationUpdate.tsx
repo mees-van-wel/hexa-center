@@ -530,7 +530,7 @@ const SaveBadge = ({ reservation, reservations }: SaveButtonProps) => {
 
   const { control, getValues, reset, setError } =
     useFormContext<ReservationInputUpdateSchema>();
-  const { isDirty, errors } = useFormState({ control });
+  const { isDirty, errors, dirtyFields } = useFormState({ control });
   const isError = useMemo(() => !!Object.keys(errors).length, [errors]);
 
   const overlaps = reservations.some(({ id, startDate, endDate, roomId }) => {
@@ -569,8 +569,10 @@ const SaveBadge = ({ reservation, reservations }: SaveButtonProps) => {
         reset();
         return;
       }
-
-      if (overlaps) {
+      if (
+        overlaps &&
+        (dirtyFields.startDate || dirtyFields.endDate || dirtyFields.roomId)
+      ) {
         modals.openConfirmModal({
           title: t("common.areYouSure"),
           children: <div>{t("entities.reservation.overlapError")}</div>,
@@ -614,7 +616,9 @@ const SaveBadge = ({ reservation, reservations }: SaveButtonProps) => {
     }
   });
 
-  const updateHandler = async (values: ReservationInputUpdateSchema) => {
+  const updateHandler = async (
+    values: Omit<ReservationInputUpdateSchema, "id">,
+  ) => {
     const updatedReservation = await updateReservation.mutate({
       ...values,
       id: getValues("id"),
