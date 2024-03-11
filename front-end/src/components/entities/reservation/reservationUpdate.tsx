@@ -533,20 +533,22 @@ const SaveBadge = ({ reservation, reservations }: SaveButtonProps) => {
   const { isDirty, errors } = useFormState({ control });
   const isError = useMemo(() => !!Object.keys(errors).length, [errors]);
 
+  const overlaps = reservations.some(({ id, startDate, endDate, roomId }) => {
+    if (
+      (getValues("roomId") || reservation.roomId) !== roomId ||
+      id === getValues("id")
+    )
+      return;
+
+    return overlapDates(
+      getValues("startDate") || reservation.startDate,
+      getValues("endDate") || reservation.endDate,
+      startDate,
+      endDate,
+    );
+  });
+
   useAutosave(control, async (values) => {
-    // TODO: check does not work yet
-    const overlaps = reservations.some(({ startDate, endDate, roomId }) => {
-      if (getValues("roomId") || reservation.roomId !== roomId) return;
-      console.log("FDDF");
-
-      return overlapDates(
-        getValues("startDate") || reservation.startDate,
-        getValues("endDate") || reservation.endDate,
-        startDate,
-        endDate,
-      );
-    });
-
     function isJson(str: string) {
       if (!str) return { success: false, json: undefined };
 
@@ -566,20 +568,28 @@ const SaveBadge = ({ reservation, reservations }: SaveButtonProps) => {
 
         reset();
         return;
-      } else if (overlaps) {
+      }
+
+      if (overlaps) {
         modals.openConfirmModal({
           title: t("common.areYouSure"),
           children: <div>{t("entities.reservation.overlapError")}</div>,
           labels: { confirm: t("common.yes"), cancel: t("common.no") },
-          onConfirm: async () => {
+          closeOnClickOutside: false,
+          withCloseButton: false,
+          onConfirm: () => {
             updateHandler(values);
-            return;
+          },
+          onCancel: () => {
+            reset();
           },
         });
-      }
 
-      updateHandler(values);
-      return;
+        return;
+      } else {
+        updateHandler(values);
+        return;
+      }
     } catch (error) {
       const { success, json } = isJson((error as any).message);
       if (!success) {
@@ -589,7 +599,6 @@ const SaveBadge = ({ reservation, reservations }: SaveButtonProps) => {
         });
 
         reset();
-
         return;
       }
 
