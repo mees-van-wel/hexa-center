@@ -13,12 +13,15 @@ export const useMutation = <
 ) => {
   const [loading, setLoading] = useState(false);
 
-  const mutate = async (params: RouterInput[T][P]) => {
+  const mutate = async (
+    params: RouterInput[T][P],
+    options?: { signal?: AbortSignal },
+  ) => {
     setLoading(true);
 
     // @ts-ignore
     const result: RouterOutput[T][P] = await trpc[scope][procedure]
-      .mutate(params)
+      .mutate(params, { signal: options?.signal })
       .finally(() => {
         setLoading(false);
       });

@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1709305572445,
-      "tag": "0000_boring_diamondback",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1709844615974,
-      "tag": "0001_lean_blade",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1709903863608,
-      "tag": "0002_sturdy_jetstream",
+      "when": 1710260130266,
+      "tag": "0000_lethal_doctor_doom",
       "breakpoints": true
     }
   ]

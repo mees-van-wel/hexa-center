@@ -1,1 +1,0 @@
-ALTER TYPE "reservations_to_invoice_extra_instances_cycle" ADD VALUE 'oneTimeOnNext';

@@ -164,7 +164,6 @@ export const ReservationDetail = ({
   const createInvoiceExtraHandler = () => {
     modals.open({
       title: <Title order={3}>Add Invoice Extra</Title>,
-      // size: "sm",
       children: (
         <CreateInvoiceExtraModal
           templates={invoiceExtraTemplates}

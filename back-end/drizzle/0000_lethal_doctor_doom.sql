@@ -1,11 +1,11 @@
 DO $$ BEGIN
- CREATE TYPE "api_connection_type" AS ENUM('twinfield');
+ CREATE TYPE "integration_connection_type" AS ENUM('twinfield');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "api_entity_ref_type" AS ENUM('relation');
+ CREATE TYPE "integration_entity_ref_type" AS ENUM('relation');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -47,7 +47,13 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "log_event" AS ENUM('apiConnect', 'apiRefreshAuth', 'apiSend', 'apiSync', 'apiDisconnect');
+ CREATE TYPE "log_event" AS ENUM('integrationConnect', 'integrationRefreshAuth', 'integrationSend', 'integrationSync', 'integrationDisconnect');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ CREATE TYPE "log_ref_type" AS ENUM('integration');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -65,19 +71,19 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "reservations_to_invoice_extra_instance_cycle" AS ENUM('oneTimeOnEnd', 'perNightThroughout', 'perNightOnEnd');
+ CREATE TYPE "reservations_to_invoice_extra_instances_cycle" AS ENUM('oneTimeOnNext', 'oneTimeOnEnd', 'perNightThroughout', 'perNightOnEnd');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "reservations_to_invoice_extra_instance_status" AS ENUM('notApplied', 'partiallyApplied', 'fullyApplied');
+ CREATE TYPE "reservations_to_invoice_extra_instances_status" AS ENUM('notApplied', 'partiallyApplied', 'fullyApplied');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "setting_name" AS ENUM('companyPaymentTerms', 'companyVatNumber', 'companyCocNumber', 'companyIban', 'companySwiftBic', 'invoiceEmailTitle', 'invoiceEmailContent', 'invoiceHeaderImageSrc', 'invoiceFooterImageSrc');
+ CREATE TYPE "setting_name" AS ENUM('companyPaymentTerms', 'companyVatNumber', 'companyCocNumber', 'companyIban', 'companySwiftBic', 'invoiceEmailTitle', 'invoiceEmailContent', 'invoiceHeaderImageSrc', 'invoiceFooterImageSrc', 'priceEntryMode');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -96,20 +102,21 @@ CREATE TABLE IF NOT EXISTS "accounts" (
 	"firstDayOfWeek" text NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "api_connections" (
-	"$kind" text DEFAULT 'apiConnection' NOT NULL,
+CREATE TABLE IF NOT EXISTS "integration_connections" (
+	"$kind" text DEFAULT 'integrationConnection' NOT NULL,
 	"id" serial PRIMARY KEY NOT NULL,
 	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
-	"type" "api_connection_type" NOT NULL,
-	"data" jsonb
+	"type" "integration_connection_type" NOT NULL,
+	"data" jsonb NOT NULL,
+	CONSTRAINT "integration_connections_type_unique" UNIQUE("type")
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "api_entities" (
-	"$kind" text DEFAULT 'apiEntity' NOT NULL,
+CREATE TABLE IF NOT EXISTS "integration_entities" (
+	"$kind" text DEFAULT 'integrationEntity' NOT NULL,
 	"id" serial PRIMARY KEY NOT NULL,
 	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"connection_id" integer,
-	"ref_type" "api_entity_ref_type" NOT NULL,
+	"ref_type" "integration_entity_ref_type" NOT NULL,
 	"ref_id" integer NOT NULL,
 	"external_id" text NOT NULL
 );
@@ -134,8 +141,8 @@ CREATE TABLE IF NOT EXISTS "invoice_extra_instances" (
 	"quantity" numeric(10, 2) DEFAULT '1' NOT NULL,
 	"amount" numeric(10, 2) NOT NULL,
 	"unit" "invoice_extra_unit" NOT NULL,
-	"vat_percentage" numeric(10, 2) DEFAULT '0' NOT NULL,
-	"status" "reservations_to_invoice_extra_instance_status" DEFAULT 'notApplied' NOT NULL
+	"vat_rate" numeric(10, 2) DEFAULT '0' NOT NULL,
+	"status" "reservations_to_invoice_extra_instances_status" DEFAULT 'notApplied' NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "invoice_extra_templates" (
@@ -151,7 +158,7 @@ CREATE TABLE IF NOT EXISTS "invoice_extra_templates" (
 	"description" text,
 	"amount" numeric(10, 2) NOT NULL,
 	"unit" "invoice_extra_unit" NOT NULL,
-	"vat_percentage" numeric(10, 2) DEFAULT '0' NOT NULL
+	"vat_rate" numeric(10, 2) DEFAULT '0' NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "invoice_lines" (
@@ -163,7 +170,7 @@ CREATE TABLE IF NOT EXISTS "invoice_lines" (
 	"quantity" numeric(10, 2) NOT NULL,
 	"net_amount" numeric(10, 2) NOT NULL,
 	"vat_amount" numeric(10, 2) NOT NULL,
-	"vat_percentage" numeric(10, 2) NOT NULL,
+	"vat_rate" numeric(10, 2) NOT NULL,
 	"gross_amount" numeric(10, 2) NOT NULL
 );
 --> statement-breakpoint
@@ -219,7 +226,9 @@ CREATE TABLE IF NOT EXISTS "logs" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"relation_id" integer,
 	"type" "log_type" NOT NULL,
-	"event" "log_type" NOT NULL,
+	"event" "log_event" NOT NULL,
+	"ref_type" "log_ref_type",
+	"ref_id" integer,
 	"data" jsonb
 );
 --> statement-breakpoint
@@ -301,7 +310,7 @@ CREATE TABLE IF NOT EXISTS "reservations" (
 CREATE TABLE IF NOT EXISTS "reservations_to_invoice_extra_instances" (
 	"reservation_id" integer NOT NULL,
 	"instance_id" integer NOT NULL,
-	"cycle" "reservations_to_invoice_extra_instance_cycle" NOT NULL,
+	"cycle" "reservations_to_invoice_extra_instances_cycle" NOT NULL,
 	CONSTRAINT "reservations_to_invoice_extra_instances_reservation_id_instance_id_pk" PRIMARY KEY("reservation_id","instance_id")
 );
 --> statement-breakpoint
@@ -379,7 +388,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "api_entities" ADD CONSTRAINT "api_entities_connection_id_api_connections_id_fk" FOREIGN KEY ("connection_id") REFERENCES "api_connections"("id") ON DELETE cascade ON UPDATE no action;
+ ALTER TABLE "integration_entities" ADD CONSTRAINT "integration_entities_connection_id_integration_connections_id_fk" FOREIGN KEY ("connection_id") REFERENCES "integration_connections"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

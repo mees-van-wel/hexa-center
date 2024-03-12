@@ -610,7 +610,7 @@ export const invoiceExtraTemplatesRelations = relationBuilder(
 );
 
 export const reservationsToInvoiceExtraInstancesStatusEnum = pgEnum(
-  "reservations_to_invoice_extra_instance_status",
+  "reservations_to_invoice_extra_instances_status",
   ["notApplied", "partiallyApplied", "fullyApplied"],
 );
 
@@ -760,12 +760,14 @@ export const settingsRelations = relationBuilder(settings, ({ one }) => ({
 export const logTypeEnum = pgEnum("log_type", ["info", "warning", "error"]);
 
 export const logEventEnum = pgEnum("log_event", [
-  "apiConnect",
-  "apiRefreshAuth",
-  "apiSend",
-  "apiSync",
-  "apiDisconnect",
+  "integrationConnect",
+  "integrationRefreshAuth",
+  "integrationSend",
+  "integrationSync",
+  "integrationDisconnect",
 ]);
+
+export const logRefTypeEnum = pgEnum("log_ref_type", ["integration"]);
 
 export const logs = pgTable("logs", {
   $kind: text("$kind").default("log").notNull(),
@@ -779,7 +781,9 @@ export const logs = pgTable("logs", {
     { onDelete: "set null" },
   ),
   type: logTypeEnum("type").notNull(),
-  event: logTypeEnum("event").notNull(),
+  event: logEventEnum("event").notNull(),
+  refType: logRefTypeEnum("ref_type"),
+  refId: integer("ref_id"),
   data: jsonb("data"),
 });
 
@@ -790,35 +794,45 @@ export const logsRelations = relationBuilder(logs, ({ one }) => ({
   }),
 }));
 
-export const apiConnectionTypeEnum = pgEnum("api_connection_type", [
-  "twinfield",
-]);
+export const integrationConnectionTypeEnum = pgEnum(
+  "integration_connection_type",
+  ["twinfield"],
+);
 
-export const apiConnections = pgTable("api_connections", {
-  $kind: text("$kind").default("apiConnection").notNull(),
+export const integrationConnections = pgTable("integration_connections", {
+  $kind: text("$kind").default("integrationConnection").notNull(),
   id: serial("id").primaryKey(),
   uuid: uuid("uuid").defaultRandom().notNull(),
-  type: apiConnectionTypeEnum("type").notNull(),
+  type: integrationConnectionTypeEnum("type").unique().notNull(),
   data: jsonb("data").notNull(),
 });
 
-export const apiEntityRefTypeEnum = pgEnum("api_entity_ref_type", ["relation"]);
+export const integrationEntityRefTypeEnum = pgEnum(
+  "integration_entity_ref_type",
+  ["relation"],
+);
 
-export const apiEntities = pgTable("api_entities", {
-  $kind: text("$kind").default("apiEntity").notNull(),
+export const integrationEntities = pgTable("integration_entities", {
+  $kind: text("$kind").default("integrationEntity").notNull(),
   id: serial("id").primaryKey(),
   uuid: uuid("uuid").defaultRandom().notNull(),
-  connectionId: integer("connection_id").references(() => apiConnections.id, {
-    onDelete: "cascade",
-  }),
-  refType: apiEntityRefTypeEnum("ref_type").notNull(),
+  connectionId: integer("connection_id").references(
+    () => integrationConnections.id,
+    {
+      onDelete: "cascade",
+    },
+  ),
+  refType: integrationEntityRefTypeEnum("ref_type").notNull(),
   refId: integer("ref_id").notNull(),
   externalId: text("external_id").notNull(),
 });
 
-export const apiEntitiesRelations = relationBuilder(apiEntities, ({ one }) => ({
-  connection: one(apiConnections, {
-    fields: [apiEntities.connectionId],
-    references: [apiConnections.id],
+export const integrationEntitiesRelations = relationBuilder(
+  integrationEntities,
+  ({ one }) => ({
+    connection: one(integrationConnections, {
+      fields: [integrationEntities.connectionId],
+      references: [integrationConnections.id],
+    }),
   }),
-}));
+);

@@ -1,5 +1,5 @@
 {
-  "id": "ad8a5f8b-575e-4e10-8a4c-5675b7ec84f2",
+  "id": "033a2503-29b8-46f4-9b01-c6ad728683df",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -95,8 +95,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "api_connections": {
-      "name": "api_connections",
+    "integration_connections": {
+      "name": "integration_connections",
       "schema": "",
       "columns": {
         "$kind": {
@@ -104,7 +104,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'apiConnection'"
+          "default": "'integrationConnection'"
         },
         "id": {
           "name": "id",
@@ -121,7 +121,7 @@
         },
         "type": {
           "name": "type",
-          "type": "api_connection_type",
+          "type": "integration_connection_type",
           "primaryKey": false,
           "notNull": true
         },
@@ -129,16 +129,24 @@
           "name": "data",
           "type": "jsonb",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {
+        "integration_connections_type_unique": {
+          "name": "integration_connections_type_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "type"
+          ]
+        }
+      }
     },
-    "api_entities": {
-      "name": "api_entities",
+    "integration_entities": {
+      "name": "integration_entities",
       "schema": "",
       "columns": {
         "$kind": {
@@ -146,7 +154,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'apiEntity'"
+          "default": "'integrationEntity'"
         },
         "id": {
           "name": "id",
@@ -169,7 +177,7 @@
         },
         "ref_type": {
           "name": "ref_type",
-          "type": "api_entity_ref_type",
+          "type": "integration_entity_ref_type",
           "primaryKey": false,
           "notNull": true
         },
@@ -188,10 +196,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "api_entities_connection_id_api_connections_id_fk": {
-          "name": "api_entities_connection_id_api_connections_id_fk",
-          "tableFrom": "api_entities",
-          "tableTo": "api_connections",
+        "integration_entities_connection_id_integration_connections_id_fk": {
+          "name": "integration_entities_connection_id_integration_connections_id_fk",
+          "tableFrom": "integration_entities",
+          "tableTo": "integration_connections",
           "columnsFrom": [
             "connection_id"
           ],
@@ -347,8 +355,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "vat_percentage": {
-          "name": "vat_percentage",
+        "vat_rate": {
+          "name": "vat_rate",
           "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true,
@@ -356,7 +364,7 @@
         },
         "status": {
           "name": "status",
-          "type": "reservations_to_invoice_extra_instance_status",
+          "type": "reservations_to_invoice_extra_instances_status",
           "primaryKey": false,
           "notNull": true,
           "default": "'notApplied'"
@@ -462,8 +470,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "vat_percentage": {
-          "name": "vat_percentage",
+        "vat_rate": {
+          "name": "vat_rate",
           "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true,
@@ -555,8 +563,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "vat_percentage": {
-          "name": "vat_percentage",
+        "vat_rate": {
+          "name": "vat_rate",
           "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true
@@ -937,9 +945,21 @@
         },
         "event": {
           "name": "event",
-          "type": "log_type",
+          "type": "log_event",
           "primaryKey": false,
           "notNull": true
+        },
+        "ref_type": {
+          "name": "ref_type",
+          "type": "log_ref_type",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ref_id": {
+          "name": "ref_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
         },
         "data": {
           "name": "data",
@@ -1569,7 +1589,7 @@
         },
         "cycle": {
           "name": "cycle",
-          "type": "reservations_to_invoice_extra_instance_cycle",
+          "type": "reservations_to_invoice_extra_instances_cycle",
           "primaryKey": false,
           "notNull": true
         }
@@ -2129,14 +2149,14 @@
     }
   },
   "enums": {
-    "api_connection_type": {
-      "name": "api_connection_type",
+    "integration_connection_type": {
+      "name": "integration_connection_type",
       "values": {
         "twinfield": "twinfield"
       }
     },
-    "api_entity_ref_type": {
-      "name": "api_entity_ref_type",
+    "integration_entity_ref_type": {
+      "name": "integration_entity_ref_type",
       "values": {
         "relation": "relation"
       }
@@ -2187,11 +2207,17 @@
     "log_event": {
       "name": "log_event",
       "values": {
-        "apiConnect": "apiConnect",
-        "apiRefreshAuth": "apiRefreshAuth",
-        "apiSend": "apiSend",
-        "apiSync": "apiSync",
-        "apiDisconnect": "apiDisconnect"
+        "integrationConnect": "integrationConnect",
+        "integrationRefreshAuth": "integrationRefreshAuth",
+        "integrationSend": "integrationSend",
+        "integrationSync": "integrationSync",
+        "integrationDisconnect": "integrationDisconnect"
+      }
+    },
+    "log_ref_type": {
+      "name": "log_ref_type",
+      "values": {
+        "integration": "integration"
       }
     },
     "log_type": {
@@ -2209,16 +2235,17 @@
         "business": "business"
       }
     },
-    "reservations_to_invoice_extra_instance_cycle": {
-      "name": "reservations_to_invoice_extra_instance_cycle",
+    "reservations_to_invoice_extra_instances_cycle": {
+      "name": "reservations_to_invoice_extra_instances_cycle",
       "values": {
+        "oneTimeOnNext": "oneTimeOnNext",
         "oneTimeOnEnd": "oneTimeOnEnd",
         "perNightThroughout": "perNightThroughout",
         "perNightOnEnd": "perNightOnEnd"
       }
     },
-    "reservations_to_invoice_extra_instance_status": {
-      "name": "reservations_to_invoice_extra_instance_status",
+    "reservations_to_invoice_extra_instances_status": {
+      "name": "reservations_to_invoice_extra_instances_status",
       "values": {
         "notApplied": "notApplied",
         "partiallyApplied": "partiallyApplied",
@@ -2236,7 +2263,8 @@
         "invoiceEmailTitle": "invoiceEmailTitle",
         "invoiceEmailContent": "invoiceEmailContent",
         "invoiceHeaderImageSrc": "invoiceHeaderImageSrc",
-        "invoiceFooterImageSrc": "invoiceFooterImageSrc"
+        "invoiceFooterImageSrc": "invoiceFooterImageSrc",
+        "priceEntryMode": "priceEntryMode"
       }
     }
   },

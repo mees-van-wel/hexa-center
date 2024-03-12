@@ -273,6 +273,12 @@ export default {
     roomDeleted: "Room successfully deleted",
     roomCreated: "Room successfully created",
   },
+  screens: {
+    integrationsPage: {
+      singleName: "Integration",
+      pluralName: "Integrations",
+    },
+  },
   components: {
     address: {
       streetAndHouseNumber: "Street and House number",

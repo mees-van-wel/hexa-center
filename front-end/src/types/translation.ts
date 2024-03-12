@@ -281,6 +281,12 @@ export type Translation = {
     roomDeleted: string;
     roomCreated: string;
   };
+  screens: {
+    integrationsPage: {
+      singleName: string;
+      pluralName: string;
+    };
+  };
   components: {
     address: {
       streetAndHouseNumber: string;

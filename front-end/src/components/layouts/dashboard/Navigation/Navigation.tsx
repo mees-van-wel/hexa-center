@@ -10,6 +10,7 @@ import {
   IconFileEuro,
   IconHome,
   IconHotelService,
+  IconPlugConnected,
   IconUsers,
 } from "@tabler/icons-react";
 
@@ -39,13 +40,13 @@ export const Navigation = () => {
             <Stack gap={0}>
               <Button
                 component={Link}
-                href="/properties"
-                variant={pathname === "/properties" ? "filled" : "subtle"}
-                leftSection={<IconBuilding />}
+                href="/relations"
+                variant={pathname === "/relations" ? "filled" : "subtle"}
+                leftSection={<IconUsers />}
                 fullWidth
                 justify="left"
               >
-                {t("dashboardLayout.properties")}
+                {t("entities.relation.name.plural")}
               </Button>
               {/* <Button
                 component={Link}
@@ -59,13 +60,13 @@ export const Navigation = () => {
               </Button> */}
               <Button
                 component={Link}
-                href="/relations"
-                variant={pathname === "/relations" ? "filled" : "subtle"}
-                leftSection={<IconUsers />}
+                href="/properties"
+                variant={pathname === "/properties" ? "filled" : "subtle"}
+                leftSection={<IconBuilding />}
                 fullWidth
                 justify="left"
               >
-                {t("entities.relation.name.plural")}
+                {t("dashboardLayout.properties")}
               </Button>
             </Stack>
           </Stack>
@@ -114,13 +115,13 @@ export const Navigation = () => {
             <Stack gap={0}>
               <Button
                 component={Link}
-                href="/invoices"
-                variant={pathname === "/invoices" ? "filled" : "subtle"}
-                leftSection={<IconFileEuro />}
+                href="/integrations"
+                variant={pathname === "/integrations" ? "filled" : "subtle"}
+                leftSection={<IconPlugConnected />}
                 fullWidth
                 justify="left"
               >
-                {t("entities.invoice.pluralName")}
+                {t("screens.integrationsPage.pluralName")}
               </Button>
             </Stack>
           </Stack>

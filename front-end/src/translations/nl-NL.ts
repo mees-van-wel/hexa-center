@@ -275,6 +275,12 @@ export default {
     roomDeleted: "Kamer succesvol verwijderd",
     roomCreated: "Kamer succesvol aangemaakt",
   },
+  screens: {
+    integrationsPage: {
+      singleName: "Integratie",
+      pluralName: "Integraties",
+    },
+  },
   components: {
     address: {
       streetAndHouseNumber: "Straat en huisnummer",
