@@ -176,3 +176,21 @@ export const getTwinfieldAccessToken = async () => {
 
   return accessToken;
 };
+
+export const getTwinfieldWsdlUrl = async (accessToken: string) => {
+  const clientSecret = process.env.TWINFIELD_CLIENT_SECRET;
+  if (!clientSecret)
+    throw new Error("Missing TWINFIELD_CLIENT_SECRET in .env.local");
+
+  const { data } = await axios.get(
+    `https://login.twinfield.com/auth/authentication/connect/accesstokenvalidation?token=${accessToken}`,
+    {
+      headers: {
+        // "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: `Basic ${clientSecret}`,
+      },
+    },
+  );
+
+  return data["twf.clusterUrl"] + "/webservices/processxml.asmx?wsdl";
+};

@@ -21,6 +21,7 @@ export const TwinfieldDetail = ({ integration }: TwinfieldDetailProps) => {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState<Step>();
   const connectTwinfield = useMutation("integration", "connectTwinfield");
+  const test = useMutation("integration", "test");
   const router = useRouter();
 
   // const twinfieldConnectHandler = () => {
@@ -82,13 +83,25 @@ export const TwinfieldDetail = ({ integration }: TwinfieldDetailProps) => {
           </div>
           <div>
             <Title order={3} mb="xs">
-              Step 2. Syncing your customers
+              Step 2. Choose office
+            </Title>
+            <Button
+              onClick={() => {
+                test.mutate();
+              }}
+            >
+              Choose
+            </Button>
+          </div>
+          <div>
+            <Title order={3} mb="xs">
+              Step 3. Syncing your customers
             </Title>
             <Button>Sync</Button>
           </div>
           <div>
             <Title order={3} mb="xs">
-              Step 3. Selecting the correct ledgers
+              Step 4. Selecting the correct ledgers
             </Title>
             <Button>Select</Button>
           </div>
