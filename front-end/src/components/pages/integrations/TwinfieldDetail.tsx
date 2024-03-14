@@ -21,7 +21,7 @@ export const TwinfieldDetail = ({ integration }: TwinfieldDetailProps) => {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState<Step>();
   const connectTwinfield = useMutation("integration", "connectTwinfield");
-  const test = useMutation("integration", "test");
+  const test = useMutation("integration", "listTwinfieldOffices");
   const router = useRouter();
 
   // const twinfieldConnectHandler = () => {
@@ -74,7 +74,7 @@ export const TwinfieldDetail = ({ integration }: TwinfieldDetailProps) => {
               disabled={!!integration}
               loading={loading === "authorize"}
               leftSection={integration ? <IconCheck /> : undefined}
-              component="a"
+              component={!!integration ? "button" : "a"}
               // TODO dynamic redirect uri
               href="https://login.twinfield.com/auth/authentication/connect/authorize?client_id=book-a-room&redirect_uri=http://localhost:3000/integrations/twinfield&response_type=code&scope=openid+twf.organisationUser+twf.user+twf.organisation+offline_access&state=state&nonce=nonce"
             >
@@ -86,8 +86,11 @@ export const TwinfieldDetail = ({ integration }: TwinfieldDetailProps) => {
               Step 2. Choose office
             </Title>
             <Button
-              onClick={() => {
-                test.mutate();
+              // disabled={!!integration?.data?.companyCode}
+              leftSection={integration ? <IconCheck /> : undefined}
+              onClick={async () => {
+                const a = await test.mutate();
+                console.log(a);
               }}
             >
               Choose

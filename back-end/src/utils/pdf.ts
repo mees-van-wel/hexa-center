@@ -1,18 +1,9 @@
 import ejs from "ejs";
-import fs from "fs/promises";
-import path from "path";
 import puppeteer from "puppeteer";
-import { fileURLToPath } from "url";
 
 import { PDFTemplate, PDFTemplateVariables } from "@/constants/pdfTemplates";
 
-import { isProduction } from "./environment";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const basePath = isProduction
-  ? path.join(__dirname, "pdfs")
-  : path.join(__dirname, "..", "src", "pdfs");
+import { readFile } from "./fileSystem";
 
 export const generatePdf = async <T extends PDFTemplate>(
   templateName: T,
@@ -21,9 +12,7 @@ export const generatePdf = async <T extends PDFTemplate>(
   const browser = await puppeteer.launch({ headless: "new" });
   const page = await browser.newPage();
 
-  const templatePath = path.join(basePath, `${templateName}.ejs`);
-
-  let htmlContent = await fs.readFile(templatePath, "utf8");
+  let htmlContent = await readFile("pdf", `${templateName}.ejs`);
   htmlContent = await ejs.render(htmlContent, variables, { async: true });
 
   await page.setContent(htmlContent);

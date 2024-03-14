@@ -12,10 +12,11 @@ type RequestRefreshTokenResponse = {
   expires_in: number;
 };
 
-type TwinfieldIntegrationData = {
+export type TwinfieldIntegrationData = {
   refreshToken: string;
   accessToken: string;
   expiresOn: string;
+  companyCode?: string;
 };
 
 export const connectTwinfield = async (code: string, relationId: number) => {
@@ -145,6 +146,7 @@ export const refreshTwinfield = async () => {
   return { refreshToken, accessToken, expiresOn };
 };
 
+// Rename to getIntegrationData with typed response
 export const getTwinfieldAccessToken = async () => {
   const result = await db
     .select({
@@ -160,6 +162,7 @@ export const getTwinfieldAccessToken = async () => {
         id: number;
         data: TwinfieldIntegrationData;
       };
+
   if (!integration)
     throw new TRPCError({
       code: "BAD_REQUEST",
@@ -174,7 +177,14 @@ export const getTwinfieldAccessToken = async () => {
     accessToken = data.accessToken;
   }
 
-  return accessToken;
+  console.log(integration.data);
+
+  return {
+    id: integration.id,
+    accessToken,
+    // TODO Retrieve from database
+    companyCode: "2505-1",
+  };
 };
 
 export const getTwinfieldWsdlUrl = async (accessToken: string) => {
