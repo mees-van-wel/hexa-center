@@ -19,6 +19,8 @@ const Files = {
   [Type.soapEnvelope]: [
     "listTwinfieldOffices.xml.ejs",
     "createTwinfieldCustomer.xml.ejs",
+    "updateTwinfieldCustomer.xml.ejs",
+    "deleteTwinfieldCustomer.xml.ejs",
   ],
 } as const;
 

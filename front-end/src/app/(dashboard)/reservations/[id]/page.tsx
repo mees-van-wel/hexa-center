@@ -15,20 +15,19 @@ export default async function Page({ params }: ReservationPageParams) {
 
   const reservationId = parseInt(params.id);
 
-  const [reservation, relations, rooms, invoiceExtraTemplates] =
-    await Promise.all([
-      trpc.reservation.get.query(reservationId),
-      trpc.relation.list.query(),
-      trpc.room.list.query(),
-      trpc.invoiceExtra.list.query(),
-    ]);
+  const [reservation, relations, rooms, productTemplates] = await Promise.all([
+    trpc.reservation.get.query(reservationId),
+    trpc.relation.list.query(),
+    trpc.room.list.query(),
+    trpc.product.list.query(),
+  ]);
 
   return (
     <ReservationDetail
       reservation={reservation}
       rooms={rooms}
       relations={relations}
-      invoiceExtraTemplates={invoiceExtraTemplates}
+      productTemplates={productTemplates}
     />
   );
 }

@@ -1,6 +1,6 @@
 import axios from "axios";
 import dayjs from "dayjs";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 import db from "@/db/client";
 import { integrationConnections, logs } from "@/db/schema";
@@ -46,26 +46,40 @@ export const connectTwinfield = async (code: string, relationId: number) => {
     const expiresOn = dayjs().add(expires_in, "second").toISOString();
 
     const result = await db
-      .select({ id: integrationConnections.id })
+      .select({
+        id: integrationConnections.id,
+        data: integrationConnections.data,
+      })
       .from(integrationConnections)
       .where(eq(integrationConnections.type, "twinfield"));
 
-    let id = result[0]?.id;
+    let integration = result[0];
 
-    if (id) {
+    if (integration) {
       await db
         .update(integrationConnections)
-        .set({ data: { refreshToken, accessToken, expiresOn } })
-        .where(eq(integrationConnections.id, id));
+        .set({
+          data: sql`${{
+            ...integration.data,
+            refreshToken,
+            accessToken,
+            expiresOn,
+          }}::jsonb`,
+        })
+        .where(eq(integrationConnections.id, integration.id));
     } else {
       const result = await db
         .insert(integrationConnections)
         .values({
           type: "twinfield",
-          data: { refreshToken, accessToken, expiresOn },
+          data: sql`${{ refreshToken, accessToken, expiresOn }}::jsonb`,
         })
-        .returning({ id: integrationConnections.id });
-      id = result[0].id;
+        .returning({
+          id: integrationConnections.id,
+          data: integrationConnections.data,
+        });
+
+      integration = result[0];
     }
 
     await db.insert(logs).values({
@@ -73,7 +87,7 @@ export const connectTwinfield = async (code: string, relationId: number) => {
       event: "integrationConnect",
       relationId,
       refType: "integration",
-      refId: id,
+      refId: integration.id,
     });
 
     return { refreshToken, accessToken, expiresOn };
@@ -133,7 +147,14 @@ export const refreshTwinfield = async () => {
 
   await db
     .update(integrationConnections)
-    .set({ data: { refreshToken, accessToken, expiresOn } })
+    .set({
+      data: sql`${{
+        ...integration.data,
+        refreshToken,
+        accessToken,
+        expiresOn,
+      }}::jsonb`,
+    })
     .where(eq(integrationConnections.id, integration.id));
 
   await db.insert(logs).values({
@@ -177,13 +198,10 @@ export const getTwinfieldAccessToken = async () => {
     accessToken = data.accessToken;
   }
 
-  console.log(integration.data);
-
   return {
     id: integration.id,
     accessToken,
-    // TODO Retrieve from database
-    companyCode: "2505-1",
+    companyCode: integration.data.companyCode,
   };
 };
 

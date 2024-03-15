@@ -1,0 +1,39 @@
+<soap:Envelope
+  xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:twinfield="http://www.twinfield.com/"
+>
+  <soap:Header>
+    <twinfield:Header>
+      <twinfield:AccessToken><%= accessToken %></twinfield:AccessToken>
+      <twinfield:CompanyCode><%= companyCode %></twinfield:CompanyCode>
+    </twinfield:Header>
+  </soap:Header>
+  <soap:Body>
+    <twinfield:ProcessXmlDocument>
+      <twinfield:xmlRequest>
+        <dimensions>
+          <dimension>
+            <office><%= companyCode %></office>
+            <code><%= code %></code>
+            <name><![CDATA[<%= name %>]]></name>
+            <type>DEB</type>
+            <addresses>
+              <address id="1" type="invoice" default="true">
+                <name><![CDATA[<%= name %>]]></name>
+                <field1><![CDATA[<%= businessContactName %>]]></field1>
+                <field2><![CDATA[<%= street %> <%= houseNumber %>]]></field2>
+                <postcode><![CDATA[<%= postalCode %>]]></postcode>
+                <city><![CDATA[<%= city %>]]></city>
+                <country><%= country %></country>
+                <telephone><%= phoneNumber %></telephone>
+                <email><%= emailAddress %></email>
+                <field4><%= vatNumber %></field4>
+                <field5><%= cocNumber %></field5>
+              </address>
+            </addresses>
+          </dimension>
+        </dimensions>
+      </twinfield:xmlRequest>
+    </twinfield:ProcessXmlDocument>
+  </soap:Body>
+</soap:Envelope>

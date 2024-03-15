@@ -86,8 +86,10 @@ export const TwinfieldDetail = ({ integration }: TwinfieldDetailProps) => {
               Step 2. Choose office
             </Title>
             <Button
-              // disabled={!!integration?.data?.companyCode}
-              leftSection={integration ? <IconCheck /> : undefined}
+              disabled={!!integration?.data?.companyCode}
+              leftSection={
+                integration?.data?.companyCode ? <IconCheck /> : undefined
+              }
               onClick={async () => {
                 const a = await test.mutate();
                 console.log(a);

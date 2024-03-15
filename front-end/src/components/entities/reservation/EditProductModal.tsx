@@ -11,22 +11,23 @@ import {
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 
-import { ReservationInvoiceExtraValues } from "./CreateInvoiceExtraModal";
+import { ReservationProductValues } from "./AddProductModal";
 
-export const EditInvoiceExtraModal = ({
+type EditProductModalProps = {
+  currentValues: ReservationProductValues;
+  onConfirm: (updatedValues: ReservationProductValues) => void;
+};
+
+export const EditProductModal = ({
   currentValues,
   onConfirm,
-}: {
-  currentValues: ReservationInvoiceExtraValues;
-  onConfirm: (updatedValues: ReservationInvoiceExtraValues) => void;
-}) => {
+}: EditProductModalProps) => {
   const [values, setValues] = useState({
     name: currentValues.name,
-    quantity: currentValues.quantity,
-    amount: currentValues.amount,
-    unit: currentValues.unit,
-    cycle: currentValues.cycle,
+    price: currentValues.price,
     vatRate: currentValues.vatRate,
+    quantity: currentValues.quantity,
+    cycle: currentValues.cycle,
   });
 
   const changeHandler = (newValues: Partial<typeof currentValues>) => {
@@ -50,6 +51,31 @@ export const EditInvoiceExtraModal = ({
           withAsterisk
         />
         <NumberInput
+          label="Price"
+          value={values.price}
+          onChange={(price) => {
+            changeHandler({ price: price.toString() });
+          }}
+          decimalScale={2}
+          decimalSeparator=","
+          fixedDecimalScale
+          hideControls
+          withAsterisk
+        />
+        <NumberInput
+          label="VAT Rate"
+          value={values.vatRate}
+          onChange={(vatRate) => {
+            changeHandler({ vatRate: vatRate.toString() });
+          }}
+          decimalScale={2}
+          decimalSeparator=","
+          fixedDecimalScale
+          hideControls
+          withAsterisk
+          rightSection="%"
+        />
+        <NumberInput
           label="Quantity"
           value={values.quantity}
           onChange={(quantity) => {
@@ -59,28 +85,6 @@ export const EditInvoiceExtraModal = ({
           decimalSeparator=","
           fixedDecimalScale
           hideControls
-          withAsterisk
-        />
-        <NumberInput
-          label="Amount"
-          value={values.amount}
-          onChange={(amount) => {
-            changeHandler({ amount: amount.toString() });
-          }}
-          decimalScale={2}
-          decimalSeparator=","
-          fixedDecimalScale
-          hideControls
-          withAsterisk
-        />
-        <Select
-          label="Unit"
-          data={["currency"]}
-          value={values.unit}
-          onChange={(unit) => {
-            if (unit) changeHandler({ unit });
-          }}
-          allowDeselect={false}
           withAsterisk
         />
         <Select
@@ -97,19 +101,6 @@ export const EditInvoiceExtraModal = ({
           }}
           allowDeselect={false}
           withAsterisk
-        />
-        <NumberInput
-          label="VAT Rate"
-          value={values.vatRate}
-          onChange={(vatRate) => {
-            changeHandler({ vatRate: vatRate.toString() });
-          }}
-          decimalScale={2}
-          decimalSeparator=","
-          fixedDecimalScale
-          hideControls
-          withAsterisk
-          rightSection="%"
         />
       </SimpleGrid>
       <ButtonGroup>

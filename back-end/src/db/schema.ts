@@ -287,10 +287,7 @@ export const rooms = pgTable("rooms", {
     .references(() => properties.id, { onDelete: "restrict" })
     .notNull(),
   name: text("name").unique().notNull(),
-  price: numeric("price", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
+  price: numeric("price", { precision: 10, scale: 2 }).notNull(),
 });
 
 export const roomsRelations = relationBuilder(rooms, ({ one }) => ({
@@ -338,10 +335,7 @@ export const reservations = pgTable("reservations", {
     .notNull(),
   startDate: timestamp("start_date", { withTimezone: true }).notNull(),
   endDate: timestamp("end_date", { withTimezone: true }).notNull(),
-  priceOverride: numeric("price_override", {
-    precision: 10,
-    scale: 2,
-  }),
+  priceOverride: numeric("price_override", { precision: 10, scale: 2 }),
   guestName: text("guest_name").notNull(),
   reservationNotes: text("reservation_notes"),
   invoiceNotes: text("invoice_notes"),
@@ -367,7 +361,7 @@ export const reservationsRelations = relationBuilder(
       references: [rooms.id],
     }),
     invoicesJunction: many(reservationsToInvoices),
-    invoicesExtrasJunction: many(reservationsToInvoiceExtraInstances),
+    productInstancesJunction: many(reservationsToProductInstances),
   }),
 );
 
@@ -404,19 +398,10 @@ export const invoices = pgTable("invoices", {
   refId: integer("ref_id").notNull(),
   type: invoiceTypeEnum("type").notNull(),
   status: invoiceStatusEnum("status").notNull(),
-  netAmount: numeric("net_amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
-  vatAmount: numeric("vat_amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
-  grossAmount: numeric("gross_amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
-  number: text("number"),
+  netAmount: numeric("net_amount", { precision: 10, scale: 2 }).notNull(),
+  vatAmount: numeric("vat_amount", { precision: 10, scale: 2 }).notNull(),
+  grossAmount: numeric("gross_amount", { precision: 10, scale: 2 }).notNull(),
+  number: text("number").unique(),
   notes: text("notes"),
   date: date("date", { mode: "date" }),
   dueDate: date("due_date", { mode: "date" }),
@@ -477,27 +462,12 @@ export const invoiceLines = pgTable("invoice_lines", {
     .references(() => invoices.id, { onDelete: "cascade" })
     .notNull(),
   name: text("name").notNull(),
-  unitAmount: numeric("unit_amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
+  unitAmount: numeric("unit_amount", { precision: 10, scale: 2 }).notNull(),
   quantity: numeric("quantity", { precision: 10, scale: 2 }).notNull(),
-  netAmount: numeric("net_amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
-  vatAmount: numeric("vat_amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
-  vatRate: numeric("vat_rate", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
-  grossAmount: numeric("gross_amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
+  netAmount: numeric("net_amount", { precision: 10, scale: 2 }).notNull(),
+  vatAmount: numeric("vat_amount", { precision: 10, scale: 2 }).notNull(),
+  vatRate: numeric("vat_rate", { precision: 10, scale: 2 }).notNull(),
+  grossAmount: numeric("gross_amount", { precision: 10, scale: 2 }).notNull(),
 });
 
 export const invoiceLinesRelations = relationBuilder(
@@ -552,11 +522,8 @@ export const invoiceEventsRelations = relationBuilder(
   }),
 );
 
-// TODO Add percentage
-export const invoiceExtraUnitEnum = pgEnum("invoice_extra_unit", ["currency"]);
-
-export const invoiceExtraTemplates = pgTable("invoice_extra_templates", {
-  $kind: text("$kind").default("invoiceExtraTemplate").notNull(),
+export const productTemplates = pgTable("product_templates", {
+  $kind: text("$kind").default("productTemplate").notNull(),
   id: serial("id").primaryKey(),
   uuid: uuid("uuid").defaultRandom().notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -574,121 +541,90 @@ export const invoiceExtraTemplates = pgTable("invoice_extra_templates", {
     { onDelete: "set null" },
   ),
   name: text("name").notNull(),
-  quantity: numeric("quantity", {
-    precision: 10,
-    scale: 2,
-  })
-    .default("1")
-    .notNull(),
-  description: text("description"),
-  amount: numeric("amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
-  unit: invoiceExtraUnitEnum("unit").notNull(),
-  vatRate: numeric("vat_rate", {
-    precision: 10,
-    scale: 2,
-  })
-    .default("0")
-    .notNull(),
+  price: numeric("price", { precision: 10, scale: 2 }).notNull(),
+  vatRate: numeric("vat_rate", { precision: 10, scale: 2 }).notNull(),
 });
 
-export const invoiceExtraTemplatesRelations = relationBuilder(
-  invoiceExtraTemplates,
+export const productTemplatesRelations = relationBuilder(
+  productTemplates,
   ({ one, many }) => ({
     createdBy: one(relations, {
-      fields: [invoiceExtraTemplates.createdById],
+      fields: [productTemplates.createdById],
       references: [relations.id],
     }),
     updatedBy: one(relations, {
-      fields: [invoiceExtraTemplates.updatedById],
+      fields: [productTemplates.updatedById],
       references: [relations.id],
     }),
-    instances: many(invoiceExtraInstances),
+    instances: many(productInstances),
   }),
 );
 
-export const reservationsToInvoiceExtraInstancesStatusEnum = pgEnum(
-  "reservations_to_invoice_extra_instances_status",
-  ["notApplied", "partiallyApplied", "fullyApplied"],
-);
-
-export const invoiceExtraInstances = pgTable("invoice_extra_instances", {
-  $kind: text("$kind").default("invoiceExtraInstance").notNull(),
+export const productInstances = pgTable("product_instances", {
+  $kind: text("$kind").default("productInstance").notNull(),
   id: serial("id").primaryKey(),
   uuid: uuid("uuid").defaultRandom().notNull(),
-  templateId: integer("template_id").references(
-    () => invoiceExtraTemplates.id,
-    { onDelete: "set null" },
-  ),
+  templateId: integer("template_id").references(() => productTemplates.id, {
+    onDelete: "set null",
+  }),
   name: text("name").notNull(),
-  quantity: numeric("quantity", {
-    precision: 10,
-    scale: 2,
-  })
-    .default("1")
-    .notNull(),
-  amount: numeric("amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
-  unit: invoiceExtraUnitEnum("unit").notNull(),
-  vatRate: numeric("vat_rate", {
-    precision: 10,
-    scale: 2,
-  })
-    .default("0")
-    .notNull(),
-  status: reservationsToInvoiceExtraInstancesStatusEnum("status")
-    .default("notApplied")
-    .notNull(),
+  price: numeric("price", { precision: 10, scale: 2 }).notNull(),
+  vatRate: numeric("vat_rate", { precision: 10, scale: 2 }).notNull(),
 });
 
-export const invoiceExtraInstancesRelations = relationBuilder(
-  invoiceExtraInstances,
+export const productInstancesRelations = relationBuilder(
+  productInstances,
   ({ one, many }) => ({
-    template: one(invoiceExtraTemplates, {
-      fields: [invoiceExtraInstances.templateId],
-      references: [invoiceExtraTemplates.id],
+    template: one(productTemplates, {
+      fields: [productInstances.templateId],
+      references: [productTemplates.id],
     }),
-    reservationsJunction: many(reservationsToInvoiceExtraInstances),
+    reservationsJunction: many(reservationsToProductInstances),
   }),
 );
 
 // TODO Add support for perInvoice, perPerson, perPersonPerNight, perItem, perDay and perHour
 // TODO Add start, Maybe support uponUsage, when invoked show on next invoice only
-export const reservationsToInvoiceExtraInstancesCycleEnum = pgEnum(
-  "reservations_to_invoice_extra_instances_cycle",
+export const reservationsToProductInstancesCycleEnum = pgEnum(
+  "reservations_to_product_instances_cycle",
   ["oneTimeOnNext", "oneTimeOnEnd", "perNightThroughout", "perNightOnEnd"],
 );
 
-export const reservationsToInvoiceExtraInstances = pgTable(
-  "reservations_to_invoice_extra_instances",
+export const reservationsToProductInstancesStatusEnum = pgEnum(
+  "reservations_to_product_instances_status",
+  ["notInvoiced", "partiallyInvoiced", "fullyInvoiced"],
+);
+
+export const reservationsToProductInstances = pgTable(
+  "reservations_to_product_instances",
   {
     reservationId: integer("reservation_id")
       .references(() => reservations.id, { onDelete: "cascade" })
       .notNull(),
-    instanceId: integer("instance_id")
-      .references(() => invoiceExtraInstances.id, { onDelete: "cascade" })
+    productInstanceId: integer("product_instance_id")
+      .references(() => productInstances.id, { onDelete: "cascade" })
       .notNull(),
-    cycle: reservationsToInvoiceExtraInstancesCycleEnum("cycle").notNull(),
+    quantity: numeric("quantity", { precision: 10, scale: 2 })
+      .default("1")
+      .notNull(),
+    cycle: reservationsToProductInstancesCycleEnum("cycle").notNull(),
+    status: reservationsToProductInstancesStatusEnum("status").notNull(),
   },
   (t) => ({
-    pk: primaryKey({ columns: [t.reservationId, t.instanceId] }),
+    pk: primaryKey({ columns: [t.reservationId, t.productInstanceId] }),
   }),
 );
 
-export const reservationsToInvoiceExtraInstancesRelations = relationBuilder(
-  reservationsToInvoiceExtraInstances,
+export const reservationsToProductInstancesRelations = relationBuilder(
+  reservationsToProductInstances,
   ({ one }) => ({
     reservation: one(reservations, {
-      fields: [reservationsToInvoiceExtraInstances.reservationId],
+      fields: [reservationsToProductInstances.reservationId],
       references: [reservations.id],
     }),
-    instance: one(invoiceExtraInstances, {
-      fields: [reservationsToInvoiceExtraInstances.instanceId],
-      references: [invoiceExtraInstances.id],
+    productInstance: one(productInstances, {
+      fields: [reservationsToProductInstances.productInstanceId],
+      references: [productInstances.id],
     }),
   }),
 );
@@ -702,8 +638,12 @@ export const reservationsToInvoices = pgTable(
     invoiceId: integer("invoice_id")
       .notNull()
       .references(() => invoices.id, { onDelete: "cascade" }),
-    startDate: timestamp("start_date", { withTimezone: true }).notNull(),
-    endDate: timestamp("end_date", { withTimezone: true }).notNull(),
+    periodStartDate: timestamp("period_start_date", {
+      withTimezone: true,
+    }).notNull(),
+    periodEndDate: timestamp("period_end_date", {
+      withTimezone: true,
+    }).notNull(),
   },
   (t) => ({
     pk: primaryKey({ columns: [t.reservationId, t.invoiceId] }),
@@ -735,6 +675,7 @@ export const settingNameEnum = pgEnum("setting_name", [
   "invoiceHeaderImageSrc",
   "invoiceFooterImageSrc",
   "priceEntryMode",
+  "bookingGeneralLedger",
 ]);
 
 export const settings = pgTable("settings", {

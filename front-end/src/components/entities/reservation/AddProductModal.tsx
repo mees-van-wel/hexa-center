@@ -13,32 +13,32 @@ import {
 } from "@mantine/core";
 import { useDidUpdate } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
+import { IconCurrencyEuro } from "@tabler/icons-react";
 
-export type ReservationInvoiceExtraValues = {
+export type ReservationProductValues = {
   name: string;
+  price: string;
+  vatRate: string;
   quantity: string;
-  amount: string;
-  unit: "currency";
   cycle:
     | "oneTimeOnNext"
     | "oneTimeOnEnd"
     | "perNightThroughout"
     | "perNightOnEnd";
-  vatRate: string;
 };
 
-type CreateInvoiceExtraModalProps = {
-  templates: RouterOutput["invoiceExtra"]["list"];
+type AddProductModalProps = {
+  templates: RouterOutput["product"]["list"];
   onConfirm: (
     templateId: number | null,
-    overrides: ReservationInvoiceExtraValues,
+    overrides: ReservationProductValues,
   ) => void;
 };
 
-export const CreateInvoiceExtraModal = ({
+export const AddProductModal = ({
   templates,
   onConfirm,
-}: CreateInvoiceExtraModalProps) => {
+}: AddProductModalProps) => {
   const [templateId, setTemplateId] = useState<number | null>(null);
 
   const template = useMemo(
@@ -47,27 +47,22 @@ export const CreateInvoiceExtraModal = ({
     [templateId, templates],
   );
 
-  const [values, setValues] = useState<ReservationInvoiceExtraValues>({
+  const [values, setValues] = useState<ReservationProductValues>({
     name: "",
-    quantity: "1",
-    amount: "",
-    unit: "currency",
-    cycle: "",
+    price: "",
     vatRate: "21",
+    quantity: "1",
+    cycle: "",
   });
 
   useDidUpdate(() => {
     if (!template) return;
 
-    const { name, quantity, amount, unit, vatRate } = template;
-
     setValues({
       ...values,
-      name,
-      quantity,
-      amount,
-      unit,
-      vatRate,
+      name: template.name,
+      price: template.price,
+      vatRate: template.vatRate,
     });
   }, [template]);
 
@@ -106,6 +101,32 @@ export const CreateInvoiceExtraModal = ({
           withAsterisk
         />
         <NumberInput
+          label="Price"
+          value={values.price}
+          onChange={(price) => {
+            changeHandler({ price: price.toString() });
+          }}
+          leftSection={<IconCurrencyEuro size="1rem" />}
+          decimalScale={2}
+          decimalSeparator=","
+          fixedDecimalScale
+          hideControls
+          withAsterisk
+        />
+        <NumberInput
+          label="VAT Rate"
+          value={values.vatRate}
+          onChange={(vatRate) => {
+            changeHandler({ vatRate: vatRate.toString() });
+          }}
+          decimalScale={2}
+          decimalSeparator=","
+          fixedDecimalScale
+          hideControls
+          withAsterisk
+          rightSection="%"
+        />
+        <NumberInput
           label="Quantity"
           value={values.quantity}
           onChange={(quantity) => {
@@ -115,28 +136,6 @@ export const CreateInvoiceExtraModal = ({
           decimalSeparator=","
           fixedDecimalScale
           hideControls
-          withAsterisk
-        />
-        <NumberInput
-          label="Amount"
-          value={values.amount}
-          onChange={(amount) => {
-            changeHandler({ amount: amount.toString() });
-          }}
-          decimalScale={2}
-          decimalSeparator=","
-          fixedDecimalScale
-          hideControls
-          withAsterisk
-        />
-        <Select
-          label="Unit"
-          data={["currency"]}
-          value={values.unit}
-          onChange={(unit) => {
-            if (unit) changeHandler({ unit });
-          }}
-          allowDeselect={false}
           withAsterisk
         />
         <Select
@@ -154,19 +153,6 @@ export const CreateInvoiceExtraModal = ({
           allowDeselect={false}
           withAsterisk
         />
-        <NumberInput
-          label="VAT Rate"
-          value={values.vatRate}
-          onChange={(vatRate) => {
-            changeHandler({ vatRate: vatRate.toString() });
-          }}
-          decimalScale={2}
-          decimalSeparator=","
-          fixedDecimalScale
-          hideControls
-          withAsterisk
-          rightSection="%"
-        />
       </SimpleGrid>
       <ButtonGroup>
         <Button
@@ -180,7 +166,7 @@ export const CreateInvoiceExtraModal = ({
         </Button>
         <Button
           disabled={
-            !values.name || !values.cycle || !values.amount || !values.vatRate
+            !values.name || !values.price || !values.vatRate || !values.cycle
           }
           onClick={confirmHandler}
           fullWidth
