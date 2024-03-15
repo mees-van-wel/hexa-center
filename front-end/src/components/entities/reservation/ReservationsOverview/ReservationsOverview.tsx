@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import dayjs, { Dayjs } from "dayjs";
 import utc from "dayjs/plugin/utc";
 
@@ -54,6 +55,11 @@ export const ReservationsOverview = ({
   showAll,
 }: ReservationsProps) => {
   const t = useTranslation();
+  const router = useRouter();
+
+  useEffect(() => {
+    router.refresh();
+  }, []);
 
   const [calendarCurrentDay, setCalendarCurrentDay] = useSessionStorage({
     key: "calendarCurrentDay",
