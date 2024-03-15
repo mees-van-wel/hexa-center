@@ -37,9 +37,6 @@ export const reservationRouter = router({
           ...input,
           createdById: ctx.relation.id,
           updatedById: ctx.relation.id,
-          priceOverride: input.priceOverride
-            ? input.priceOverride.toString()
-            : undefined,
         })
         .returning({
           $kind: reservations.$kind,
@@ -157,12 +154,6 @@ export const reservationRouter = router({
           ...input,
           updatedAt: new Date(),
           updatedById: ctx.relation.id,
-          priceOverride:
-            input.priceOverride === null
-              ? null
-              : input.priceOverride
-                ? input.priceOverride.toString()
-                : undefined,
         })
         .where(eq(reservations.id, input.id))
         .returning({

@@ -83,12 +83,7 @@ export const ReservationDetail = ({
   const deleteProductInstance = useMutation("product", "deleteInstance");
 
   const formMethods = useForm<ReservationInputUpdateSchema>({
-    defaultValues: {
-      ...reservation,
-      priceOverride: reservation.priceOverride
-        ? parseFloat(reservation.priceOverride)
-        : undefined,
-    },
+    defaultValues: reservation,
     resolver: valibotResolver(ReservationUpdateSchema),
   });
 
@@ -625,12 +620,7 @@ const SaveBadge = () => {
         ...values,
       });
 
-      reset({
-        ...updatedReservation,
-        priceOverride: updatedReservation.priceOverride
-          ? parseFloat(updatedReservation.priceOverride)
-          : undefined,
-      });
+      reset(updatedReservation);
     } catch (error) {
       const { success, json } = isJson((error as any).message);
       if (!success) {
