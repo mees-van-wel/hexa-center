@@ -33,13 +33,17 @@ export const Overview = ({ integrations }: OverviewProps) => {
         <Indicator
           inline
           position="top-start"
-          size="1rem"
+          size="1.5rem"
           color={
             integrations.some(({ type }) => type === "twinfield")
               ? "green"
               : "red"
           }
-          withBorder
+          styles={{
+            indicator: {
+              border: "solid 0.3rem black",
+            },
+          }}
         >
           <Stack className={styles.card}>
             <Image

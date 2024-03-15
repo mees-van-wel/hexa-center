@@ -123,22 +123,22 @@
           <div class="detail-box">
             <strong>To:</strong>
             <div>
-              <p><%= customerName %></p>
-              <p><%= customerStreet %> <%= customerHouseNumber %></p>
-              <p><%= customerPostalCode %> <%= customerCity %></p>
+              <p><%- customerName %></p>
+              <p><%- customerStreet %> <%- customerHouseNumber %></p>
+              <p><%- customerPostalCode %> <%- customerCity %></p>
               <p><%= customerCountry %></p>
             </div>
             <div>
-              <p>Email address: <%= customerEmailAddress %></p>
-              <p>Phone number: <%= customerPhoneNumber %></p>
+              <p>Email address: <%- customerEmailAddress %></p>
+              <p>Phone number: <%- customerPhoneNumber %></p>
             </div>
             <% if (customerCocNumber || customerVatNumber) { %>
             <div>
               <% if (customerCocNumber) { %>
-              <p>CoC-number: <%= customerCocNumber %></p>
+              <p>CoC-number: <%- customerCocNumber %></p>
               <% } %>
               <% if (customerVatNumber) { %>
-              <p>VAT number: <%= customerVatNumber %></p>
+              <p>VAT number: <%- customerVatNumber %></p>
               <% } %>
             </div>
             <% } %>
@@ -146,27 +146,27 @@
           <div class="detail-box detail-box-right">
             <strong>From:</strong>
             <div>
-              <p><%= companyName %></p>
-              <p><%= companyStreet %> <%= companyHouseNumber %></p>
-              <p><%= companyPostalCode %> <%= companyCity %></p>
+              <p><%- companyName %></p>
+              <p><%- companyStreet %> <%- companyHouseNumber %></p>
+              <p><%- companyPostalCode %> <%- companyCity %></p>
               <p><%= companyCountry %></p>
             </div>
             <div>
-              <p>Email address: <%= companyEmailAddress %></p>
-              <p>Phone number: <%= companyPhoneNumber %></p>
+              <p>Email address: <%- companyEmailAddress %></p>
+              <p>Phone number: <%- companyPhoneNumber %></p>
             </div>
             <div>
-              <p>CoC-number: <%= companyCocNumber %></p>
-              <p>VAT number: <%= companyVatNumber %></p>
+              <p>CoC-number: <%- companyCocNumber %></p>
+              <p>VAT number: <%- companyVatNumber %></p>
             </div>
             <div>
-              <p>IBAN: <%= companyIban %></p>
-              <p>SWIFT/BIC Code: <%= companySwiftBic %></p>
+              <p>IBAN: <%- companyIban %></p>
+              <p>SWIFT/BIC Code: <%- companySwiftBic %></p>
             </div>
           </div>
         </div>
         <% if (notes) { %>
-        <p><%= notes %></p>
+        <p><%- notes %></p>
         <% } %>
         <table class="invoice-table">
           <thead>
@@ -182,7 +182,7 @@
           <tbody>
             <% lines.forEach(function(line) { %>
             <tr>
-              <td><%= line.name %></td>
+              <td><%- line.name %></td>
               <td><%= line.unitAmount %></td>
               <td><%= line.quantity %>x</td>
               <td><%= line.netAmount %></td>

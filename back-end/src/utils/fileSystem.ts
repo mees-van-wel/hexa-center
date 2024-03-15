@@ -21,6 +21,8 @@ const Files = {
     "createTwinfieldCustomer.xml.ejs",
     "updateTwinfieldCustomer.xml.ejs",
     "deleteTwinfieldCustomer.xml.ejs",
+    "createTwinfieldTransaction.xml.ejs",
+    "spreadTwinfieldTransaction.xml.ejs",
   ],
 } as const;
 

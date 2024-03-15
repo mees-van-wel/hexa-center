@@ -60,7 +60,7 @@ export const integrationRouter = router({
       const data = await sendSoapRequest({
         url: wsdlUrl,
         headers: {
-          "Content-Type": "text/xml",
+          "Content-Type": "text/xml; charset=utf-8",
           SOAPAction: "http://www.twinfield.com/ProcessXmlDocument",
         },
         xml,

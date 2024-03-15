@@ -748,31 +748,28 @@ export const integrationConnections = pgTable("integration_connections", {
   data: jsonb("data").notNull(),
 });
 
-export const integrationEntityRefTypeEnum = pgEnum(
-  "integration_entity_ref_type",
+export const integrationMappingRefTypeEnum = pgEnum(
+  "integration_mapping_ref_type",
   ["relation"],
 );
 
-export const integrationEntities = pgTable("integration_entities", {
-  $kind: text("$kind").default("integrationEntity").notNull(),
+export const integrationMappings = pgTable("integration_mappings", {
+  $kind: text("$kind").default("integrationMapping").notNull(),
   id: serial("id").primaryKey(),
   uuid: uuid("uuid").defaultRandom().notNull(),
-  connectionId: integer("connection_id").references(
-    () => integrationConnections.id,
-    {
-      onDelete: "cascade",
-    },
-  ),
-  refType: integrationEntityRefTypeEnum("ref_type").notNull(),
+  connectionId: integer("connection_id")
+    .references(() => integrationConnections.id, { onDelete: "cascade" })
+    .notNull(),
+  refType: integrationMappingRefTypeEnum("ref_type").notNull(),
   refId: integer("ref_id").notNull(),
-  externalId: text("external_id").notNull(),
+  data: jsonb("data").notNull(),
 });
 
 export const integrationEntitiesRelations = relationBuilder(
-  integrationEntities,
+  integrationMappings,
   ({ one }) => ({
     connection: one(integrationConnections, {
-      fields: [integrationEntities.connectionId],
+      fields: [integrationMappings.connectionId],
       references: [integrationConnections.id],
     }),
   }),

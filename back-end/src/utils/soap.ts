@@ -7,6 +7,7 @@ type sendSoapRequestProps = {
   xml: string;
 };
 
+// TODO typed generic response
 export const sendSoapRequest = async ({
   url,
   headers,
