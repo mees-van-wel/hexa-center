@@ -28,6 +28,89 @@
     border: none;
     padding: 0 10px;
 
+    &:hover {
+      .reservationBackground {
+        filter: contrast(40%);
+      }
+
+      .invoiced {
+        background-color: var(--mantine-primary-color-filled-hover);
+      }
+    }
+
+    .reservationBackground {
+      position: absolute;
+      inset: 0;
+      background-color: var(--mantine-primary-color-filled);
+      filter: contrast(50%);
+    }
+
+    .invoiced {
+      position: absolute;
+      inset: 0;
+      background-color: var(--mantine-primary-color-filled);
+    }
+
+    .buttonContent {
+      position: absolute;
+      padding: 0 1rem;
+      inset: 0;
+
+      &.start {
+        background: linear-gradient(
+          90deg,
+          var(--mantine-color-green-filled) 0px,
+          transparent 15px
+        );
+
+        &:hover {
+          background: linear-gradient(
+            90deg,
+            var(--mantine-color-green-filled-hover) 0px,
+            transparent 15px
+          );
+        }
+      }
+
+      &.end {
+        background: linear-gradient(
+          90deg,
+          transparent 0px,
+          transparent calc(100% - 15px),
+          var(--mantine-color-red-filled) 100%
+        );
+
+        &:hover {
+          background: linear-gradient(
+            90deg,
+            transparent 0px,
+            transparent calc(100% - 15px),
+            var(--mantine-color-red-filled-hover) 100%
+          );
+        }
+      }
+
+      &.startEnd {
+        background: linear-gradient(
+          90deg,
+          var(--mantine-color-green-filled) 0px,
+          transparent 15px,
+          transparent calc(100% - 15px),
+          var(--mantine-color-red-filled) 100%
+        );
+
+        &:hover {
+          background: linear-gradient(
+            90deg,
+            var(--mantine-color-green-filled-hover) 0px,
+            transparent 15px,
+            transparent calc(100% - 15px),
+            var(--mantine-color-red-filled-hover) 100%
+          );
+        }
+      }
+    }
+
     .labelContainer {
       width: 100%;
     }
@@ -45,60 +128,6 @@
       margin-left: 5px;
       margin-right: 5px;
       text-align: center;
-    }
-
-    &.start {
-      background: linear-gradient(
-        90deg,
-        var(--mantine-color-green-filled) 0px,
-        var(--mantine-color-blue-filled) 15px
-      );
-
-      &:hover {
-        background: linear-gradient(
-          90deg,
-          var(--mantine-color-green-filled-hover) 0px,
-          var(--mantine-primary-color-filled-hover) 15px
-        );
-      }
-    }
-
-    &.end {
-      background: linear-gradient(
-        90deg,
-        var(--mantine-color-blue-filled) 0px,
-        var(--mantine-color-blue-filled) calc(100% - 15px),
-        var(--mantine-color-red-filled) 100%
-      );
-
-      &:hover {
-        background: linear-gradient(
-          90deg,
-          var(--mantine-primary-color-filled-hover) 0px,
-          var(--mantine-primary-color-filled-hover) calc(100% - 15px),
-          var(--mantine-color-red-filled-hover) 100%
-        );
-      }
-    }
-
-    &.startEnd {
-      background: linear-gradient(
-        90deg,
-        var(--mantine-color-green-filled) 0px,
-        var(--mantine-color-blue-filled) 15px,
-        var(--mantine-color-blue-filled) calc(100% - 15px),
-        var(--mantine-color-red-filled) 100%
-      );
-
-      &:hover {
-        background: linear-gradient(
-          90deg,
-          var(--mantine-color-green-filled-hover) 0px,
-          var(--mantine-color-blue-filled-hover) 15px,
-          var(--mantine-color-blue-filled-hover) calc(100% - 15px),
-          var(--mantine-color-red-filled-hover) 100%
-        );
-      }
     }
   }
 }
