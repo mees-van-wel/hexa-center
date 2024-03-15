@@ -428,10 +428,12 @@ export const ReservationDetail = ({
 
                       const color =
                         invoice.type === "credit"
-                          ? "blue-8"
+                          ? "orange-8"
                           : invoice.status === "draft"
-                            ? "orange-8"
-                            : "green-8";
+                            ? "red-8"
+                            : isFinalInvoice
+                              ? "green-8"
+                              : "blue-8";
 
                       return (
                         <Card
