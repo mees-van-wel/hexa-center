@@ -442,12 +442,6 @@ export const ReservationDetail = ({
                           padding={0}
                           radius="md"
                           withBorder
-                          style={{
-                            boxShadow: `0px 0px 16px -4px var(--mantine-color-${color})`,
-                            border: `2px ${
-                              invoice.status === "credited" ? "dashed" : "solid"
-                            } var(--mantine-color-${color})`,
-                          }}
                         >
                           <Card.Section
                             style={{
@@ -470,7 +464,7 @@ export const ReservationDetail = ({
                                 size="2rem"
                                 stroke={1}
                                 style={{
-                                  color: "gray",
+                                  color: `var(--mantine-color-${color})`,
                                   transform: "rotate(-22deg)",
                                 }}
                               />
@@ -478,10 +472,15 @@ export const ReservationDetail = ({
                                 size="5rem"
                                 stroke={1}
                                 style={{
-                                  color: "gray",
+                                  color: "rgb(var(--color-text))",
                                   padding: "0.75rem",
                                   margin: "0",
-                                  border: "2px dashed gray",
+                                  boxShadow: `inset 0px 0px 16px -4px var(--mantine-color-${color}), 0px 0px 16px -4px var(--mantine-color-${color})`,
+                                  border: `2px ${
+                                    invoice.status === "credited"
+                                      ? "dashed"
+                                      : "solid"
+                                  } var(--mantine-color-${color})`,
                                   transition: "margin var(--transition)",
                                   borderRadius: "100%",
                                 }}
@@ -490,7 +489,7 @@ export const ReservationDetail = ({
                                 size="2rem"
                                 stroke={1}
                                 style={{
-                                  color: "gray",
+                                  color: `var(--mantine-color-${color})`,
                                   transform: "rotate(22deg)",
                                 }}
                               />
