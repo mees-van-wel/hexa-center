@@ -124,7 +124,6 @@ export const invoiceRouter = router({
       type: "mailed",
     });
   }),
-  // TOOD Make credit invoice be issued right away
   credit: procedure.input(wrap(number())).mutation(async ({ input, ctx }) => {
     const invoicesResult = await db
       .select({
@@ -165,6 +164,7 @@ export const invoiceRouter = router({
           .returning({ id: invoices.id }),
         db
           .select({
+            revenueAccountId: invoiceLines.revenueAccountId,
             name: invoiceLines.name,
             unitAmount: invoiceLines.unitAmount,
             quantity: invoiceLines.quantity,
@@ -190,6 +190,7 @@ export const invoiceRouter = router({
       db.insert(invoiceLines).values(
         invoiceLinesResult.map((invoiceLine) => ({
           invoiceId: creditInvoiceId,
+          revenueAccountId: invoiceLine.revenueAccountId,
           name: invoiceLine.name,
           unitAmount: invertDecimalString(invoiceLine.unitAmount),
           quantity: invoiceLine.quantity,

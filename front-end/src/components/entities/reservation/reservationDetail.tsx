@@ -65,6 +65,7 @@ type ReservationProps = {
   rooms: RouterOutput["room"]["list"];
   relations: RouterOutput["relation"]["list"];
   productTemplates: RouterOutput["product"]["list"];
+  ledgerAccounts: RouterOutput["ledgerAccount"]["list"];
 };
 
 export const ReservationDetail = ({
@@ -72,6 +73,7 @@ export const ReservationDetail = ({
   rooms,
   relations,
   productTemplates,
+  ledgerAccounts,
 }: ReservationProps) => {
   const t = useTranslation();
   const router = useRouter();
@@ -167,11 +169,12 @@ export const ReservationDetail = ({
       children: (
         <AddProductModal
           templates={productTemplates}
-          onConfirm={async (templateId, overrides) => {
+          ledgerAccounts={ledgerAccounts}
+          onConfirm={async (templateId, values) => {
             await addProduct.mutate({
               reservationId: reservation.id,
               templateId,
-              ...overrides,
+              ...values,
             });
 
             router.refresh();
@@ -197,12 +200,15 @@ export const ReservationDetail = ({
       title: <Title order={3}>Edit Product</Title>,
       children: (
         <EditProductModal
+          ledgerAccounts={ledgerAccounts}
           currentValues={{
             name: productInstanceJunction.productInstance.name,
             price: productInstanceJunction.productInstance.price,
             vatRate: productInstanceJunction.productInstance.vatRate,
             quantity: productInstanceJunction.quantity,
             cycle: productInstanceJunction.cycle,
+            revenueAccountId:
+              productInstanceJunction.productInstance.revenueAccountId,
           }}
           onConfirm={async (values) => {
             await editProduct.mutate({
@@ -343,9 +349,14 @@ export const ReservationDetail = ({
                     ({ productInstance, quantity, cycle, status }) => (
                       <Table.Tr key={productInstance.id}>
                         <Table.Td>{productInstance.name}</Table.Td>
-                        <Table.Td>{productInstance.price}</Table.Td>
+                        <Table.Td>
+                          {Intl.NumberFormat("nl-NL", {
+                            style: "currency",
+                            currency: "EUR",
+                          }).format(parseFloat(productInstance.price))}
+                        </Table.Td>
                         <Table.Td>{productInstance.vatRate}%</Table.Td>
-                        <Table.Td>{quantity}</Table.Td>
+                        <Table.Td>{quantity}x</Table.Td>
                         <Table.Td>{cycle}</Table.Td>
                         <Table.Td>
                           <Badge

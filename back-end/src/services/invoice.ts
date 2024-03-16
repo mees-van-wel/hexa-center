@@ -1,19 +1,26 @@
 import dayjs from "dayjs";
 import Decimal from "decimal.js";
 import { and, eq, sql } from "drizzle-orm";
+import ejs from "ejs";
 
 import db from "@/db/client";
 import {
+  integrationConnections,
+  integrationMappings,
   invoiceEvents,
   invoiceLines,
   invoices,
+  logs,
   properties,
   relations,
 } from "@/db/schema";
+import { readFile } from "@/utils/fileSystem";
 import { generatePdf } from "@/utils/pdf";
+import { sendSoapRequest } from "@/utils/soap";
 import { Settings } from "@front-end/constants/settings";
 import { TRPCError } from "@trpc/server";
 
+import { getTwinfieldAccessToken, getTwinfieldWsdlUrl } from "./integration";
 import { getSetting, getSettings } from "./setting";
 
 export const getInvoice = async (invoiceId: number) => {
@@ -347,6 +354,7 @@ type CreateInvoiceProps = {
   customerId: number;
   companyId: number;
   lines: {
+    revenueAccountId: number;
     name: string;
     unitAmount: string;
     quantity: string;
@@ -392,12 +400,13 @@ export const createInvoice = async ({
   const invoice = invoiceInsertResult[0];
 
   await db.insert(invoiceLines).values(
-    lines.map(({ name, quantity, vatRate }, index) => {
+    lines.map(({ revenueAccountId, name, quantity, vatRate }, index) => {
       const { unitAmount, netAmount, vatAmount, grossAmount } =
         calculatedLines[index];
 
       return {
         invoiceId: invoice.id,
+        revenueAccountId,
         name,
         unitAmount: roundDecimal(unitAmount).toString(),
         quantity,
@@ -492,8 +501,12 @@ export const issueInvoice = async (
 
   const { count } = countResult[0];
 
-  // TODO only update when empty (customer/company)
+  const dueDate = dayjs(date).add(dayjs.duration(companyPaymentTerms));
+  const invoiceNumber =
+    invoice.number ||
+    date.getFullYear() + (count + 1).toString().padStart(4, "0");
 
+  // TODO only update when empty (customer/company)
   await db
     .update(invoices)
     .set({
@@ -501,11 +514,9 @@ export const issueInvoice = async (
       date,
       dueDate:
         invoice.type !== "credit" && invoice.type !== "quotation"
-          ? dayjs(date).add(dayjs.duration(companyPaymentTerms)).toDate()
+          ? dueDate.toDate()
           : undefined,
-      number:
-        invoice.number ||
-        date.getFullYear() + (count + 1).toString().padStart(4, "0"),
+      number: invoiceNumber,
       customerName: customer.name,
       customerEmailAddress: customer.emailAddress,
       customerPhoneNumber: customer.phoneNumber,
@@ -532,6 +543,130 @@ export const issueInvoice = async (
       companySwiftBic,
     })
     .where(eq(invoices.id, invoiceId));
+
+  const integrationResult = await db
+    .select()
+    .from(integrationConnections)
+    .where(eq(integrationConnections.type, "twinfield"));
+
+  const integration = integrationResult[0];
+
+  if (integration) {
+    const { id, accessToken, companyCode } = await getTwinfieldAccessToken();
+    const wsdlUrl = await getTwinfieldWsdlUrl(accessToken);
+
+    let xml = await readFile(
+      "soapEnvelope",
+      "createTwinfieldTransaction.xml.ejs",
+    );
+
+    const VatRateToVatCodeMap = {
+      "21.00": "VH",
+      "9.00": "VL",
+      "0.00": "VN",
+    } as const;
+
+    const customerMappingResult = await db
+      .select()
+      .from(integrationMappings)
+      .where(
+        and(
+          eq(integrationMappings.refType, "relation"),
+          eq(integrationMappings.refId, customer.id),
+        ),
+      );
+
+    const externalCustomerId = customerMappingResult[0]?.data?.externalId;
+
+    if (!externalCustomerId) {
+      console.warn(`Missing integration mapping for relation: ${customer.id}`);
+      return;
+    }
+
+    const lines = await db
+      .select()
+      .from(invoiceLines)
+      .where(eq(invoiceLines.invoiceId, invoice.id));
+
+    const formattedLines: {
+      revenueAccountId: string;
+      netAmount: string;
+      name: string;
+      vatCode: string;
+      vatAmount: string;
+    }[] = [];
+
+    for (const line of lines) {
+      const ledgerAccountMappingResult = await db
+        .select()
+        .from(integrationMappings)
+        .where(
+          and(
+            eq(integrationMappings.refType, "ledgerAccount"),
+            eq(integrationMappings.refId, line.revenueAccountId),
+          ),
+        );
+
+      const revenueAccountId = ledgerAccountMappingResult[0]?.data?.externalId;
+
+      if (!revenueAccountId) {
+        console.warn(
+          `Missing integration mapping for ledger account: ${line.revenueAccountId}`,
+        );
+        return;
+      }
+
+      formattedLines.push({
+        revenueAccountId,
+        netAmount: line.netAmount,
+        name: line.name,
+        vatCode:
+          line.vatRate in VatRateToVatCodeMap
+            ? VatRateToVatCodeMap[line.vatRate]
+            : VatRateToVatCodeMap["0.00"],
+        vatAmount: line.vatAmount,
+      });
+    }
+
+    xml = await ejs.render(
+      xml,
+      {
+        accessToken,
+        companyCode,
+        date: dayjs(date).format("YYYYMMDD"),
+        invoiceNumber,
+        dueDate: dueDate.format("YYYYMMDD"),
+        // TODO Find correct name
+        balanceAccount: "130000",
+        customerCode: externalCustomerId,
+        totalAmount: invoice.grossAmount,
+        lines: formattedLines,
+      },
+      { async: true },
+    );
+
+    // TODO Spread transaction
+
+    try {
+      await sendSoapRequest({
+        url: wsdlUrl,
+        headers: {
+          "Content-Type": "text/xml; charset=utf-8",
+          SOAPAction: "http://www.twinfield.com/ProcessXmlDocument",
+        },
+        xml,
+      });
+
+      await db.insert(logs).values({
+        type: "info",
+        event: "integrationSend",
+        refType: "integration",
+        refId: id,
+      });
+    } catch (error) {
+      console.warn(error);
+    }
+  }
 
   await db.insert(invoiceEvents).values({
     createdById: relationId,

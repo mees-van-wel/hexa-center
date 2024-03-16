@@ -10,7 +10,7 @@ export const getSetting = async <
   T extends (typeof settings.name.enumValues)[number],
 >(
   name: T,
-): Promise<Settings[T]> => {
+) => {
   const settingsResult = await db
     .select()
     .from(settings)
@@ -19,7 +19,7 @@ export const getSetting = async <
   const setting = settingsResult[0];
   if (!setting) throw new Error(`Setting '${name}' is missing`);
 
-  return setting.value as any;
+  return setting.value as Settings[T];
 };
 
 export const getSettings = async <

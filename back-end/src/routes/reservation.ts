@@ -19,6 +19,7 @@ import {
   reservationsToProductInstances,
 } from "@/db/schema";
 import { createInvoice } from "@/services/invoice";
+import { getSetting } from "@/services/setting";
 import { procedure, router } from "@/trpc";
 import { wrap } from "@decs/typeschema";
 import {
@@ -101,6 +102,7 @@ export const reservationRouter = router({
               columns: {
                 $kind: true,
                 id: true,
+                revenueAccountId: true,
                 name: true,
                 price: true,
                 vatRate: true,
@@ -209,6 +211,7 @@ export const reservationRouter = router({
       if (!reservation) throw new TRPCError({ code: "NOT_FOUND" });
 
       const extraLines: {
+        revenueAccountId: number;
         name: string;
         unitAmount: string;
         quantity: string;
@@ -258,6 +261,7 @@ export const reservationRouter = router({
               );
 
             extraLines.push({
+              revenueAccountId: productInstance.revenueAccountId,
               name: productInstance.name,
               unitAmount: productInstance.price,
               quantity,
@@ -265,6 +269,10 @@ export const reservationRouter = router({
             });
           },
         ),
+      );
+
+      const reservationRevenueAccountId = await getSetting(
+        "reservationRevenueAccountId",
       );
 
       const invoiceId = await createInvoice({
@@ -277,6 +285,7 @@ export const reservationRouter = router({
         notes: reservation.invoiceNotes,
         lines: [
           {
+            revenueAccountId: reservationRevenueAccountId,
             name: "Overnight Stays",
             unitAmount: reservation.priceOverride || reservation.room.price,
             quantity: periodNights.toString(),
@@ -305,6 +314,7 @@ export const reservationRouter = router({
           price: string(),
           vatRate: string(),
           quantity: string(),
+          revenueAccountId: number(),
           cycle: picklist([
             "oneTimeOnNext",
             "oneTimeOnEnd",
@@ -319,6 +329,7 @@ export const reservationRouter = router({
         .insert(productInstances)
         .values({
           templateId: input.templateId,
+          revenueAccountId: input.revenueAccountId,
           name: input.name,
           price: input.price,
           vatRate: input.vatRate,
@@ -345,6 +356,7 @@ export const reservationRouter = router({
           price: optional(string()),
           vatRate: optional(string()),
           quantity: optional(string()),
+          revenueAccountId: number(),
           cycle: optional(
             picklist([
               "oneTimeOnNext",
@@ -356,7 +368,7 @@ export const reservationRouter = router({
         }),
       ),
     )
-    .mutation(async ({ input }) =>
+    .mutation(({ input }) =>
       Promise.all([
         db
           .update(productInstances)
@@ -364,6 +376,7 @@ export const reservationRouter = router({
             name: input.name,
             price: input.price,
             vatRate: input.vatRate,
+            revenueAccountId: input.revenueAccountId,
           })
           .where(eq(productInstances.id, input.instanceId)),
         db
@@ -395,7 +408,7 @@ export const reservationRouter = router({
         }),
       ),
     )
-    .mutation(async ({ input }) =>
+    .mutation(({ input }) =>
       db
         .update(reservationsToProductInstances)
         .set({ status: "notInvoiced" })

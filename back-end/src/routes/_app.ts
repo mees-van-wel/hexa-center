@@ -5,6 +5,7 @@ import { router } from "../trpc";
 import { authRouter } from "./auth";
 import { integrationRouter } from "./integration";
 import { invoiceRouter } from "./invoice";
+import { ledgerAccountRouter } from "./ledgerAccount";
 import { productRouter } from "./product";
 import { propertyRouter } from "./property";
 import { relationRouter } from "./relation";
@@ -19,6 +20,7 @@ export const appRouter = router({
   reservation: reservationRouter,
   invoice: invoiceRouter,
   product: productRouter,
+  ledgerAccount: ledgerAccountRouter,
   integration: integrationRouter,
 });
 

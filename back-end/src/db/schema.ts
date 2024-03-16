@@ -365,6 +365,87 @@ export const reservationsRelations = relationBuilder(
   }),
 );
 
+// TODO Add support for perInvoice, perPerson, perPersonPerNight, perItem, perDay and perHour
+// TODO Add start, Maybe support uponUsage, when invoked show on next invoice only
+export const reservationsToProductInstancesCycleEnum = pgEnum(
+  "reservations_to_product_instances_cycle",
+  ["oneTimeOnNext", "oneTimeOnEnd", "perNightThroughout", "perNightOnEnd"],
+);
+
+export const reservationsToProductInstancesStatusEnum = pgEnum(
+  "reservations_to_product_instances_status",
+  ["notInvoiced", "partiallyInvoiced", "fullyInvoiced"],
+);
+
+export const reservationsToProductInstances = pgTable(
+  "reservations_to_product_instances",
+  {
+    reservationId: integer("reservation_id")
+      .references(() => reservations.id, { onDelete: "cascade" })
+      .notNull(),
+    productInstanceId: integer("product_instance_id")
+      .references(() => productInstances.id, { onDelete: "cascade" })
+      .notNull(),
+    quantity: numeric("quantity", { precision: 10, scale: 2 })
+      .default("1")
+      .notNull(),
+    cycle: reservationsToProductInstancesCycleEnum("cycle").notNull(),
+    status: reservationsToProductInstancesStatusEnum("status").notNull(),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.reservationId, t.productInstanceId] }),
+  }),
+);
+
+export const reservationsToProductInstancesRelations = relationBuilder(
+  reservationsToProductInstances,
+  ({ one }) => ({
+    reservation: one(reservations, {
+      fields: [reservationsToProductInstances.reservationId],
+      references: [reservations.id],
+    }),
+    productInstance: one(productInstances, {
+      fields: [reservationsToProductInstances.productInstanceId],
+      references: [productInstances.id],
+    }),
+  }),
+);
+
+export const reservationsToInvoices = pgTable(
+  "reservations_to_invoices",
+  {
+    reservationId: integer("reservation_id")
+      .notNull()
+      .references(() => reservations.id, { onDelete: "cascade" }),
+    invoiceId: integer("invoice_id")
+      .notNull()
+      .references(() => invoices.id, { onDelete: "cascade" }),
+    periodStartDate: timestamp("period_start_date", {
+      withTimezone: true,
+    }).notNull(),
+    periodEndDate: timestamp("period_end_date", {
+      withTimezone: true,
+    }).notNull(),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.reservationId, t.invoiceId] }),
+  }),
+);
+
+export const reservationsToInvoicesRelations = relationBuilder(
+  reservationsToInvoices,
+  ({ one }) => ({
+    reservation: one(reservations, {
+      fields: [reservationsToInvoices.reservationId],
+      references: [reservations.id],
+    }),
+    invoice: one(invoices, {
+      fields: [reservationsToInvoices.invoiceId],
+      references: [invoices.id],
+    }),
+  }),
+);
+
 export const invoiceRefTypeEnum = pgEnum("invoice_ref_type", [
   "invoice",
   "reservation",
@@ -461,6 +542,9 @@ export const invoiceLines = pgTable("invoice_lines", {
   invoiceId: integer("invoice_id")
     .references(() => invoices.id, { onDelete: "cascade" })
     .notNull(),
+  revenueAccountId: integer("revenue_account_id")
+    .references(() => ledgerAccounts.id, { onDelete: "restrict" })
+    .notNull(),
   name: text("name").notNull(),
   unitAmount: numeric("unit_amount", { precision: 10, scale: 2 }).notNull(),
   quantity: numeric("quantity", { precision: 10, scale: 2 }).notNull(),
@@ -476,6 +560,10 @@ export const invoiceLinesRelations = relationBuilder(
     invoice: one(invoices, {
       fields: [invoiceLines.invoiceId],
       references: [invoices.id],
+    }),
+    revenueAccount: one(ledgerAccounts, {
+      fields: [invoiceLines.revenueAccountId],
+      references: [ledgerAccounts.id],
     }),
   }),
 );
@@ -522,6 +610,8 @@ export const invoiceEventsRelations = relationBuilder(
   }),
 );
 
+// TODO Inventory
+// TODO COGS account
 export const productTemplates = pgTable("product_templates", {
   $kind: text("$kind").default("productTemplate").notNull(),
   id: serial("id").primaryKey(),
@@ -540,6 +630,9 @@ export const productTemplates = pgTable("product_templates", {
     (): AnyPgColumn => relations.id,
     { onDelete: "set null" },
   ),
+  revenueAccountId: integer("revenue_account_id")
+    .references(() => ledgerAccounts.id, { onDelete: "restrict" })
+    .notNull(),
   name: text("name").notNull(),
   price: numeric("price", { precision: 10, scale: 2 }).notNull(),
   vatRate: numeric("vat_rate", { precision: 10, scale: 2 }).notNull(),
@@ -556,6 +649,10 @@ export const productTemplatesRelations = relationBuilder(
       fields: [productTemplates.updatedById],
       references: [relations.id],
     }),
+    revenueAccount: one(ledgerAccounts, {
+      fields: [productTemplates.revenueAccountId],
+      references: [ledgerAccounts.id],
+    }),
     instances: many(productInstances),
   }),
 );
@@ -567,6 +664,9 @@ export const productInstances = pgTable("product_instances", {
   templateId: integer("template_id").references(() => productTemplates.id, {
     onDelete: "set null",
   }),
+  revenueAccountId: integer("revenue_account_id")
+    .references(() => ledgerAccounts.id, { onDelete: "restrict" })
+    .notNull(),
   name: text("name").notNull(),
   price: numeric("price", { precision: 10, scale: 2 }).notNull(),
   vatRate: numeric("vat_rate", { precision: 10, scale: 2 }).notNull(),
@@ -579,87 +679,85 @@ export const productInstancesRelations = relationBuilder(
       fields: [productInstances.templateId],
       references: [productTemplates.id],
     }),
+    revenueAccount: one(ledgerAccounts, {
+      fields: [productInstances.revenueAccountId],
+      references: [ledgerAccounts.id],
+    }),
     reservationsJunction: many(reservationsToProductInstances),
   }),
 );
 
-// TODO Add support for perInvoice, perPerson, perPersonPerNight, perItem, perDay and perHour
-// TODO Add start, Maybe support uponUsage, when invoked show on next invoice only
-export const reservationsToProductInstancesCycleEnum = pgEnum(
-  "reservations_to_product_instances_cycle",
-  ["oneTimeOnNext", "oneTimeOnEnd", "perNightThroughout", "perNightOnEnd"],
-);
+export const ledgers = pgTable("ledgers", {
+  $kind: text("$kind").default("ledger").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .default(sql`now()`)
+    .notNull(),
+  createdById: integer("created_by_id").references(
+    (): AnyPgColumn => relations.id,
+    { onDelete: "set null" },
+  ),
+  updatedById: integer("updated_by_id").references(
+    (): AnyPgColumn => relations.id,
+    { onDelete: "set null" },
+  ),
+  name: text("name").notNull(),
+});
 
-export const reservationsToProductInstancesStatusEnum = pgEnum(
-  "reservations_to_product_instances_status",
-  ["notInvoiced", "partiallyInvoiced", "fullyInvoiced"],
-);
-
-export const reservationsToProductInstances = pgTable(
-  "reservations_to_product_instances",
-  {
-    reservationId: integer("reservation_id")
-      .references(() => reservations.id, { onDelete: "cascade" })
-      .notNull(),
-    productInstanceId: integer("product_instance_id")
-      .references(() => productInstances.id, { onDelete: "cascade" })
-      .notNull(),
-    quantity: numeric("quantity", { precision: 10, scale: 2 })
-      .default("1")
-      .notNull(),
-    cycle: reservationsToProductInstancesCycleEnum("cycle").notNull(),
-    status: reservationsToProductInstancesStatusEnum("status").notNull(),
-  },
-  (t) => ({
-    pk: primaryKey({ columns: [t.reservationId, t.productInstanceId] }),
+export const ledgersRelations = relationBuilder(ledgers, ({ one, many }) => ({
+  createdBy: one(relations, {
+    fields: [ledgers.createdById],
+    references: [relations.id],
   }),
-);
+  updatedBy: one(relations, {
+    fields: [ledgers.updatedById],
+    references: [relations.id],
+  }),
+  accounts: many(ledgerAccounts),
+}));
 
-export const reservationsToProductInstancesRelations = relationBuilder(
-  reservationsToProductInstances,
+export const ledgerAccounts = pgTable("ledger_accounts", {
+  $kind: text("$kind").default("ledgerAccount").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .default(sql`now()`)
+    .notNull(),
+  createdById: integer("created_by_id").references(
+    (): AnyPgColumn => relations.id,
+    { onDelete: "set null" },
+  ),
+  updatedById: integer("updated_by_id").references(
+    (): AnyPgColumn => relations.id,
+    { onDelete: "set null" },
+  ),
+  ledgerId: integer("ledger_id").references(() => ledgers.id, {
+    onDelete: "restrict",
+  }),
+  name: text("name").notNull(),
+});
+
+export const ledgerAccountsRelations = relationBuilder(
+  ledgerAccounts,
   ({ one }) => ({
-    reservation: one(reservations, {
-      fields: [reservationsToProductInstances.reservationId],
-      references: [reservations.id],
+    createdBy: one(relations, {
+      fields: [ledgerAccounts.createdById],
+      references: [relations.id],
     }),
-    productInstance: one(productInstances, {
-      fields: [reservationsToProductInstances.productInstanceId],
-      references: [productInstances.id],
+    updatedBy: one(relations, {
+      fields: [ledgerAccounts.updatedById],
+      references: [relations.id],
     }),
-  }),
-);
-
-export const reservationsToInvoices = pgTable(
-  "reservations_to_invoices",
-  {
-    reservationId: integer("reservation_id")
-      .notNull()
-      .references(() => reservations.id, { onDelete: "cascade" }),
-    invoiceId: integer("invoice_id")
-      .notNull()
-      .references(() => invoices.id, { onDelete: "cascade" }),
-    periodStartDate: timestamp("period_start_date", {
-      withTimezone: true,
-    }).notNull(),
-    periodEndDate: timestamp("period_end_date", {
-      withTimezone: true,
-    }).notNull(),
-  },
-  (t) => ({
-    pk: primaryKey({ columns: [t.reservationId, t.invoiceId] }),
-  }),
-);
-
-export const reservationsToInvoicesRelations = relationBuilder(
-  reservationsToInvoices,
-  ({ one }) => ({
-    reservation: one(reservations, {
-      fields: [reservationsToInvoices.reservationId],
-      references: [reservations.id],
-    }),
-    invoice: one(invoices, {
-      fields: [reservationsToInvoices.invoiceId],
-      references: [invoices.id],
+    ledger: one(ledgers, {
+      fields: [ledgerAccounts.ledgerId],
+      references: [ledgers.id],
     }),
   }),
 );
@@ -675,7 +773,7 @@ export const settingNameEnum = pgEnum("setting_name", [
   "invoiceHeaderImageSrc",
   "invoiceFooterImageSrc",
   "priceEntryMode",
-  "bookingGeneralLedger",
+  "reservationRevenueAccountId",
 ]);
 
 export const settings = pgTable("settings", {
@@ -750,7 +848,7 @@ export const integrationConnections = pgTable("integration_connections", {
 
 export const integrationMappingRefTypeEnum = pgEnum(
   "integration_mapping_ref_type",
-  ["relation"],
+  ["relation", "ledgerAccount"],
 );
 
 export const integrationMappings = pgTable("integration_mappings", {

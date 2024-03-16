@@ -1,18 +1,13 @@
-import { eq } from "drizzle-orm";
-import ejs from "ejs";
-import { picklist, string } from "valibot";
+import { and, eq } from "drizzle-orm";
+import { number, object, picklist, string } from "valibot";
 
 import db from "@/db/client";
-import { integrationConnections, logs } from "@/db/schema";
+import { integrationConnections, integrationMappings } from "@/db/schema";
 import {
   connectTwinfield,
-  getTwinfieldAccessToken,
-  getTwinfieldWsdlUrl,
   TwinfieldIntegrationData,
 } from "@/services/integration";
 import { procedure, router } from "@/trpc";
-import { readFile } from "@/utils/fileSystem";
-import { sendSoapRequest } from "@/utils/soap";
 import { wrap } from "@decs/typeschema";
 
 export const integrationRouter = router({
@@ -42,48 +37,71 @@ export const integrationRouter = router({
           }
         : undefined;
     }),
+  getMapping: procedure
+    .input(
+      wrap(
+        object({
+          refType: picklist(["relation", "productTemplate", "productInstance"]),
+          refId: number(),
+        }),
+      ),
+    )
+    // TODO Convert to query
+    .mutation(async ({ input }) => {
+      const result = await db
+        .select()
+        .from(integrationMappings)
+        .where(
+          and(
+            eq(integrationMappings.refType, input.refType),
+            eq(integrationMappings.refId, input.refId),
+          ),
+        );
+      const mapping = result[0];
+      return mapping as typeof mapping | undefined;
+    }),
   connectTwinfield: procedure
     .input(wrap(string()))
     .mutation(async ({ input: code, ctx }) => {
       await connectTwinfield(code, ctx.relation.id);
     }),
-  listTwinfieldOffices: procedure.mutation(async () => {
-    const { id, accessToken, companyCode } = await getTwinfieldAccessToken();
-    const wsdlUrl = await getTwinfieldWsdlUrl(accessToken);
+  // listTwinfieldOffices: procedure.mutation(async () => {
+  //   const { id, accessToken, companyCode } = await getTwinfieldAccessToken();
+  //   const wsdlUrl = await getTwinfieldWsdlUrl(accessToken);
 
-    console.log(companyCode);
+  //   console.log(companyCode);
 
-    let xml = await readFile("soapEnvelope", "listTwinfieldOffices.xml.ejs");
-    xml = await ejs.render(xml, { accessToken }, { async: true });
+  //   let xml = await readFile("soapEnvelope", "listTwinfieldOffices.xml.ejs");
+  //   xml = await ejs.render(xml, { accessToken }, { async: true });
 
-    try {
-      const data = await sendSoapRequest({
-        url: wsdlUrl,
-        headers: {
-          "Content-Type": "text/xml; charset=utf-8",
-          SOAPAction: "http://www.twinfield.com/ProcessXmlDocument",
-        },
-        xml,
-      });
+  //   try {
+  //     const data = await sendSoapRequest({
+  //       url: wsdlUrl,
+  //       headers: {
+  //         "Content-Type": "text/xml; charset=utf-8",
+  //         SOAPAction: "http://www.twinfield.com/ProcessXmlDocument",
+  //       },
+  //       xml,
+  //     });
 
-      const offices =
-        data.ProcessXmlDocumentResponse.ProcessXmlDocumentResult.offices.office.map(
-          (office) => ({
-            name: office["@_name"],
-            code: office["#text"].toString(),
-          }),
-        );
+  //     const offices =
+  //       data.ProcessXmlDocumentResponse.ProcessXmlDocumentResult.offices.office.map(
+  //         (office) => ({
+  //           name: office["@_name"],
+  //           code: office["#text"].toString(),
+  //         }),
+  //       );
 
-      await db.insert(logs).values({
-        type: "info",
-        event: "integrationSend",
-        refType: "integration",
-        refId: id,
-      });
+  //     await db.insert(logs).values({
+  //       type: "info",
+  //       event: "integrationSend",
+  //       refType: "integration",
+  //       refId: id,
+  //     });
 
-      return offices;
-    } catch (error) {
-      console.log(error);
-    }
-  }),
+  //     return offices;
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }),
 });

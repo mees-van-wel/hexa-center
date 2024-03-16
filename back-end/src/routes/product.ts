@@ -12,6 +12,7 @@ export const productRouter = router({
       .select({
         $kind: productTemplates.$kind,
         id: productTemplates.id,
+        revenueAccountId: productTemplates.revenueAccountId,
         name: productTemplates.name,
         price: productTemplates.price,
         vatRate: productTemplates.vatRate,
@@ -20,7 +21,23 @@ export const productRouter = router({
   ),
   deleteInstance: procedure
     .input(wrap(number()))
-    .mutation(async ({ input }) =>
-      db.delete(productInstances).where(eq(productInstances.id, input)),
-    ),
+    .mutation(async ({ input }) => {
+      await db.delete(productInstances).where(eq(productInstances.id, input));
+
+      // try {
+      //   await db
+      //     .delete(integrationMappings)
+      //     .where(
+      //       and(
+      //         eq(integrationMappings.refType, "productInstance"),
+      //         eq(integrationMappings.refId, input),
+      //       ),
+      //     );
+      // } catch (error) {
+      //   console.warn(
+      //     `Error while trying to delete integration mapping for product instance: ${input}`,
+      //     error,
+      //   );
+      // }
+    }),
 });

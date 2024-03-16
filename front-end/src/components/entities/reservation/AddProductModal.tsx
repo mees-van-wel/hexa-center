@@ -13,22 +13,25 @@ import {
 } from "@mantine/core";
 import { useDidUpdate } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
-import { IconCurrencyEuro } from "@tabler/icons-react";
+
+export type Cycle =
+  | "oneTimeOnNext"
+  | "oneTimeOnEnd"
+  | "perNightThroughout"
+  | "perNightOnEnd";
 
 export type ReservationProductValues = {
   name: string;
   price: string;
   vatRate: string;
   quantity: string;
-  cycle:
-    | "oneTimeOnNext"
-    | "oneTimeOnEnd"
-    | "perNightThroughout"
-    | "perNightOnEnd";
+  cycle: Cycle;
+  revenueAccountId: number;
 };
 
 type AddProductModalProps = {
   templates: RouterOutput["product"]["list"];
+  ledgerAccounts: RouterOutput["ledgerAccount"]["list"];
   onConfirm: (
     templateId: number | null,
     overrides: ReservationProductValues,
@@ -37,6 +40,7 @@ type AddProductModalProps = {
 
 export const AddProductModal = ({
   templates,
+  ledgerAccounts,
   onConfirm,
 }: AddProductModalProps) => {
   const [templateId, setTemplateId] = useState<number | null>(null);
@@ -52,18 +56,20 @@ export const AddProductModal = ({
     price: "",
     vatRate: "21",
     quantity: "1",
-    cycle: "",
+    revenueAccountId: null,
+    cycle: null,
   });
 
   useDidUpdate(() => {
     if (!template) return;
 
-    setValues({
+    setValues((values) => ({
       ...values,
       name: template.name,
       price: template.price,
       vatRate: template.vatRate,
-    });
+      revenueAccountId: template.revenueAccountId,
+    }));
   }, [template]);
 
   const changeHandler = (newValues: Partial<typeof values>) => {
@@ -91,22 +97,22 @@ export const AddProductModal = ({
         clearable
       />
       <Divider label="Values" />
-      <TextInput
-        label="Name"
-        value={values.name}
-        onChange={(event) => {
-          changeHandler({ name: event.target.value });
-        }}
-        withAsterisk
-      />
       <SimpleGrid cols={2} verticalSpacing="xs">
+        <TextInput
+          label="Name"
+          value={values.name}
+          onChange={(event) => {
+            changeHandler({ name: event.target.value });
+          }}
+          withAsterisk
+        />
         <NumberInput
           label="Price"
           value={values.price}
           onChange={(price) => {
             changeHandler({ price: price.toString() });
           }}
-          leftSection={<IconCurrencyEuro size="1rem" />}
+          leftSection="€"
           decimalScale={2}
           decimalSeparator=","
           fixedDecimalScale
@@ -139,16 +145,43 @@ export const AddProductModal = ({
           withAsterisk
         />
         <Select
+          label="Revenue account"
+          data={ledgerAccounts.map(({ id, name }) => ({
+            label: name,
+            value: id.toString(),
+          }))}
+          value={values.revenueAccountId?.toString()}
+          onChange={(revenueAccountId) => {
+            if (!revenueAccountId) return;
+            changeHandler({ revenueAccountId: parseInt(revenueAccountId) });
+          }}
+          allowDeselect={false}
+          withAsterisk
+        />
+        <Select
           label="Cycle"
           data={[
-            "oneTimeOnNext",
-            "oneTimeOnEnd",
-            "perNightThroughout",
-            "perNightOnEnd",
+            {
+              value: "oneTimeOnNext",
+              label: "One-Time - On Next Invoice",
+            },
+            {
+              value: "oneTimeOnEnd",
+              label: "One-Time - On Final Invoice",
+            },
+            {
+              value: "perNightThroughout",
+              label: "Per Night - On Every Invoice",
+            },
+            {
+              value: "perNightOnEnd",
+              label: "Per Night - On Final Invoice",
+            },
           ]}
           value={values.cycle}
           onChange={(cycle) => {
-            if (cycle) changeHandler({ cycle });
+            if (!cycle) return;
+            changeHandler({ cycle: cycle as Cycle });
           }}
           allowDeselect={false}
           withAsterisk

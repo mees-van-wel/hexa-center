@@ -15,12 +15,14 @@ export default async function Page({ params }: ReservationPageParams) {
 
   const reservationId = parseInt(params.id);
 
-  const [reservation, relations, rooms, productTemplates] = await Promise.all([
-    trpc.reservation.get.query(reservationId),
-    trpc.relation.list.query(),
-    trpc.room.list.query(),
-    trpc.product.list.query(),
-  ]);
+  const [reservation, relations, rooms, productTemplates, ledgerAccounts] =
+    await Promise.all([
+      trpc.reservation.get.query(reservationId),
+      trpc.relation.list.query(),
+      trpc.room.list.query(),
+      trpc.product.list.query(),
+      trpc.ledgerAccount.list.query(),
+    ]);
 
   return (
     <ReservationDetail
@@ -28,6 +30,7 @@ export default async function Page({ params }: ReservationPageParams) {
       rooms={rooms}
       relations={relations}
       productTemplates={productTemplates}
+      ledgerAccounts={ledgerAccounts}
     />
   );
 }

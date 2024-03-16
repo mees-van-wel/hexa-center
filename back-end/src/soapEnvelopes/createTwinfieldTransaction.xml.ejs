@@ -22,19 +22,19 @@
           </header>
           <lines>
             <line type="total" id="1">
-              <dim1>130000</dim1>
-              <dim2>DB10080</dim2>
-              <value>240.00</value>
+              <dim1><%= balanceAccount %></dim1>
+              <dim2><%= customerCode %></dim2>
+              <value><%= totalAmount %></value>
               <debitcredit>debit</debitcredit>
             </line>
             <% lines.forEach(function(line, index) { %>
-            <line type="detail" id="<%= index + 1 %>">
-              <dim1>804000</dim1>
-              <value>220.18</value>
+            <line type="detail" id="<%= index + 2 %>">
+              <dim1><%= line.revenueAccountId %></dim1>
+              <value><%= line.netAmount %></value>
               <debitcredit>credit</debitcredit>
-              <description><![CDATA[Overnight stays]]></description>
-              <vatcode>VL</vatcode>
-              <vatvalue>19.82</vatvalue>
+              <description><![CDATA[<%- line.name %>]]></description>
+              <vatcode><%= line.vatCode %></vatcode>
+              <vatvalue><%= line.vatAmount %></vatvalue>
             </line>
             <% }); %>
           </lines>

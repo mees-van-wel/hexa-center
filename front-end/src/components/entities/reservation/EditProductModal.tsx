@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { RouterOutput } from "@/utils/trpc";
 import {
   Button,
   ButtonGroup,
@@ -11,14 +12,16 @@ import {
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 
-import { ReservationProductValues } from "./AddProductModal";
+import { Cycle, ReservationProductValues } from "./AddProductModal";
 
 type EditProductModalProps = {
+  ledgerAccounts: RouterOutput["ledgerAccount"]["list"];
   currentValues: ReservationProductValues;
   onConfirm: (updatedValues: ReservationProductValues) => void;
 };
 
 export const EditProductModal = ({
+  ledgerAccounts,
   currentValues,
   onConfirm,
 }: EditProductModalProps) => {
@@ -27,6 +30,7 @@ export const EditProductModal = ({
     price: currentValues.price,
     vatRate: currentValues.vatRate,
     quantity: currentValues.quantity,
+    revenueAccountId: currentValues.revenueAccountId,
     cycle: currentValues.cycle,
   });
 
@@ -41,21 +45,22 @@ export const EditProductModal = ({
 
   return (
     <Stack>
-      <TextInput
-        label="Name"
-        value={values.name}
-        onChange={(event) => {
-          changeHandler({ name: event.target.value });
-        }}
-        withAsterisk
-      />
       <SimpleGrid cols={2} verticalSpacing="xs">
+        <TextInput
+          label="Name"
+          value={values.name}
+          onChange={(event) => {
+            changeHandler({ name: event.target.value });
+          }}
+          withAsterisk
+        />
         <NumberInput
           label="Price"
           value={values.price}
           onChange={(price) => {
             changeHandler({ price: price.toString() });
           }}
+          leftSection="€"
           decimalScale={2}
           decimalSeparator=","
           fixedDecimalScale
@@ -88,16 +93,43 @@ export const EditProductModal = ({
           withAsterisk
         />
         <Select
+          label="Revenue account"
+          data={ledgerAccounts.map(({ id, name }) => ({
+            label: name,
+            value: id.toString(),
+          }))}
+          value={values.revenueAccountId?.toString()}
+          onChange={(revenueAccountId) => {
+            if (!revenueAccountId) return;
+            changeHandler({ revenueAccountId: parseInt(revenueAccountId) });
+          }}
+          allowDeselect={false}
+          withAsterisk
+        />
+        <Select
           label="Cycle"
           data={[
-            "oneTimeOnNext",
-            "oneTimeOnEnd",
-            "perNightThroughout",
-            "perNightOnEnd",
+            {
+              value: "oneTimeOnNext",
+              label: "One-Time - On Next Invoice",
+            },
+            {
+              value: "oneTimeOnEnd",
+              label: "One-Time - On Final Invoice",
+            },
+            {
+              value: "perNightThroughout",
+              label: "Per Night - On Every Invoice",
+            },
+            {
+              value: "perNightOnEnd",
+              label: "Per Night - On Final Invoice",
+            },
           ]}
           value={values.cycle}
           onChange={(cycle) => {
-            if (cycle) changeHandler({ cycle });
+            if (!cycle) return;
+            changeHandler({ cycle: cycle as Cycle });
           }}
           allowDeselect={false}
           withAsterisk
