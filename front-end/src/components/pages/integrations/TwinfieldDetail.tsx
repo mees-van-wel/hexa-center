@@ -21,7 +21,6 @@ export const TwinfieldDetail = ({ integration }: TwinfieldDetailProps) => {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState<Step>();
   const connectTwinfield = useMutation("integration", "connectTwinfield");
-  const test = useMutation("integration", "listTwinfieldOffices");
   const router = useRouter();
 
   // const twinfieldConnectHandler = () => {
@@ -90,15 +89,11 @@ export const TwinfieldDetail = ({ integration }: TwinfieldDetailProps) => {
               leftSection={
                 integration?.data?.companyCode ? <IconCheck /> : undefined
               }
-              onClick={async () => {
-                const a = await test.mutate();
-                console.log(a);
-              }}
             >
               Choose
             </Button>
           </div>
-          <div>
+          {/* <div>
             <Title order={3} mb="xs">
               Step 3. Syncing your customers
             </Title>
@@ -109,7 +104,7 @@ export const TwinfieldDetail = ({ integration }: TwinfieldDetailProps) => {
               Step 4. Selecting the correct ledgers
             </Title>
             <Button>Select</Button>
-          </div>
+          </div> */}
         </Stack>
       </Paper>
     </Stack>

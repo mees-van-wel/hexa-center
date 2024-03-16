@@ -163,7 +163,7 @@ export const ReservationDetail = ({
 
   const createProductHandler = () => {
     modals.open({
-      title: <Title order={3}>Add Invoice Extra</Title>,
+      title: <Title order={3}>Add Product</Title>,
       children: (
         <AddProductModal
           templates={productTemplates}
@@ -177,7 +177,7 @@ export const ReservationDetail = ({
             router.refresh();
 
             notifications.show({
-              message: "Invoice extra successfully added",
+              message: "Product successfully added",
               color: "green",
             });
           }}
@@ -194,7 +194,7 @@ export const ReservationDetail = ({
     if (!productInstanceJunction) return;
 
     modals.open({
-      title: <Title order={3}>Edit Invoice Extra</Title>,
+      title: <Title order={3}>Edit Product</Title>,
       children: (
         <EditProductModal
           currentValues={{
@@ -214,7 +214,7 @@ export const ReservationDetail = ({
             router.refresh();
 
             notifications.show({
-              message: "Invoice extra successfully edited",
+              message: "Product successfully edited",
               color: "green",
             });
           }}
@@ -236,7 +236,7 @@ export const ReservationDetail = ({
         router.refresh();
 
         notifications.show({
-          message: "Invoice extra status successfully resetted",
+          message: "Product status successfully resetted",
           color: "green",
         });
       },
@@ -253,7 +253,7 @@ export const ReservationDetail = ({
         router.refresh();
 
         notifications.show({
-          message: "Invoice extra successfully deleted",
+          message: "Product successfully deleted",
           color: "green",
         });
       },
@@ -311,7 +311,7 @@ export const ReservationDetail = ({
           <Band
             title={
               <>
-                <Title order={3}>Invoice Extra&apos;s</Title>
+                <Title order={3}>Products</Title>
                 <Button
                   onClick={createProductHandler}
                   leftSection={<IconPlus />}

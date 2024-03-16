@@ -91,15 +91,15 @@ export const AddProductModal = ({
         clearable
       />
       <Divider label="Values" />
+      <TextInput
+        label="Name"
+        value={values.name}
+        onChange={(event) => {
+          changeHandler({ name: event.target.value });
+        }}
+        withAsterisk
+      />
       <SimpleGrid cols={2} verticalSpacing="xs">
-        <TextInput
-          label="Name"
-          value={values.name}
-          onChange={(event) => {
-            changeHandler({ name: event.target.value });
-          }}
-          withAsterisk
-        />
         <NumberInput
           label="Price"
           value={values.price}
