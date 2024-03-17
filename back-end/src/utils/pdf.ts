@@ -12,7 +12,7 @@ export const generatePdf = async <T extends PDFTemplate>(
   const browser = await puppeteer.launch({ headless: "new" });
   const page = await browser.newPage();
 
-  let htmlContent = await readFile("pdf", `${templateName}.ejs`);
+  let htmlContent = await readFile("pdf", `${templateName}.html.ejs`);
   htmlContent = await ejs.render(htmlContent, variables, { async: true });
 
   await page.setContent(htmlContent);

@@ -854,6 +854,7 @@ export const ledgerAccountsRelations = relations(ledgerAccounts, ({ one }) => ({
 
 export const settingNameEnum = pgEnum("setting_name", [
   "companyPaymentTerms",
+  "companyLogoSrc",
   "invoiceEmailTitle",
   "invoiceEmailContent",
   "invoiceHeaderImageSrc",

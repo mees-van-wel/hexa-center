@@ -1,0 +1,1 @@
+ALTER TYPE "setting_name" ADD VALUE 'companyLogoSrc';

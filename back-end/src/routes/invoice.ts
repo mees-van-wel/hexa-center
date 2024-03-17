@@ -16,7 +16,7 @@ import {
   invertDecimalString,
   issueInvoice,
 } from "@/services/invoice";
-import { getSettings } from "@/services/setting";
+import { getSetting, getSettings } from "@/services/setting";
 import { procedure, router } from "@/trpc";
 import { sendMail } from "@/utils/mail";
 import { wrap } from "@decs/typeschema";
@@ -95,8 +95,26 @@ export const invoiceRouter = router({
         message: "Missing customer email",
       });
 
+    const companyName = invoice.companyName || invoice.company?.name;
+    if (!customerEmail)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Missing company name",
+      });
+
+    const companyLogoSrc = await getSetting("companyLogoSrc");
+    if (!companyLogoSrc)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Missing company logo src",
+      });
+
     await sendMail({
+      logo: companyLogoSrc,
       title: invoiceEmailTitle,
+      from: {
+        name: companyName,
+      },
       to: {
         name: customerName,
         email: customerEmail,
