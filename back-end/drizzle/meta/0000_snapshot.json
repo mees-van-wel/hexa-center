@@ -1,5 +1,5 @@
 {
-  "id": "78e6c946-7702-42aa-ae12-73d73b5fd744",
+  "id": "430356bb-bf03-47e2-8b84-bc6abe815ca4",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -145,8 +145,8 @@
         }
       }
     },
-    "integration_entities": {
-      "name": "integration_entities",
+    "integration_mappings": {
+      "name": "integration_mappings",
       "schema": "",
       "columns": {
         "$kind": {
@@ -154,7 +154,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'integrationEntity'"
+          "default": "'integrationMapping'"
         },
         "id": {
           "name": "id",
@@ -173,11 +173,11 @@
           "name": "connection_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "ref_type": {
           "name": "ref_type",
-          "type": "integration_entity_ref_type",
+          "type": "integration_mapping_ref_type",
           "primaryKey": false,
           "notNull": true
         },
@@ -187,18 +187,18 @@
           "primaryKey": false,
           "notNull": true
         },
-        "external_id": {
-          "name": "external_id",
-          "type": "text",
+        "data": {
+          "name": "data",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "integration_entities_connection_id_integration_connections_id_fk": {
-          "name": "integration_entities_connection_id_integration_connections_id_fk",
-          "tableFrom": "integration_entities",
+        "integration_mappings_connection_id_integration_connections_id_fk": {
+          "name": "integration_mappings_connection_id_integration_connections_id_fk",
+          "tableFrom": "integration_mappings",
           "tableTo": "integration_connections",
           "columnsFrom": [
             "connection_id"
@@ -323,6 +323,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "revenue_account_id": {
+          "name": "revenue_account_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
         "name": {
           "name": "name",
           "type": "text",
@@ -379,6 +385,19 @@
             "id"
           ],
           "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "invoice_lines_revenue_account_id_ledger_accounts_id_fk": {
+          "name": "invoice_lines_revenue_account_id_ledger_accounts_id_fk",
+          "tableFrom": "invoice_lines",
+          "tableTo": "ledger_accounts",
+          "columnsFrom": [
+            "revenue_account_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
           "onUpdate": "no action"
         }
       },
@@ -698,6 +717,311 @@
         }
       }
     },
+    "ledger_account_types": {
+      "name": "ledger_account_types",
+      "schema": "",
+      "columns": {
+        "$kind": {
+          "name": "$kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'ledgerAccount'"
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "uuid": {
+          "name": "uuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "created_by_id": {
+          "name": "created_by_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_by_id": {
+          "name": "updated_by_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ledger_account_types_created_by_id_relations_id_fk": {
+          "name": "ledger_account_types_created_by_id_relations_id_fk",
+          "tableFrom": "ledger_account_types",
+          "tableTo": "relations",
+          "columnsFrom": [
+            "created_by_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "ledger_account_types_updated_by_id_relations_id_fk": {
+          "name": "ledger_account_types_updated_by_id_relations_id_fk",
+          "tableFrom": "ledger_account_types",
+          "tableTo": "relations",
+          "columnsFrom": [
+            "updated_by_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "ledger_accounts": {
+      "name": "ledger_accounts",
+      "schema": "",
+      "columns": {
+        "$kind": {
+          "name": "$kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'ledgerAccount'"
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "uuid": {
+          "name": "uuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "created_by_id": {
+          "name": "created_by_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_by_id": {
+          "name": "updated_by_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ledger_id": {
+          "name": "ledger_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type_id": {
+          "name": "type_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ledger_accounts_created_by_id_relations_id_fk": {
+          "name": "ledger_accounts_created_by_id_relations_id_fk",
+          "tableFrom": "ledger_accounts",
+          "tableTo": "relations",
+          "columnsFrom": [
+            "created_by_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "ledger_accounts_updated_by_id_relations_id_fk": {
+          "name": "ledger_accounts_updated_by_id_relations_id_fk",
+          "tableFrom": "ledger_accounts",
+          "tableTo": "relations",
+          "columnsFrom": [
+            "updated_by_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "ledger_accounts_ledger_id_ledgers_id_fk": {
+          "name": "ledger_accounts_ledger_id_ledgers_id_fk",
+          "tableFrom": "ledger_accounts",
+          "tableTo": "ledgers",
+          "columnsFrom": [
+            "ledger_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "ledger_accounts_type_id_ledger_account_types_id_fk": {
+          "name": "ledger_accounts_type_id_ledger_account_types_id_fk",
+          "tableFrom": "ledger_accounts",
+          "tableTo": "ledger_account_types",
+          "columnsFrom": [
+            "type_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "ledgers": {
+      "name": "ledgers",
+      "schema": "",
+      "columns": {
+        "$kind": {
+          "name": "$kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'ledger'"
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "uuid": {
+          "name": "uuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "created_by_id": {
+          "name": "created_by_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_by_id": {
+          "name": "updated_by_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ledgers_created_by_id_relations_id_fk": {
+          "name": "ledgers_created_by_id_relations_id_fk",
+          "tableFrom": "ledgers",
+          "tableTo": "relations",
+          "columnsFrom": [
+            "created_by_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "ledgers_updated_by_id_relations_id_fk": {
+          "name": "ledgers_updated_by_id_relations_id_fk",
+          "tableFrom": "ledgers",
+          "tableTo": "relations",
+          "columnsFrom": [
+            "updated_by_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
     "logs": {
       "name": "logs",
       "schema": "",
@@ -859,6 +1183,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "revenue_account_id": {
+          "name": "revenue_account_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
         "name": {
           "name": "name",
           "type": "text",
@@ -891,6 +1221,19 @@
             "id"
           ],
           "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "product_instances_revenue_account_id_ledger_accounts_id_fk": {
+          "name": "product_instances_revenue_account_id_ledger_accounts_id_fk",
+          "tableFrom": "product_instances",
+          "tableTo": "ledger_accounts",
+          "columnsFrom": [
+            "revenue_account_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
           "onUpdate": "no action"
         }
       },
@@ -947,6 +1290,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "revenue_account_id": {
+          "name": "revenue_account_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
         "name": {
           "name": "name",
           "type": "text",
@@ -992,6 +1341,19 @@
             "id"
           ],
           "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "product_templates_revenue_account_id_ledger_accounts_id_fk": {
+          "name": "product_templates_revenue_account_id_ledger_accounts_id_fk",
+          "tableFrom": "product_templates",
+          "tableTo": "ledger_accounts",
+          "columnsFrom": [
+            "revenue_account_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
           "onUpdate": "no action"
         }
       },
@@ -2135,10 +2497,12 @@
         "twinfield": "twinfield"
       }
     },
-    "integration_entity_ref_type": {
-      "name": "integration_entity_ref_type",
+    "integration_mapping_ref_type": {
+      "name": "integration_mapping_ref_type",
       "values": {
-        "relation": "relation"
+        "relation": "relation",
+        "ledgerAccount": "ledgerAccount",
+        "ledgerAccountType": "ledgerAccountType"
       }
     },
     "invoice_event_ref_type": {
@@ -2239,7 +2603,7 @@
         "invoiceHeaderImageSrc": "invoiceHeaderImageSrc",
         "invoiceFooterImageSrc": "invoiceFooterImageSrc",
         "priceEntryMode": "priceEntryMode",
-        "bookingGeneralLedger": "bookingGeneralLedger"
+        "reservationRevenueAccountId": "reservationRevenueAccountId"
       }
     }
   },

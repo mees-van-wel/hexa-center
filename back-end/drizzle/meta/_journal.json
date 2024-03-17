@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1710519506177,
+      "when": 1710672384928,
       "tag": "0000_lethal_doctor_doom",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1710634584239,
-      "tag": "0001_oval_green_goblin",
       "breakpoints": true
     }
   ]
