@@ -24,7 +24,7 @@ export const InvoicesOverview = ({ invoices }: InvoicesOverviewProps) => {
   const searchBarId = useId();
   const t = useTranslation();
 
-  const totalIncomeThisYear = useMemo(
+  const totalRevenueThisYear = useMemo(
     () =>
       Intl.NumberFormat("nl-NL", {
         style: "currency",
@@ -41,7 +41,7 @@ export const InvoicesOverview = ({ invoices }: InvoicesOverviewProps) => {
     [invoices],
   );
 
-  const totalIncomePreviousYear = useMemo(
+  const totalRevenuePreviousYear = useMemo(
     () =>
       Intl.NumberFormat("nl-NL", {
         style: "currency",
@@ -71,14 +71,14 @@ export const InvoicesOverview = ({ invoices }: InvoicesOverviewProps) => {
 
             clone[index] = {
               ...current,
-              incomeThisYear:
+              revenueThisYear:
                 invoice.date.getFullYear() === year
-                  ? current.incomeThisYear.add(invoice.netAmount)
-                  : current.incomeThisYear,
-              incomePreviousYear:
+                  ? current.revenueThisYear.add(invoice.netAmount)
+                  : current.revenueThisYear,
+              revenuePreviousYear:
                 invoice.date.getFullYear() === year - 1
-                  ? current.incomePreviousYear.add(invoice.netAmount)
-                  : current.incomePreviousYear,
+                  ? current.revenuePreviousYear.add(invoice.netAmount)
+                  : current.revenuePreviousYear,
             };
 
             return clone;
@@ -86,72 +86,72 @@ export const InvoicesOverview = ({ invoices }: InvoicesOverviewProps) => {
           [
             {
               date: "January",
-              incomeThisYear: new Decimal(0),
-              incomePreviousYear: new Decimal(0),
+              revenueThisYear: new Decimal(0),
+              revenuePreviousYear: new Decimal(0),
             },
             {
               date: "February",
-              incomeThisYear: new Decimal(0),
-              incomePreviousYear: new Decimal(0),
+              revenueThisYear: new Decimal(0),
+              revenuePreviousYear: new Decimal(0),
             },
             {
               date: "March",
-              incomeThisYear: new Decimal(0),
-              incomePreviousYear: new Decimal(0),
+              revenueThisYear: new Decimal(0),
+              revenuePreviousYear: new Decimal(0),
             },
             {
               date: "April",
-              incomeThisYear: new Decimal(0),
-              incomePreviousYear: new Decimal(0),
+              revenueThisYear: new Decimal(0),
+              revenuePreviousYear: new Decimal(0),
             },
             {
               date: "May",
-              incomeThisYear: new Decimal(0),
-              incomePreviousYear: new Decimal(0),
+              revenueThisYear: new Decimal(0),
+              revenuePreviousYear: new Decimal(0),
             },
             {
               date: "June",
-              incomeThisYear: new Decimal(0),
-              incomePreviousYear: new Decimal(0),
+              revenueThisYear: new Decimal(0),
+              revenuePreviousYear: new Decimal(0),
             },
             {
               date: "July",
-              incomeThisYear: new Decimal(0),
-              incomePreviousYear: new Decimal(0),
+              revenueThisYear: new Decimal(0),
+              revenuePreviousYear: new Decimal(0),
             },
             {
               date: "August",
-              incomeThisYear: new Decimal(0),
-              incomePreviousYear: new Decimal(0),
+              revenueThisYear: new Decimal(0),
+              revenuePreviousYear: new Decimal(0),
             },
             {
               date: "September",
-              incomeThisYear: new Decimal(0),
-              incomePreviousYear: new Decimal(0),
+              revenueThisYear: new Decimal(0),
+              revenuePreviousYear: new Decimal(0),
             },
             {
               date: "October",
-              incomeThisYear: new Decimal(0),
-              incomePreviousYear: new Decimal(0),
+              revenueThisYear: new Decimal(0),
+              revenuePreviousYear: new Decimal(0),
             },
             {
               date: "November",
-              incomeThisYear: new Decimal(0),
-              incomePreviousYear: new Decimal(0),
+              revenueThisYear: new Decimal(0),
+              revenuePreviousYear: new Decimal(0),
             },
             {
               date: "December",
-              incomeThisYear: new Decimal(0),
-              incomePreviousYear: new Decimal(0),
+              revenueThisYear: new Decimal(0),
+              revenuePreviousYear: new Decimal(0),
             },
           ],
         )
         .map((month) => ({
           ...month,
-          incomeThisYear: month.incomeThisYear
+          revenueThisYear: month.revenueThisYear
             .toDecimalPlaces(2, Decimal.ROUND_HALF_UP)
             .toNumber(),
-          incomePreviousYear: month.incomePreviousYear
+          revenuePreviousYear: month.revenuePreviousYear
             .toDecimalPlaces(2, Decimal.ROUND_HALF_UP)
             .toNumber(),
         })),
@@ -168,9 +168,9 @@ export const InvoicesOverview = ({ invoices }: InvoicesOverviewProps) => {
         <Table.SearchBar id={searchBarId} />
       </DashboardHeader>
       <Paper p="md">
-        <Title order={3}>Total income this year: {totalIncomeThisYear}</Title>
+        <Title order={3}>Total revenue this year: {totalRevenueThisYear}</Title>
         <Title order={4} mb="md" c="dimmed">
-          Total income last year: {totalIncomePreviousYear}
+          Total revenue last year: {totalRevenuePreviousYear}
         </Title>
         <AreaChart
           h={200}
@@ -179,13 +179,13 @@ export const InvoicesOverview = ({ invoices }: InvoicesOverviewProps) => {
           dataKey="date"
           series={[
             {
-              name: "incomeThisYear",
-              label: "Income this year",
+              name: "revenueThisYear",
+              label: "Revenue this year",
               color: "blue.6",
             },
             {
-              name: "incomePreviousYear",
-              label: "Income previous year",
+              name: "revenuePreviousYear",
+              label: "Revenue previous year",
               color: "gray.6",
             },
           ]}
