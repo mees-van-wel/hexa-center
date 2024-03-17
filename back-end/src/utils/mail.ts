@@ -38,11 +38,11 @@ type SendMailProps<T extends keyof Mails> = {
   footer?: string;
   from?: {
     name?: string;
-    emailAddress?: string;
+    email?: string;
   };
   to: {
     name: string;
-    emailAddress: string;
+    email: string;
   };
   template: T;
   variables: Mails[T];
@@ -56,7 +56,7 @@ export const sendMail = async <T extends keyof Mails>({
   footer,
   from = {
     name: company,
-    emailAddress: "noreply@hexa.center",
+    email: "noreply@hexa.center",
   },
   to,
   template,
@@ -85,8 +85,8 @@ export const sendMail = async <T extends keyof Mails>({
   const { html } = mjml2html(baseTemplateContent.replace(/{{.*?}}/g, ""));
 
   return await postmarkClient.sendEmail({
-    From: `${from.name} <${from.emailAddress}>`,
-    To: `${to.name} <${to.emailAddress}>`,
+    From: `${from.name} <${from.email}>`,
+    To: `${to.name} <${to.email}>`,
     Subject: title,
     HtmlBody: html,
     Attachments: attachments,

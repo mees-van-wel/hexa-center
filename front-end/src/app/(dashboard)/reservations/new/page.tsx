@@ -7,14 +7,14 @@ export default async function Page() {
   const refreshToken = cookies().get("refreshToken")?.value;
   if (refreshToken) setTRPCRefreshToken(refreshToken);
 
-  const relations = await trpc.relation.list.query();
+  const customers = await trpc.customer.list.query();
   const rooms = await trpc.room.list.query();
   const reservations = await trpc.reservation.list.query();
 
   return (
     <ReservationCreate
       rooms={rooms}
-      relations={relations}
+      customers={customers}
       reservations={reservations}
     />
   );

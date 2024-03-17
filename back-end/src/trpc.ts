@@ -6,7 +6,7 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import * as trpcExpress from "@trpc/server/adapters/express";
 
 import db from "./db/client";
-import { relations, sessions } from "./db/schema";
+import { users, userSessions } from "./db/schema";
 
 export const createContext = async ({
   req,
@@ -18,22 +18,22 @@ export const createContext = async ({
   if (authHeader && authHeader.startsWith("Bearer "))
     refreshToken = authHeader.substring(7, authHeader.length);
 
-  if (!refreshToken) return { req, res, relation: null };
+  if (!refreshToken) return { req, res, user: null };
 
   const now = new Date();
 
   const sessionsResult = await db
     .select({
-      id: sessions.id,
-      relationId: sessions.relationId,
-      expiresAt: sessions.expiresAt,
-      ipAddress: sessions.ipAddress,
+      id: userSessions.id,
+      userId: userSessions.userId,
+      expiresAt: userSessions.expiresAt,
+      ipAddress: userSessions.ipAddress,
     })
-    .from(sessions)
+    .from(userSessions)
     .where(
       and(
-        eq(sessions.refreshToken, refreshToken),
-        or(gt(sessions.expiresAt, now), isNull(sessions.expiresAt)),
+        eq(userSessions.refreshToken, refreshToken),
+        or(gt(userSessions.expiresAt, now), isNull(userSessions.expiresAt)),
       ),
     );
 
@@ -48,28 +48,29 @@ export const createContext = async ({
       maxAge: 0,
     });
 
-    return { req, res, relation: null };
+    return { req, res, user: null };
   }
 
-  const relation = await db.query.relations.findFirst({
-    where: eq(relations.id, session.relationId),
+  const user = await db.query.users.findFirst({
+    where: eq(users.id, session.userId),
     columns: {
       id: true,
-      name: true,
-      emailAddress: true,
-      phoneNumber: true,
-      street: true,
-      houseNumber: true,
-      postalCode: true,
+      propertyId: true,
+      firstName: true,
+      lastName: true,
+      email: true,
+      phone: true,
+      addressLineOne: true,
+      addressLineTwo: true,
       city: true,
       region: true,
+      postalCode: true,
       country: true,
       sex: true,
-      dateOfBirth: true,
-      propertyId: true,
+      birthDate: true,
     },
     with: {
-      account: {
+      accountDetails: {
         columns: {
           locale: true,
           theme: true,
@@ -111,15 +112,15 @@ export const createContext = async ({
 
   (async () => {
     await db
-      .update(sessions)
+      .update(userSessions)
       .set({
         lastAccessed: now,
         // refreshToken,
       })
-      .where(eq(sessions.id, session.id));
+      .where(eq(userSessions.id, session.id));
   })();
 
-  return { req, res, relation: relation || null };
+  return { req, res, user: user || null };
 };
 
 type Context = Awaited<ReturnType<typeof createContext>>;
@@ -133,11 +134,10 @@ const t = initTRPC.context<Context>().meta<Meta>().create({
 });
 
 const authMiddleware = t.middleware(({ meta, next, ctx }) => {
-  if (!meta?.public && !ctx.relation)
-    throw new TRPCError({ code: "UNAUTHORIZED" });
+  if (!meta?.public && !ctx.user) throw new TRPCError({ code: "UNAUTHORIZED" });
   return next({
     ctx: {
-      relation: ctx.relation as NonNullable<typeof ctx.relation>,
+      user: ctx.user as NonNullable<typeof ctx.user>,
     },
   });
 });

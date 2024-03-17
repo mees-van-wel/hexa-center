@@ -138,7 +138,7 @@ const SaveBadge = () => {
 
       if (exception === "DB_UNIQUE_CONSTRAINT") {
         setError(data.column, {
-          message: `${t("entities.property.name.singular")} - ${getValues(
+          message: `${t("entities.property.singularName")} - ${getValues(
             data.column,
           )} - ${data.column}`,
         });

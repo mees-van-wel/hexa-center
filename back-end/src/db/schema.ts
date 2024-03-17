@@ -1,4 +1,4 @@
-import { relations as relationBuilder, sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   AnyPgColumn,
   date,
@@ -26,36 +26,40 @@ export const properties = pgTable("properties", {
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
   createdById: integer("created_by_id").references(
-    (): AnyPgColumn => relations.id,
+    (): AnyPgColumn => users.id,
     {
       onDelete: "set null",
     },
   ),
   updatedById: integer("updated_by_id").references(
-    (): AnyPgColumn => relations.id,
+    (): AnyPgColumn => users.id,
     {
       onDelete: "set null",
     },
   ),
   name: text("name").unique().notNull(),
-  emailAddress: text("email_address"),
-  phoneNumber: text("phone_number"),
-  street: text("street"),
-  houseNumber: text("house_number"),
-  postalCode: text("postal_code"),
-  city: text("city"),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  addressLineOne: text("address_line_one").notNull(),
+  addressLineTwo: text("address_line_two"),
+  city: text("city").notNull(),
   region: text("region"),
-  country: text("country"),
+  postalCode: text("postal_code"),
+  country: text("country").notNull(),
+  cocNumber: text("coc_number").notNull(),
+  vatId: text("vat_id").notNull(),
+  iban: text("iban").notNull(),
+  swiftBic: text("swift_bic").notNull(),
 });
 
-export const propertiesRelations = relationBuilder(properties, ({ one }) => ({
-  createdBy: one(relations, {
+export const propertiesRelations = relations(properties, ({ one }) => ({
+  createdBy: one(users, {
     fields: [properties.createdById],
-    references: [relations.id],
+    references: [users.id],
   }),
-  updatedBy: one(relations, {
+  updatedBy: one(users, {
     fields: [properties.updatedById],
-    references: [relations.id],
+    references: [users.id],
   }),
 }));
 
@@ -70,13 +74,13 @@ export const roles = pgTable("roles", {
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
   createdById: integer("created_by_id").references(
-    (): AnyPgColumn => relations.id,
+    (): AnyPgColumn => users.id,
     {
       onDelete: "set null",
     },
   ),
   updatedById: integer("updated_by_id").references(
-    (): AnyPgColumn => relations.id,
+    (): AnyPgColumn => users.id,
     {
       onDelete: "set null",
     },
@@ -84,14 +88,14 @@ export const roles = pgTable("roles", {
   name: text("name").unique().notNull(),
 });
 
-export const rolesRelations = relationBuilder(roles, ({ one }) => ({
-  createdBy: one(relations, {
+export const rolesRelations = relations(roles, ({ one }) => ({
+  createdBy: one(users, {
     fields: [roles.createdById],
-    references: [relations.id],
+    references: [users.id],
   }),
-  updatedBy: one(relations, {
+  updatedBy: one(users, {
     fields: [roles.updatedById],
-    references: [relations.id],
+    references: [users.id],
   }),
 }));
 
@@ -108,20 +112,15 @@ export const permissions = pgTable(
   }),
 );
 
-export const permissionsRelations = relationBuilder(permissions, ({ one }) => ({
+export const permissionsRelations = relations(permissions, ({ one }) => ({
   role: one(roles, {
     fields: [permissions.roleId],
     references: [roles.id],
   }),
 }));
 
-export const relationTypeEnum = pgEnum("relation_type", [
-  "individual",
-  "business",
-]);
-
-export const relations = pgTable("relations", {
-  $kind: text("$kind").default("relation").notNull(),
+export const users = pgTable("users", {
+  $kind: text("$kind").default("user").notNull(),
   id: serial("id").primaryKey(),
   uuid: uuid("uuid").defaultRandom().notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -131,16 +130,12 @@ export const relations = pgTable("relations", {
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
   createdById: integer("created_by_id").references(
-    (): AnyPgColumn => relations.id,
-    {
-      onDelete: "set null",
-    },
+    (): AnyPgColumn => users.id,
+    { onDelete: "set null" },
   ),
   updatedById: integer("updated_by_id").references(
-    (): AnyPgColumn => relations.id,
-    {
-      onDelete: "set null",
-    },
+    (): AnyPgColumn => users.id,
+    { onDelete: "set null" },
   ),
   propertyId: integer("property_id")
     .references(() => properties.id, { onDelete: "restrict" })
@@ -148,55 +143,47 @@ export const relations = pgTable("relations", {
   roleId: integer("role_id")
     .references(() => roles.id, { onDelete: "restrict" })
     .notNull(),
-  type: relationTypeEnum("type").notNull(),
-  name: text("name").notNull(),
-  emailAddress: text("email_address").unique(),
-  phoneNumber: text("phone_number").unique(),
-  street: text("street"),
-  houseNumber: text("house_number"),
-  postalCode: text("postal_code"),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
+  email: text("email").unique(),
+  phone: text("phone").unique(),
+  addressLineOne: text("address_line_one"),
+  addressLineTwo: text("address_line_two"),
   city: text("city"),
   region: text("region"),
+  postalCode: text("postal_code"),
   country: text("country"),
   sex: text("sex"),
-  dateOfBirth: date("date_of_birth", { mode: "date" }),
-  vatNumber: text("vat_number"),
-  cocNumber: text("coc_number"),
-  businessContactName: text("business_contact_name"),
-  businessContactEmailAddress: text("business_contact_email_address"),
-  businessContactPhoneNumber: text("business_contact_phone_number"),
+  birthDate: date("birth_date", { mode: "date" }),
 });
 
-export const relationsRelations = relationBuilder(
-  relations,
-  ({ one, many }) => ({
-    createdBy: one(relations, {
-      fields: [relations.createdById],
-      references: [relations.id],
-    }),
-    updatedBy: one(relations, {
-      fields: [relations.updatedById],
-      references: [relations.id],
-    }),
-    property: one(properties, {
-      fields: [relations.propertyId],
-      references: [properties.id],
-    }),
-    role: one(roles, {
-      fields: [relations.roleId],
-      references: [roles.id],
-    }),
-    sessions: many(sessions),
-    account: one(accounts, {
-      fields: [relations.id],
-      references: [accounts.relationId],
-    }),
+export const usersRelations = relations(users, ({ one, many }) => ({
+  createdBy: one(users, {
+    fields: [users.createdById],
+    references: [users.id],
   }),
-);
+  updatedBy: one(users, {
+    fields: [users.updatedById],
+    references: [users.id],
+  }),
+  property: one(properties, {
+    fields: [users.propertyId],
+    references: [properties.id],
+  }),
+  role: one(roles, {
+    fields: [users.roleId],
+    references: [roles.id],
+  }),
+  accountDetails: one(userAccountDetails),
+  sessions: many(userSessions),
+}));
 
-export const sessions = pgTable("sessions", {
+export const userSessions = pgTable("user_sessions", {
   id: serial("id").primaryKey(),
   uuid: uuid("uuid").defaultRandom().notNull(),
+  userId: integer("user_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
   issuedAt: timestamp("issued_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -204,26 +191,23 @@ export const sessions = pgTable("sessions", {
     .defaultNow()
     .notNull(),
   expiresAt: timestamp("expires_at", { withTimezone: true }),
-  relationId: integer("relation_id")
-    .references(() => relations.id, { onDelete: "cascade" })
-    .notNull(),
   refreshToken: text("refresh_token").unique().notNull(),
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
 });
 
-export const sessionsRelations = relationBuilder(sessions, ({ one }) => ({
-  relation: one(relations, {
-    fields: [sessions.relationId],
-    references: [relations.id],
+export const userSessionsRelations = relations(userSessions, ({ one }) => ({
+  user: one(users, {
+    fields: [userSessions.userId],
+    references: [users.id],
   }),
 }));
 
-export const accounts = pgTable("accounts", {
+export const userAccountDetails = pgTable("user_account_details", {
   id: serial("id").primaryKey(),
   uuid: uuid("uuid").defaultRandom().notNull(),
-  relationId: integer("relation_id")
-    .references(() => relations.id, { onDelete: "cascade" })
+  userId: integer("user_id")
+    .references(() => users.id, { onDelete: "cascade" })
     .notNull(),
   locale: text("locale").notNull(),
   theme: text("theme").notNull(),
@@ -235,28 +219,38 @@ export const accounts = pgTable("accounts", {
   firstDayOfWeek: text("firstDayOfWeek").notNull(),
 });
 
-export const accountsRelations = relationBuilder(accounts, ({ many }) => ({
-  workingHours: many(workingHours),
-}));
+export const userAccountDetailsRelations = relations(
+  userAccountDetails,
+  ({ one, many }) => ({
+    user: one(users, {
+      fields: [userAccountDetails.userId],
+      references: [users.id],
+    }),
+    workingHours: many(userAccountDetailsWorkingHours),
+  }),
+);
 
-export const workingHours = pgTable("working_hours", {
-  id: serial("id").primaryKey(),
-  uuid: uuid("uuid").defaultRandom().notNull(),
-  accountId: integer("account_id")
-    .references(() => accounts.id, { onDelete: "cascade" })
-    .notNull(),
-  startDay: integer("start_day").notNull(),
-  endDay: integer("end_day").notNull(),
-  startTime: time("start_time", { withTimezone: true }).notNull(),
-  endTime: time("end_time", { withTimezone: true }).notNull(),
-});
+export const userAccountDetailsWorkingHours = pgTable(
+  "user_account_details_working_hours",
+  {
+    id: serial("id").primaryKey(),
+    uuid: uuid("uuid").defaultRandom().notNull(),
+    accountId: integer("account_id")
+      .references(() => userAccountDetails.id, { onDelete: "cascade" })
+      .notNull(),
+    startDay: integer("start_day").notNull(),
+    endDay: integer("end_day").notNull(),
+    startTime: time("start_time", { withTimezone: true }).notNull(),
+    endTime: time("end_time", { withTimezone: true }).notNull(),
+  },
+);
 
-export const workingHoursRelations = relationBuilder(
-  workingHours,
+export const workingHoursRelations = relations(
+  userAccountDetailsWorkingHours,
   ({ one }) => ({
-    account: one(accounts, {
-      fields: [workingHours.accountId],
-      references: [accounts.id],
+    account: one(userAccountDetails, {
+      fields: [userAccountDetailsWorkingHours.accountId],
+      references: [userAccountDetails.id],
     }),
   }),
 );
@@ -272,13 +266,13 @@ export const rooms = pgTable("rooms", {
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
   createdById: integer("created_by_id").references(
-    (): AnyPgColumn => relations.id,
+    (): AnyPgColumn => users.id,
     {
       onDelete: "set null",
     },
   ),
   updatedById: integer("updated_by_id").references(
-    (): AnyPgColumn => relations.id,
+    (): AnyPgColumn => users.id,
     {
       onDelete: "set null",
     },
@@ -290,14 +284,14 @@ export const rooms = pgTable("rooms", {
   price: numeric("price", { precision: 10, scale: 2 }).notNull(),
 });
 
-export const roomsRelations = relationBuilder(rooms, ({ one }) => ({
-  createdBy: one(relations, {
+export const roomsRelations = relations(rooms, ({ one }) => ({
+  createdBy: one(users, {
     fields: [rooms.createdById],
-    references: [relations.id],
+    references: [users.id],
   }),
-  updatedBy: one(relations, {
+  updatedBy: one(users, {
     fields: [rooms.updatedById],
-    references: [relations.id],
+    references: [users.id],
   }),
   property: one(properties, {
     fields: [rooms.propertyId],
@@ -316,22 +310,22 @@ export const reservations = pgTable("reservations", {
     .default(sql`now()`)
     .notNull(),
   createdById: integer("created_by_id").references(
-    (): AnyPgColumn => relations.id,
+    (): AnyPgColumn => users.id,
     {
       onDelete: "set null",
     },
   ),
   updatedById: integer("updated_by_id").references(
-    (): AnyPgColumn => relations.id,
+    (): AnyPgColumn => users.id,
     {
       onDelete: "set null",
     },
   ),
+  customerId: integer("customer_id")
+    .references(() => customers.id, { onDelete: "restrict" })
+    .notNull(),
   roomId: integer("room_id")
     .references(() => rooms.id, { onDelete: "restrict" })
-    .notNull(),
-  customerId: integer("customer_id")
-    .references(() => relations.id, { onDelete: "restrict" })
     .notNull(),
   startDate: timestamp("start_date", { withTimezone: true }).notNull(),
   endDate: timestamp("end_date", { withTimezone: true }).notNull(),
@@ -341,20 +335,20 @@ export const reservations = pgTable("reservations", {
   invoiceNotes: text("invoice_notes"),
 });
 
-export const reservationsRelations = relationBuilder(
+export const reservationsRelations = relations(
   reservations,
   ({ one, many }) => ({
-    createdBy: one(relations, {
+    createdBy: one(users, {
       fields: [reservations.createdById],
-      references: [relations.id],
+      references: [users.id],
     }),
-    updatedBy: one(relations, {
+    updatedBy: one(users, {
       fields: [reservations.updatedById],
-      references: [relations.id],
+      references: [users.id],
     }),
-    customer: one(relations, {
+    customer: one(customers, {
       fields: [reservations.customerId],
-      references: [relations.id],
+      references: [customers.id],
     }),
     room: one(rooms, {
       fields: [reservations.roomId],
@@ -397,7 +391,7 @@ export const reservationsToProductInstances = pgTable(
   }),
 );
 
-export const reservationsToProductInstancesRelations = relationBuilder(
+export const reservationsToProductInstancesRelations = relations(
   reservationsToProductInstances,
   ({ one }) => ({
     reservation: one(reservations, {
@@ -432,7 +426,7 @@ export const reservationsToInvoices = pgTable(
   }),
 );
 
-export const reservationsToInvoicesRelations = relationBuilder(
+export const reservationsToInvoicesRelations = relations(
   reservationsToInvoices,
   ({ one }) => ({
     reservation: one(reservations, {
@@ -445,6 +439,63 @@ export const reservationsToInvoicesRelations = relationBuilder(
     }),
   }),
 );
+
+// TODO Shipping address
+export const customers = pgTable("customers", {
+  $kind: text("$kind").default("customer").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  createdById: integer("created_by_id").references(
+    (): AnyPgColumn => users.id,
+    {
+      onDelete: "set null",
+    },
+  ),
+  updatedById: integer("updated_by_id").references(
+    (): AnyPgColumn => users.id,
+    {
+      onDelete: "set null",
+    },
+  ),
+  propertyId: integer("property_id")
+    .references(() => properties.id, { onDelete: "restrict" })
+    .notNull(),
+  name: text("name").unique().notNull(),
+  email: text("email").unique(),
+  phone: text("phone").unique(),
+  billingAddressLineOne: text("billing_address_line_one").notNull(),
+  billingAddressLineTwo: text("billing_address_line_two"),
+  billingCity: text("billing_city").notNull(),
+  billingRegion: text("billing_region"),
+  billingPostalCode: text("billing_postal_code"),
+  billingCountry: text("billing_country").notNull(),
+  cocNumber: text("coc_number"),
+  vatId: text("vat_id"),
+  contactPersonName: text("contact_person_name"),
+  contactPersonEmail: text("contact_person_email"),
+  contactPersonPhone: text("contact_person_phone"),
+});
+
+export const customersRelations = relations(customers, ({ one }) => ({
+  createdBy: one(users, {
+    fields: [customers.createdById],
+    references: [users.id],
+  }),
+  updatedBy: one(users, {
+    fields: [customers.updatedById],
+    references: [users.id],
+  }),
+  property: one(properties, {
+    fields: [customers.propertyId],
+    references: [properties.id],
+  }),
+}));
 
 export const invoiceRefTypeEnum = pgEnum("invoice_ref_type", [
   "invoice",
@@ -472,7 +523,7 @@ export const invoices = pgTable("invoices", {
     .defaultNow()
     .notNull(),
   createdById: integer("created_by_id").references(
-    (): AnyPgColumn => relations.id,
+    (): AnyPgColumn => users.id,
     { onDelete: "set null" },
   ),
   refType: invoiceRefTypeEnum("ref_type").notNull(),
@@ -486,46 +537,47 @@ export const invoices = pgTable("invoices", {
   notes: text("notes"),
   date: date("date", { mode: "date" }),
   dueDate: date("due_date", { mode: "date" }),
-  customerId: integer("customer_id").references(() => relations.id, {
+  customerId: integer("customer_id").references(() => customers.id, {
     onDelete: "set null",
   }),
   customerName: text("customer_name"),
-  customerEmailAddress: text("customer_email_address"),
-  customerPhoneNumber: text("customer_phone_number"),
-  customerStreet: text("customer_street"),
-  customerHouseNumber: text("customer_house_number"),
-  customerPostalCode: text("customer_postal_code"),
-  customerCity: text("customer_city"),
-  customerRegion: text("customer_region"),
-  customerCountry: text("customer_country"),
-  customerVatNumber: text("customer_vat_number"),
+  customerBusinessContactPerson: text("customer_business_contact_person"),
+  customerEmail: text("customer_email"),
+  customerPhone: text("customer_phone"),
+  customerBillingAddressLineOne: text("customer_billing_address_line_one"),
+  customerBillingAddressLineTwo: text("customer_billing_address_line_two"),
+  customerBillingCity: text("customer_billing_city"),
+  customerBillingRegion: text("customer_billing_region"),
+  customerBillingPostalCode: text("customer_billing_postal_code"),
+  customerBillingCountry: text("customer_billing_country"),
+  customerVatId: text("customer_vat_id"),
   customerCocNumber: text("customer_coc_number"),
   companyId: integer("company_id").references(() => properties.id, {
     onDelete: "set null",
   }),
   companyName: text("company_name"),
-  companyEmailAddress: text("company_email_address"),
-  companyPhoneNumber: text("company_phone_number"),
-  companyStreet: text("company_street"),
-  companyHouseNumber: text("company_house_number"),
+  companyEmail: text("company_email"),
+  companyPhone: text("company_phone"),
+  companyAddressLineOne: text("company_address_line_one"),
+  companyAddressLineTwo: text("company_address_line_two"),
   companyPostalCode: text("company_postal_code"),
   companyCity: text("company_city"),
   companyRegion: text("company_region"),
   companyCountry: text("company_country"),
-  companyVatNumber: text("company_vat_number"),
+  companyVatId: text("company_vat_id"),
   companyCocNumber: text("company_coc_number"),
   companyIban: text("company_iban"),
   companySwiftBic: text("company_swift_bic"),
 });
 
-export const invoicesRelations = relationBuilder(invoices, ({ one, many }) => ({
-  createdBy: one(relations, {
+export const invoicesRelations = relations(invoices, ({ one, many }) => ({
+  createdBy: one(users, {
     fields: [invoices.createdById],
-    references: [relations.id],
+    references: [users.id],
   }),
-  customer: one(relations, {
+  customer: one(customers, {
     fields: [invoices.customerId],
-    references: [relations.id],
+    references: [customers.id],
   }),
   company: one(properties, {
     fields: [invoices.companyId],
@@ -554,19 +606,16 @@ export const invoiceLines = pgTable("invoice_lines", {
   grossAmount: numeric("gross_amount", { precision: 10, scale: 2 }).notNull(),
 });
 
-export const invoiceLinesRelations = relationBuilder(
-  invoiceLines,
-  ({ one }) => ({
-    invoice: one(invoices, {
-      fields: [invoiceLines.invoiceId],
-      references: [invoices.id],
-    }),
-    revenueAccount: one(ledgerAccounts, {
-      fields: [invoiceLines.revenueAccountId],
-      references: [ledgerAccounts.id],
-    }),
+export const invoiceLinesRelations = relations(invoiceLines, ({ one }) => ({
+  invoice: one(invoices, {
+    fields: [invoiceLines.invoiceId],
+    references: [invoices.id],
   }),
-);
+  revenueAccount: one(ledgerAccounts, {
+    fields: [invoiceLines.revenueAccountId],
+    references: [ledgerAccounts.id],
+  }),
+}));
 
 export const invoiceEventTypeEnum = pgEnum("invoice_event_type", [
   "issued",
@@ -585,7 +634,7 @@ export const invoiceEvents = pgTable("invoice_events", {
     .defaultNow()
     .notNull(),
   createdById: integer("created_by_id").references(
-    (): AnyPgColumn => relations.id,
+    (): AnyPgColumn => users.id,
     { onDelete: "set null" },
   ),
   invoiceId: integer("invoice_id")
@@ -596,19 +645,16 @@ export const invoiceEvents = pgTable("invoice_events", {
   refId: integer("ref_id"),
 });
 
-export const invoiceEventsRelations = relationBuilder(
-  invoiceEvents,
-  ({ one }) => ({
-    createdBy: one(relations, {
-      fields: [invoiceEvents.createdById],
-      references: [relations.id],
-    }),
-    invoice: one(invoices, {
-      fields: [invoiceEvents.invoiceId],
-      references: [invoices.id],
-    }),
+export const invoiceEventsRelations = relations(invoiceEvents, ({ one }) => ({
+  createdBy: one(users, {
+    fields: [invoiceEvents.createdById],
+    references: [users.id],
   }),
-);
+  invoice: one(invoices, {
+    fields: [invoiceEvents.invoiceId],
+    references: [invoices.id],
+  }),
+}));
 
 // TODO Inventory
 // TODO COGS account
@@ -623,11 +669,11 @@ export const productTemplates = pgTable("product_templates", {
     .default(sql`now()`)
     .notNull(),
   createdById: integer("created_by_id").references(
-    (): AnyPgColumn => relations.id,
+    (): AnyPgColumn => users.id,
     { onDelete: "set null" },
   ),
   updatedById: integer("updated_by_id").references(
-    (): AnyPgColumn => relations.id,
+    (): AnyPgColumn => users.id,
     { onDelete: "set null" },
   ),
   revenueAccountId: integer("revenue_account_id")
@@ -638,16 +684,16 @@ export const productTemplates = pgTable("product_templates", {
   vatRate: numeric("vat_rate", { precision: 10, scale: 2 }).notNull(),
 });
 
-export const productTemplatesRelations = relationBuilder(
+export const productTemplatesRelations = relations(
   productTemplates,
   ({ one, many }) => ({
-    createdBy: one(relations, {
+    createdBy: one(users, {
       fields: [productTemplates.createdById],
-      references: [relations.id],
+      references: [users.id],
     }),
-    updatedBy: one(relations, {
+    updatedBy: one(users, {
       fields: [productTemplates.updatedById],
-      references: [relations.id],
+      references: [users.id],
     }),
     revenueAccount: one(ledgerAccounts, {
       fields: [productTemplates.revenueAccountId],
@@ -672,7 +718,7 @@ export const productInstances = pgTable("product_instances", {
   vatRate: numeric("vat_rate", { precision: 10, scale: 2 }).notNull(),
 });
 
-export const productInstancesRelations = relationBuilder(
+export const productInstancesRelations = relations(
   productInstances,
   ({ one, many }) => ({
     template: one(productTemplates, {
@@ -698,24 +744,24 @@ export const ledgers = pgTable("ledgers", {
     .default(sql`now()`)
     .notNull(),
   createdById: integer("created_by_id").references(
-    (): AnyPgColumn => relations.id,
+    (): AnyPgColumn => users.id,
     { onDelete: "set null" },
   ),
   updatedById: integer("updated_by_id").references(
-    (): AnyPgColumn => relations.id,
+    (): AnyPgColumn => users.id,
     { onDelete: "set null" },
   ),
   name: text("name").notNull(),
 });
 
-export const ledgersRelations = relationBuilder(ledgers, ({ one, many }) => ({
-  createdBy: one(relations, {
+export const ledgersRelations = relations(ledgers, ({ one, many }) => ({
+  createdBy: one(users, {
     fields: [ledgers.createdById],
-    references: [relations.id],
+    references: [users.id],
   }),
-  updatedBy: one(relations, {
+  updatedBy: one(users, {
     fields: [ledgers.updatedById],
-    references: [relations.id],
+    references: [users.id],
   }),
   accounts: many(ledgerAccounts),
 }));
@@ -731,26 +777,26 @@ export const ledgerAccountTypes = pgTable("ledger_account_types", {
     .default(sql`now()`)
     .notNull(),
   createdById: integer("created_by_id").references(
-    (): AnyPgColumn => relations.id,
+    (): AnyPgColumn => users.id,
     { onDelete: "set null" },
   ),
   updatedById: integer("updated_by_id").references(
-    (): AnyPgColumn => relations.id,
+    (): AnyPgColumn => users.id,
     { onDelete: "set null" },
   ),
   name: text("name").notNull(),
 });
 
-export const ledgerAccountTypesRelations = relationBuilder(
+export const ledgerAccountTypesRelations = relations(
   ledgerAccountTypes,
   ({ one, many }) => ({
-    createdBy: one(relations, {
+    createdBy: one(users, {
       fields: [ledgerAccountTypes.createdById],
-      references: [relations.id],
+      references: [users.id],
     }),
-    updatedBy: one(relations, {
+    updatedBy: one(users, {
       fields: [ledgerAccountTypes.updatedById],
-      references: [relations.id],
+      references: [users.id],
     }),
     accounts: many(ledgerAccounts),
   }),
@@ -767,11 +813,11 @@ export const ledgerAccounts = pgTable("ledger_accounts", {
     .default(sql`now()`)
     .notNull(),
   createdById: integer("created_by_id").references(
-    (): AnyPgColumn => relations.id,
+    (): AnyPgColumn => users.id,
     { onDelete: "set null" },
   ),
   updatedById: integer("updated_by_id").references(
-    (): AnyPgColumn => relations.id,
+    (): AnyPgColumn => users.id,
     { onDelete: "set null" },
   ),
   ledgerId: integer("ledger_id")
@@ -787,34 +833,27 @@ export const ledgerAccounts = pgTable("ledger_accounts", {
   name: text("name").notNull(),
 });
 
-export const ledgerAccountsRelations = relationBuilder(
-  ledgerAccounts,
-  ({ one }) => ({
-    createdBy: one(relations, {
-      fields: [ledgerAccounts.createdById],
-      references: [relations.id],
-    }),
-    updatedBy: one(relations, {
-      fields: [ledgerAccounts.updatedById],
-      references: [relations.id],
-    }),
-    ledger: one(ledgers, {
-      fields: [ledgerAccounts.ledgerId],
-      references: [ledgers.id],
-    }),
-    type: one(ledgerAccountTypes, {
-      fields: [ledgerAccounts.typeId],
-      references: [ledgerAccountTypes.id],
-    }),
+export const ledgerAccountsRelations = relations(ledgerAccounts, ({ one }) => ({
+  createdBy: one(users, {
+    fields: [ledgerAccounts.createdById],
+    references: [users.id],
   }),
-);
+  updatedBy: one(users, {
+    fields: [ledgerAccounts.updatedById],
+    references: [users.id],
+  }),
+  ledger: one(ledgers, {
+    fields: [ledgerAccounts.ledgerId],
+    references: [ledgers.id],
+  }),
+  type: one(ledgerAccountTypes, {
+    fields: [ledgerAccounts.typeId],
+    references: [ledgerAccountTypes.id],
+  }),
+}));
 
 export const settingNameEnum = pgEnum("setting_name", [
   "companyPaymentTerms",
-  "companyVatNumber",
-  "companyCocNumber",
-  "companyIban",
-  "companySwiftBic",
   "invoiceEmailTitle",
   "invoiceEmailContent",
   "invoiceHeaderImageSrc",
@@ -829,17 +868,17 @@ export const settings = pgTable("settings", {
   uuid: uuid("uuid").defaultRandom().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   updatedById: integer("updated_by_id").references(
-    (): AnyPgColumn => relations.id,
+    (): AnyPgColumn => users.id,
     { onDelete: "set null" },
   ),
   name: settingNameEnum("name").notNull(),
   value: jsonb("value"),
 });
 
-export const settingsRelations = relationBuilder(settings, ({ one }) => ({
-  updatedBy: one(relations, {
+export const settingsRelations = relations(settings, ({ one }) => ({
+  updatedBy: one(users, {
     fields: [settings.updatedById],
-    references: [relations.id],
+    references: [users.id],
   }),
 }));
 
@@ -862,10 +901,9 @@ export const logs = pgTable("logs", {
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
-  relationId: integer("relation_id").references(
-    (): AnyPgColumn => relations.id,
-    { onDelete: "set null" },
-  ),
+  userId: integer("user_id").references((): AnyPgColumn => users.id, {
+    onDelete: "set null",
+  }),
   type: logTypeEnum("type").notNull(),
   event: logEventEnum("event").notNull(),
   refType: logRefTypeEnum("ref_type"),
@@ -873,10 +911,10 @@ export const logs = pgTable("logs", {
   data: jsonb("data"),
 });
 
-export const logsRelations = relationBuilder(logs, ({ one }) => ({
-  relation: one(relations, {
-    fields: [logs.relationId],
-    references: [relations.id],
+export const logsRelations = relations(logs, ({ one }) => ({
+  user: one(users, {
+    fields: [logs.userId],
+    references: [users.id],
   }),
 }));
 
@@ -895,7 +933,7 @@ export const integrationConnections = pgTable("integration_connections", {
 
 export const integrationMappingRefTypeEnum = pgEnum(
   "integration_mapping_ref_type",
-  ["relation", "ledgerAccount", "ledgerAccountType"],
+  ["customer", "ledgerAccount", "ledgerAccountType"],
 );
 
 export const integrationMappings = pgTable("integration_mappings", {
@@ -910,7 +948,7 @@ export const integrationMappings = pgTable("integration_mappings", {
   data: jsonb("data").notNull(),
 });
 
-export const integrationEntitiesRelations = relationBuilder(
+export const integrationEntitiesRelations = relations(
   integrationMappings,
   ({ one }) => ({
     connection: one(integrationConnections, {

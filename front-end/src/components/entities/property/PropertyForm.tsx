@@ -27,32 +27,64 @@ export const PropertyForm = ({ disabled }: PropertyFormProps) => {
         <Group align="end">
           <TextInput
             {...register("name")}
-            label={t("entities.property.keys.name")}
+            label={t("common.name")}
             error={formState.errors.name?.message}
             disabled={disabled}
-            required
+            withAsterisk
           />
           <TextInput
-            {...register("emailAddress")}
-            label={t("entities.property.keys.email")}
-            error={formState.errors.emailAddress?.message}
+            {...register("email")}
+            label={t("common.email")}
+            error={formState.errors.email?.message}
             type="email"
             disabled={disabled}
+            withAsterisk
           />
           <Controller
-            name="phoneNumber"
+            name="phone"
             control={control}
             render={({ field, fieldState: { error } }) => (
               <PhoneInput
                 {...field}
-                label={t("entities.property.keys.phoneNumber")}
+                label={t("common.phone")}
                 error={error?.message}
                 disabled={disabled}
+                withAsterisk
               />
             )}
           />
         </Group>
-        <Address disabled={disabled} />
+        <Address disabled={disabled} required />
+        <Group align="end">
+          <TextInput
+            {...register("vatId")}
+            label={t("entities.property.vatId")}
+            error={formState.errors.vatId?.message}
+            disabled={disabled}
+            withAsterisk
+          />
+          <TextInput
+            {...register("cocNumber")}
+            label={t("entities.property.cocNumber")}
+            error={formState.errors.cocNumber?.message}
+            disabled={disabled}
+            withAsterisk
+          />
+          <TextInput
+            {...register("iban")}
+            label={t("entities.property.iban")}
+            error={formState.errors.iban?.message}
+            disabled={disabled}
+            withAsterisk
+          />
+          <TextInput
+            {...register("swiftBic")}
+            label={t("entities.property.swiftBic")}
+            error={formState.errors.swiftBic?.message}
+            disabled={disabled}
+            withAsterisk
+          />
+        </Group>
       </Stack>
     </Paper>
   );

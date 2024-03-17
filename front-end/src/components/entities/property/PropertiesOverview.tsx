@@ -49,15 +49,15 @@ export const PropertiesOverview = ({ properties }: PropertiesPageProps) => {
         columns={[
           {
             selector: "name",
-            label: t("entities.property.keys.name"),
+            label: t("common.name"),
           },
           {
-            selector: "emailAddress",
-            label: t("entities.property.keys.email"),
+            selector: "email",
+            label: t("common.email"),
           },
           {
-            selector: "phoneNumber",
-            label: t("entities.property.keys.phoneNumber"),
+            selector: "phone",
+            label: t("common.phone"),
           },
           {
             selector: "id",

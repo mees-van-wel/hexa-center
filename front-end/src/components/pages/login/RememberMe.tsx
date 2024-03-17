@@ -22,13 +22,13 @@ export const RememberMe = () => {
   const router = useRouter();
 
   const clickHandler = async () => {
-    const relation = await login.mutate({
-      emailAddress: loginState.emailAddress,
-      emailAddressToken: loginState.emailToken,
-      emailAddressOtp: loginState.emailOtp,
-      phoneNumber: loginState.phoneNumber,
-      phoneNumberToken: loginState.phoneToken,
-      phoneNumberOtp: loginState.phoneOtp,
+    const user = await login.mutate({
+      email: loginState.email,
+      emailToken: loginState.emailToken,
+      emailOtp: loginState.emailOtp,
+      phone: loginState.phone,
+      phoneToken: loginState.phoneToken,
+      phoneOtp: loginState.phoneOtp,
       userAgent: navigator.userAgent,
       duration,
     });
@@ -37,7 +37,7 @@ export const RememberMe = () => {
     main?.setAttribute("data-fade", "true");
     window.localStorage.setItem("fade", "true");
 
-    setAuth({ ...auth, relation });
+    setAuth({ ...auth, user });
     setLoginState({ step: "SUCCESS" });
 
     setTimeout(() => {

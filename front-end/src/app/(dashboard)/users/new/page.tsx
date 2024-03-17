@@ -9,14 +9,11 @@ import {
   useFormState,
 } from "react-hook-form";
 
-import { RelationForm } from "@/components/entities/relation/RelationForm";
+import { UserForm } from "@/components/entities/user/UserForm";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
-import {
-  RelationCreateInputSchema,
-  RelationCreateSchema,
-} from "@/schemas/relation";
+import { UserCreateInputSchema, UserCreateSchema } from "@/schemas/user";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Button, Stack } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
@@ -25,26 +22,21 @@ import { IconDeviceFloppy, IconUsers } from "@tabler/icons-react";
 export default function Page() {
   const t = useTranslation();
 
-  const formMethods = useForm<RelationCreateInputSchema>({
-    resolver: valibotResolver(RelationCreateSchema),
+  const formMethods = useForm<UserCreateInputSchema>({
+    resolver: valibotResolver(UserCreateSchema),
     defaultValues: {
-      type: "individual",
-      name: "",
-      emailAddress: "",
-      phoneNumber: "",
-      street: "",
-      houseNumber: "",
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      addressLineOne: "",
+      addressLineTwo: "",
       postalCode: "",
       city: "",
       region: "",
       country: null,
-      dateOfBirth: null,
       sex: null,
-      vatNumber: "",
-      cocNumber: "",
-      businessContactName: "",
-      businessContactEmailAddress: "",
-      businessContactPhoneNumber: "",
+      birthDate: null,
     },
   });
 
@@ -52,43 +44,43 @@ export default function Page() {
     <FormProvider {...formMethods}>
       <Stack>
         <DashboardHeader
-          backRouteFallback="/relations"
+          backRouteFallback="/users"
           title={[
             {
               icon: <IconUsers />,
-              label: t("entities.relation.name.plural"),
-              href: "/relations",
+              label: t("entities.user.pluralName"),
+              href: "/users",
             },
             { label: t("common.new") },
           ]}
         >
           <SaveButton />
         </DashboardHeader>
-        <RelationForm />
+        <UserForm />
       </Stack>
     </FormProvider>
   );
 }
 
 const SaveButton = () => {
-  const createRelation = useMutation("relation", "create");
+  const createUser = useMutation("user", "create");
   const router = useRouter();
   const t = useTranslation();
 
-  const { control, handleSubmit } = useFormContext<RelationCreateInputSchema>();
+  const { control, handleSubmit } = useFormContext<UserCreateInputSchema>();
   const { isDirty } = useFormState({ control });
 
-  const submitHandler: SubmitHandler<RelationCreateInputSchema> = async (
+  const submitHandler: SubmitHandler<UserCreateInputSchema> = async (
     values,
   ) => {
-    const response = await createRelation.mutate(values);
+    const response = await createUser.mutate(values);
 
     notifications.show({
-      message: t("entities.relation.createdNotification"),
+      message: t("entities.user.createdNotification"),
       color: "green",
     });
 
-    router.push(`/relations/${response.id}`);
+    router.push(`/users/${response.id}`);
   };
 
   return (
@@ -96,7 +88,7 @@ const SaveButton = () => {
       onClick={handleSubmit(submitHandler)}
       leftSection={<IconDeviceFloppy />}
       disabled={!isDirty}
-      loading={createRelation.loading}
+      loading={createUser.loading}
     >
       {t("common.save")}
     </Button>

@@ -5,6 +5,7 @@ import ejs from "ejs";
 
 import db from "@/db/client";
 import {
+  customers,
   integrationConnections,
   integrationMappings,
   invoiceEvents,
@@ -12,7 +13,6 @@ import {
   invoices,
   logs,
   properties,
-  relations,
 } from "@/db/schema";
 import { readFile } from "@/utils/fileSystem";
 import { generatePdf } from "@/utils/pdf";
@@ -60,29 +60,34 @@ export const getInvoice = async (invoiceId: number) => {
       customer: {
         columns: {
           name: true,
-          street: true,
-          houseNumber: true,
-          postalCode: true,
-          city: true,
-          region: true,
-          country: true,
-          emailAddress: true,
-          phoneNumber: true,
+          billingAddressLineOne: true,
+          billingAddressLineTwo: true,
+          billingCity: true,
+          billingRegion: true,
+          billingPostalCode: true,
+          billingCountry: true,
+          email: true,
+          phone: true,
+          contactPersonName: true,
           cocNumber: true,
-          vatNumber: true,
+          vatId: true,
         },
       },
       company: {
         columns: {
           name: true,
-          street: true,
-          houseNumber: true,
-          postalCode: true,
+          email: true,
+          phone: true,
+          addressLineOne: true,
+          addressLineTwo: true,
           city: true,
           region: true,
+          postalCode: true,
           country: true,
-          emailAddress: true,
-          phoneNumber: true,
+          cocNumber: true,
+          vatId: true,
+          iban: true,
+          swiftBic: true,
         },
       },
     },
@@ -105,28 +110,29 @@ export const getInvoice = async (invoiceId: number) => {
 
       customerId: true,
       customerName: true,
-      customerStreet: true,
-      customerHouseNumber: true,
-      customerPostalCode: true,
-      customerCity: true,
-      customerRegion: true,
-      customerCountry: true,
-      customerEmailAddress: true,
-      customerPhoneNumber: true,
-      customerVatNumber: true,
+      customerBusinessContactPerson: true,
+      customerBillingAddressLineOne: true,
+      customerBillingAddressLineTwo: true,
+      customerBillingPostalCode: true,
+      customerBillingCity: true,
+      customerBillingRegion: true,
+      customerBillingCountry: true,
+      customerEmail: true,
+      customerPhone: true,
       customerCocNumber: true,
+      customerVatId: true,
 
       companyId: true,
       companyName: true,
-      companyStreet: true,
-      companyHouseNumber: true,
+      companyAddressLineOne: true,
+      companyAddressLineTwo: true,
       companyPostalCode: true,
       companyCity: true,
       companyRegion: true,
       companyCountry: true,
-      companyEmailAddress: true,
-      companyPhoneNumber: true,
-      companyVatNumber: true,
+      companyEmail: true,
+      companyPhone: true,
+      companyVatId: true,
       companyCocNumber: true,
       companyIban: true,
       companySwiftBic: true,
@@ -135,49 +141,191 @@ export const getInvoice = async (invoiceId: number) => {
 
   if (!invoice) throw new TRPCError({ code: "NOT_FOUND" });
 
-  const {
-    companyPaymentTerms,
-    companyVatNumber,
-    companyCocNumber,
-    companyIban,
-    companySwiftBic,
-    invoiceHeaderImageSrc,
-    invoiceFooterImageSrc,
-  } = await getSettings([
-    "companyPaymentTerms",
-    "companyVatNumber",
-    "companyCocNumber",
-    "companyIban",
-    "companySwiftBic",
-    "invoiceHeaderImageSrc",
-    "invoiceFooterImageSrc",
-  ]);
-
-  return {
-    ...invoice,
-    company: invoice.company
-      ? {
-          ...invoice.company,
-          paymentTerms: companyPaymentTerms,
-          vatNumber: companyVatNumber,
-          cocNumber: companyCocNumber,
-          iban: companyIban,
-          swiftBic: companySwiftBic,
-        }
-      : null,
-    headerImageSrc:
-      typeof invoiceHeaderImageSrc === "string" ? invoiceHeaderImageSrc : null,
-    footerImageSrc:
-      typeof invoiceFooterImageSrc === "string" ? invoiceFooterImageSrc : null,
-  };
+  return invoice;
 };
 
 export const generateInvoicePdf = async (invoiceId: number) => {
   const invoice = await getInvoice(invoiceId);
 
+  const { invoiceHeaderImageSrc, invoiceFooterImageSrc } = await getSettings([
+    "invoiceHeaderImageSrc",
+    "invoiceFooterImageSrc",
+  ]);
+
+  const customerName = invoice.customerName || invoice.customer?.name;
+  if (!customerName) {
+    console.warn("Missing customerName");
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Missing customerName",
+    });
+  }
+
+  const customerBusinessContactPerson =
+    invoice.customerBusinessContactPerson ||
+    invoice.customer?.contactPersonName ||
+    null;
+
+  const customerBillingAddressLineOne =
+    invoice.customerBillingAddressLineOne ||
+    invoice.customer?.billingAddressLineOne;
+  if (!customerBillingAddressLineOne) {
+    console.warn("Missing customerBillingAddressLineOne");
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Missing customerBillingAddressLineOne",
+    });
+  }
+
+  const customerBillingAddressLineTwo =
+    invoice.customerBillingAddressLineTwo ||
+    invoice.customer?.billingAddressLineTwo ||
+    null;
+
+  const customerBillingCity =
+    invoice.customerBillingCity || invoice.customer?.billingCity;
+  if (!customerBillingCity) {
+    console.warn("Missing customerBillingCity");
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Missing customerBillingCity",
+    });
+  }
+
+  const customerBillingRegion =
+    invoice.customerBillingRegion || invoice.customer?.billingRegion || null;
+
+  const customerBillingPostalCode =
+    invoice.customerBillingPostalCode ||
+    invoice.customer?.billingPostalCode ||
+    null;
+
+  const customerBillingCountry =
+    invoice.customerBillingCountry || invoice.customer?.billingCountry;
+  if (!customerBillingCountry) {
+    console.warn("Missing customerBillingCountry");
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Missing customerBillingCountry",
+    });
+  }
+
+  const customerEmail =
+    invoice.customerEmail || invoice.customer?.email || null;
+
+  const customerPhone =
+    invoice.customerPhone || invoice.customer?.phone || null;
+
+  const customerCocNumber =
+    invoice.customerCocNumber || invoice.customer?.cocNumber || null;
+
+  const customerVatId =
+    invoice.customerVatId || invoice.customer?.vatId || null;
+
+  const companyName = invoice.companyName || invoice.company?.name;
+  if (!companyName) {
+    console.warn("Missing companyName");
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Missing companyName",
+    });
+  }
+
+  const companyAddressLineOne =
+    invoice.companyAddressLineOne || invoice.company?.addressLineOne;
+  if (!companyAddressLineOne) {
+    console.warn("Missing companyAddressLineOne");
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Missing companyAddressLineOne",
+    });
+  }
+
+  const companyAddressLineTwo =
+    invoice.companyAddressLineTwo || invoice.company?.addressLineTwo || null;
+
+  const companyCity = invoice.companyCity || invoice.company?.city;
+  if (!companyCity) {
+    console.warn("Missing companyCity");
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Missing companyCity",
+    });
+  }
+
+  const companyRegion =
+    invoice.companyRegion || invoice.company?.region || null;
+
+  const companyPostalCode =
+    invoice.companyPostalCode || invoice.company?.postalCode || null;
+
+  const companyCountry = invoice.companyCountry || invoice.company?.country;
+  if (!companyCountry) {
+    console.warn("Missing companyCountry");
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Missing companyCountry",
+    });
+  }
+
+  const companyEmail = invoice.companyEmail || invoice.company?.email;
+  if (!companyEmail) {
+    console.warn("Missing companyEmail");
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Missing companyEmail",
+    });
+  }
+
+  const companyPhone = invoice.companyPhone || invoice.company?.phone;
+  if (!companyPhone) {
+    console.warn("Missing companyPhone");
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Missing companyPhone",
+    });
+  }
+
+  const companyCocNumber =
+    invoice.companyCocNumber || invoice.company?.cocNumber;
+  if (!companyCocNumber) {
+    console.warn("Missing companyCocNumber");
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Missing companyCocNumber",
+    });
+  }
+
+  const companyVatId = invoice.companyVatId || invoice.company?.vatId;
+  if (!companyVatId) {
+    console.warn("Missing companyVatId");
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Missing companyVatId",
+    });
+  }
+
+  const companyIban = invoice.companyIban || invoice.company?.iban;
+  if (!companyIban) {
+    console.warn("Missing companyIban");
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Missing companyIban",
+    });
+  }
+
+  const companySwiftBic = invoice.companySwiftBic || invoice.company?.swiftBic;
+  if (!companySwiftBic) {
+    console.warn("Missing companySwiftBic");
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Missing companySwiftBic",
+    });
+  }
+
   const pdfBuffer = await generatePdf("invoice", {
-    headerImageSrc: invoice.headerImageSrc,
-    footerImageSrc: invoice.footerImageSrc,
+    headerImageSrc: invoiceHeaderImageSrc,
+    footerImageSrc: invoiceFooterImageSrc,
     type:
       invoice.type === "quotation"
         ? "Quotation"
@@ -188,40 +336,31 @@ export const generateInvoicePdf = async (invoiceId: number) => {
     date: invoice.date
       ? dayjs(invoice.date).format("DD-MM-YYYY")
       : dayjs(invoice.createdAt).format("DD-MM-YYYY"),
-    customerName: invoice.customerName || invoice.customer?.name || "",
-    customerStreet: invoice.customerStreet || invoice.customer?.street || "",
-    customerHouseNumber:
-      invoice.customerHouseNumber || invoice.customer?.houseNumber || "",
-    customerPostalCode:
-      invoice.customerPostalCode || invoice.customer?.postalCode || "",
-    customerCity: invoice.customerCity || invoice.customer?.city || "",
-    customerCountry: invoice.customerCountry || invoice.customer?.country || "",
-    customerEmailAddress:
-      invoice.customerEmailAddress || invoice.customer?.emailAddress || "",
-    customerPhoneNumber:
-      invoice.customerPhoneNumber || invoice.customer?.phoneNumber || "",
-    customerCocNumber:
-      invoice.customerCocNumber || invoice.customer?.cocNumber || null,
-    customerVatNumber:
-      invoice.customerVatNumber || invoice.customer?.vatNumber || null,
-    companyName: invoice.companyName || invoice.company?.name || "",
-    companyStreet: invoice.companyStreet || invoice.company?.street || "",
-    companyHouseNumber:
-      invoice.companyHouseNumber || invoice.company?.houseNumber || "",
-    companyPostalCode:
-      invoice.companyPostalCode || invoice.company?.postalCode || "",
-    companyCity: invoice.companyCity || invoice.company?.city || "",
-    companyCountry: invoice.companyCountry || invoice.company?.country || "",
-    companyEmailAddress:
-      invoice.companyEmailAddress || invoice.company?.emailAddress || "",
-    companyPhoneNumber:
-      invoice.companyPhoneNumber || invoice.company?.phoneNumber || "",
-    companyCocNumber:
-      invoice.companyCocNumber || invoice.company?.cocNumber || "",
-    companyVatNumber:
-      invoice.companyVatNumber || invoice.company?.vatNumber || "",
-    companyIban: invoice.companyIban || invoice.company?.iban || "",
-    companySwiftBic: invoice.companySwiftBic || invoice.company?.swiftBic || "",
+    customerName,
+    customerBusinessContactPerson,
+    customerBillingAddressLineOne,
+    customerBillingAddressLineTwo,
+    customerBillingCity,
+    customerBillingRegion,
+    customerBillingPostalCode,
+    customerBillingCountry,
+    customerEmail,
+    customerPhone,
+    customerCocNumber,
+    customerVatId,
+    companyName,
+    companyAddressLineOne,
+    companyAddressLineTwo,
+    companyCity,
+    companyRegion,
+    companyPostalCode,
+    companyCountry,
+    companyEmail,
+    companyPhone,
+    companyCocNumber,
+    companyVatId,
+    companyIban,
+    companySwiftBic,
     lines: invoice.lines.map(
       ({
         name,
@@ -432,7 +571,7 @@ export const createInvoice = async ({
 export const issueInvoice = async (
   invoiceId: number,
   date: Date,
-  relationId: number,
+  userId: number,
 ) => {
   const invoicesResult = await db
     .select()
@@ -459,41 +598,25 @@ export const issueInvoice = async (
       message: "Missing company id",
     });
 
-  const [
-    relationsResult,
-    propertiesResult,
-    {
-      companyPaymentTerms,
-      companyVatNumber,
-      companyCocNumber,
-      companyIban,
-      companySwiftBic,
-    },
-    countResult,
-  ] = await Promise.all([
-    db.select().from(relations).where(eq(relations.id, invoice.customerId)),
-    db.select().from(properties).where(eq(properties.id, invoice.companyId)),
-    getSettings([
-      "companyPaymentTerms",
-      "companyVatNumber",
-      "companyCocNumber",
-      "companyIban",
-      "companySwiftBic",
-    ]),
-    db
-      .select({
-        count: sql<number>`CAST(COUNT(*) AS INT)`,
-      })
-      .from(invoices)
-      .where(
-        and(
-          sql`EXTRACT(YEAR FROM ${invoices.date}) = ${date.getFullYear()}`,
-          or(eq(invoices.type, "standard"), eq(invoices.type, "credit")),
+  const [customerResult, propertiesResult, companyPaymentTerms, countResult] =
+    await Promise.all([
+      db.select().from(customers).where(eq(customers.id, invoice.customerId)),
+      db.select().from(properties).where(eq(properties.id, invoice.companyId)),
+      getSetting("companyPaymentTerms"),
+      db
+        .select({
+          count: sql<number>`CAST(COUNT(*) AS INT)`,
+        })
+        .from(invoices)
+        .where(
+          and(
+            sql`EXTRACT(YEAR FROM ${invoices.date}) = ${date.getFullYear()}`,
+            or(eq(invoices.type, "standard"), eq(invoices.type, "credit")),
+          ),
         ),
-      ),
-  ]);
+    ]);
 
-  const customer = relationsResult[0];
+  const customer = customerResult[0];
   if (!customer)
     throw new TRPCError({
       code: "NOT_FOUND",
@@ -526,29 +649,28 @@ export const issueInvoice = async (
           : undefined,
       number: invoiceNumber,
       customerName: customer.name,
-      customerEmailAddress: customer.emailAddress,
-      customerPhoneNumber: customer.phoneNumber,
-      customerStreet: customer.street,
-      customerHouseNumber: customer.houseNumber,
-      customerPostalCode: customer.postalCode,
-      customerCity: customer.city,
-      customerRegion: customer.region,
-      customerCountry: customer.country,
-      customerVatNumber: customer.vatNumber,
-      customerCocNumber: customer.cocNumber,
+      customerEmail: customer.email,
+      customerPhone: customer.phone,
+      customerBillingAddressLineOne: customer.billingAddressLineOne,
+      customerBillingAddressLineTwo: customer.billingAddressLineTwo,
+      customerBillingCity: customer.billingCity,
+      customerBillingRegion: customer.billingRegion,
+      customerBillingPostalCode: customer.billingPostalCode,
+      customerBillingCountry: customer.billingCountry,
+      customerVatId: customer?.vatId,
       companyName: company.name,
-      companyEmailAddress: company.emailAddress,
-      companyPhoneNumber: company.phoneNumber,
-      companyStreet: company.street,
-      companyHouseNumber: company.houseNumber,
-      companyPostalCode: company.postalCode,
+      companyEmail: company.email,
+      companyPhone: company.phone,
+      companyAddressLineOne: company.addressLineOne,
+      companyAddressLineTwo: company.addressLineTwo,
       companyCity: company.city,
       companyRegion: company.region,
+      companyPostalCode: company.postalCode,
       companyCountry: company.country,
-      companyVatNumber,
-      companyCocNumber,
-      companyIban,
-      companySwiftBic,
+      companyCocNumber: company.cocNumber,
+      companyVatId: company.vatId,
+      companyIban: company.iban,
+      companySwiftBic: company.swiftBic,
     })
     .where(eq(invoices.id, invoiceId));
 
@@ -576,7 +698,7 @@ export const issueInvoice = async (
       .from(integrationMappings)
       .where(
         and(
-          eq(integrationMappings.refType, "relation"),
+          eq(integrationMappings.refType, "customer"),
           eq(integrationMappings.refId, customer.id),
         ),
       );
@@ -584,7 +706,7 @@ export const issueInvoice = async (
     const externalCustomerCode = customerMappingResult[0]?.data?.code;
 
     if (!externalCustomerCode) {
-      console.warn(`Missing integration mapping for relation: ${customer.id}`);
+      console.warn(`Missing integration mapping for user: ${customer.id}`);
       return;
     }
 
@@ -704,7 +826,7 @@ export const issueInvoice = async (
     );
 
     try {
-      await sendSoapRequest({
+      const res = await sendSoapRequest({
         url: wsdlUrl,
         headers: {
           "Content-Type": "text/xml; charset=utf-8",
@@ -712,6 +834,8 @@ export const issueInvoice = async (
         },
         xml,
       });
+
+      console.log(JSON.stringify(res));
 
       await db.insert(logs).values({
         type: "info",
@@ -828,7 +952,7 @@ export const issueInvoice = async (
   }
 
   await db.insert(invoiceEvents).values({
-    createdById: relationId,
+    createdById: userId,
     invoiceId,
     type: "issued",
   });

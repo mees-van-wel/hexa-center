@@ -1,0 +1,19 @@
+import { cookies } from "next/headers";
+
+import { CustomerDetail } from "@/components/entities/customer/CustomerDetail";
+import { setTRPCRefreshToken, trpc } from "@/utils/trpc";
+
+type PageParams = {
+  params: {
+    id: string;
+  };
+};
+
+export default async function Page({ params }: PageParams) {
+  const refreshToken = cookies().get("refreshToken")?.value;
+  if (refreshToken) setTRPCRefreshToken(refreshToken);
+
+  const customer = await trpc.customer.get.query(parseInt(params.id));
+
+  return <CustomerDetail customer={customer} />;
+}

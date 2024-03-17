@@ -196,7 +196,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
       onConfirm: async () => {
         await deleteInvoice.mutate(invoice.id);
 
-        router.replace("/invoices");
+        router.back();
 
         notifications.show({
           message: "Invoice successfully deleted",
@@ -220,11 +220,13 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
     [invoice.events],
   );
 
-  const customerVatNumber =
-    invoice.customerVatNumber || invoice.customer?.vatNumber;
   const customerCocNumber =
     invoice.customerCocNumber || invoice.customer?.cocNumber;
-  const customerCountry = invoice.customerCountry || invoice.customer?.country;
+  const customerVatId = invoice.customerVatId || invoice.customer?.vatId;
+
+  const customerCountry =
+    invoice.customerBillingCountry || invoice.customer?.billingCountry;
+
   const companyCountry = invoice.companyCountry || invoice.company?.country;
 
   return (
@@ -261,14 +263,16 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
           </>
         ) : (
           <>
-            <Button
-              variant={hasBeenMailed ? "light" : undefined}
-              leftSection={<IconMailFast />}
-              loading={mailInvoice.loading}
-              onClick={mailHandler}
-            >
-              {hasBeenMailed ? "Remail" : "Mail"}
-            </Button>
+            {(invoice.customerEmail || invoice.customer?.email) && (
+              <Button
+                variant={hasBeenMailed ? "light" : undefined}
+                leftSection={<IconMailFast />}
+                loading={mailInvoice.loading}
+                onClick={mailHandler}
+              >
+                {hasBeenMailed ? "Remail" : "Mail"}
+              </Button>
+            )}
             <Button
               loading={downloadLoading}
               leftSection={<IconDownload />}
@@ -384,7 +388,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                       component={Link}
                       size="compact-md"
                       // @ts-ignore Router
-                      href={`/relations/${invoice.customerId}`}
+                      href={`/customers/${invoice.customerId}`}
                       variant="light"
                       rightSection={<IconExternalLink size="1rem" />}
                     >
@@ -405,47 +409,61 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
               <Stack>
                 <div>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    {invoice.customerStreet || invoice.customer?.street}{" "}
-                    {invoice.customerHouseNumber ||
-                      invoice.customer?.houseNumber}
+                    {invoice.customerBillingAddressLineOne ||
+                      invoice.customer?.billingAddressLineOne}
                   </p>
+                  {(invoice.customerBillingAddressLineTwo ||
+                    invoice.customer?.billingAddressLineTwo) && (
+                    <p style={{ whiteSpace: "nowrap" }}>
+                      {invoice.customerBillingAddressLineTwo ||
+                        invoice.customer?.billingAddressLineTwo}
+                    </p>
+                  )}
                   <p style={{ whiteSpace: "nowrap" }}>
-                    {invoice.customerPostalCode || invoice.customer?.postalCode}{" "}
-                    {invoice.customerCity || invoice.customer?.city}
+                    {invoice.customerBillingCity ||
+                      invoice.customer?.billingCity}{" "}
+                    {invoice.customerBillingRegion ||
+                      invoice.customer?.billingRegion}{" "}
+                    {invoice.customerBillingPostalCode ||
+                      invoice.customer?.billingPostalCode}
                   </p>
-                  <p style={{ whiteSpace: "nowrap" }}>
-                    {invoice.customerRegion || invoice.customer?.region}
-                    {customerCountry &&
-                      " - " +
-                        t(
-                          `constants.countries.${
-                            customerCountry as CountryKey
-                          }`,
-                        )}
-                  </p>
+                  {customerCountry && (
+                    <p style={{ whiteSpace: "nowrap" }}>
+                      {t(
+                        `constants.countries.${customerCountry as CountryKey}`,
+                      )}
+                    </p>
+                  )}
                 </div>
-                <div>
-                  <p style={{ whiteSpace: "nowrap" }}>
-                    Email address:{" "}
-                    {invoice.customerEmailAddress ||
-                      invoice.customer?.emailAddress}
-                  </p>
-                  <p style={{ whiteSpace: "nowrap" }}>
-                    Phone number:{" "}
-                    {invoice.customerPhoneNumber ||
-                      invoice.customer?.phoneNumber}
-                  </p>
-                </div>
-                {(customerVatNumber || customerCocNumber) && (
+                {(invoice.customerEmail ||
+                  invoice.customer?.email ||
+                  invoice.customerPhone ||
+                  invoice.customer?.phone) && (
                   <div>
-                    {customerVatNumber && (
+                    {(invoice.customerEmail || invoice.customer?.email) && (
                       <p style={{ whiteSpace: "nowrap" }}>
-                        VAT number: {customerVatNumber}
+                        Email address:{" "}
+                        {invoice.customerEmail || invoice.customer?.email}
                       </p>
                     )}
+                    {(invoice.customerPhone || invoice.customer?.phone) && (
+                      <p style={{ whiteSpace: "nowrap" }}>
+                        Phone number:{" "}
+                        {invoice.customerPhone || invoice.customer?.phone}
+                      </p>
+                    )}
+                  </div>
+                )}
+                {(customerVatId || customerCocNumber) && (
+                  <div>
                     {customerCocNumber && (
                       <p style={{ whiteSpace: "nowrap" }}>
-                        CoC number: {customerCocNumber}
+                        Coc-number: {customerCocNumber}
+                      </p>
+                    )}
+                    {customerVatId && (
+                      <p style={{ whiteSpace: "nowrap" }}>
+                        VAT ID: {customerVatId}
                       </p>
                     )}
                   </div>
@@ -483,40 +501,43 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
               <Stack>
                 <div>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    {invoice.companyStreet || invoice.company?.street}{" "}
-                    {invoice.companyHouseNumber || invoice.company?.houseNumber}
+                    {invoice.companyAddressLineOne ||
+                      invoice.company?.addressLineOne}
                   </p>
+                  {(invoice.companyAddressLineTwo ||
+                    invoice.company?.addressLineTwo) && (
+                    <p style={{ whiteSpace: "nowrap" }}>
+                      {invoice.companyAddressLineTwo ||
+                        invoice.company?.addressLineTwo}
+                    </p>
+                  )}
                   <p style={{ whiteSpace: "nowrap" }}>
-                    {invoice.companyPostalCode || invoice.company?.postalCode}{" "}
-                    {invoice.companyCity || invoice.company?.city}
+                    {invoice.companyCity || invoice.company?.city}{" "}
+                    {invoice.companyRegion || invoice.company?.region}{" "}
+                    {invoice.companyPostalCode || invoice.company?.postalCode}
                   </p>
-                  <p style={{ whiteSpace: "nowrap" }}>
-                    {invoice.companyRegion || invoice.company?.region}
-                    {companyCountry &&
-                      " - " +
-                        t(
-                          `constants.countries.${companyCountry as CountryKey}`,
-                        )}
-                  </p>
+                  {companyCountry && (
+                    <p style={{ whiteSpace: "nowrap" }}>
+                      {t(`constants.countries.${companyCountry as CountryKey}`)}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <p style={{ whiteSpace: "nowrap" }}>
                     Email address:{" "}
-                    {invoice.companyEmailAddress ||
-                      invoice.company?.emailAddress}
+                    {invoice.companyEmail || invoice.company?.email}
                   </p>
                   <p style={{ whiteSpace: "nowrap" }}>
                     Phone number:{" "}
-                    {invoice.companyPhoneNumber || invoice.company?.phoneNumber}
+                    {invoice.companyPhone || invoice.company?.phone}
                   </p>
                 </div>
                 <div>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    VAT number:{" "}
-                    {invoice.companyVatNumber || invoice.company?.vatNumber}
+                    VAT ID: {invoice.companyVatId || invoice.company?.vatId}
                   </p>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    CoC number:{" "}
+                    CoC-number:{" "}
                     {invoice.companyCocNumber || invoice.company?.cocNumber}
                   </p>
                 </div>
@@ -586,8 +607,8 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                             {createdById && (
                               <>
                                 {" by "}
-                                <Link href={`/relations/${createdById}`}>
-                                  {createdBy?.name}
+                                <Link href={`/users/${createdById}`}>
+                                  {createdBy?.firstName} {createdBy?.lastName}
                                 </Link>
                               </>
                             )}
@@ -606,8 +627,9 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                     {invoice.createdById && (
                       <>
                         {" by "}
-                        <Link href={`/relations/${invoice.createdById}`}>
-                          {invoice.createdBy?.name}
+                        <Link href={`/users/${invoice.createdById}`}>
+                          {invoice.createdBy?.firstName}{" "}
+                          {invoice.createdBy?.lastName}
                         </Link>
                       </>
                     )}

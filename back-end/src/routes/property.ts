@@ -19,8 +19,8 @@ export const propertyRouter = router({
         .insert(properties)
         .values({
           ...input,
-          createdById: ctx.relation.id,
-          updatedById: ctx.relation.id,
+          createdById: ctx.user.id,
+          updatedById: ctx.user.id,
         })
         .returning({
           $kind: properties.$kind,
@@ -30,14 +30,18 @@ export const propertyRouter = router({
           updatedAt: properties.updatedAt,
           updatedById: properties.updatedById,
           name: properties.name,
-          emailAddress: properties.emailAddress,
-          phoneNumber: properties.phoneNumber,
-          street: properties.street,
-          houseNumber: properties.houseNumber,
-          postalCode: properties.postalCode,
+          email: properties.email,
+          phone: properties.phone,
+          addressLineOne: properties.addressLineOne,
+          addressLineTwo: properties.addressLineTwo,
           city: properties.city,
           region: properties.region,
+          postalCode: properties.postalCode,
           country: properties.country,
+          cocNumber: properties.cocNumber,
+          vatId: properties.vatId,
+          iban: properties.iban,
+          swiftBic: properties.swiftBic,
         });
 
       return result[0];
@@ -48,8 +52,8 @@ export const propertyRouter = router({
         $kind: properties.$kind,
         id: properties.id,
         name: properties.name,
-        emailAddress: properties.emailAddress,
-        phoneNumber: properties.phoneNumber,
+        email: properties.email,
+        phone: properties.phone,
       })
       .from(properties),
   ),
@@ -63,14 +67,18 @@ export const propertyRouter = router({
         updatedAt: properties.updatedAt,
         updatedById: properties.updatedById,
         name: properties.name,
-        emailAddress: properties.emailAddress,
-        phoneNumber: properties.phoneNumber,
-        street: properties.street,
-        houseNumber: properties.houseNumber,
+        email: properties.email,
+        phone: properties.phone,
+        addressLineOne: properties.addressLineOne,
+        addressLineTwo: properties.addressLineTwo,
         postalCode: properties.postalCode,
         city: properties.city,
         region: properties.region,
         country: properties.country,
+        cocNumber: properties.cocNumber,
+        vatId: properties.vatId,
+        iban: properties.iban,
+        swiftBic: properties.swiftBic,
       })
       .from(properties)
       .where(eq(properties.id, input));
@@ -89,7 +97,7 @@ export const propertyRouter = router({
         .set({
           ...input,
           updatedAt: new Date(),
-          updatedById: ctx.relation.id,
+          updatedById: ctx.user.id,
         })
         .where(eq(properties.id, input.id))
         .returning({
@@ -100,14 +108,18 @@ export const propertyRouter = router({
           updatedAt: properties.updatedAt,
           updatedById: properties.updatedById,
           name: properties.name,
-          emailAddress: properties.emailAddress,
-          phoneNumber: properties.phoneNumber,
-          street: properties.street,
-          houseNumber: properties.houseNumber,
+          email: properties.email,
+          phone: properties.phone,
+          addressLineOne: properties.addressLineOne,
+          addressLineTwo: properties.addressLineTwo,
           postalCode: properties.postalCode,
           city: properties.city,
           region: properties.region,
           country: properties.country,
+          cocNumber: properties.cocNumber,
+          vatId: properties.vatId,
+          iban: properties.iban,
+          swiftBic: properties.swiftBic,
         });
 
       return result[0];

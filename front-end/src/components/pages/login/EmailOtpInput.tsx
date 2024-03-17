@@ -35,7 +35,7 @@ export const EmailOtpInput = () => {
 
   const sendAgainHandler = async () => {
     const emailToken = await sendEmailOtp.mutate({
-      emailAddress: loginState.emailAddress,
+      email: loginState.email,
     });
     setLoginState({ emailToken });
     reset();
@@ -45,9 +45,7 @@ export const EmailOtpInput = () => {
     <Stack>
       <Input.Wrapper
         label={t("loginPage.otp")}
-        description={`${t("loginPage.emailOtpSent")} ${
-          loginState.emailAddress
-        }`}
+        description={`${t("loginPage.emailOtpSent")} ${loginState.email}`}
         error={error}
         withAsterisk
       >

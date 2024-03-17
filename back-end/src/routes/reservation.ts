@@ -36,8 +36,8 @@ export const reservationRouter = router({
         .insert(reservations)
         .values({
           ...input,
-          createdById: ctx.relation.id,
-          updatedById: ctx.relation.id,
+          createdById: ctx.user.id,
+          updatedById: ctx.user.id,
         })
         .returning({
           $kind: reservations.$kind,
@@ -166,7 +166,7 @@ export const reservationRouter = router({
         .set({
           ...input,
           updatedAt: new Date(),
-          updatedById: ctx.relation.id,
+          updatedById: ctx.user.id,
         })
         .where(eq(reservations.id, input.id))
         .returning({
@@ -292,12 +292,12 @@ export const reservationRouter = router({
       );
 
       const invoiceId = await createInvoice({
-        createdById: ctx.relation.id,
+        createdById: ctx.user.id,
         refType: "reservation",
         refId: input.reservationId,
         type: "standard",
         customerId: reservation.customerId,
-        companyId: ctx.relation.propertyId,
+        companyId: ctx.user.propertyId,
         notes: reservation.invoiceNotes,
         lines: [
           {

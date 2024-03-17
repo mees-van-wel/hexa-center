@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useRecoilValue } from "recoil";
 
-import { useAuthRelation } from "@/contexts/AuthContext";
+import { useAuthUser } from "@/contexts/AuthContext";
 import { useTranslation } from "@/hooks/useTranslation";
 import { routeHistoryState } from "@/states/routeHistoryState";
 import { trpc } from "@/utils/trpc";
@@ -48,7 +48,7 @@ export const DashboardHeader = ({
   const t = useTranslation();
   const router = useRouter();
   const pathName = usePathname();
-  const authRelation = useAuthRelation();
+  const authUser = useAuthUser();
   const routeHistory = useRecoilValue(routeHistoryState);
   const previousRoute = routeHistory.at(-2);
   const showBackButton =
@@ -130,7 +130,7 @@ export const DashboardHeader = ({
                   whiteSpace: "nowrap",
                 }}
               >
-                {authRelation.name}
+                {authUser.firstName} {authUser.lastName}
               </Text>
               <Text
                 size="xs"
@@ -138,7 +138,7 @@ export const DashboardHeader = ({
                   whiteSpace: "nowrap",
                 }}
               >
-                {authRelation.emailAddress}
+                {authUser.email}
               </Text>
             </Stack>
             <Avatar />

@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-import { RelationDetail } from "@/components/entities/relation/RelationDetail";
+import { UserDetail } from "@/components/entities/user/UserDetail";
 import { setTRPCRefreshToken, trpc } from "@/utils/trpc";
 
 type PageParams = {
@@ -13,7 +13,7 @@ export default async function Page({ params }: PageParams) {
   const refreshToken = cookies().get("refreshToken")?.value;
   if (refreshToken) setTRPCRefreshToken(refreshToken);
 
-  const relation = await trpc.relation.get.query(parseInt(params.id));
+  const user = await trpc.user.get.query(parseInt(params.id));
 
-  return <RelationDetail relation={relation} />;
+  return <UserDetail user={user} />;
 }

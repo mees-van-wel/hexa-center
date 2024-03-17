@@ -40,7 +40,7 @@ export const integrationRouter = router({
   connectTwinfield: procedure
     .input(wrap(string()))
     .mutation(async ({ input: code, ctx }) => {
-      await connectTwinfield(code, ctx.relation.id);
+      await connectTwinfield(code, ctx.user.id);
     }),
   // listTwinfieldOffices: procedure.mutation(async () => {
   //   const { id, accessToken, companyCode } = await getTwinfieldAccessToken();

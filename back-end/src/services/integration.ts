@@ -24,7 +24,7 @@ export type TwinfieldIntegrationData = {
   spreadAccountTypeId: number;
 };
 
-export const connectTwinfield = async (code: string, relationId: number) => {
+export const connectTwinfield = async (code: string, userId: number) => {
   const clientSecret = process.env.TWINFIELD_CLIENT_SECRET;
   if (!clientSecret)
     throw new Error("Missing TWINFIELD_CLIENT_SECRET in .env.local");
@@ -90,7 +90,7 @@ export const connectTwinfield = async (code: string, relationId: number) => {
     await db.insert(logs).values({
       type: "info",
       event: "integrationConnect",
-      relationId,
+      userId,
       refType: "integration",
       refId: integration.id,
     });
@@ -219,7 +219,6 @@ export const getTwinfieldWsdlUrl = async (accessToken: string) => {
     `https://login.twinfield.com/auth/authentication/connect/accesstokenvalidation?token=${accessToken}`,
     {
       headers: {
-        // "Content-Type": "application/x-www-form-urlencoded",
         Authorization: `Basic ${clientSecret}`,
       },
     },

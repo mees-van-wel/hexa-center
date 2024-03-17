@@ -47,13 +47,13 @@ export const overlapDates = (
 
 type ReservationCreateProps = {
   rooms: RouterOutput["room"]["list"];
-  relations: RouterOutput["relation"]["list"];
+  customers: RouterOutput["customer"]["list"];
   reservations: RouterOutput["reservation"]["list"];
 };
 
 export const ReservationCreate = ({
   rooms,
-  relations,
+  customers,
   reservations,
 }: ReservationCreateProps) => {
   const t = useTranslation();
@@ -88,7 +88,7 @@ export const ReservationCreate = ({
         >
           <SaveButton reservations={reservations} />
         </DashboardHeader>
-        <ReservationForm rooms={rooms} relations={relations} />
+        <ReservationForm rooms={rooms} customers={customers} />
       </Stack>
     </FormProvider>
   );

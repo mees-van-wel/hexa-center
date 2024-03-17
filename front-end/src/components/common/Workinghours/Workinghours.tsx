@@ -16,10 +16,10 @@ import { Sheet } from "../Sheet";
 import styles from "./WorkingHours.module.scss";
 
 type workinghoursProps = {
-  account: RouterOutput["auth"]["currentRelation"]["account"];
+  accountDetails: RouterOutput["auth"]["currentUser"]["accountDetails"];
 };
 
-export const Workinghours = ({ account }: workinghoursProps) => {
+export const Workinghours = ({ accountDetails }: workinghoursProps) => {
   const t = useTranslation();
 
   const [currentWeekday, setCurrentWeekday] = useState<Weekday>(
@@ -27,9 +27,9 @@ export const Workinghours = ({ account }: workinghoursProps) => {
   );
 
   const startIndex = WEEKDAY_VALUES.indexOf(
-    (account.firstDayOfWeek === FIRST_DAYS_OF_THE_WEEK.AUTO
+    (accountDetails?.firstDayOfWeek === FIRST_DAYS_OF_THE_WEEK.AUTO
       ? dayjs().startOf("week").format("dddd").toUpperCase()
-      : account.firstDayOfWeek) as Weekday,
+      : accountDetails?.firstDayOfWeek) as Weekday,
   );
 
   const sortedWeekdays = useMemo(
@@ -61,8 +61,8 @@ export const Workinghours = ({ account }: workinghoursProps) => {
                   <IconPlus />
                 </Button>
               </Group>
-              {account.workingHours &&
-                account.workingHours
+              {accountDetails?.workingHours &&
+                accountDetails?.workingHours
                   .filter(
                     ({ startDay, endDay }) =>
                       sortedWeekdays.indexOf(sortedWeekdays[startDay]) ===

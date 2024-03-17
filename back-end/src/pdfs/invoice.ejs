@@ -124,21 +124,36 @@
             <strong>To:</strong>
             <div>
               <p><%- customerName %></p>
-              <p><%- customerStreet %> <%- customerHouseNumber %></p>
-              <p><%- customerPostalCode %> <%- customerCity %></p>
-              <p><%= customerCountry %></p>
+              <% if (customerBusinessContactPerson) { %>
+              <p>Attn: <%- customerBusinessContactPerson %></p>
+              <% } %>
+              <p><%- customerBillingAddressLineOne %></p>
+              <% if (customerBillingAddressLineTwo) { %>
+              <p><%- customerBillingAddressLineTwo %></p>
+              <% } %>
+              <p>
+                <%- customerBillingCity %> <%- customerBillingRegion %> <%-
+                customerBillingPostalCode %>
+              </p>
+              <p><%= customerBillingCountry %></p>
             </div>
+            <% if (customerEmail || customerPhone) { %>
             <div>
-              <p>Email address: <%- customerEmailAddress %></p>
-              <p>Phone number: <%- customerPhoneNumber %></p>
+              <% if (customerEmail) { %>
+              <p>Email address: <%- customerEmail %></p>
+              <% } %>
+              <% if (customerPhone) { %>
+              <p>Phone number: <%- customerPhone %></p>
+              <% } %>
             </div>
-            <% if (customerCocNumber || customerVatNumber) { %>
+            <% } %>
+            <% if (customerCocNumber || customerVatId) { %>
             <div>
               <% if (customerCocNumber) { %>
               <p>CoC-number: <%- customerCocNumber %></p>
               <% } %>
-              <% if (customerVatNumber) { %>
-              <p>VAT number: <%- customerVatNumber %></p>
+              <% if (customerVatId) { %>
+              <p>VAT ID: <%- customerVatId %></p>
               <% } %>
             </div>
             <% } %>
@@ -147,17 +162,22 @@
             <strong>From:</strong>
             <div>
               <p><%- companyName %></p>
-              <p><%- companyStreet %> <%- companyHouseNumber %></p>
-              <p><%- companyPostalCode %> <%- companyCity %></p>
+              <p><%- companyAddressLineOne %></p>
+              <% if (companyAddressLineTwo) { %>
+              <p><%- companyAddressLineTwo %></p>
+              <% } %>
+              <p>
+                <%- companyCity %> <%- companyRegion %> <%- companyPostalCode %>
+              </p>
               <p><%= companyCountry %></p>
             </div>
             <div>
-              <p>Email address: <%- companyEmailAddress %></p>
-              <p>Phone number: <%- companyPhoneNumber %></p>
+              <p>Email address: <%- companyEmail %></p>
+              <p>Phone number: <%- companyPhone %></p>
             </div>
             <div>
               <p>CoC-number: <%- companyCocNumber %></p>
-              <p>VAT number: <%- companyVatNumber %></p>
+              <p>VAT ID: <%- companyVatId %></p>
             </div>
             <div>
               <p>IBAN: <%- companyIban %></p>
