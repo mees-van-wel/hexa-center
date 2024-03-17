@@ -13,6 +13,8 @@ import { IconArrowMoveLeft, IconArrowMoveRight } from "@tabler/icons-react";
 
 import styles from "./ReservationCalendar.module.scss";
 
+dayjs.extend(isBetween);
+
 export const compareDates = (firstDate: Dayjs, secondDate: Dayjs) => {
   return firstDate.startOf("day").isSame(secondDate.startOf("day"), "day");
 };
@@ -69,6 +71,31 @@ export const ReservationCalendar = ({
       return shouldShow;
     });
 
+  const calculateDateRange = (
+    startDate: Dayjs,
+    endDate: Dayjs,
+    weekDay: Dayjs,
+  ) => {
+    const hasStart = currentWeek.some((day) => compareDates(day, startDate));
+    const hasEnd = currentWeek.some((day) => compareDates(day, endDate));
+    let multiplier;
+    let left = 1;
+
+    if (hasStart && hasEnd) {
+      multiplier = Math.round(getIndexDiff(startDate, endDate));
+      left = Math.round(getIndexDiff(weekDay, startDate));
+    } else if (hasStart) {
+      multiplier = getIndexDiff(startDate, currentWeek.at(-1)!);
+      left = Math.round(getIndexDiff(weekDay, startDate));
+    } else if (hasEnd) {
+      multiplier = getIndexDiff(currentWeek[0], endDate);
+    } else {
+      multiplier = getIndexDiff(currentWeek[0], currentWeek.at(-1)!);
+    }
+
+    return { hasStart, hasEnd, multiplier, left };
+  };
+
   if (!currentRooms.length)
     return (
       <div className={styles.noRooms}>
@@ -118,6 +145,40 @@ export const ReservationCalendar = ({
                   const startDate = dayjs(reservation.startDate);
                   const endDate = dayjs(reservation.endDate);
 
+                  const invoiced = reservation.invoicesJunction
+                    .filter(
+                      ({ reservationId, startDate, endDate, invoice }) => {
+                        const start = dayjs(startDate);
+                        const end = dayjs(endDate);
+
+                        return (
+                          reservationId === reservation.id &&
+                          invoice.status === "issued" &&
+                          invoice.type !== "credit" &&
+                          currentWeek.some((weekDayDate) =>
+                            dayjs(weekDayDate).isBetween(
+                              start,
+                              end,
+                              null,
+                              "[]",
+                            ),
+                          )
+                        );
+                      },
+                    )
+                    .map((invoice) => {
+                      const { multiplier, left } = calculateDateRange(
+                        dayjs(invoice.startDate),
+                        dayjs(invoice.endDate),
+                        weekDay,
+                      );
+
+                      return {
+                        left: left,
+                        width: multiplier,
+                      };
+                    });
+
                   // const title = `${
                   //   reservation.guestName ? `${reservation.guestName} - ` : ""
                   // }${reservation.customer.name}`;
@@ -130,32 +191,11 @@ export const ReservationCalendar = ({
                     ? 16
                     : 8;
 
-                  const hasStart = currentWeek.some((day) =>
-                    compareDates(day, startDate),
+                  const { hasStart, hasEnd, multiplier } = calculateDateRange(
+                    startDate,
+                    endDate,
+                    weekDay,
                   );
-
-                  const hasEnd = currentWeek.some((day) =>
-                    compareDates(day, endDate),
-                  );
-
-                  let widthMultiplier;
-                  if (hasStart && hasEnd) {
-                    widthMultiplier = Math.round(
-                      getIndexDiff(startDate, endDate),
-                    );
-                  } else if (hasStart) {
-                    widthMultiplier = getIndexDiff(
-                      weekDay,
-                      currentWeek.at(-1)!,
-                    );
-                  } else if (hasEnd) {
-                    widthMultiplier = getIndexDiff(currentWeek[0], endDate);
-                  } else {
-                    widthMultiplier = getIndexDiff(
-                      currentWeek[0],
-                      currentWeek.at(-1)!,
-                    );
-                  }
 
                   let locatedPosition = positions.findIndex(
                     (pos) => pos && pos.end < reservation.startDate,
@@ -181,25 +221,37 @@ export const ReservationCalendar = ({
                       title={title}
                       size="xs"
                       classNames={{
-                        root: clsx(styles.reservation, {
-                          [styles.start]: hasStart && !hasEnd,
-                          [styles.end]: hasEnd && !hasStart,
-                          [styles.startEnd]: hasStart && hasEnd,
-                        }),
+                        root: styles.reservation,
                         label: styles.labelContainer,
                       }}
                       style={{
-                        width: `calc(${
-                          100 * widthMultiplier
-                        }% - ${correctWidth}px)`,
+                        width: `calc(${100 * multiplier}% - ${correctWidth}px)`,
                         top: `${top}px`,
                       }}
                     >
+                      <span className={styles.reservationBackground} />
+                      {invoiced.map(({ left, width }, index) => {
+                        return (
+                          <span
+                            key={`invoiced-${index}`}
+                            className={styles.invoiced}
+                            style={{
+                              width: `calc(${(100 / multiplier) * width}%)`,
+                              left: `calc(${(100 / multiplier) * (left - 1)}%)`,
+                            }}
+                          />
+                        );
+                      })}
                       <Group
                         grow
                         wrap="nowrap"
                         w="100%"
                         preventGrowOverflow={false}
+                        className={clsx(styles.buttonContent, {
+                          [styles.start]: hasStart && !hasEnd,
+                          [styles.end]: hasEnd && !hasStart,
+                          [styles.startEnd]: hasStart && hasEnd,
+                        })}
                       >
                         {!hasStart && (
                           <IconArrowMoveLeft className={styles.icon} />

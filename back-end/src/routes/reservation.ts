@@ -68,6 +68,17 @@ export const reservationRouter = router({
       with: {
         customer: true,
         room: true,
+        invoicesJunction: {
+          with: {
+            invoice: {
+              columns: {
+                $kind: true,
+                type: true,
+                status: true,
+              },
+            },
+          },
+        },
       },
     }),
   ),
