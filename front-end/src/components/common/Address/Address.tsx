@@ -44,8 +44,8 @@ export const Address = ({ disabled }: AddressProps) => {
 
   const {
     register,
-    getValues,
     setValue,
+    watch,
     control,
     formState: { errors },
   } = useFormContext<{
@@ -57,14 +57,15 @@ export const Address = ({ disabled }: AddressProps) => {
     country?: string | null;
   }>();
 
-  const defaultValue = useMemo(() => {
-    const street = getValues("street");
-    const houseNumber = getValues("houseNumber");
-
-    return street && houseNumber
-      ? `${street} ${houseNumber}`
-      : street ?? houseNumber;
-  }, [getValues]);
+  const street = watch("street");
+  const houseNumber = watch("houseNumber");
+  const defaultValue = useMemo(
+    () =>
+      street && houseNumber
+        ? `${street} ${houseNumber}`
+        : street ?? houseNumber,
+    [street, houseNumber],
+  );
 
   const [searchValue, setSearchValue] = useState(defaultValue);
   const [options, setOptions] = useState<{ label: string; value: string }[]>(
@@ -84,11 +85,18 @@ export const Address = ({ disabled }: AddressProps) => {
         return setOptions(
           searchValue?.length
             ? [{ value: searchValue, label: searchValue }]
-            : [],
+            : defaultValue
+              ? [
+                  {
+                    label: defaultValue,
+                    value: defaultValue,
+                  },
+                ]
+              : [],
         );
 
       const params = new URLSearchParams({
-        apiKey: "Q3oVSE4h4paphYezCmG4ULnFSnILGHxNBWksauiT6AQ",
+        apiKey: process.env.NEXT_PUBLIC_HERE_API_KEY!,
         q: searchValue.replaceAll(" ", "+"),
       });
 
@@ -130,6 +138,8 @@ export const Address = ({ disabled }: AddressProps) => {
       setOptions([...options, { value: searchValue, label: searchValue }]);
     })();
   }, [searchValue]);
+
+  console.log(options);
 
   const selectHandler = useCallback(
     (option: string | null) => {
@@ -185,7 +195,7 @@ export const Address = ({ disabled }: AddressProps) => {
         autoComplete="none"
         label={t("components.address.streetAndHouseNumber")}
         onSearchChange={setSearchValue}
-        searchValue={searchValue || ""}
+        searchValue={searchValue || defaultValue || ""}
         data={options}
         onChange={selectHandler}
         defaultValue={defaultValue}
