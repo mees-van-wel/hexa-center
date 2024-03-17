@@ -6,10 +6,20 @@
   position: relative;
   flex-grow: 1;
 
-  .weekHidden {
+  .roomName {
     width: 150px;
-    padding: 0 0.5rem;
-    flex-grow: 0 !important;
+    flex-grow: 0;
+  }
+
+  .weekDays {
+    display: flex;
+    justify-content: center;
+
+    .currentDay {
+      background-color: var(--mantine-primary-color-light);
+      border-radius: 0.5rem;
+      width: 100%;
+    }
   }
 }
 

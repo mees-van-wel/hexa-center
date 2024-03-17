@@ -15,12 +15,13 @@ export default async function Page({ params }: ReservationPageParams) {
 
   const reservationId = parseInt(params.id);
 
-  const [reservation, relations, rooms, invoiceExtraTemplates] =
+  const [reservation, relations, rooms, invoiceExtraTemplates, reservations] =
     await Promise.all([
       trpc.reservation.get.query(reservationId),
       trpc.relation.list.query(),
       trpc.room.list.query(),
       trpc.invoiceExtra.list.query(),
+      trpc.reservation.list.query(),
     ]);
 
   return (
@@ -29,6 +30,7 @@ export default async function Page({ params }: ReservationPageParams) {
       rooms={rooms}
       relations={relations}
       invoiceExtraTemplates={invoiceExtraTemplates}
+      reservations={reservations}
     />
   );
 }

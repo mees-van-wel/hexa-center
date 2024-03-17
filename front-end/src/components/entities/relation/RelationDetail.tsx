@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   FormProvider,
@@ -103,11 +102,11 @@ export const RelationDetail = ({ relation }: RelationDetailProps) => {
             color="orange"
             title={t("entities.relation.isSelfAlert.title")}
           >
-            {t("entities.relation.isSelfAlert.message") + " "}
+            {/* {t("entities.relation.isSelfAlert.message") + " "}
             <Link href="/profile">
               {t("entities.relation.isSelfAlert.button")}
             </Link>
-            .
+            . */}
           </Alert>
         )}
         <RelationForm disabled={isSelf} />

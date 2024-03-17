@@ -56,6 +56,7 @@ import { IconRotate } from "@tabler/icons-react";
 import { CreateInvoiceExtraModal } from "./CreateInvoiceExtraModal";
 import { EditInvoiceExtraModal } from "./EditInvoiceExtraModal";
 import { InvoicePeriodModal } from "./InvoicePeriodModal";
+import { overlapDates } from "./ReservationCreate";
 import { ReservationForm } from "./ReservationForm";
 
 dayjs.extend(isBetween);
@@ -65,6 +66,7 @@ type ReservationProps = {
   rooms: RouterOutput["room"]["list"];
   relations: RouterOutput["relation"]["list"];
   invoiceExtraTemplates: RouterOutput["invoiceExtra"]["list"];
+  reservations: RouterOutput["reservation"]["list"];
 };
 
 export const ReservationDetail = ({
@@ -72,6 +74,7 @@ export const ReservationDetail = ({
   rooms,
   relations,
   invoiceExtraTemplates,
+  reservations,
 }: ReservationProps) => {
   const t = useTranslation();
   const router = useRouter();
@@ -130,7 +133,9 @@ export const ReservationDetail = ({
     const lastInvoicedDate = countingInvoices[0]?.endDate;
 
     modals.open({
-      title: <Title order={3}>Invoice Period</Title>,
+      title: (
+        <Title order={3}>{t("entities.reservation.invoicePeriod.name")}</Title>
+      ),
       size: "xs",
       children: (
         <InvoicePeriodModal
@@ -156,7 +161,7 @@ export const ReservationDetail = ({
             router.refresh();
 
             notifications.show({
-              message: "Period successfully Invoiced",
+              message: t("entities.reservation.invoicePeriod.succes"),
               color: "green",
             });
           }}
@@ -167,7 +172,9 @@ export const ReservationDetail = ({
 
   const createInvoiceExtraHandler = () => {
     modals.open({
-      title: <Title order={3}>Add Invoice Extra</Title>,
+      title: (
+        <Title order={3}>{t("entities.reservation.invoiceExtra.add")}</Title>
+      ),
       // size: "sm",
       children: (
         <CreateInvoiceExtraModal
@@ -182,7 +189,7 @@ export const ReservationDetail = ({
             router.refresh();
 
             notifications.show({
-              message: "Invoice extra successfully added",
+              message: t("entities.reservation.invoiceExtra.addSucces"),
               color: "green",
             });
           }}
@@ -199,7 +206,9 @@ export const ReservationDetail = ({
     if (!invoiceExtra) return;
 
     modals.open({
-      title: <Title order={3}>Edit Invoice Extra</Title>,
+      title: (
+        <Title order={3}>{t("entities.reservation.invoiceExtra.edit")}</Title>
+      ),
       // size: "sm",
       children: (
         <EditInvoiceExtraModal
@@ -221,7 +230,7 @@ export const ReservationDetail = ({
             router.refresh();
 
             notifications.show({
-              message: "Invoice extra successfully edited",
+              message: t("entities.reservation.invoiceExtra.addSucces"),
               color: "green",
             });
           }}
@@ -240,7 +249,7 @@ export const ReservationDetail = ({
         router.refresh();
 
         notifications.show({
-          message: "Invoice extra status successfully resetted",
+          message: t("entities.reservation.invoiceExtra.resetSucces"),
           color: "green",
         });
       },
@@ -257,7 +266,7 @@ export const ReservationDetail = ({
         router.refresh();
 
         notifications.show({
-          message: "Invoice extra successfully deleted",
+          message: t("entities.reservation.invoiceExtra.deleted"),
           color: "green",
         });
       },
@@ -308,39 +317,57 @@ export const ReservationDetail = ({
           >
             {t("common.delete")}
           </Button>
-          <SaveBadge />
+          <SaveBadge reservation={reservation} reservations={reservations} />
         </DashboardHeader>
         <ReservationForm rooms={rooms} relations={relations} />
         <Paper p="2rem">
           <Band
             title={
               <>
-                <Title order={3}>Invoice Extra&apos;s</Title>
+                <Title order={3}>
+                  {t("entities.reservation.invoiceExtra.name")}
+                </Title>
                 <Button
                   onClick={createInvoiceExtraHandler}
                   leftSection={<IconPlus />}
                   loading={createInvoiceExtra.loading}
                   disabled={hasFinalInvoice}
                 >
-                  Add
+                  {t("common.add")}
                 </Button>
               </>
             }
           >
             {!reservation.invoicesExtrasJunction.length ? (
-              <p>None added</p>
+              <p>{t("entities.reservation.invoiceExtra.empty")}</p>
             ) : (
               <Table>
                 <Table.Thead>
                   <Table.Tr>
-                    <Table.Th>Name</Table.Th>
-                    <Table.Th>Quantity</Table.Th>
-                    <Table.Th>Amount</Table.Th>
-                    <Table.Th>Unit</Table.Th>
-                    <Table.Th>Vat Rate</Table.Th>
-                    <Table.Th>Cycle</Table.Th>
-                    <Table.Th>Status</Table.Th>
-                    <Table.Th>Actions</Table.Th>
+                    <Table.Th>
+                      {t("entities.reservation.invoiceExtra.keys.name")}
+                    </Table.Th>
+                    <Table.Th>
+                      {t("entities.reservation.invoiceExtra.keys.quantity")}
+                    </Table.Th>
+                    <Table.Th>
+                      {t("entities.reservation.invoiceExtra.keys.amount")}
+                    </Table.Th>
+                    <Table.Th>
+                      {t("entities.reservation.invoiceExtra.keys.unit")}
+                    </Table.Th>
+                    <Table.Th>
+                      {t("entities.reservation.invoiceExtra.keys.vatRate")}
+                    </Table.Th>
+                    <Table.Th>
+                      {t("entities.reservation.invoiceExtra.keys.cycle")}
+                    </Table.Th>
+                    <Table.Th>
+                      {t("entities.reservation.invoiceExtra.keys.status")}
+                    </Table.Th>
+                    <Table.Th>
+                      {t("entities.reservation.invoiceExtra.keys.actions")}
+                    </Table.Th>
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
@@ -588,15 +615,35 @@ export const ReservationDetail = ({
   );
 };
 
-const SaveBadge = () => {
+type SaveButtonProps = {
+  reservation: RouterOutput["reservation"]["get"];
+  reservations: RouterOutput["reservation"]["list"];
+};
+
+const SaveBadge = ({ reservation, reservations }: SaveButtonProps) => {
   const updateReservation = useMutation("reservation", "update");
   const t = useTranslation();
   const router = useRouter();
 
   const { control, getValues, reset, setError } =
     useFormContext<ReservationInputUpdateSchema>();
-  const { isDirty, errors } = useFormState({ control });
+  const { isDirty, errors, dirtyFields } = useFormState({ control });
   const isError = useMemo(() => !!Object.keys(errors).length, [errors]);
+
+  const overlaps = reservations.some(({ id, startDate, endDate, roomId }) => {
+    if (
+      (getValues("roomId") || reservation.roomId) !== roomId ||
+      id === getValues("id")
+    )
+      return;
+
+    return overlapDates(
+      getValues("startDate") || reservation.startDate,
+      getValues("endDate") || reservation.endDate,
+      startDate,
+      endDate,
+    );
+  });
 
   useAutosave(control, async (values) => {
     function isJson(str: string) {
@@ -619,19 +666,29 @@ const SaveBadge = () => {
         reset();
         return;
       }
-      const updatedReservation = await updateReservation.mutate({
-        id: getValues("id"),
-        ...values,
-      });
+      if (
+        overlaps &&
+        (dirtyFields.startDate || dirtyFields.endDate || dirtyFields.roomId)
+      ) {
+        modals.openConfirmModal({
+          title: t("common.areYouSure"),
+          children: <div>{t("entities.reservation.overlapError")}</div>,
+          labels: { confirm: t("common.yes"), cancel: t("common.no") },
+          closeOnClickOutside: false,
+          withCloseButton: false,
+          onConfirm: () => {
+            updateHandler(values);
+          },
+          onCancel: () => {
+            reset();
+          },
+        });
 
-      reset({
-        ...updatedReservation,
-        priceOverride: updatedReservation.priceOverride
-          ? parseFloat(updatedReservation.priceOverride)
-          : undefined,
-      });
-
-      router.refresh();
+        return;
+      } else {
+        updateHandler(values);
+        return;
+      }
     } catch (error) {
       const { success, json } = isJson((error as any).message);
       if (!success) {
@@ -641,7 +698,6 @@ const SaveBadge = () => {
         });
 
         reset();
-
         return;
       }
 
@@ -656,6 +712,24 @@ const SaveBadge = () => {
       }
     }
   });
+
+  const updateHandler = async (
+    values: Omit<ReservationInputUpdateSchema, "id">,
+  ) => {
+    const updatedReservation = await updateReservation.mutate({
+      ...values,
+      id: getValues("id"),
+    });
+
+    reset({
+      ...updatedReservation,
+      priceOverride: updatedReservation.priceOverride
+        ? parseFloat(updatedReservation.priceOverride)
+        : undefined,
+    });
+
+    router.refresh();
+  };
 
   return (
     <Badge
