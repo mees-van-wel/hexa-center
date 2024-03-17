@@ -36,13 +36,13 @@
       position: absolute;
       inset: 0;
       background-color: var(--mantine-primary-color-filled);
-      filter: contrast(50%);
     }
 
     .invoiced {
       position: absolute;
       inset: 0;
       background-color: var(--mantine-primary-color-filled);
+      filter: saturate(20%);
     }
 
     .buttonContent {
@@ -51,6 +51,7 @@
       inset: 0;
 
       &.start {
+        padding-left: calc(2rem + 20px);
         background: linear-gradient(
           90deg,
           var(--mantine-color-green-filled) 0px,
@@ -67,6 +68,7 @@
       }
 
       &.end {
+        padding-right: calc(2rem + 20px);
         background: linear-gradient(
           90deg,
           transparent 0px,
@@ -110,12 +112,14 @@
     }
 
     .icon {
-      flex-shrink: 0;
-      flex-grow: 0;
+      flex: 0 0 auto;
+      min-width: 20px;
       width: 20px;
     }
 
     .label {
+      flex: 1;
+      max-width: unset;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;

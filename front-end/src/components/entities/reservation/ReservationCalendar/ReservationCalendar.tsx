@@ -19,8 +19,6 @@ export const compareDates = (firstDate: Dayjs, secondDate: Dayjs) => {
   return firstDate.startOf("day").isSame(secondDate.startOf("day"), "day");
 };
 
-dayjs.extend(isBetween);
-
 type ReservationCalendarProps = {
   currentWeek: Dayjs[];
   currentRooms: RouterOutput["room"]["list"];
@@ -147,9 +145,14 @@ export const ReservationCalendar = ({
 
                   const invoiced = reservation.invoicesJunction
                     .filter(
-                      ({ reservationId, startDate, endDate, invoice }) => {
-                        const start = dayjs(startDate);
-                        const end = dayjs(endDate);
+                      ({
+                        reservationId,
+                        periodStartDate,
+                        periodEndDate,
+                        invoice,
+                      }) => {
+                        const start = dayjs(periodStartDate);
+                        const end = dayjs(periodEndDate);
 
                         return (
                           reservationId === reservation.id &&
@@ -168,8 +171,8 @@ export const ReservationCalendar = ({
                     )
                     .map((invoice) => {
                       const { multiplier, left } = calculateDateRange(
-                        dayjs(invoice.startDate),
-                        dayjs(invoice.endDate),
+                        dayjs(invoice.periodStartDate),
+                        dayjs(invoice.periodEndDate),
                         weekDay,
                       );
 
@@ -179,11 +182,12 @@ export const ReservationCalendar = ({
                       };
                     });
 
-                  // const title = `${
-                  //   reservation.guestName ? `${reservation.guestName} - ` : ""
-                  // }${reservation.customer.name}`;
-
-                  const title = reservation.customer.name;
+                  const title = `${
+                    reservation.guestName &&
+                    reservation.guestName !== reservation.customer.name
+                      ? `${reservation.guestName} - `
+                      : ""
+                  }${reservation.customer.name}`;
 
                   const correctWidth = currentWeek
                     .at(-1)!
@@ -216,7 +220,7 @@ export const ReservationCalendar = ({
                     <Button
                       key={`${reservation.room.name}-${reservationIndex}`}
                       component={Link}
-                      // TODO: Bug seemed to be everywhere where you go to single pagination, maybe because of how mantine handles a Link component?
+                      // @ts-ignore Router
                       href={`/reservations/${reservation.id}`}
                       title={title}
                       size="xs"
@@ -245,7 +249,7 @@ export const ReservationCalendar = ({
                       <Group
                         grow
                         wrap="nowrap"
-                        w="100%"
+                        justify="space-between"
                         preventGrowOverflow={false}
                         className={clsx(styles.buttonContent, {
                           [styles.start]: hasStart && !hasEnd,

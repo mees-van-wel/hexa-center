@@ -153,11 +153,11 @@ export const ReservationDetail = ({
               ? dayjs(lastInvoicedDate).add(1, "day").toDate()
               : reservation.startDate
           }
-          onConfirm={async (startDate, endDate) => {
+          onConfirm={async (periodStartDate, periodEndDate) => {
             await invoicePeriod.mutate({
               reservationId: reservation.id,
-              startDate,
-              endDate,
+              periodStartDate,
+              periodEndDate,
             });
 
             router.refresh();

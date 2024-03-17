@@ -201,8 +201,8 @@ export const reservationRouter = router({
       wrap(
         object({
           reservationId: number(),
-          startDate: date(),
-          endDate: date(),
+          periodStartDate: date(),
+          periodEndDate: date(),
         }),
       ),
     )
@@ -228,8 +228,13 @@ export const reservationRouter = router({
         quantity: string;
         vatRate: string;
       }[] = [];
-      const isFinalInvoice = dayjs(reservation.endDate).isSame(input.endDate);
-      const periodNights = dayjs(input.endDate).diff(input.startDate, "days");
+      const isFinalInvoice = dayjs(reservation.endDate).isSame(
+        input.periodEndDate,
+      );
+      const periodNights = dayjs(input.periodEndDate).diff(
+        input.periodStartDate,
+        "days",
+      );
       const totalNights = dayjs(reservation.endDate).diff(
         reservation.startDate,
         "days",
@@ -309,8 +314,8 @@ export const reservationRouter = router({
       await db.insert(reservationsToInvoices).values({
         reservationId: reservation.id,
         invoiceId,
-        periodStartDate: input.startDate,
-        periodEndDate: input.endDate,
+        periodStartDate: input.periodStartDate,
+        periodEndDate: input.periodEndDate,
       });
 
       return invoiceId;
