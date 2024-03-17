@@ -1,1 +1,0 @@
-ALTER TYPE "setting_name" ADD VALUE 'reservationRevenueAccountId';

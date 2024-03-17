@@ -12,50 +12,8 @@
     {
       "idx": 1,
       "version": "5",
-      "when": 1710537720876,
-      "tag": "0001_cool_lyja",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1710545355338,
-      "tag": "0002_lucky_bulldozer",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1710582167307,
-      "tag": "0003_mute_beast",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1710591881573,
-      "tag": "0004_fair_jack_flag",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "5",
-      "when": 1710592889261,
-      "tag": "0005_lovely_surge",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "5",
-      "when": 1710599911894,
-      "tag": "0006_broken_vance_astro",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "5",
-      "when": 1710601426752,
-      "tag": "0007_pale_harpoon",
+      "when": 1710634584239,
+      "tag": "0001_oval_green_goblin",
       "breakpoints": true
     }
   ]

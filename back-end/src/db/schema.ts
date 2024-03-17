@@ -720,6 +720,42 @@ export const ledgersRelations = relationBuilder(ledgers, ({ one, many }) => ({
   accounts: many(ledgerAccounts),
 }));
 
+export const ledgerAccountTypes = pgTable("ledger_account_types", {
+  $kind: text("$kind").default("ledgerAccount").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .default(sql`now()`)
+    .notNull(),
+  createdById: integer("created_by_id").references(
+    (): AnyPgColumn => relations.id,
+    { onDelete: "set null" },
+  ),
+  updatedById: integer("updated_by_id").references(
+    (): AnyPgColumn => relations.id,
+    { onDelete: "set null" },
+  ),
+  name: text("name").notNull(),
+});
+
+export const ledgerAccountTypesRelations = relationBuilder(
+  ledgerAccountTypes,
+  ({ one, many }) => ({
+    createdBy: one(relations, {
+      fields: [ledgerAccountTypes.createdById],
+      references: [relations.id],
+    }),
+    updatedBy: one(relations, {
+      fields: [ledgerAccountTypes.updatedById],
+      references: [relations.id],
+    }),
+    accounts: many(ledgerAccounts),
+  }),
+);
+
 export const ledgerAccounts = pgTable("ledger_accounts", {
   $kind: text("$kind").default("ledgerAccount").notNull(),
   id: serial("id").primaryKey(),
@@ -738,9 +774,16 @@ export const ledgerAccounts = pgTable("ledger_accounts", {
     (): AnyPgColumn => relations.id,
     { onDelete: "set null" },
   ),
-  ledgerId: integer("ledger_id").references(() => ledgers.id, {
-    onDelete: "restrict",
-  }),
+  ledgerId: integer("ledger_id")
+    .references(() => ledgers.id, {
+      onDelete: "restrict",
+    })
+    .notNull(),
+  typeId: integer("type_id")
+    .references(() => ledgerAccountTypes.id, {
+      onDelete: "restrict",
+    })
+    .notNull(),
   name: text("name").notNull(),
 });
 
@@ -758,6 +801,10 @@ export const ledgerAccountsRelations = relationBuilder(
     ledger: one(ledgers, {
       fields: [ledgerAccounts.ledgerId],
       references: [ledgers.id],
+    }),
+    type: one(ledgerAccountTypes, {
+      fields: [ledgerAccounts.typeId],
+      references: [ledgerAccountTypes.id],
     }),
   }),
 );
@@ -848,7 +895,7 @@ export const integrationConnections = pgTable("integration_connections", {
 
 export const integrationMappingRefTypeEnum = pgEnum(
   "integration_mapping_ref_type",
-  ["relation", "ledgerAccount"],
+  ["relation", "ledgerAccount", "ledgerAccountType"],
 );
 
 export const integrationMappings = pgTable("integration_mappings", {

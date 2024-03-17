@@ -9,5 +9,11 @@ export default async function Page() {
 
   const invoices = await trpc.invoice.list.query();
 
-  return <InvoicesOverview invoices={invoices} />;
+  return (
+    <InvoicesOverview
+      invoices={invoices.sort(
+        (a, b) => b.createdAt?.getTime() - a.createdAt?.getTime(),
+      )}
+    />
+  );
 }

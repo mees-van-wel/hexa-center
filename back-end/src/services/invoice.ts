@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import Decimal from "decimal.js";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, or, sql } from "drizzle-orm";
 import ejs from "ejs";
 
 import db from "@/db/client";
@@ -20,7 +20,11 @@ import { sendSoapRequest } from "@/utils/soap";
 import { Settings } from "@front-end/constants/settings";
 import { TRPCError } from "@trpc/server";
 
-import { getTwinfieldAccessToken, getTwinfieldWsdlUrl } from "./integration";
+import {
+  getTwinfieldAccessToken,
+  getTwinfieldWsdlUrl,
+  TwinfieldIntegrationData,
+} from "./integration";
 import { getSetting, getSettings } from "./setting";
 
 export const getInvoice = async (invoiceId: number) => {
@@ -480,7 +484,7 @@ export const issueInvoice = async (
       .where(
         and(
           sql`EXTRACT(YEAR FROM ${invoices.date}) = ${date.getFullYear()}`,
-          eq(invoices.type, "standard"),
+          or(eq(invoices.type, "standard"), eq(invoices.type, "credit")),
         ),
       ),
   ]);
@@ -549,16 +553,13 @@ export const issueInvoice = async (
     .from(integrationConnections)
     .where(eq(integrationConnections.type, "twinfield"));
 
-  const integration = integrationResult[0];
+  const integration = integrationResult[0] as (typeof integrationResult)[0] & {
+    data: TwinfieldIntegrationData;
+  };
 
   if (integration) {
     const { id, accessToken, companyCode } = await getTwinfieldAccessToken();
     const wsdlUrl = await getTwinfieldWsdlUrl(accessToken);
-
-    let xml = await readFile(
-      "soapEnvelope",
-      "createTwinfieldTransaction.xml.ejs",
-    );
 
     const VatRateToVatCodeMap = {
       "21.00": "VH",
@@ -576,9 +577,9 @@ export const issueInvoice = async (
         ),
       );
 
-    const externalCustomerId = customerMappingResult[0]?.data?.externalId;
+    const externalCustomerCode = customerMappingResult[0]?.data?.code;
 
-    if (!externalCustomerId) {
+    if (!externalCustomerCode) {
       console.warn(`Missing integration mapping for relation: ${customer.id}`);
       return;
     }
@@ -589,7 +590,7 @@ export const issueInvoice = async (
       .where(eq(invoiceLines.invoiceId, invoice.id));
 
     const formattedLines: {
-      revenueAccountId: string;
+      revenueAccountCode: string;
       netAmount: string;
       name: string;
       vatCode: string;
@@ -597,7 +598,7 @@ export const issueInvoice = async (
     }[] = [];
 
     for (const line of lines) {
-      const ledgerAccountMappingResult = await db
+      const revenueAccountMappingResult = await db
         .select()
         .from(integrationMappings)
         .where(
@@ -607,9 +608,9 @@ export const issueInvoice = async (
           ),
         );
 
-      const revenueAccountId = ledgerAccountMappingResult[0]?.data?.externalId;
+      const revenueAccountCode = revenueAccountMappingResult[0]?.data?.code;
 
-      if (!revenueAccountId) {
+      if (!revenueAccountCode) {
         console.warn(
           `Missing integration mapping for ledger account: ${line.revenueAccountId}`,
         );
@@ -617,7 +618,7 @@ export const issueInvoice = async (
       }
 
       formattedLines.push({
-        revenueAccountId,
+        revenueAccountCode,
         netAmount: line.netAmount,
         name: line.name,
         vatCode:
@@ -628,24 +629,75 @@ export const issueInvoice = async (
       });
     }
 
+    const balanceAccountMappingResult = await db
+      .select()
+      .from(integrationMappings)
+      .where(
+        and(
+          eq(integrationMappings.refType, "ledgerAccount"),
+          eq(
+            integrationMappings.refId,
+            integration.data.transactionBalanceAccountId,
+          ),
+        ),
+      );
+
+    const externalBalanceAccountCode =
+      balanceAccountMappingResult[0]?.data?.code;
+
+    if (!externalBalanceAccountCode) {
+      console.warn(
+        `Missing integration mapping for ledger account: ${integration.data.transactionBalanceAccountId}`,
+      );
+      return;
+    }
+
+    const transactionTypeMappingResult = await db
+      .select()
+      .from(integrationMappings)
+      .where(
+        and(
+          eq(integrationMappings.refType, "ledgerAccountType"),
+          eq(
+            integrationMappings.refId,
+            integration.data.transactionAccountTypeId,
+          ),
+        ),
+      );
+
+    const externalTransactionTypeCode =
+      transactionTypeMappingResult[0]?.data?.code;
+
+    if (!externalTransactionTypeCode) {
+      console.warn(
+        `Missing integration mapping for ledger account type: ${integration.data.transactionAccountTypeId}`,
+      );
+      return;
+    }
+
+    let xml = await readFile(
+      "soapEnvelope",
+      "createTwinfieldTransaction.xml.ejs",
+    );
+
     xml = await ejs.render(
       xml,
       {
         accessToken,
         companyCode,
+        // TODO Make variable
+        currency: "EUR",
+        transactionTypeCode: externalTransactionTypeCode,
         date: dayjs(date).format("YYYYMMDD"),
         invoiceNumber,
         dueDate: dueDate.format("YYYYMMDD"),
-        // TODO Find correct name
-        balanceAccount: "130000",
-        customerCode: externalCustomerId,
+        balanceAccountCode: externalBalanceAccountCode,
+        customerCode: externalCustomerCode,
         totalAmount: invoice.grossAmount,
         lines: formattedLines,
       },
       { async: true },
     );
-
-    // TODO Spread transaction
 
     try {
       await sendSoapRequest({
@@ -666,6 +718,109 @@ export const issueInvoice = async (
     } catch (error) {
       console.warn(error);
     }
+
+    // if (invoice.refType === "reservation") {
+    //   const reservationResult = await db
+    //     .select({
+    //       startDate: reservations.startDate,
+    //       endDate: reservations.endDate,
+    //     })
+    //     .from(reservations)
+    //     .where(eq(reservations.id, invoice.refId));
+
+    //   const reservation = reservationResult[0];
+
+    //   if (!reservation) {
+    //     console.warn(`Reservation not found: ${invoice.refId}`);
+    //     return;
+    //   }
+
+    //   const balanceAccountMappingResult = await db
+    //     .select()
+    //     .from(integrationMappings)
+    //     .where(
+    //       and(
+    //         eq(integrationMappings.refType, "ledgerAccount"),
+    //         eq(
+    //           integrationMappings.refId,
+    //           integration.data.spreadBalanceAccountId,
+    //         ),
+    //       ),
+    //     );
+
+    //   const externalBalanceAccountCode =
+    //     balanceAccountMappingResult[0]?.data?.code;
+
+    //   if (!externalBalanceAccountCode) {
+    //     console.warn(
+    //       `Missing integration mapping for ledger account: ${integration.data.spreadBalanceAccountId}`,
+    //     );
+    //     return;
+    //   }
+
+    //   const transactionTypeMappingResult = await db
+    //     .select()
+    //     .from(integrationMappings)
+    //     .where(
+    //       and(
+    //         eq(integrationMappings.refType, "ledgerAccountType"),
+    //         eq(integrationMappings.refId, integration.data.spreadAccountTypeId),
+    //       ),
+    //     );
+
+    //   const externalTransactionTypeCode =
+    //     transactionTypeMappingResult[0]?.data?.code;
+
+    //   if (!externalTransactionTypeCode) {
+    //     console.warn(
+    //       `Missing integration mapping for ledger account type: ${integration.data.spreadAccountTypeId}`,
+    //     );
+    //     return;
+    //   }
+
+    //   let xml = await readFile(
+    //     "soapEnvelope",
+    //     "spreadTwinfieldTransaction.xml.ejs",
+    //   );
+
+    //   xml = await ejs.render(
+    //     xml,
+    //     {
+    //       accessToken,
+    //       companyCode,
+    //       transactionTypeCode: externalTransactionTypeCode,
+    //       invoiceNumber,
+    //       balanceAccountCode: externalBalanceAccountCode,
+    //       startPeriod: dayjs(reservation.startDate).format("YYYY/MM"),
+    //       endPeriod: dayjs(reservation.endDate).format("YYYY/MM"),
+    //     },
+    //     { async: true },
+    //   );
+
+    //   console.log(xml);
+
+    //   try {
+    //     const res = await sendSoapRequest({
+    //       url: wsdlUrl,
+    //       headers: {
+    //         "Content-Type": "text/xml; charset=utf-8",
+    //         SOAPAction: "http://www.twinfield.com/ProcessXmlDocument",
+    //       },
+    //       xml,
+    //     });
+
+    //     console.log(JSON.stringify(res));
+
+    //     await db.insert(logs).values({
+    //       type: "info",
+    //       event: "integrationSend",
+    //       refType: "integration",
+    //       refId: id,
+    //     });
+    //   } catch (error) {
+    //     console.warn(error);
+    //   }
+    // }
   }
 
   await db.insert(invoiceEvents).values({

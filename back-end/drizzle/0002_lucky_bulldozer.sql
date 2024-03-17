@@ -1,1 +1,0 @@
-ALTER TABLE "integration_mappings" ALTER COLUMN "connection_id" SET NOT NULL;

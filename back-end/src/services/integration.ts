@@ -16,7 +16,12 @@ export type TwinfieldIntegrationData = {
   refreshToken: string;
   accessToken: string;
   expiresOn: string;
-  companyCode?: string;
+  companyCode: string;
+  reservationRevenueAccountId: number;
+  transactionBalanceAccountId: number;
+  transactionAccountTypeId: number;
+  spreadBalanceAccountId: number;
+  spreadAccountTypeId: number;
 };
 
 export const connectTwinfield = async (code: string, relationId: number) => {
@@ -60,7 +65,7 @@ export const connectTwinfield = async (code: string, relationId: number) => {
         .update(integrationConnections)
         .set({
           data: sql`${{
-            ...integration.data,
+            ...(integration.data as TwinfieldIntegrationData),
             refreshToken,
             accessToken,
             expiresOn,
@@ -92,7 +97,7 @@ export const connectTwinfield = async (code: string, relationId: number) => {
 
     return { refreshToken, accessToken, expiresOn };
   } catch (error) {
-    console.log(error);
+    console.warn(error);
 
     throw new TRPCError({
       code: "BAD_REQUEST",

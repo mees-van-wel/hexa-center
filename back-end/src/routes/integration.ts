@@ -1,8 +1,8 @@
-import { and, eq } from "drizzle-orm";
-import { number, object, picklist, string } from "valibot";
+import { eq } from "drizzle-orm";
+import { picklist, string } from "valibot";
 
 import db from "@/db/client";
-import { integrationConnections, integrationMappings } from "@/db/schema";
+import { integrationConnections } from "@/db/schema";
 import {
   connectTwinfield,
   TwinfieldIntegrationData,
@@ -36,29 +36,6 @@ export const integrationRouter = router({
             },
           }
         : undefined;
-    }),
-  getMapping: procedure
-    .input(
-      wrap(
-        object({
-          refType: picklist(["relation", "productTemplate", "productInstance"]),
-          refId: number(),
-        }),
-      ),
-    )
-    // TODO Convert to query
-    .mutation(async ({ input }) => {
-      const result = await db
-        .select()
-        .from(integrationMappings)
-        .where(
-          and(
-            eq(integrationMappings.refType, input.refType),
-            eq(integrationMappings.refId, input.refId),
-          ),
-        );
-      const mapping = result[0];
-      return mapping as typeof mapping | undefined;
     }),
   connectTwinfield: procedure
     .input(wrap(string()))

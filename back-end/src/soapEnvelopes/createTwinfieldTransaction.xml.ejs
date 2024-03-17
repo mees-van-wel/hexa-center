@@ -13,8 +13,8 @@
       <twinfield:xmlRequest>
         <transaction destiny="final" raisewarning="false">
           <header>
-            <code>VRK</code>
-            <currency>EUR</currency>
+            <code><%= transactionTypeCode %></code>
+            <currency><%= currency %></currency>
             <date><%= date %></date>
             <invoicenumber><%= invoiceNumber %></invoicenumber>
             <office><%= companyCode %></office>
@@ -22,14 +22,14 @@
           </header>
           <lines>
             <line type="total" id="1">
-              <dim1><%= balanceAccount %></dim1>
+              <dim1><%= balanceAccountCode %></dim1>
               <dim2><%= customerCode %></dim2>
               <value><%= totalAmount %></value>
               <debitcredit>debit</debitcredit>
             </line>
             <% lines.forEach(function(line, index) { %>
             <line type="detail" id="<%= index + 2 %>">
-              <dim1><%= line.revenueAccountId %></dim1>
+              <dim1><%= line.revenueAccountCode %></dim1>
               <value><%= line.netAmount %></value>
               <debitcredit>credit</debitcredit>
               <description><![CDATA[<%- line.name %>]]></description>

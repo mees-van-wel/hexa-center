@@ -467,7 +467,7 @@ export const ReservationDetail = ({
                                 size="1rem"
                                 stroke={1}
                                 style={{
-                                  color: "gray",
+                                  color: `var(--mantine-color-${color})`,
                                   transform: "rotate(-45deg)",
                                 }}
                               />
@@ -486,8 +486,8 @@ export const ReservationDetail = ({
                                   color: "rgb(var(--color-text))",
                                   padding: "0.75rem",
                                   margin: "0",
-                                  boxShadow: `inset 0px 0px 16px -4px var(--mantine-color-${color}), 0px 0px 16px -4px var(--mantine-color-${color})`,
-                                  border: `2px ${
+                                  boxShadow: `inset 0px -8px 16px -8px var(--mantine-color-${color}), 0px 8px 16px -8px var(--mantine-color-${color})`,
+                                  borderBottom: `5px ${
                                     invoice.status === "credited"
                                       ? "dashed"
                                       : "solid"
@@ -508,7 +508,7 @@ export const ReservationDetail = ({
                                 size="1rem"
                                 stroke={1}
                                 style={{
-                                  color: "gray",
+                                  color: `var(--mantine-color-${color})`,
                                   transform: "rotate(45deg)",
                                 }}
                               />

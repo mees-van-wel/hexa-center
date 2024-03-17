@@ -121,7 +121,7 @@ export const relationRouter = router({
             refId: id,
           });
 
-          const externalId =
+          const code =
             response.ProcessXmlDocumentResponse.ProcessXmlDocumentResult
               .dimensions.dimension.code;
 
@@ -129,10 +129,10 @@ export const relationRouter = router({
             connectionId: id,
             refType: "relation",
             refId: relation.id,
-            data: sql`${{ externalId }}::jsonb`,
+            data: sql`${{ code }}::jsonb`,
           });
         } catch (error) {
-          console.log(error);
+          console.warn(error);
         }
       }
 
@@ -244,8 +244,8 @@ export const relationRouter = router({
               ),
             );
 
-          const externalId = result[0]?.data?.externalId as string | undefined;
-          if (!externalId)
+          const code = result[0]?.data?.code as string | undefined;
+          if (!code)
             throw new Error(
               `Missing twinfield customer code mapping for relation: ${input}`,
             );
@@ -264,7 +264,7 @@ export const relationRouter = router({
             {
               accessToken,
               companyCode,
-              code: externalId,
+              code,
               name: relation.name,
               businessContactName: relation.businessContactName,
               street: relation.street,
@@ -297,7 +297,7 @@ export const relationRouter = router({
               refId: id,
             });
           } catch (error) {
-            console.log(error);
+            console.warn(error);
           }
         }
 
@@ -327,8 +327,8 @@ export const relationRouter = router({
           ),
         );
 
-      const externalId = result[0]?.data?.externalId as string | undefined;
-      if (!externalId)
+      const code = result[0]?.data?.code as string | undefined;
+      if (!code)
         throw new Error(
           `Missing twinfield customer code mapping for relation: ${input}`,
         );
@@ -346,7 +346,7 @@ export const relationRouter = router({
         {
           accessToken,
           companyCode,
-          code: externalId,
+          code,
         },
         { async: true },
       );
@@ -377,7 +377,7 @@ export const relationRouter = router({
             ),
           );
       } catch (error) {
-        console.log(error);
+        console.warn(error);
       }
     }
   }),

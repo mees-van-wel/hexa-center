@@ -11,14 +11,14 @@
   <soap:Body>
     <twinfield:ProcessXmlDocument>
       <twinfield:xmlRequest>
-        <spread action="postprovisional">
+        <spread action="postfinal">
           <original>
             <office><%= companyCode %></office>
-            <code>VRK</code>
+            <code><%= transactionTypeCode %></code>
             <number><%= invoiceNumber %></number>
           </original>
           <settings>
-            <dim1>179100</dim1>
+            <dim1><%= balanceAccountCode %></dim1>
             <startperiod><%= startPeriod %></startperiod>
             <endperiod><%= endPeriod %></endperiod>
           </settings>
