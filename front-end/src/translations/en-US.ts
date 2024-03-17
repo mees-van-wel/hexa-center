@@ -28,6 +28,7 @@ export default {
     essentials: "Essentials",
     sales: "Sales",
     bookings: "Bookings",
+    system: "System",
   },
   entities: {
     relation: {
@@ -103,24 +104,24 @@ export default {
         name: "Invoice Period",
         succes: "Period successfully Invoiced",
       },
-      invoiceExtra: {
+      product: {
         keys: {
           name: "Name",
           quantity: "Quantity",
-          amount: "Amount",
-          unit: "Unit",
+          price: "Price",
           vatRate: "Vat Rate",
           cycle: "Cycle",
           status: "Status",
           actions: "Actions",
         },
-        name: "Invoice Extra's",
-        edit: "Edit Invoice Extra",
-        add: "Add Invoice Extra",
-        addSucces: "Invoice extra successfully added",
-        resetSucces: "Invoice extra status successfully resetted",
-        deleted: "Invoice extra successfully deleted",
-        empty: "Nothing added",
+        name: "Products",
+        edit: "Edit product",
+        editSucces: "Product successfully edited",
+        add: "Add product",
+        addSucces: "Product successfully added",
+        resetSucces: "Product status successfully resetted",
+        deleted: "Product successfully deleted",
+        empty: "None added yet",
       },
       calendar: {
         roomName: "Room name",
@@ -299,6 +300,12 @@ export default {
     confirmDeleteModal: "If you continue this room will be deleted.",
     roomDeleted: "Room successfully deleted",
     roomCreated: "Room successfully created",
+  },
+  screens: {
+    integrationsPage: {
+      singleName: "Integration",
+      pluralName: "Integrations",
+    },
   },
   components: {
     address: {

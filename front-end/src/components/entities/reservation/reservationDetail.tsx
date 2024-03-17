@@ -53,8 +53,8 @@ import {
 } from "@tabler/icons-react";
 import { IconRotate } from "@tabler/icons-react";
 
-import { CreateInvoiceExtraModal } from "./CreateInvoiceExtraModal";
-import { EditInvoiceExtraModal } from "./EditInvoiceExtraModal";
+import { AddProductModal } from "./AddProductModal";
+import { EditProductModal } from "./EditProductModal";
 import { InvoicePeriodModal } from "./InvoicePeriodModal";
 import { overlapDates } from "./ReservationCreate";
 import { ReservationForm } from "./ReservationForm";
@@ -65,37 +65,34 @@ type ReservationProps = {
   reservation: RouterOutput["reservation"]["get"];
   rooms: RouterOutput["room"]["list"];
   relations: RouterOutput["relation"]["list"];
-  invoiceExtraTemplates: RouterOutput["invoiceExtra"]["list"];
   reservations: RouterOutput["reservation"]["list"];
+  productTemplates: RouterOutput["product"]["list"];
+  ledgerAccounts: RouterOutput["ledgerAccount"]["list"];
 };
 
 export const ReservationDetail = ({
   reservation,
   rooms,
   relations,
-  invoiceExtraTemplates,
   reservations,
+  productTemplates,
+  ledgerAccounts,
 }: ReservationProps) => {
   const t = useTranslation();
   const router = useRouter();
   const deleteReservation = useMutation("reservation", "delete");
   const invoicePeriod = useMutation("reservation", "invoicePeriod");
-  const createInvoiceExtra = useMutation("reservation", "addInvoiceExtra");
-  const updateInvoiceExtra = useMutation("reservation", "updateInvoiceExtra");
-  const resetInvoiceExtra = useMutation("invoiceExtra", "resetInstance");
-  const deleteInvoiceExtra = useMutation("invoiceExtra", "deleteInstance");
+  const addProduct = useMutation("reservation", "addProduct");
+  const editProduct = useMutation("reservation", "editProduct");
+  const resetProduct = useMutation("reservation", "resetProduct");
+  const deleteProductInstance = useMutation("product", "deleteInstance");
 
   useEffect(() => {
     router.refresh();
   }, []);
 
   const formMethods = useForm<ReservationInputUpdateSchema>({
-    defaultValues: {
-      ...reservation,
-      priceOverride: reservation.priceOverride
-        ? parseFloat(reservation.priceOverride)
-        : undefined,
-    },
+    defaultValues: reservation,
     resolver: valibotResolver(ReservationUpdateSchema),
   });
 
@@ -130,7 +127,7 @@ export const ReservationDetail = ({
         invoice.status !== "credited" && invoice.type !== "credit",
     );
 
-    const lastInvoicedDate = countingInvoices[0]?.endDate;
+    const lastInvoicedDate = countingInvoices[0]?.periodEndDate;
 
     modals.open({
       title: (
@@ -142,8 +139,13 @@ export const ReservationDetail = ({
           minDate={reservation.startDate}
           maxDate={reservation.endDate}
           excludeDate={(date) =>
-            countingInvoices.some(({ startDate, endDate }) =>
-              dayjs(date).isBetween(startDate, endDate, "day", "[]"),
+            countingInvoices.some(({ periodStartDate, periodEndDate }) =>
+              dayjs(date).isBetween(
+                periodStartDate,
+                periodEndDate,
+                "day",
+                "[]",
+              ),
             )
           }
           defaultDate={
@@ -151,11 +153,11 @@ export const ReservationDetail = ({
               ? dayjs(lastInvoicedDate).add(1, "day").toDate()
               : reservation.startDate
           }
-          onConfirm={async (startDate, endDate) => {
+          onConfirm={async (periodStartDate, periodEndDate) => {
             await invoicePeriod.mutate({
               reservationId: reservation.id,
-              startDate,
-              endDate,
+              periodStartDate,
+              periodEndDate,
             });
 
             router.refresh();
@@ -170,67 +172,24 @@ export const ReservationDetail = ({
     });
   };
 
-  const createInvoiceExtraHandler = () => {
+  const createProductHandler = () => {
     modals.open({
-      title: (
-        <Title order={3}>{t("entities.reservation.invoiceExtra.add")}</Title>
-      ),
-      // size: "sm",
+      title: <Title order={3}>{t("entities.reservation.product.add")}</Title>,
       children: (
-        <CreateInvoiceExtraModal
-          templates={invoiceExtraTemplates}
-          onConfirm={async (templateId, overrides) => {
-            await createInvoiceExtra.mutate({
+        <AddProductModal
+          templates={productTemplates}
+          ledgerAccounts={ledgerAccounts}
+          onConfirm={async (templateId, values) => {
+            await addProduct.mutate({
               reservationId: reservation.id,
               templateId,
-              ...overrides,
-            });
-
-            router.refresh();
-
-            notifications.show({
-              message: t("entities.reservation.invoiceExtra.addSucces"),
-              color: "green",
-            });
-          }}
-        />
-      ),
-    });
-  };
-
-  const editInvoiceExtraHandler = async (id: number) => {
-    const invoiceExtra = reservation.invoicesExtrasJunction.find(
-      ({ instance }) => instance.id === id,
-    );
-
-    if (!invoiceExtra) return;
-
-    modals.open({
-      title: (
-        <Title order={3}>{t("entities.reservation.invoiceExtra.edit")}</Title>
-      ),
-      // size: "sm",
-      children: (
-        <EditInvoiceExtraModal
-          currentValues={{
-            name: invoiceExtra.instance.name,
-            quantity: invoiceExtra.instance.quantity,
-            amount: invoiceExtra.instance.amount,
-            unit: invoiceExtra.instance.unit,
-            vatRate: invoiceExtra.instance.vatRate,
-            cycle: invoiceExtra.cycle,
-          }}
-          onConfirm={async (values) => {
-            await updateInvoiceExtra.mutate({
-              reservationId: reservation.id,
-              instanceId: invoiceExtra.instance.id,
               ...values,
             });
 
             router.refresh();
 
             notifications.show({
-              message: t("entities.reservation.invoiceExtra.addSucces"),
+              message: t("entities.reservation.product.addSucces"),
               color: "green",
             });
           }}
@@ -239,34 +198,77 @@ export const ReservationDetail = ({
     });
   };
 
-  const resetInvoiceExtraHandler = (id: number) => {
+  const editProductHandler = async (id: number) => {
+    const productInstanceJunction = reservation.productInstancesJunction.find(
+      ({ productInstance }) => productInstance.id === id,
+    );
+
+    if (!productInstanceJunction) return;
+
+    modals.open({
+      title: <Title order={3}>{t("entities.reservation.product.edit")}</Title>,
+      children: (
+        <EditProductModal
+          ledgerAccounts={ledgerAccounts}
+          currentValues={{
+            name: productInstanceJunction.productInstance.name,
+            price: productInstanceJunction.productInstance.price,
+            vatRate: productInstanceJunction.productInstance.vatRate,
+            quantity: productInstanceJunction.quantity,
+            cycle: productInstanceJunction.cycle,
+            revenueAccountId:
+              productInstanceJunction.productInstance.revenueAccountId,
+          }}
+          onConfirm={async (values) => {
+            await editProduct.mutate({
+              reservationId: reservation.id,
+              instanceId: productInstanceJunction.productInstance.id,
+              ...values,
+            });
+
+            router.refresh();
+
+            notifications.show({
+              message: t("entities.reservation.product.editSucces"),
+              color: "green",
+            });
+          }}
+        />
+      ),
+    });
+  };
+
+  const resetProductHandler = (productInstanceId: number) => {
     modals.openConfirmModal({
       title: t("common.areYouSure"),
       labels: { confirm: t("common.yes"), cancel: t("common.no") },
       onConfirm: async () => {
-        await resetInvoiceExtra.mutate(id);
+        await resetProduct.mutate({
+          reservationId: reservation.id,
+          productInstanceId,
+        });
 
         router.refresh();
 
         notifications.show({
-          message: t("entities.reservation.invoiceExtra.resetSucces"),
+          message: t("entities.reservation.product.resetSucces"),
           color: "green",
         });
       },
     });
   };
 
-  const deleteInvoiceExtraHandler = (id: number) => {
+  const deleteProductHandler = (productInstanceId: number) => {
     modals.openConfirmModal({
       title: t("common.areYouSure"),
       labels: { confirm: t("common.yes"), cancel: t("common.no") },
       onConfirm: async () => {
-        await deleteInvoiceExtra.mutate(id);
+        await deleteProductInstance.mutate(productInstanceId);
 
         router.refresh();
 
         notifications.show({
-          message: t("entities.reservation.invoiceExtra.deleted"),
+          message: t("entities.reservation.product.deleted"),
           color: "green",
         });
       },
@@ -276,10 +278,10 @@ export const ReservationDetail = ({
   const hasFinalInvoice = useMemo(
     () =>
       invoices.some(
-        ({ endDate, invoice: { type, status } }) =>
+        ({ periodEndDate, invoice: { type, status } }) =>
           type !== "credit" &&
           status !== "credited" &&
-          dayjs(endDate).isSame(reservation.endDate, "day"),
+          dayjs(periodEndDate).isSame(reservation.endDate, "day"),
       ),
     [invoices, reservation.endDate],
   );
@@ -325,12 +327,12 @@ export const ReservationDetail = ({
             title={
               <>
                 <Title order={3}>
-                  {t("entities.reservation.invoiceExtra.name")}
+                  {t("entities.reservation.product.name")}
                 </Title>
                 <Button
-                  onClick={createInvoiceExtraHandler}
+                  onClick={createProductHandler}
                   leftSection={<IconPlus />}
-                  loading={createInvoiceExtra.loading}
+                  loading={addProduct.loading}
                   disabled={hasFinalInvoice}
                 >
                   {t("common.add")}
@@ -338,60 +340,61 @@ export const ReservationDetail = ({
               </>
             }
           >
-            {!reservation.invoicesExtrasJunction.length ? (
-              <p>{t("entities.reservation.invoiceExtra.empty")}</p>
+            {!reservation.productInstancesJunction.length ? (
+              <p>{t("entities.reservation.product.empty")}</p>
             ) : (
               <Table>
                 <Table.Thead>
                   <Table.Tr>
                     <Table.Th>
-                      {t("entities.reservation.invoiceExtra.keys.name")}
+                      {t("entities.reservation.product.keys.name")}
                     </Table.Th>
                     <Table.Th>
-                      {t("entities.reservation.invoiceExtra.keys.quantity")}
+                      {t("entities.reservation.product.keys.price")}
                     </Table.Th>
                     <Table.Th>
-                      {t("entities.reservation.invoiceExtra.keys.amount")}
+                      {t("entities.reservation.product.keys.vatRate")}
                     </Table.Th>
                     <Table.Th>
-                      {t("entities.reservation.invoiceExtra.keys.unit")}
+                      {t("entities.reservation.product.keys.quantity")}
                     </Table.Th>
                     <Table.Th>
-                      {t("entities.reservation.invoiceExtra.keys.vatRate")}
+                      {t("entities.reservation.product.keys.cycle")}
                     </Table.Th>
                     <Table.Th>
-                      {t("entities.reservation.invoiceExtra.keys.cycle")}
+                      {t("entities.reservation.product.keys.status")}
                     </Table.Th>
                     <Table.Th>
-                      {t("entities.reservation.invoiceExtra.keys.status")}
-                    </Table.Th>
-                    <Table.Th>
-                      {t("entities.reservation.invoiceExtra.keys.actions")}
+                      {t("entities.reservation.product.keys.actions")}
                     </Table.Th>
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
-                  {reservation.invoicesExtrasJunction.map(
-                    ({ instance, cycle }) => (
-                      <Table.Tr key={instance.id}>
-                        <Table.Td>{instance.name}</Table.Td>
-                        <Table.Td>{instance.quantity}</Table.Td>
-                        <Table.Td>{instance.amount}</Table.Td>
-                        <Table.Td>{instance.unit}</Table.Td>
-                        <Table.Td>{instance.vatRate}%</Table.Td>
+                  {reservation.productInstancesJunction.map(
+                    ({ productInstance, quantity, cycle, status }) => (
+                      <Table.Tr key={productInstance.id}>
+                        <Table.Td>{productInstance.name}</Table.Td>
+                        <Table.Td>
+                          {Intl.NumberFormat("nl-NL", {
+                            style: "currency",
+                            currency: "EUR",
+                          }).format(parseFloat(productInstance.price))}
+                        </Table.Td>
+                        <Table.Td>{productInstance.vatRate}%</Table.Td>
+                        <Table.Td>{quantity}x</Table.Td>
                         <Table.Td>{cycle}</Table.Td>
                         <Table.Td>
                           <Badge
                             variant="light"
                             color={
-                              instance.status === "notApplied"
+                              status === "notInvoiced"
                                 ? "red"
-                                : instance.status === "partiallyApplied"
+                                : status === "partiallyInvoiced"
                                   ? "orange"
                                   : "green"
                             }
                           >
-                            {instance.status}
+                            {status}
                           </Badge>
                         </Table.Td>
                         <Table.Td>
@@ -401,20 +404,20 @@ export const ReservationDetail = ({
                               title="Edit"
                               variant="light"
                               onClick={() => {
-                                editInvoiceExtraHandler(instance.id);
+                                editProductHandler(productInstance.id);
                               }}
                               disabled={hasFinalInvoice}
                             >
                               <IconEdit size="1rem" />
                             </Button>
-                            {instance.status !== "notApplied" && (
+                            {status !== "notInvoiced" && (
                               <Button
                                 size="compact-md"
                                 title="Reset status"
                                 variant="light"
                                 color="orange"
                                 onClick={() => {
-                                  resetInvoiceExtraHandler(instance.id);
+                                  resetProductHandler(productInstance.id);
                                 }}
                                 disabled={hasFinalInvoice}
                               >
@@ -427,7 +430,7 @@ export const ReservationDetail = ({
                               variant="light"
                               color="red"
                               onClick={() => {
-                                deleteInvoiceExtraHandler(instance.id);
+                                deleteProductHandler(productInstance.id);
                               }}
                               disabled={hasFinalInvoice}
                             >
@@ -448,162 +451,166 @@ export const ReservationDetail = ({
             <Band title={<Title order={3}>Invoices</Title>}>
               <ScrollArea>
                 <Group gap="2rem" p="md" wrap="nowrap">
-                  {invoices.map(({ invoice, startDate, endDate }) => {
-                    const Icon =
-                      invoice.type === "credit"
-                        ? IconFileArrowLeft
-                        : IconFileEuro;
+                  {invoices.map(
+                    ({ invoice, periodStartDate, periodEndDate }) => {
+                      const Icon =
+                        invoice.type === "credit"
+                          ? IconFileArrowLeft
+                          : IconFileEuro;
 
-                    const isFinalInvoice = dayjs(reservation.endDate).isSame(
-                      endDate,
-                    );
+                      const isFinalInvoice = dayjs(reservation.endDate).isSame(
+                        periodEndDate,
+                      );
 
-                    const color =
-                      invoice.type === "credit"
-                        ? "blue-8"
-                        : invoice.status === "draft"
+                      const color =
+                        invoice.type === "credit"
                           ? "orange-8"
-                          : "green-8";
-
-                    return (
-                      <Card
-                        key={invoice.id}
-                        shadow="sm"
-                        padding={0}
-                        radius="md"
-                        withBorder
-                        style={{
-                          boxShadow: `0px 0px 16px -4px var(--mantine-color-${color})`,
-                          border: `2px ${
-                            invoice.status === "credited" ? "dashed" : "solid"
-                          } var(--mantine-color-${color})`,
-                        }}
-                      >
-                        <Card.Section
-                          style={{
-                            backgroundColor: "rgb(var(--color-background))",
-                            display: "grid",
-                            placeContent: "center",
-                            overflow: "hidden",
-                          }}
-                        >
-                          <Group p="1rem" wrap="nowrap">
-                            <IconFile
-                              size="1rem"
-                              stroke={1}
-                              style={{
-                                color: "gray",
-                                transform: "rotate(-45deg)",
-                              }}
-                            />
-                            <IconFile
-                              size="2rem"
-                              stroke={1}
-                              style={{
-                                color: "gray",
-                                transform: "rotate(-22deg)",
-                              }}
-                            />
-                            <Icon
-                              size="5rem"
-                              stroke={1}
-                              style={{
-                                color: "gray",
-                                padding: "0.75rem",
-                                margin: "0",
-                                border: "2px dashed gray",
-                                transition: "margin var(--transition)",
-                                borderRadius: "100%",
-                              }}
-                            />
-                            <IconFile
-                              size="2rem"
-                              stroke={1}
-                              style={{
-                                color: "gray",
-                                transform: "rotate(22deg)",
-                              }}
-                            />
-                            <IconFile
-                              size="1rem"
-                              stroke={1}
-                              style={{
-                                color: "gray",
-                                transform: "rotate(45deg)",
-                              }}
-                            />
-                          </Group>
-                        </Card.Section>
-                        <Stack my="md" px="md">
-                          <Text fw="bold">
-                            {invoice.type === "credit"
-                              ? "Credit Invoice"
-                              : isFinalInvoice
-                                ? "Final Invoice"
-                                : "Invoice"}
-                            : {invoice.number || invoice.id}
-                          </Text>
-                          <Text size="sm">
-                            From: {dayjs(startDate).format("DD-MM-YYYY")}
-                            <br />
-                            To: {dayjs(endDate).format("DD-MM-YYYY")}
-                          </Text>
-                        </Stack>
-                        <Divider />
-                        <Stack my="md" px="md">
-                          <Text size="sm" c="dimmed">
-                            Invoice date:{" "}
-                            {dayjs(invoice.date || invoice.createdAt).format(
-                              "DD-MM-YYYY",
-                            )}
-                            <br />
-                            Amount:{" "}
-                            {Intl.NumberFormat("nl-NL", {
-                              style: "currency",
-                              currency: "EUR",
-                            }).format(parseFloat(invoice.grossAmount))}
-                          </Text>
-                        </Stack>
-                        <Button
-                          fullWidth
-                          component={Link}
-                          // @ts-ignore Router
-                          href={`/invoices/${invoice.id}`}
-                          radius={0}
-                        >
-                          View Details
-                        </Button>
-                        <Badge
-                          variant="light"
-                          style={{
-                            position: "absolute",
-                            left: 0,
-                            right: 0,
-                            borderRadius: "0rem",
-                            borderBottomRightRadius: "0.5rem",
-                          }}
-                        >
-                          {invoice.type === "credit"
-                            ? "Credit"
+                          : invoice.status === "draft"
+                            ? "red-8"
                             : isFinalInvoice
-                              ? "Final"
-                              : invoice.type}
-                        </Badge>
-                        <Badge
-                          variant="light"
-                          style={{
-                            position: "absolute",
-                            top: 0,
-                            right: 0,
-                            borderRadius: "0rem",
-                            borderBottomLeftRadius: "0.5rem",
-                          }}
+                              ? "green-8"
+                              : "blue-8";
+
+                      return (
+                        <Card
+                          key={invoice.id}
+                          shadow="sm"
+                          padding={0}
+                          radius="md"
+                          withBorder
                         >
-                          {invoice.status}
-                        </Badge>
-                      </Card>
-                    );
-                  })}
+                          <Card.Section
+                            style={{
+                              backgroundColor: "rgb(var(--color-background))",
+                              display: "grid",
+                              placeContent: "center",
+                              overflow: "hidden",
+                            }}
+                          >
+                            <Group p="1rem" wrap="nowrap">
+                              <IconFile
+                                size="1rem"
+                                stroke={1}
+                                style={{
+                                  color: `var(--mantine-color-${color})`,
+                                  transform: "rotate(-45deg)",
+                                }}
+                              />
+                              <IconFile
+                                size="2rem"
+                                stroke={1}
+                                style={{
+                                  color: `var(--mantine-color-${color})`,
+                                  transform: "rotate(-22deg)",
+                                }}
+                              />
+                              <Icon
+                                size="5rem"
+                                stroke={1}
+                                style={{
+                                  color: "rgb(var(--color-text))",
+                                  padding: "0.75rem",
+                                  margin: "0",
+                                  boxShadow: `inset 0px -8px 16px -8px var(--mantine-color-${color}), 0px 8px 16px -8px var(--mantine-color-${color})`,
+                                  borderBottom: `5px ${
+                                    invoice.status === "credited"
+                                      ? "dashed"
+                                      : "solid"
+                                  } var(--mantine-color-${color})`,
+                                  transition: "margin var(--transition)",
+                                  borderRadius: "100%",
+                                }}
+                              />
+                              <IconFile
+                                size="2rem"
+                                stroke={1}
+                                style={{
+                                  color: `var(--mantine-color-${color})`,
+                                  transform: "rotate(22deg)",
+                                }}
+                              />
+                              <IconFile
+                                size="1rem"
+                                stroke={1}
+                                style={{
+                                  color: `var(--mantine-color-${color})`,
+                                  transform: "rotate(45deg)",
+                                }}
+                              />
+                            </Group>
+                          </Card.Section>
+                          <Stack my="md" px="md">
+                            <Text fw="bold">
+                              {invoice.type === "credit"
+                                ? "Credit Invoice"
+                                : isFinalInvoice
+                                  ? "Final Invoice"
+                                  : "Invoice"}
+                              : {invoice.number || invoice.id}
+                            </Text>
+                            <Text size="sm">
+                              From:{" "}
+                              {dayjs(periodStartDate).format("DD-MM-YYYY")}
+                              <br />
+                              To: {dayjs(periodEndDate).format("DD-MM-YYYY")}
+                            </Text>
+                          </Stack>
+                          <Divider />
+                          <Stack my="md" px="md">
+                            <Text size="sm" c="dimmed">
+                              Invoice date:{" "}
+                              {dayjs(invoice.date || invoice.createdAt).format(
+                                "DD-MM-YYYY",
+                              )}
+                              <br />
+                              Amount:{" "}
+                              {Intl.NumberFormat("nl-NL", {
+                                style: "currency",
+                                currency: "EUR",
+                              }).format(parseFloat(invoice.grossAmount))}
+                            </Text>
+                          </Stack>
+                          <Button
+                            fullWidth
+                            component={Link}
+                            // @ts-ignore Router
+                            href={`/invoices/${invoice.id}`}
+                            radius={0}
+                          >
+                            View Details
+                          </Button>
+                          <Badge
+                            variant="light"
+                            style={{
+                              position: "absolute",
+                              left: 0,
+                              right: 0,
+                              borderRadius: "0rem",
+                              borderBottomRightRadius: "0.5rem",
+                            }}
+                          >
+                            {invoice.type === "credit"
+                              ? "Credit"
+                              : isFinalInvoice
+                                ? "Final"
+                                : invoice.type}
+                          </Badge>
+                          <Badge
+                            variant="light"
+                            style={{
+                              position: "absolute",
+                              top: 0,
+                              right: 0,
+                              borderRadius: "0rem",
+                              borderBottomLeftRadius: "0.5rem",
+                            }}
+                          >
+                            {invoice.status}
+                          </Badge>
+                        </Card>
+                      );
+                    },
+                  )}
                 </Group>
               </ScrollArea>
             </Band>
@@ -721,12 +728,7 @@ const SaveBadge = ({ reservation, reservations }: SaveButtonProps) => {
       id: getValues("id"),
     });
 
-    reset({
-      ...updatedReservation,
-      priceOverride: updatedReservation.priceOverride
-        ? parseFloat(updatedReservation.priceOverride)
-        : undefined,
-    });
+    reset(updatedReservation);
 
     router.refresh();
   };

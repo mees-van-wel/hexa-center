@@ -1,0 +1,45 @@
+<soap:Envelope
+  xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:twinfield="http://www.twinfield.com/"
+>
+  <soap:Header>
+    <twinfield:Header>
+      <twinfield:AccessToken><%= accessToken %></twinfield:AccessToken>
+      <twinfield:CompanyCode><%= companyCode %></twinfield:CompanyCode>
+    </twinfield:Header>
+  </soap:Header>
+  <soap:Body>
+    <twinfield:ProcessXmlDocument>
+      <twinfield:xmlRequest>
+        <transaction destiny="final" raisewarning="false">
+          <header>
+            <code><%= transactionTypeCode %></code>
+            <currency><%= currency %></currency>
+            <date><%= date %></date>
+            <invoicenumber><%= invoiceNumber %></invoicenumber>
+            <office><%= companyCode %></office>
+            <duedate><%= dueDate %></duedate>
+          </header>
+          <lines>
+            <line type="total" id="1">
+              <dim1><%= balanceAccountCode %></dim1>
+              <dim2><%= customerCode %></dim2>
+              <value><%= totalAmount %></value>
+              <debitcredit>debit</debitcredit>
+            </line>
+            <% lines.forEach(function(line, index) { %>
+            <line type="detail" id="<%= index + 2 %>">
+              <dim1><%= line.revenueAccountCode %></dim1>
+              <value><%= line.netAmount %></value>
+              <debitcredit>credit</debitcredit>
+              <description><![CDATA[<%- line.name %>]]></description>
+              <vatcode><%= line.vatCode %></vatcode>
+              <vatvalue><%= line.vatAmount %></vatvalue>
+            </line>
+            <% }); %>
+          </lines>
+        </transaction>
+      </twinfield:xmlRequest>
+    </twinfield:ProcessXmlDocument>
+  </soap:Body>
+</soap:Envelope>

@@ -11,7 +11,7 @@ export const trpcTransformer = {
     try {
       return pack(data).toString("base64");
     } catch (error) {
-      console.log(error);
+      console.warn(error);
     }
 
     return data;
@@ -34,7 +34,7 @@ export const trpcTransformer = {
         return unpack(buffer);
       }
     } catch (error) {
-      console.log(error);
+      console.warn(error);
     }
 
     return data;

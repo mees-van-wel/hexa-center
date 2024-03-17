@@ -10,7 +10,7 @@ type InvoicePeriodModalProps = {
   defaultDate?: Date;
   excludeDate: (date: Date) => boolean;
   onCancel?: () => void;
-  onConfirm?: (startDate: Date, endDate: Date) => void;
+  onConfirm?: (periodStartDate: Date, periodEndDate: Date) => void;
 };
 
 export const InvoicePeriodModal = ({

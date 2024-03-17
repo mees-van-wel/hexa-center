@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1709298329025,
-      "tag": "0000_open_cobalt_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1709809872703,
-      "tag": "0001_normal_havok",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1709903863608,
-      "tag": "0002_sturdy_jetstream",
+      "when": 1710672384928,
+      "tag": "0000_lethal_doctor_doom",
       "breakpoints": true
     }
   ]

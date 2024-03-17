@@ -14,31 +14,35 @@ import {
 import { useDidUpdate } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 
-export type ReservationInvoiceExtraValues = {
+export type Cycle =
+  | "oneTimeOnNext"
+  | "oneTimeOnEnd"
+  | "perNightThroughout"
+  | "perNightOnEnd";
+
+export type ReservationProductValues = {
   name: string;
-  quantity: string;
-  amount: string;
-  unit: "currency";
-  cycle:
-    | "oneTimeOnNext"
-    | "oneTimeOnEnd"
-    | "perNightThroughout"
-    | "perNightOnEnd";
+  price: string;
   vatRate: string;
+  quantity: string;
+  cycle: Cycle;
+  revenueAccountId: number;
 };
 
-type CreateInvoiceExtraModalProps = {
-  templates: RouterOutput["invoiceExtra"]["list"];
+type AddProductModalProps = {
+  templates: RouterOutput["product"]["list"];
+  ledgerAccounts: RouterOutput["ledgerAccount"]["list"];
   onConfirm: (
     templateId: number | null,
-    overrides: ReservationInvoiceExtraValues,
+    overrides: ReservationProductValues,
   ) => void;
 };
 
-export const CreateInvoiceExtraModal = ({
+export const AddProductModal = ({
   templates,
+  ledgerAccounts,
   onConfirm,
-}: CreateInvoiceExtraModalProps) => {
+}: AddProductModalProps) => {
   const [templateId, setTemplateId] = useState<number | null>(null);
 
   const template = useMemo(
@@ -47,28 +51,25 @@ export const CreateInvoiceExtraModal = ({
     [templateId, templates],
   );
 
-  const [values, setValues] = useState<ReservationInvoiceExtraValues>({
+  const [values, setValues] = useState<ReservationProductValues>({
     name: "",
-    quantity: "1",
-    amount: "",
-    unit: "currency",
-    cycle: "",
+    price: "",
     vatRate: "21",
+    quantity: "1",
+    revenueAccountId: null,
+    cycle: null,
   });
 
   useDidUpdate(() => {
     if (!template) return;
 
-    const { name, quantity, amount, unit, vatRate } = template;
-
-    setValues({
+    setValues((values) => ({
       ...values,
-      name,
-      quantity,
-      amount,
-      unit,
-      vatRate,
-    });
+      name: template.name,
+      price: template.price,
+      vatRate: template.vatRate,
+      revenueAccountId: template.revenueAccountId,
+    }));
   }, [template]);
 
   const changeHandler = (newValues: Partial<typeof values>) => {
@@ -106,52 +107,16 @@ export const CreateInvoiceExtraModal = ({
           withAsterisk
         />
         <NumberInput
-          label="Quantity"
-          value={values.quantity}
-          onChange={(quantity) => {
-            changeHandler({ quantity: quantity.toString() });
+          label="Price"
+          value={values.price}
+          onChange={(price) => {
+            changeHandler({ price: price.toString() });
           }}
+          leftSection="€"
           decimalScale={2}
           decimalSeparator=","
           fixedDecimalScale
           hideControls
-          withAsterisk
-        />
-        <NumberInput
-          label="Amount"
-          value={values.amount}
-          onChange={(amount) => {
-            changeHandler({ amount: amount.toString() });
-          }}
-          decimalScale={2}
-          decimalSeparator=","
-          fixedDecimalScale
-          hideControls
-          withAsterisk
-        />
-        <Select
-          label="Unit"
-          data={["currency"]}
-          value={values.unit}
-          onChange={(unit) => {
-            if (unit) changeHandler({ unit });
-          }}
-          allowDeselect={false}
-          withAsterisk
-        />
-        <Select
-          label="Cycle"
-          data={[
-            "oneTimeOnNext",
-            "oneTimeOnEnd",
-            "perNightThroughout",
-            "perNightOnEnd",
-          ]}
-          value={values.cycle}
-          onChange={(cycle) => {
-            if (cycle) changeHandler({ cycle });
-          }}
-          allowDeselect={false}
           withAsterisk
         />
         <NumberInput
@@ -167,6 +132,60 @@ export const CreateInvoiceExtraModal = ({
           withAsterisk
           rightSection="%"
         />
+        <NumberInput
+          label="Quantity"
+          value={values.quantity}
+          onChange={(quantity) => {
+            changeHandler({ quantity: quantity.toString() });
+          }}
+          decimalScale={2}
+          decimalSeparator=","
+          fixedDecimalScale
+          hideControls
+          withAsterisk
+        />
+        <Select
+          label="Revenue account"
+          data={ledgerAccounts.map(({ id, name }) => ({
+            label: name,
+            value: id.toString(),
+          }))}
+          value={values.revenueAccountId?.toString()}
+          onChange={(revenueAccountId) => {
+            if (!revenueAccountId) return;
+            changeHandler({ revenueAccountId: parseInt(revenueAccountId) });
+          }}
+          allowDeselect={false}
+          withAsterisk
+        />
+        <Select
+          label="Cycle"
+          data={[
+            {
+              value: "oneTimeOnNext",
+              label: "One-Time - On Next Invoice",
+            },
+            {
+              value: "oneTimeOnEnd",
+              label: "One-Time - On Final Invoice",
+            },
+            {
+              value: "perNightThroughout",
+              label: "Per Night - On Every Invoice",
+            },
+            {
+              value: "perNightOnEnd",
+              label: "Per Night - On Final Invoice",
+            },
+          ]}
+          value={values.cycle}
+          onChange={(cycle) => {
+            if (!cycle) return;
+            changeHandler({ cycle: cycle as Cycle });
+          }}
+          allowDeselect={false}
+          withAsterisk
+        />
       </SimpleGrid>
       <ButtonGroup>
         <Button
@@ -180,7 +199,7 @@ export const CreateInvoiceExtraModal = ({
         </Button>
         <Button
           disabled={
-            !values.name || !values.cycle || !values.amount || !values.vatRate
+            !values.name || !values.price || !values.vatRate || !values.cycle
           }
           onClick={confirmHandler}
           fullWidth

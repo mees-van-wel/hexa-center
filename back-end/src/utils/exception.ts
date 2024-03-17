@@ -15,7 +15,7 @@ export const createPgException = (error: any) => {
 
   const exception = PG_EXCEPTION_MAP[error.code] as Exception | undefined;
 
-  console.log(error);
+  console.warn(error);
 
   if (exception === "DB_UNIQUE_CONSTRAINT")
     return new TRPCError({

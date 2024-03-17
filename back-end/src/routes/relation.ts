@@ -1,10 +1,22 @@
-import { eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
+import ejs from "ejs";
 import { number } from "valibot";
 
 import db from "@/db/client";
-import { relations } from "@/db/schema";
+import {
+  integrationConnections,
+  integrationMappings,
+  logs,
+  relations,
+} from "@/db/schema";
+import {
+  getTwinfieldAccessToken,
+  getTwinfieldWsdlUrl,
+} from "@/services/integration";
 import { procedure, router } from "@/trpc";
 import { createPgException } from "@/utils/exception";
+import { readFile } from "@/utils/fileSystem";
+import { sendSoapRequest } from "@/utils/soap";
 import { wrap } from "@decs/typeschema";
 import {
   RelationCreateSchema,
@@ -52,7 +64,79 @@ export const relationRouter = router({
           businessContactPhoneNumber: relations.businessContactPhoneNumber,
         });
 
-      return result[0];
+      const relation = result[0];
+
+      const integrationResult = await db
+        .select()
+        .from(integrationConnections)
+        .where(eq(integrationConnections.type, "twinfield"));
+
+      const integration = integrationResult[0];
+
+      if (integration) {
+        const { id, accessToken, companyCode } =
+          await getTwinfieldAccessToken();
+
+        const wsdlUrl = await getTwinfieldWsdlUrl(accessToken);
+
+        let xml = await readFile(
+          "soapEnvelope",
+          "createTwinfieldCustomer.xml.ejs",
+        );
+
+        xml = await ejs.render(
+          xml,
+          {
+            accessToken,
+            companyCode,
+            name: relation.name,
+            businessContactName: relation.businessContactName,
+            street: relation.street,
+            houseNumber: relation.houseNumber,
+            postalCode: relation.postalCode,
+            city: relation.city,
+            country: relation.country,
+            phoneNumber: relation.phoneNumber,
+            emailAddress: relation.emailAddress,
+            vatNumber: relation.vatNumber,
+            cocNumber: relation.cocNumber,
+          },
+          { async: true },
+        );
+
+        try {
+          const response = await sendSoapRequest({
+            url: wsdlUrl,
+            headers: {
+              "Content-Type": "text/xml; charset=utf-8",
+              SOAPAction: "http://www.twinfield.com/ProcessXmlDocument",
+            },
+            xml,
+          });
+
+          await db.insert(logs).values({
+            type: "info",
+            event: "integrationSend",
+            refType: "integration",
+            refId: id,
+          });
+
+          const code =
+            response.ProcessXmlDocumentResponse.ProcessXmlDocumentResult
+              .dimensions.dimension.code;
+
+          await db.insert(integrationMappings).values({
+            connectionId: id,
+            refType: "relation",
+            refId: relation.id,
+            data: sql`${{ code }}::jsonb`,
+          });
+        } catch (error) {
+          console.warn(error);
+        }
+      }
+
+      return relation;
     }),
   list: procedure.query(() =>
     db
@@ -140,14 +224,161 @@ export const relationRouter = router({
             businessContactPhoneNumber: relations.businessContactPhoneNumber,
           });
 
-        return result[0];
+        const relation = result[0];
+
+        const integrationResult = await db
+          .select()
+          .from(integrationConnections)
+          .where(eq(integrationConnections.type, "twinfield"));
+
+        const integration = integrationResult[0];
+
+        if (integration) {
+          const result = await db
+            .select({ data: integrationMappings.data })
+            .from(integrationMappings)
+            .where(
+              and(
+                eq(integrationMappings.refType, "relation"),
+                eq(integrationMappings.refId, relation.id),
+              ),
+            );
+
+          const code = result[0]?.data?.code as string | undefined;
+          if (!code)
+            throw new Error(
+              `Missing twinfield customer code mapping for relation: ${input}`,
+            );
+
+          const { id, accessToken, companyCode } =
+            await getTwinfieldAccessToken();
+          const wsdlUrl = await getTwinfieldWsdlUrl(accessToken);
+
+          let xml = await readFile(
+            "soapEnvelope",
+            "updateTwinfieldCustomer.xml.ejs",
+          );
+
+          xml = await ejs.render(
+            xml,
+            {
+              accessToken,
+              companyCode,
+              code,
+              name: relation.name,
+              businessContactName: relation.businessContactName,
+              street: relation.street,
+              houseNumber: relation.houseNumber,
+              postalCode: relation.postalCode,
+              city: relation.city,
+              country: relation.country,
+              phoneNumber: relation.phoneNumber,
+              emailAddress: relation.emailAddress,
+              vatNumber: relation.vatNumber,
+              cocNumber: relation.cocNumber,
+            },
+            { async: true },
+          );
+
+          try {
+            await sendSoapRequest({
+              url: wsdlUrl,
+              headers: {
+                "Content-Type": "text/xml; charset=utf-8",
+                SOAPAction: "http://www.twinfield.com/ProcessXmlDocument",
+              },
+              xml,
+            });
+
+            await db.insert(logs).values({
+              type: "info",
+              event: "integrationSend",
+              refType: "integration",
+              refId: id,
+            });
+          } catch (error) {
+            console.warn(error);
+          }
+        }
+
+        return relation;
       } catch (error) {
         throw createPgException(error);
       }
     }),
-  delete: procedure
-    .input(wrap(number()))
-    .mutation(({ input }) =>
-      db.delete(relations).where(eq(relations.id, input)),
-    ),
+  delete: procedure.input(wrap(number())).mutation(async ({ input }) => {
+    await db.delete(relations).where(eq(relations.id, input));
+
+    const integrationResult = await db
+      .select()
+      .from(integrationConnections)
+      .where(eq(integrationConnections.type, "twinfield"));
+
+    const integration = integrationResult[0];
+
+    if (integration) {
+      const result = await db
+        .select({ data: integrationMappings.data })
+        .from(integrationMappings)
+        .where(
+          and(
+            eq(integrationMappings.refType, "relation"),
+            eq(integrationMappings.refId, input),
+          ),
+        );
+
+      const code = result[0]?.data?.code as string | undefined;
+      if (!code)
+        throw new Error(
+          `Missing twinfield customer code mapping for relation: ${input}`,
+        );
+
+      const { id, accessToken, companyCode } = await getTwinfieldAccessToken();
+      const wsdlUrl = await getTwinfieldWsdlUrl(accessToken);
+
+      let xml = await readFile(
+        "soapEnvelope",
+        "deleteTwinfieldCustomer.xml.ejs",
+      );
+
+      xml = await ejs.render(
+        xml,
+        {
+          accessToken,
+          companyCode,
+          code,
+        },
+        { async: true },
+      );
+
+      try {
+        await sendSoapRequest({
+          url: wsdlUrl,
+          headers: {
+            "Content-Type": "text/xml; charset=utf-8",
+            SOAPAction: "http://www.twinfield.com/ProcessXmlDocument",
+          },
+          xml,
+        });
+
+        await db.insert(logs).values({
+          type: "info",
+          event: "integrationSend",
+          refType: "integration",
+          refId: id,
+        });
+
+        await db
+          .delete(integrationMappings)
+          .where(
+            and(
+              eq(integrationMappings.refType, "relation"),
+              eq(integrationMappings.refId, input),
+            ),
+          );
+      } catch (error) {
+        console.warn(error);
+      }
+    }
+  }),
 });

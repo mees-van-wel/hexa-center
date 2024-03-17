@@ -37,6 +37,7 @@ export type Translation = {
     essentials: string;
     sales: string;
     bookings: string;
+    system: string;
   };
   entities: {
     relation: {
@@ -111,12 +112,11 @@ export type Translation = {
         name: string;
         succes: string;
       };
-      invoiceExtra: {
+      product: {
         keys: {
           name: string;
           quantity: string;
-          amount: string;
-          unit: string;
+          price: string;
           vatRate: string;
           cycle: string;
           status: string;
@@ -124,6 +124,7 @@ export type Translation = {
         };
         name: string;
         edit: string;
+        editSucces: string;
         add: string;
         addSucces: string;
         resetSucces: string;
@@ -305,6 +306,12 @@ export type Translation = {
     confirmDeleteModal: string;
     roomDeleted: string;
     roomCreated: string;
+  };
+  screens: {
+    integrationsPage: {
+      singleName: string;
+      pluralName: string;
+    };
   };
   components: {
     address: {

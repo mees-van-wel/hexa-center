@@ -160,9 +160,9 @@ export const ReservationForm = ({ rooms, relations }: ReservationForm) => {
             render={({ field, fieldState: { error } }) => (
               <NumberInput
                 {...field}
-                value={field.value || undefined}
+                value={field.value || ""}
                 onChange={(value) => {
-                  field.onChange(value || null);
+                  field.onChange(value.toString() || null);
                 }}
                 error={error?.message}
                 label={t("entities.reservation.keys.priceOverride")}

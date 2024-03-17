@@ -10,4 +10,5 @@ export type Settings = {
   invoiceHeaderImageSrc: string;
   invoiceFooterImageSrc: string;
   priceEntryMode: "net" | "gross";
+  reservationRevenueAccountId: number;
 };

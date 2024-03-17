@@ -28,6 +28,7 @@ export default {
     essentials: "Essentieel",
     sales: "Verkoop",
     bookings: "Bookingen",
+    system: "Systeem",
   },
   entities: {
     relation: {
@@ -103,24 +104,24 @@ export default {
         name: "Factuurperiode",
         succes: "Periode succesvol gefactureerd",
       },
-      invoiceExtra: {
+      product: {
         keys: {
           name: "Naam",
           quantity: "Aantal",
-          amount: "Bedrag",
-          unit: "Eenheid",
+          price: "Prijs",
           vatRate: "BTW-tarief",
           cycle: "Cyclus",
           status: "Status",
           actions: "Acties",
         },
-        name: "Factuur Extra's",
-        edit: "Factuur Extra bewerken",
-        add: "Voeg Factuur Extra toe",
-        addSucces: "Factuur extra succesvol toegevoegd",
-        resetSucces: "Factuur extra status succesvol gereset",
-        deleted: "Factuur extra succesvol verwijderd",
-        empty: "Niks toegevoegd",
+        name: "Producten",
+        edit: "Product aanpassen",
+        editSucces: "Product succesvol aangepast",
+        add: "Voeg product toe",
+        addSucces: "Product succesvol toegevoegd",
+        resetSucces: "Product status succesvol gereset",
+        deleted: "Product succesvol verwijderd",
+        empty: "Nog geen toegevoegd",
       },
       calendar: {
         roomName: "Kamer naam",
@@ -300,6 +301,12 @@ export default {
     confirmDeleteModal: "Als u doorgaat wordt deze kamer verwijdert.",
     roomDeleted: "Kamer succesvol verwijderd",
     roomCreated: "Kamer succesvol aangemaakt",
+  },
+  screens: {
+    integrationsPage: {
+      singleName: "Integratie",
+      pluralName: "Integraties",
+    },
   },
   components: {
     address: {

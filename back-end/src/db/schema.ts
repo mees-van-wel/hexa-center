@@ -287,10 +287,7 @@ export const rooms = pgTable("rooms", {
     .references(() => properties.id, { onDelete: "restrict" })
     .notNull(),
   name: text("name").unique().notNull(),
-  price: numeric("price", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
+  price: numeric("price", { precision: 10, scale: 2 }).notNull(),
 });
 
 export const roomsRelations = relationBuilder(rooms, ({ one }) => ({
@@ -338,10 +335,7 @@ export const reservations = pgTable("reservations", {
     .notNull(),
   startDate: timestamp("start_date", { withTimezone: true }).notNull(),
   endDate: timestamp("end_date", { withTimezone: true }).notNull(),
-  priceOverride: numeric("price_override", {
-    precision: 10,
-    scale: 2,
-  }),
+  priceOverride: numeric("price_override", { precision: 10, scale: 2 }),
   guestName: text("guest_name").notNull(),
   reservationNotes: text("reservation_notes"),
   invoiceNotes: text("invoice_notes"),
@@ -367,7 +361,88 @@ export const reservationsRelations = relationBuilder(
       references: [rooms.id],
     }),
     invoicesJunction: many(reservationsToInvoices),
-    invoicesExtrasJunction: many(reservationsToInvoiceExtraInstances),
+    productInstancesJunction: many(reservationsToProductInstances),
+  }),
+);
+
+// TODO Add support for perInvoice, perPerson, perPersonPerNight, perItem, perDay and perHour
+// TODO Add start, Maybe support uponUsage, when invoked show on next invoice only
+export const reservationsToProductInstancesCycleEnum = pgEnum(
+  "reservations_to_product_instances_cycle",
+  ["oneTimeOnNext", "oneTimeOnEnd", "perNightThroughout", "perNightOnEnd"],
+);
+
+export const reservationsToProductInstancesStatusEnum = pgEnum(
+  "reservations_to_product_instances_status",
+  ["notInvoiced", "partiallyInvoiced", "fullyInvoiced"],
+);
+
+export const reservationsToProductInstances = pgTable(
+  "reservations_to_product_instances",
+  {
+    reservationId: integer("reservation_id")
+      .references(() => reservations.id, { onDelete: "cascade" })
+      .notNull(),
+    productInstanceId: integer("product_instance_id")
+      .references(() => productInstances.id, { onDelete: "cascade" })
+      .notNull(),
+    quantity: numeric("quantity", { precision: 10, scale: 2 })
+      .default("1")
+      .notNull(),
+    cycle: reservationsToProductInstancesCycleEnum("cycle").notNull(),
+    status: reservationsToProductInstancesStatusEnum("status").notNull(),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.reservationId, t.productInstanceId] }),
+  }),
+);
+
+export const reservationsToProductInstancesRelations = relationBuilder(
+  reservationsToProductInstances,
+  ({ one }) => ({
+    reservation: one(reservations, {
+      fields: [reservationsToProductInstances.reservationId],
+      references: [reservations.id],
+    }),
+    productInstance: one(productInstances, {
+      fields: [reservationsToProductInstances.productInstanceId],
+      references: [productInstances.id],
+    }),
+  }),
+);
+
+export const reservationsToInvoices = pgTable(
+  "reservations_to_invoices",
+  {
+    reservationId: integer("reservation_id")
+      .notNull()
+      .references(() => reservations.id, { onDelete: "cascade" }),
+    invoiceId: integer("invoice_id")
+      .notNull()
+      .references(() => invoices.id, { onDelete: "cascade" }),
+    periodStartDate: timestamp("period_start_date", {
+      withTimezone: true,
+    }).notNull(),
+    periodEndDate: timestamp("period_end_date", {
+      withTimezone: true,
+    }).notNull(),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.reservationId, t.invoiceId] }),
+  }),
+);
+
+export const reservationsToInvoicesRelations = relationBuilder(
+  reservationsToInvoices,
+  ({ one }) => ({
+    reservation: one(reservations, {
+      fields: [reservationsToInvoices.reservationId],
+      references: [reservations.id],
+    }),
+    invoice: one(invoices, {
+      fields: [reservationsToInvoices.invoiceId],
+      references: [invoices.id],
+    }),
   }),
 );
 
@@ -404,19 +479,10 @@ export const invoices = pgTable("invoices", {
   refId: integer("ref_id").notNull(),
   type: invoiceTypeEnum("type").notNull(),
   status: invoiceStatusEnum("status").notNull(),
-  netAmount: numeric("net_amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
-  vatAmount: numeric("vat_amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
-  grossAmount: numeric("gross_amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
-  number: text("number"),
+  netAmount: numeric("net_amount", { precision: 10, scale: 2 }).notNull(),
+  vatAmount: numeric("vat_amount", { precision: 10, scale: 2 }).notNull(),
+  grossAmount: numeric("gross_amount", { precision: 10, scale: 2 }).notNull(),
+  number: text("number").unique(),
   notes: text("notes"),
   date: date("date", { mode: "date" }),
   dueDate: date("due_date", { mode: "date" }),
@@ -476,28 +542,16 @@ export const invoiceLines = pgTable("invoice_lines", {
   invoiceId: integer("invoice_id")
     .references(() => invoices.id, { onDelete: "cascade" })
     .notNull(),
+  revenueAccountId: integer("revenue_account_id")
+    .references(() => ledgerAccounts.id, { onDelete: "restrict" })
+    .notNull(),
   name: text("name").notNull(),
-  unitAmount: numeric("unit_amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
+  unitAmount: numeric("unit_amount", { precision: 10, scale: 2 }).notNull(),
   quantity: numeric("quantity", { precision: 10, scale: 2 }).notNull(),
-  netAmount: numeric("net_amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
-  vatAmount: numeric("vat_amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
-  vatRate: numeric("vat_rate", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
-  grossAmount: numeric("gross_amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
+  netAmount: numeric("net_amount", { precision: 10, scale: 2 }).notNull(),
+  vatAmount: numeric("vat_amount", { precision: 10, scale: 2 }).notNull(),
+  vatRate: numeric("vat_rate", { precision: 10, scale: 2 }).notNull(),
+  grossAmount: numeric("gross_amount", { precision: 10, scale: 2 }).notNull(),
 });
 
 export const invoiceLinesRelations = relationBuilder(
@@ -506,6 +560,10 @@ export const invoiceLinesRelations = relationBuilder(
     invoice: one(invoices, {
       fields: [invoiceLines.invoiceId],
       references: [invoices.id],
+    }),
+    revenueAccount: one(ledgerAccounts, {
+      fields: [invoiceLines.revenueAccountId],
+      references: [ledgerAccounts.id],
     }),
   }),
 );
@@ -552,11 +610,85 @@ export const invoiceEventsRelations = relationBuilder(
   }),
 );
 
-// TODO Add percentage
-export const invoiceExtraUnitEnum = pgEnum("invoice_extra_unit", ["currency"]);
+// TODO Inventory
+// TODO COGS account
+export const productTemplates = pgTable("product_templates", {
+  $kind: text("$kind").default("productTemplate").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .default(sql`now()`)
+    .notNull(),
+  createdById: integer("created_by_id").references(
+    (): AnyPgColumn => relations.id,
+    { onDelete: "set null" },
+  ),
+  updatedById: integer("updated_by_id").references(
+    (): AnyPgColumn => relations.id,
+    { onDelete: "set null" },
+  ),
+  revenueAccountId: integer("revenue_account_id")
+    .references(() => ledgerAccounts.id, { onDelete: "restrict" })
+    .notNull(),
+  name: text("name").notNull(),
+  price: numeric("price", { precision: 10, scale: 2 }).notNull(),
+  vatRate: numeric("vat_rate", { precision: 10, scale: 2 }).notNull(),
+});
 
-export const invoiceExtraTemplates = pgTable("invoice_extra_templates", {
-  $kind: text("$kind").default("invoiceExtraTemplate").notNull(),
+export const productTemplatesRelations = relationBuilder(
+  productTemplates,
+  ({ one, many }) => ({
+    createdBy: one(relations, {
+      fields: [productTemplates.createdById],
+      references: [relations.id],
+    }),
+    updatedBy: one(relations, {
+      fields: [productTemplates.updatedById],
+      references: [relations.id],
+    }),
+    revenueAccount: one(ledgerAccounts, {
+      fields: [productTemplates.revenueAccountId],
+      references: [ledgerAccounts.id],
+    }),
+    instances: many(productInstances),
+  }),
+);
+
+export const productInstances = pgTable("product_instances", {
+  $kind: text("$kind").default("productInstance").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  templateId: integer("template_id").references(() => productTemplates.id, {
+    onDelete: "set null",
+  }),
+  revenueAccountId: integer("revenue_account_id")
+    .references(() => ledgerAccounts.id, { onDelete: "restrict" })
+    .notNull(),
+  name: text("name").notNull(),
+  price: numeric("price", { precision: 10, scale: 2 }).notNull(),
+  vatRate: numeric("vat_rate", { precision: 10, scale: 2 }).notNull(),
+});
+
+export const productInstancesRelations = relationBuilder(
+  productInstances,
+  ({ one, many }) => ({
+    template: one(productTemplates, {
+      fields: [productInstances.templateId],
+      references: [productTemplates.id],
+    }),
+    revenueAccount: one(ledgerAccounts, {
+      fields: [productInstances.revenueAccountId],
+      references: [ledgerAccounts.id],
+    }),
+    reservationsJunction: many(reservationsToProductInstances),
+  }),
+);
+
+export const ledgers = pgTable("ledgers", {
+  $kind: text("$kind").default("ledger").notNull(),
   id: serial("id").primaryKey(),
   uuid: uuid("uuid").defaultRandom().notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -574,152 +706,105 @@ export const invoiceExtraTemplates = pgTable("invoice_extra_templates", {
     { onDelete: "set null" },
   ),
   name: text("name").notNull(),
-  quantity: numeric("quantity", {
-    precision: 10,
-    scale: 2,
-  })
-    .default("1")
-    .notNull(),
-  description: text("description"),
-  amount: numeric("amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
-  unit: invoiceExtraUnitEnum("unit").notNull(),
-  vatRate: numeric("vat_rate", {
-    precision: 10,
-    scale: 2,
-  })
-    .default("0")
-    .notNull(),
 });
 
-export const invoiceExtraTemplatesRelations = relationBuilder(
-  invoiceExtraTemplates,
-  ({ one, many }) => ({
-    createdBy: one(relations, {
-      fields: [invoiceExtraTemplates.createdById],
-      references: [relations.id],
-    }),
-    updatedBy: one(relations, {
-      fields: [invoiceExtraTemplates.updatedById],
-      references: [relations.id],
-    }),
-    instances: many(invoiceExtraInstances),
+export const ledgersRelations = relationBuilder(ledgers, ({ one, many }) => ({
+  createdBy: one(relations, {
+    fields: [ledgers.createdById],
+    references: [relations.id],
   }),
-);
+  updatedBy: one(relations, {
+    fields: [ledgers.updatedById],
+    references: [relations.id],
+  }),
+  accounts: many(ledgerAccounts),
+}));
 
-export const reservationsToInvoiceExtraInstancesStatusEnum = pgEnum(
-  "reservations_to_invoice_extra_instances_status",
-  ["notApplied", "partiallyApplied", "fullyApplied"],
-);
-
-export const invoiceExtraInstances = pgTable("invoice_extra_instances", {
-  $kind: text("$kind").default("invoiceExtraInstance").notNull(),
+export const ledgerAccountTypes = pgTable("ledger_account_types", {
+  $kind: text("$kind").default("ledgerAccount").notNull(),
   id: serial("id").primaryKey(),
   uuid: uuid("uuid").defaultRandom().notNull(),
-  templateId: integer("template_id").references(
-    () => invoiceExtraTemplates.id,
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .default(sql`now()`)
+    .notNull(),
+  createdById: integer("created_by_id").references(
+    (): AnyPgColumn => relations.id,
+    { onDelete: "set null" },
+  ),
+  updatedById: integer("updated_by_id").references(
+    (): AnyPgColumn => relations.id,
     { onDelete: "set null" },
   ),
   name: text("name").notNull(),
-  quantity: numeric("quantity", {
-    precision: 10,
-    scale: 2,
-  })
-    .default("1")
-    .notNull(),
-  amount: numeric("amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
-  unit: invoiceExtraUnitEnum("unit").notNull(),
-  vatRate: numeric("vat_rate", {
-    precision: 10,
-    scale: 2,
-  })
-    .default("0")
-    .notNull(),
-  status: reservationsToInvoiceExtraInstancesStatusEnum("status")
-    .default("notApplied")
-    .notNull(),
 });
 
-export const invoiceExtraInstancesRelations = relationBuilder(
-  invoiceExtraInstances,
+export const ledgerAccountTypesRelations = relationBuilder(
+  ledgerAccountTypes,
   ({ one, many }) => ({
-    template: one(invoiceExtraTemplates, {
-      fields: [invoiceExtraInstances.templateId],
-      references: [invoiceExtraTemplates.id],
+    createdBy: one(relations, {
+      fields: [ledgerAccountTypes.createdById],
+      references: [relations.id],
     }),
-    reservationsJunction: many(reservationsToInvoiceExtraInstances),
+    updatedBy: one(relations, {
+      fields: [ledgerAccountTypes.updatedById],
+      references: [relations.id],
+    }),
+    accounts: many(ledgerAccounts),
   }),
 );
 
-// TODO Add support for perInvoice, perPerson, perPersonPerNight, perItem, perDay and perHour
-// TODO Add start, Maybe support uponUsage, when invoked show on next invoice only
-export const reservationsToInvoiceExtraInstancesCycleEnum = pgEnum(
-  "reservations_to_invoice_extra_instances_cycle",
-  ["oneTimeOnNext", "oneTimeOnEnd", "perNightThroughout", "perNightOnEnd"],
-);
+export const ledgerAccounts = pgTable("ledger_accounts", {
+  $kind: text("$kind").default("ledgerAccount").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .default(sql`now()`)
+    .notNull(),
+  createdById: integer("created_by_id").references(
+    (): AnyPgColumn => relations.id,
+    { onDelete: "set null" },
+  ),
+  updatedById: integer("updated_by_id").references(
+    (): AnyPgColumn => relations.id,
+    { onDelete: "set null" },
+  ),
+  ledgerId: integer("ledger_id")
+    .references(() => ledgers.id, {
+      onDelete: "restrict",
+    })
+    .notNull(),
+  typeId: integer("type_id")
+    .references(() => ledgerAccountTypes.id, {
+      onDelete: "restrict",
+    })
+    .notNull(),
+  name: text("name").notNull(),
+});
 
-export const reservationsToInvoiceExtraInstances = pgTable(
-  "reservations_to_invoice_extra_instances",
-  {
-    reservationId: integer("reservation_id")
-      .references(() => reservations.id, { onDelete: "cascade" })
-      .notNull(),
-    instanceId: integer("instance_id")
-      .references(() => invoiceExtraInstances.id, { onDelete: "cascade" })
-      .notNull(),
-    cycle: reservationsToInvoiceExtraInstancesCycleEnum("cycle").notNull(),
-  },
-  (t) => ({
-    pk: primaryKey({ columns: [t.reservationId, t.instanceId] }),
-  }),
-);
-
-export const reservationsToInvoiceExtraInstancesRelations = relationBuilder(
-  reservationsToInvoiceExtraInstances,
+export const ledgerAccountsRelations = relationBuilder(
+  ledgerAccounts,
   ({ one }) => ({
-    reservation: one(reservations, {
-      fields: [reservationsToInvoiceExtraInstances.reservationId],
-      references: [reservations.id],
+    createdBy: one(relations, {
+      fields: [ledgerAccounts.createdById],
+      references: [relations.id],
     }),
-    instance: one(invoiceExtraInstances, {
-      fields: [reservationsToInvoiceExtraInstances.instanceId],
-      references: [invoiceExtraInstances.id],
+    updatedBy: one(relations, {
+      fields: [ledgerAccounts.updatedById],
+      references: [relations.id],
     }),
-  }),
-);
-
-export const reservationsToInvoices = pgTable(
-  "reservations_to_invoices",
-  {
-    reservationId: integer("reservation_id")
-      .notNull()
-      .references(() => reservations.id, { onDelete: "cascade" }),
-    invoiceId: integer("invoice_id")
-      .notNull()
-      .references(() => invoices.id, { onDelete: "cascade" }),
-    startDate: timestamp("start_date", { withTimezone: true }).notNull(),
-    endDate: timestamp("end_date", { withTimezone: true }).notNull(),
-  },
-  (t) => ({
-    pk: primaryKey({ columns: [t.reservationId, t.invoiceId] }),
-  }),
-);
-
-export const reservationsToInvoicesRelations = relationBuilder(
-  reservationsToInvoices,
-  ({ one }) => ({
-    reservation: one(reservations, {
-      fields: [reservationsToInvoices.reservationId],
-      references: [reservations.id],
+    ledger: one(ledgers, {
+      fields: [ledgerAccounts.ledgerId],
+      references: [ledgers.id],
     }),
-    invoice: one(invoices, {
-      fields: [reservationsToInvoices.invoiceId],
-      references: [invoices.id],
+    type: one(ledgerAccountTypes, {
+      fields: [ledgerAccounts.typeId],
+      references: [ledgerAccountTypes.id],
     }),
   }),
 );
@@ -735,9 +820,11 @@ export const settingNameEnum = pgEnum("setting_name", [
   "invoiceHeaderImageSrc",
   "invoiceFooterImageSrc",
   "priceEntryMode",
+  "reservationRevenueAccountId",
 ]);
 
 export const settings = pgTable("settings", {
+  $kind: text("$kind").default("setting").notNull(),
   id: serial("id").primaryKey(),
   uuid: uuid("uuid").defaultRandom().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
@@ -749,9 +836,86 @@ export const settings = pgTable("settings", {
   value: jsonb("value"),
 });
 
-export const settingRelations = relationBuilder(settings, ({ one }) => ({
-  updatedAt: one(relations, {
-    fields: [settings.updatedAt],
+export const settingsRelations = relationBuilder(settings, ({ one }) => ({
+  updatedBy: one(relations, {
+    fields: [settings.updatedById],
     references: [relations.id],
   }),
 }));
+
+export const logTypeEnum = pgEnum("log_type", ["info", "warning", "error"]);
+
+export const logEventEnum = pgEnum("log_event", [
+  "integrationConnect",
+  "integrationRefreshAuth",
+  "integrationSend",
+  "integrationSync",
+  "integrationDisconnect",
+]);
+
+export const logRefTypeEnum = pgEnum("log_ref_type", ["integration"]);
+
+export const logs = pgTable("logs", {
+  $kind: text("$kind").default("log").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  relationId: integer("relation_id").references(
+    (): AnyPgColumn => relations.id,
+    { onDelete: "set null" },
+  ),
+  type: logTypeEnum("type").notNull(),
+  event: logEventEnum("event").notNull(),
+  refType: logRefTypeEnum("ref_type"),
+  refId: integer("ref_id"),
+  data: jsonb("data"),
+});
+
+export const logsRelations = relationBuilder(logs, ({ one }) => ({
+  relation: one(relations, {
+    fields: [logs.relationId],
+    references: [relations.id],
+  }),
+}));
+
+export const integrationConnectionTypeEnum = pgEnum(
+  "integration_connection_type",
+  ["twinfield"],
+);
+
+export const integrationConnections = pgTable("integration_connections", {
+  $kind: text("$kind").default("integrationConnection").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  type: integrationConnectionTypeEnum("type").unique().notNull(),
+  data: jsonb("data").notNull(),
+});
+
+export const integrationMappingRefTypeEnum = pgEnum(
+  "integration_mapping_ref_type",
+  ["relation", "ledgerAccount", "ledgerAccountType"],
+);
+
+export const integrationMappings = pgTable("integration_mappings", {
+  $kind: text("$kind").default("integrationMapping").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  connectionId: integer("connection_id")
+    .references(() => integrationConnections.id, { onDelete: "cascade" })
+    .notNull(),
+  refType: integrationMappingRefTypeEnum("ref_type").notNull(),
+  refId: integer("ref_id").notNull(),
+  data: jsonb("data").notNull(),
+});
+
+export const integrationEntitiesRelations = relationBuilder(
+  integrationMappings,
+  ({ one }) => ({
+    connection: one(integrationConnections, {
+      fields: [integrationMappings.connectionId],
+      references: [integrationConnections.id],
+    }),
+  }),
+);

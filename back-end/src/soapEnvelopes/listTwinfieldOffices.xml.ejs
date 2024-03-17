@@ -1,0 +1,19 @@
+<soap:Envelope
+  xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:twinfield="http://www.twinfield.com/"
+>
+  <soap:Header>
+    <twinfield:Header>
+      <twinfield:AccessToken><%= accessToken %></twinfield:AccessToken>
+    </twinfield:Header>
+  </soap:Header>
+  <soap:Body>
+    <twinfield:ProcessXmlDocument>
+      <twinfield:xmlRequest>
+        <list>
+          <type>offices</type>
+        </list>
+      </twinfield:xmlRequest>
+    </twinfield:ProcessXmlDocument>
+  </soap:Body>
+</soap:Envelope>
