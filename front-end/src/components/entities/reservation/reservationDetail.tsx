@@ -129,7 +129,9 @@ export const ReservationDetail = ({
     const lastInvoicedDate = countingInvoices[0]?.endDate;
 
     modals.open({
-      title: <Title order={3}>Invoice Period</Title>,
+      title: (
+        <Title order={3}>{t("entities.reservation.invoicePeriod.name")}</Title>
+      ),
       size: "xs",
       children: (
         <InvoicePeriodModal
@@ -155,7 +157,7 @@ export const ReservationDetail = ({
             router.refresh();
 
             notifications.show({
-              message: "Period successfully Invoiced",
+              message: t("entities.reservation.invoicePeriod.succes"),
               color: "green",
             });
           }}
@@ -166,7 +168,9 @@ export const ReservationDetail = ({
 
   const createInvoiceExtraHandler = () => {
     modals.open({
-      title: <Title order={3}>Add Invoice Extra</Title>,
+      title: (
+        <Title order={3}>{t("entities.reservation.invoiceExtra.add")}</Title>
+      ),
       // size: "sm",
       children: (
         <CreateInvoiceExtraModal
@@ -181,7 +185,7 @@ export const ReservationDetail = ({
             router.refresh();
 
             notifications.show({
-              message: "Invoice extra successfully added",
+              message: t("entities.reservation.invoiceExtra.addSucces"),
               color: "green",
             });
           }}
@@ -198,7 +202,9 @@ export const ReservationDetail = ({
     if (!invoiceExtra) return;
 
     modals.open({
-      title: <Title order={3}>Edit Invoice Extra</Title>,
+      title: (
+        <Title order={3}>{t("entities.reservation.invoiceExtra.edit")}</Title>
+      ),
       // size: "sm",
       children: (
         <EditInvoiceExtraModal
@@ -220,7 +226,7 @@ export const ReservationDetail = ({
             router.refresh();
 
             notifications.show({
-              message: "Invoice extra successfully edited",
+              message: t("entities.reservation.invoiceExtra.addSucces"),
               color: "green",
             });
           }}
@@ -239,7 +245,7 @@ export const ReservationDetail = ({
         router.refresh();
 
         notifications.show({
-          message: "Invoice extra status successfully resetted",
+          message: t("entities.reservation.invoiceExtra.resetSucces"),
           color: "green",
         });
       },
@@ -256,7 +262,7 @@ export const ReservationDetail = ({
         router.refresh();
 
         notifications.show({
-          message: "Invoice extra successfully deleted",
+          message: t("entities.reservation.invoiceExtra.deleted"),
           color: "green",
         });
       },
@@ -314,32 +320,50 @@ export const ReservationDetail = ({
           <Band
             title={
               <>
-                <Title order={3}>Invoice Extra&apos;s</Title>
+                <Title order={3}>
+                  {t("entities.reservation.invoiceExtra.name")}
+                </Title>
                 <Button
                   onClick={createInvoiceExtraHandler}
                   leftSection={<IconPlus />}
                   loading={createInvoiceExtra.loading}
                   disabled={hasFinalInvoice}
                 >
-                  Add
+                  {t("common.add")}
                 </Button>
               </>
             }
           >
             {!reservation.invoicesExtrasJunction.length ? (
-              <p>None added</p>
+              <p>{t("entities.reservation.invoiceExtra.empty")}</p>
             ) : (
               <Table>
                 <Table.Thead>
                   <Table.Tr>
-                    <Table.Th>Name</Table.Th>
-                    <Table.Th>Quantity</Table.Th>
-                    <Table.Th>Amount</Table.Th>
-                    <Table.Th>Unit</Table.Th>
-                    <Table.Th>Vat Rate</Table.Th>
-                    <Table.Th>Cycle</Table.Th>
-                    <Table.Th>Status</Table.Th>
-                    <Table.Th>Actions</Table.Th>
+                    <Table.Th>
+                      {t("entities.reservation.invoiceExtra.keys.name")}
+                    </Table.Th>
+                    <Table.Th>
+                      {t("entities.reservation.invoiceExtra.keys.quantity")}
+                    </Table.Th>
+                    <Table.Th>
+                      {t("entities.reservation.invoiceExtra.keys.amount")}
+                    </Table.Th>
+                    <Table.Th>
+                      {t("entities.reservation.invoiceExtra.keys.unit")}
+                    </Table.Th>
+                    <Table.Th>
+                      {t("entities.reservation.invoiceExtra.keys.vatRate")}
+                    </Table.Th>
+                    <Table.Th>
+                      {t("entities.reservation.invoiceExtra.keys.cycle")}
+                    </Table.Th>
+                    <Table.Th>
+                      {t("entities.reservation.invoiceExtra.keys.status")}
+                    </Table.Th>
+                    <Table.Th>
+                      {t("entities.reservation.invoiceExtra.keys.actions")}
+                    </Table.Th>
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>

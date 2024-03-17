@@ -4,6 +4,7 @@ export default {
   common: {
     back: "Back",
     create: "Create",
+    add: "Add",
     new: "New",
     save: "Save",
     saving: "Saving",
@@ -50,7 +51,8 @@ export default {
       createdNotification: "Relation successfully created",
       deletedNotification: "Relation successfully deleted",
       isSelfAlert: {
-        title: "You can't edit yourself here",
+        // title: "You can't edit yourself here",
+        title: "You can't edit yourself",
         message: "Your own personal details are editable only on the",
         button: "Profile Page",
       },
@@ -96,6 +98,29 @@ export default {
         guestName: "Guest name",
         reservationNotes: "Reservation notes",
         invoiceNotes: "Invoice notes",
+      },
+      invoicePeriod: {
+        name: "Invoice Period",
+        succes: "Period successfully Invoiced",
+      },
+      invoiceExtra: {
+        keys: {
+          name: "Name",
+          quantity: "Quantity",
+          amount: "Amount",
+          unit: "Unit",
+          vatRate: "Vat Rate",
+          cycle: "Cycle",
+          status: "Status",
+          actions: "Actions",
+        },
+        name: "Invoice Extra's",
+        edit: "Edit Invoice Extra",
+        add: "Add Invoice Extra",
+        addSucces: "Invoice extra successfully added",
+        resetSucces: "Invoice extra status successfully resetted",
+        deleted: "Invoice extra successfully deleted",
+        empty: "Nothing added",
       },
       calendar: {
         roomName: "Room name",

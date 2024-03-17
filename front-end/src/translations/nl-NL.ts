@@ -4,6 +4,7 @@ export default {
   common: {
     back: "Terug",
     create: "Aanmaken",
+    add: "Toevoegen",
     new: "Nieuw",
     save: "Opslaan",
     saving: "Opslaan",
@@ -50,7 +51,8 @@ export default {
       createdNotification: "Relatie succesvol aangemaakt",
       deletedNotification: "Relatie succesvol verwijderd",
       isSelfAlert: {
-        title: "Je kunt jezelf hier niet bewerken",
+        // title: "Je kunt jezelf hier niet bewerken",
+        title: "Je kunt jezelf niet bewerken",
         message: "Je eigen persoonlijke gegevens zijn alleen bewerkbaar op de",
         button: "Profielpagina",
       },
@@ -96,6 +98,29 @@ export default {
         guestName: "Naam gast",
         reservationNotes: "Reserveringsnotities",
         invoiceNotes: "Factuurnotities",
+      },
+      invoicePeriod: {
+        name: "Factuurperiode",
+        succes: "Periode succesvol gefactureerd",
+      },
+      invoiceExtra: {
+        keys: {
+          name: "Naam",
+          quantity: "Aantal",
+          amount: "Bedrag",
+          unit: "Eenheid",
+          vatRate: "BTW-tarief",
+          cycle: "Cyclus",
+          status: "Status",
+          actions: "Acties",
+        },
+        name: "Factuur Extra's",
+        edit: "Factuur Extra bewerken",
+        add: "Voeg Factuur Extra toe",
+        addSucces: "Factuur extra succesvol toegevoegd",
+        resetSucces: "Factuur extra status succesvol gereset",
+        deleted: "Factuur extra succesvol verwijderd",
+        empty: "Niks toegevoegd",
       },
       calendar: {
         roomName: "Kamer naam",

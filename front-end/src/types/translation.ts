@@ -13,6 +13,7 @@ export type Translation = {
   common: {
     back: string;
     create: string;
+    add: string;
     new: string;
     save: string;
     saving: string;
@@ -105,6 +106,29 @@ export type Translation = {
         guestName: string;
         reservationNotes: string;
         invoiceNotes: string;
+      };
+      invoicePeriod: {
+        name: string;
+        succes: string;
+      };
+      invoiceExtra: {
+        keys: {
+          name: string;
+          quantity: string;
+          amount: string;
+          unit: string;
+          vatRate: string;
+          cycle: string;
+          status: string;
+          actions: string;
+        };
+        name: string;
+        edit: string;
+        add: string;
+        addSucces: string;
+        resetSucces: string;
+        deleted: string;
+        empty: string;
       };
       calendar: {
         roomName: string;

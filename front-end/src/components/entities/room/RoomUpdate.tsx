@@ -74,6 +74,7 @@ export const RoomUpdate = ({ room }: RoomProps) => {
           ]}
         >
           <Button
+            variant="light"
             color="red"
             onClick={deletehandler}
             leftSection={<IconTrash />}
