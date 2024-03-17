@@ -56,6 +56,7 @@ import { IconRotate } from "@tabler/icons-react";
 import { CreateInvoiceExtraModal } from "./CreateInvoiceExtraModal";
 import { EditInvoiceExtraModal } from "./EditInvoiceExtraModal";
 import { InvoicePeriodModal } from "./InvoicePeriodModal";
+import { overlapDates } from "./ReservationCreate";
 import { ReservationForm } from "./ReservationForm";
 
 dayjs.extend(isBetween);
@@ -65,6 +66,7 @@ type ReservationProps = {
   rooms: RouterOutput["room"]["list"];
   relations: RouterOutput["relation"]["list"];
   invoiceExtraTemplates: RouterOutput["invoiceExtra"]["list"];
+  reservations: RouterOutput["reservation"]["list"];
 };
 
 export const ReservationDetail = ({
@@ -72,6 +74,7 @@ export const ReservationDetail = ({
   rooms,
   relations,
   invoiceExtraTemplates,
+  reservations,
 }: ReservationProps) => {
   const t = useTranslation();
   const router = useRouter();
@@ -304,7 +307,7 @@ export const ReservationDetail = ({
           >
             {t("common.delete")}
           </Button>
-          <SaveBadge />
+          <SaveBadge reservation={reservation} reservations={reservations} />
         </DashboardHeader>
         <ReservationForm rooms={rooms} relations={relations} />
         <Paper p="2rem">
@@ -584,14 +587,34 @@ export const ReservationDetail = ({
   );
 };
 
-const SaveBadge = () => {
+type SaveButtonProps = {
+  reservation: RouterOutput["reservation"]["get"];
+  reservations: RouterOutput["reservation"]["list"];
+};
+
+const SaveBadge = ({ reservation, reservations }: SaveButtonProps) => {
   const updateReservation = useMutation("reservation", "update");
   const t = useTranslation();
 
   const { control, getValues, reset, setError } =
     useFormContext<ReservationInputUpdateSchema>();
-  const { isDirty, errors } = useFormState({ control });
+  const { isDirty, errors, dirtyFields } = useFormState({ control });
   const isError = useMemo(() => !!Object.keys(errors).length, [errors]);
+
+  const overlaps = reservations.some(({ id, startDate, endDate, roomId }) => {
+    if (
+      (getValues("roomId") || reservation.roomId) !== roomId ||
+      id === getValues("id")
+    )
+      return;
+
+    return overlapDates(
+      getValues("startDate") || reservation.startDate,
+      getValues("endDate") || reservation.endDate,
+      startDate,
+      endDate,
+    );
+  });
 
   useAutosave(control, async (values) => {
     function isJson(str: string) {
@@ -614,17 +637,29 @@ const SaveBadge = () => {
         reset();
         return;
       }
-      const updatedReservation = await updateReservation.mutate({
-        id: getValues("id"),
-        ...values,
-      });
+      if (
+        overlaps &&
+        (dirtyFields.startDate || dirtyFields.endDate || dirtyFields.roomId)
+      ) {
+        modals.openConfirmModal({
+          title: t("common.areYouSure"),
+          children: <div>{t("entities.reservation.overlapError")}</div>,
+          labels: { confirm: t("common.yes"), cancel: t("common.no") },
+          closeOnClickOutside: false,
+          withCloseButton: false,
+          onConfirm: () => {
+            updateHandler(values);
+          },
+          onCancel: () => {
+            reset();
+          },
+        });
 
-      reset({
-        ...updatedReservation,
-        priceOverride: updatedReservation.priceOverride
-          ? parseFloat(updatedReservation.priceOverride)
-          : undefined,
-      });
+        return;
+      } else {
+        updateHandler(values);
+        return;
+      }
     } catch (error) {
       const { success, json } = isJson((error as any).message);
       if (!success) {
@@ -634,7 +669,6 @@ const SaveBadge = () => {
         });
 
         reset();
-
         return;
       }
 
@@ -649,6 +683,22 @@ const SaveBadge = () => {
       }
     }
   });
+
+  const updateHandler = async (
+    values: Omit<ReservationInputUpdateSchema, "id">,
+  ) => {
+    const updatedReservation = await updateReservation.mutate({
+      ...values,
+      id: getValues("id"),
+    });
+
+    reset({
+      ...updatedReservation,
+      priceOverride: updatedReservation.priceOverride
+        ? parseFloat(updatedReservation.priceOverride)
+        : undefined,
+    });
+  };
 
   return (
     <Badge
