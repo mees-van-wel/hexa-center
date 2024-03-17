@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
@@ -58,6 +58,10 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
   const [downloadLoading, setDownloadLoading] = useState(false);
   const [printLoading, setPrintLoading] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    router.refresh();
+  }, []);
 
   const issueHandler = async () => {
     const onConfirm = async (issueDate: Date) => {
@@ -134,43 +138,55 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
   };
 
   const mailHandler = async () => {
-    try {
-      await mailInvoice.mutate(invoice.id);
+    modals.openConfirmModal({
+      title: t("common.areYouSure"),
+      labels: { confirm: t("common.yes"), cancel: t("common.no") },
+      onConfirm: async () => {
+        try {
+          await mailInvoice.mutate(invoice.id);
 
-      router.refresh();
+          router.refresh();
 
-      notifications.show({
-        message: "Mailed successfully",
-        color: "green",
-      });
-    } catch (error) {
-      notifications.show({
-        title: "There was an error while mailing",
-        // @ts-ignore
-        message: error?.message || "...",
-        color: "red",
-      });
-    }
+          notifications.show({
+            message: "Mailed successfully",
+            color: "green",
+          });
+        } catch (error) {
+          notifications.show({
+            title: "There was an error while mailing",
+            // @ts-ignore
+            message: error?.message || "...",
+            color: "red",
+          });
+        }
+      },
+    });
   };
 
   const creditHandler = async () => {
-    try {
-      const creditInvoiceId = await creditInvoice.mutate(invoice.id);
+    modals.openConfirmModal({
+      title: t("common.areYouSure"),
+      labels: { confirm: t("common.yes"), cancel: t("common.no") },
+      onConfirm: async () => {
+        try {
+          const creditInvoiceId = await creditInvoice.mutate(invoice.id);
 
-      router.push(`/invoices/${creditInvoiceId}`);
+          router.push(`/invoices/${creditInvoiceId}`);
 
-      notifications.show({
-        message: "Credited successfully",
-        color: "green",
-      });
-    } catch (error) {
-      notifications.show({
-        title: "There was an error while crediting",
-        // @ts-ignore
-        message: error?.message || "...",
-        color: "red",
-      });
-    }
+          notifications.show({
+            message: "Credited successfully",
+            color: "green",
+          });
+        } catch (error) {
+          notifications.show({
+            title: "There was an error while crediting",
+            // @ts-ignore
+            message: error?.message || "...",
+            color: "red",
+          });
+        }
+      },
+    });
   };
 
   const deleteHandler = async () => {
@@ -312,11 +328,11 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
               <Stack align="flex-start">
                 <div>
                   <p>
-                    <strong>Type:</strong>{" "}
+                    <strong>{t("entities.invoice.type")}:</strong>{" "}
                     <Badge variant="light">{invoice.type}</Badge>
                   </p>
                   <p>
-                    <strong>Status:</strong>{" "}
+                    <strong>{t("entities.invoice.status")}:</strong>{" "}
                     <Badge variant="light">{invoice.status}</Badge>
                   </p>
                 </div>
@@ -361,7 +377,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
             <Band
               title={
                 <>
-                  <Title order={3}>Customer</Title>
+                  <Title order={3}>{t("entities.invoice.customerName")}</Title>
                   <Title order={3}>-</Title>
                   {invoice.customerId ? (
                     <Button
@@ -528,7 +544,15 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                 {invoice.events
                   .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
                   .map(
-                    ({ id, type, createdAt, createdById, refType, refId }) => {
+                    ({
+                      id,
+                      type,
+                      createdAt,
+                      createdById,
+                      createdBy,
+                      refType,
+                      refId,
+                    }) => {
                       const { IconComponent, title, message } =
                         INVOICE_EVENT_TYPE_META[type];
 
@@ -563,7 +587,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                               <>
                                 {" by "}
                                 <Link href={`/relations/${createdById}`}>
-                                  Relation {createdById}
+                                  {createdBy?.name}
                                 </Link>
                               </>
                             )}
@@ -583,7 +607,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                       <>
                         {" by "}
                         <Link href={`/relations/${invoice.createdById}`}>
-                          Relation {invoice.createdById}
+                          {invoice.createdBy?.name}
                         </Link>
                       </>
                     )}

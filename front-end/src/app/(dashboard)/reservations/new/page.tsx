@@ -9,6 +9,13 @@ export default async function Page() {
 
   const relations = await trpc.relation.list.query();
   const rooms = await trpc.room.list.query();
+  const reservations = await trpc.reservation.list.query();
 
-  return <ReservationCreate rooms={rooms} relations={relations} />;
+  return (
+    <ReservationCreate
+      rooms={rooms}
+      relations={relations}
+      reservations={reservations}
+    />
+  );
 }

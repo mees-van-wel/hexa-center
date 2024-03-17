@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
@@ -56,6 +56,7 @@ import { IconRotate } from "@tabler/icons-react";
 import { AddProductModal } from "./AddProductModal";
 import { EditProductModal } from "./EditProductModal";
 import { InvoicePeriodModal } from "./InvoicePeriodModal";
+import { overlapDates } from "./ReservationCreate";
 import { ReservationForm } from "./ReservationForm";
 
 dayjs.extend(isBetween);
@@ -64,6 +65,7 @@ type ReservationProps = {
   reservation: RouterOutput["reservation"]["get"];
   rooms: RouterOutput["room"]["list"];
   relations: RouterOutput["relation"]["list"];
+  reservations: RouterOutput["reservation"]["list"];
   productTemplates: RouterOutput["product"]["list"];
   ledgerAccounts: RouterOutput["ledgerAccount"]["list"];
 };
@@ -72,6 +74,7 @@ export const ReservationDetail = ({
   reservation,
   rooms,
   relations,
+  reservations,
   productTemplates,
   ledgerAccounts,
 }: ReservationProps) => {
@@ -83,6 +86,10 @@ export const ReservationDetail = ({
   const editProduct = useMutation("reservation", "editProduct");
   const resetProduct = useMutation("reservation", "resetProduct");
   const deleteProductInstance = useMutation("product", "deleteInstance");
+
+  useEffect(() => {
+    router.refresh();
+  }, []);
 
   const formMethods = useForm<ReservationInputUpdateSchema>({
     defaultValues: reservation,
@@ -123,7 +130,9 @@ export const ReservationDetail = ({
     const lastInvoicedDate = countingInvoices[0]?.periodEndDate;
 
     modals.open({
-      title: <Title order={3}>Invoice Period</Title>,
+      title: (
+        <Title order={3}>{t("entities.reservation.invoicePeriod.name")}</Title>
+      ),
       size: "xs",
       children: (
         <InvoicePeriodModal
@@ -154,7 +163,7 @@ export const ReservationDetail = ({
             router.refresh();
 
             notifications.show({
-              message: "Period successfully Invoiced",
+              message: t("entities.reservation.invoicePeriod.succes"),
               color: "green",
             });
           }}
@@ -165,7 +174,7 @@ export const ReservationDetail = ({
 
   const createProductHandler = () => {
     modals.open({
-      title: <Title order={3}>Add Product</Title>,
+      title: <Title order={3}>{t("entities.reservation.product.add")}</Title>,
       children: (
         <AddProductModal
           templates={productTemplates}
@@ -180,7 +189,7 @@ export const ReservationDetail = ({
             router.refresh();
 
             notifications.show({
-              message: "Product successfully added",
+              message: t("entities.reservation.product.addSucces"),
               color: "green",
             });
           }}
@@ -197,7 +206,7 @@ export const ReservationDetail = ({
     if (!productInstanceJunction) return;
 
     modals.open({
-      title: <Title order={3}>Edit Product</Title>,
+      title: <Title order={3}>{t("entities.reservation.product.edit")}</Title>,
       children: (
         <EditProductModal
           ledgerAccounts={ledgerAccounts}
@@ -220,7 +229,7 @@ export const ReservationDetail = ({
             router.refresh();
 
             notifications.show({
-              message: "Product successfully edited",
+              message: t("entities.reservation.product.editSucces"),
               color: "green",
             });
           }}
@@ -242,7 +251,7 @@ export const ReservationDetail = ({
         router.refresh();
 
         notifications.show({
-          message: "Product status successfully resetted",
+          message: t("entities.reservation.product.resetSucces"),
           color: "green",
         });
       },
@@ -259,7 +268,7 @@ export const ReservationDetail = ({
         router.refresh();
 
         notifications.show({
-          message: "Product successfully deleted",
+          message: t("entities.reservation.product.deleted"),
           color: "green",
         });
       },
@@ -310,38 +319,54 @@ export const ReservationDetail = ({
           >
             {t("common.delete")}
           </Button>
-          <SaveBadge />
+          <SaveBadge reservation={reservation} reservations={reservations} />
         </DashboardHeader>
         <ReservationForm rooms={rooms} relations={relations} />
         <Paper p="2rem">
           <Band
             title={
               <>
-                <Title order={3}>Products</Title>
+                <Title order={3}>
+                  {t("entities.reservation.product.name")}
+                </Title>
                 <Button
                   onClick={createProductHandler}
                   leftSection={<IconPlus />}
                   loading={addProduct.loading}
                   disabled={hasFinalInvoice}
                 >
-                  Add
+                  {t("common.add")}
                 </Button>
               </>
             }
           >
             {!reservation.productInstancesJunction.length ? (
-              <p>None added</p>
+              <p>{t("entities.reservation.product.empty")}</p>
             ) : (
               <Table>
                 <Table.Thead>
                   <Table.Tr>
-                    <Table.Th>Name</Table.Th>
-                    <Table.Th>Price</Table.Th>
-                    <Table.Th>Vat Rate</Table.Th>
-                    <Table.Th>Quantity</Table.Th>
-                    <Table.Th>Cycle</Table.Th>
-                    <Table.Th>Status</Table.Th>
-                    <Table.Th>Actions</Table.Th>
+                    <Table.Th>
+                      {t("entities.reservation.product.keys.name")}
+                    </Table.Th>
+                    <Table.Th>
+                      {t("entities.reservation.product.keys.price")}
+                    </Table.Th>
+                    <Table.Th>
+                      {t("entities.reservation.product.keys.vatRate")}
+                    </Table.Th>
+                    <Table.Th>
+                      {t("entities.reservation.product.keys.quantity")}
+                    </Table.Th>
+                    <Table.Th>
+                      {t("entities.reservation.product.keys.cycle")}
+                    </Table.Th>
+                    <Table.Th>
+                      {t("entities.reservation.product.keys.status")}
+                    </Table.Th>
+                    <Table.Th>
+                      {t("entities.reservation.product.keys.actions")}
+                    </Table.Th>
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
@@ -597,14 +622,35 @@ export const ReservationDetail = ({
   );
 };
 
-const SaveBadge = () => {
+type SaveButtonProps = {
+  reservation: RouterOutput["reservation"]["get"];
+  reservations: RouterOutput["reservation"]["list"];
+};
+
+const SaveBadge = ({ reservation, reservations }: SaveButtonProps) => {
   const updateReservation = useMutation("reservation", "update");
   const t = useTranslation();
+  const router = useRouter();
 
   const { control, getValues, reset, setError } =
     useFormContext<ReservationInputUpdateSchema>();
-  const { isDirty, errors } = useFormState({ control });
+  const { isDirty, errors, dirtyFields } = useFormState({ control });
   const isError = useMemo(() => !!Object.keys(errors).length, [errors]);
+
+  const overlaps = reservations.some(({ id, startDate, endDate, roomId }) => {
+    if (
+      (getValues("roomId") || reservation.roomId) !== roomId ||
+      id === getValues("id")
+    )
+      return;
+
+    return overlapDates(
+      getValues("startDate") || reservation.startDate,
+      getValues("endDate") || reservation.endDate,
+      startDate,
+      endDate,
+    );
+  });
 
   useAutosave(control, async (values) => {
     function isJson(str: string) {
@@ -627,12 +673,29 @@ const SaveBadge = () => {
         reset();
         return;
       }
-      const updatedReservation = await updateReservation.mutate({
-        id: getValues("id"),
-        ...values,
-      });
+      if (
+        overlaps &&
+        (dirtyFields.startDate || dirtyFields.endDate || dirtyFields.roomId)
+      ) {
+        modals.openConfirmModal({
+          title: t("common.areYouSure"),
+          children: <div>{t("entities.reservation.overlapError")}</div>,
+          labels: { confirm: t("common.yes"), cancel: t("common.no") },
+          closeOnClickOutside: false,
+          withCloseButton: false,
+          onConfirm: () => {
+            updateHandler(values);
+          },
+          onCancel: () => {
+            reset();
+          },
+        });
 
-      reset(updatedReservation);
+        return;
+      } else {
+        updateHandler(values);
+        return;
+      }
     } catch (error) {
       const { success, json } = isJson((error as any).message);
       if (!success) {
@@ -642,7 +705,6 @@ const SaveBadge = () => {
         });
 
         reset();
-
         return;
       }
 
@@ -657,6 +719,19 @@ const SaveBadge = () => {
       }
     }
   });
+
+  const updateHandler = async (
+    values: Omit<ReservationInputUpdateSchema, "id">,
+  ) => {
+    const updatedReservation = await updateReservation.mutate({
+      ...values,
+      id: getValues("id"),
+    });
+
+    reset(updatedReservation);
+
+    router.refresh();
+  };
 
   return (
     <Badge

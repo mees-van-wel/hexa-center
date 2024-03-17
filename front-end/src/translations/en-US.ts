@@ -4,6 +4,7 @@ export default {
   common: {
     back: "Back",
     create: "Create",
+    add: "Add",
     new: "New",
     save: "Save",
     saving: "Saving",
@@ -51,7 +52,8 @@ export default {
       createdNotification: "Relation successfully created",
       deletedNotification: "Relation successfully deleted",
       isSelfAlert: {
-        title: "You can't edit yourself here",
+        // title: "You can't edit yourself here",
+        title: "You can't edit yourself",
         message: "Your own personal details are editable only on the",
         button: "Profile Page",
       },
@@ -98,12 +100,38 @@ export default {
         reservationNotes: "Reservation notes",
         invoiceNotes: "Invoice notes",
       },
+      invoicePeriod: {
+        name: "Invoice Period",
+        succes: "Period successfully Invoiced",
+      },
+      product: {
+        keys: {
+          name: "Name",
+          quantity: "Quantity",
+          price: "Price",
+          vatRate: "Vat Rate",
+          cycle: "Cycle",
+          status: "Status",
+          actions: "Actions",
+        },
+        name: "Products",
+        edit: "Edit product",
+        editSucces: "Product successfully edited",
+        add: "Add product",
+        addSucces: "Product successfully added",
+        resetSucces: "Product status successfully resetted",
+        deleted: "Product successfully deleted",
+        empty: "None added yet",
+      },
       calendar: {
+        roomName: "Room name",
         noRooms: "No bookings found",
       },
       reservationCreated: "Reservation successfully created",
       roomDeleted: "Reservation successfully deleted",
       dateError: "Start date must be earlier than the end date.",
+      overlapError:
+        "The room is already booked on this date, do you want to continue?",
     },
     invoice: {
       singularName: "Invoice",

@@ -4,7 +4,6 @@ import { useMemo } from "react";
 import dayjs from "dayjs";
 
 import { Sheet } from "@/components/common/Sheet/Sheet";
-import { Workinghours } from "@/components/common/Workinghours";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import {
   DATE_FORMAT_VALUES,
@@ -31,7 +30,7 @@ import {
 import { TIMEZONES } from "@/constants/timezones";
 import { useAuthRelation } from "@/contexts/AuthContext";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Badge, Button, Group, Progress, Select, Stack } from "@mantine/core";
+import { Group, Select, Stack } from "@mantine/core";
 import { IconSettings } from "@tabler/icons-react";
 
 export default function Preferences() {
@@ -104,12 +103,7 @@ export default function Preferences() {
     <Stack>
       <DashboardHeader
         title={[{ label: t("preferencesPage.name"), icon: <IconSettings /> }]}
-      >
-        <Button>{t("common.create")}</Button>
-        <Badge size="lg" color="green">
-          {t("common.saved")}
-        </Badge>
-      </DashboardHeader>
+      />
       <Sheet title={t("preferencesPage.system")}>
         <Stack>
           <Group grow>
@@ -210,7 +204,7 @@ export default function Preferences() {
         </Stack>
       </Sheet>
       <Group align="flex-start" grow>
-        <Workinghours account={currentAccount} />
+        {/* <Workinghours account={currentAccount} />
         <Sheet title={t("preferencesPage.storage")}>
           <Group justify="space-between">
             <p>MB</p>
@@ -218,7 +212,7 @@ export default function Preferences() {
             <p>GB</p>
           </Group>
           <Progress size="md" value={50} />
-        </Sheet>
+        </Sheet> */}
       </Group>
     </Stack>
   );

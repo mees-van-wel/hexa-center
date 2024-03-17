@@ -31,6 +31,7 @@ export const getInvoice = async (invoiceId: number) => {
   const invoice = await db.query.invoices.findFirst({
     where: eq(invoices.id, invoiceId),
     with: {
+      createdBy: true,
       lines: {
         columns: {
           id: true,
@@ -44,6 +45,9 @@ export const getInvoice = async (invoiceId: number) => {
         },
       },
       events: {
+        with: {
+          createdBy: true,
+        },
         columns: {
           id: true,
           createdAt: true,

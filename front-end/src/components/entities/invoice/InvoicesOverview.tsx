@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useMemo } from "react";
+import { useEffect, useId, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import Decimal from "decimal.js";
@@ -157,6 +157,10 @@ export const InvoicesOverview = ({ invoices }: InvoicesOverviewProps) => {
         })),
     [invoices],
   );
+
+  useEffect(() => {
+    router.refresh();
+  }, []);
 
   return (
     <Stack>
