@@ -1,6 +1,6 @@
 "use client";
 
-import { useId } from "react";
+import { useEffect, useId } from "react";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
 
@@ -19,6 +19,10 @@ export const InvoicesOverview = ({ invoices }: InvoicesOverviewProps) => {
   const router = useRouter();
   const searchBarId = useId();
   const t = useTranslation();
+
+  useEffect(() => {
+    router.refresh();
+  }, []);
 
   return (
     <Stack>

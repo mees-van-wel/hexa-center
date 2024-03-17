@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
@@ -58,6 +58,10 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
   const [downloadLoading, setDownloadLoading] = useState(false);
   const [printLoading, setPrintLoading] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    router.refresh();
+  }, []);
 
   const issueHandler = async () => {
     const onConfirm = async (issueDate: Date) => {

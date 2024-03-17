@@ -1,6 +1,6 @@
 "use client";
 
-import { useId } from "react";
+import { useEffect, useId } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -19,6 +19,10 @@ export const RoomsOverview = ({ rooms }: RoomsProps) => {
   const router = useRouter();
   const searchBarId = useId();
   const t = useTranslation();
+
+  useEffect(() => {
+    router.refresh();
+  }, []);
 
   return (
     <Stack>

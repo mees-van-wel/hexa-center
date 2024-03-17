@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
@@ -84,6 +84,10 @@ export const ReservationDetail = ({
   const updateInvoiceExtra = useMutation("reservation", "updateInvoiceExtra");
   const resetInvoiceExtra = useMutation("invoiceExtra", "resetInstance");
   const deleteInvoiceExtra = useMutation("invoiceExtra", "deleteInstance");
+
+  useEffect(() => {
+    router.refresh();
+  }, []);
 
   const formMethods = useForm<ReservationInputUpdateSchema>({
     defaultValues: {
@@ -619,6 +623,7 @@ type SaveButtonProps = {
 const SaveBadge = ({ reservation, reservations }: SaveButtonProps) => {
   const updateReservation = useMutation("reservation", "update");
   const t = useTranslation();
+  const router = useRouter();
 
   const { control, getValues, reset, setError } =
     useFormContext<ReservationInputUpdateSchema>();
@@ -722,6 +727,8 @@ const SaveBadge = ({ reservation, reservations }: SaveButtonProps) => {
         ? parseFloat(updatedReservation.priceOverride)
         : undefined,
     });
+
+    router.refresh();
   };
 
   return (
