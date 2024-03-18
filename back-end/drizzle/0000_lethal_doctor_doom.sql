@@ -71,7 +71,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "setting_name" AS ENUM('companyPaymentTerms', 'invoiceEmailTitle', 'invoiceEmailContent', 'invoiceHeaderImageSrc', 'invoiceFooterImageSrc', 'priceEntryMode', 'reservationRevenueAccountId');
+ CREATE TYPE "setting_name" AS ENUM('companyPaymentTerms', 'companyLogoSrc', 'invoiceEmailTitle', 'invoiceEmailContent', 'invoiceHeaderImageSrc', 'invoiceFooterImageSrc', 'priceEntryMode', 'reservationRevenueAccountId');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -196,7 +196,7 @@ CREATE TABLE IF NOT EXISTS "invoices" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "ledger_account_types" (
-	"$kind" text DEFAULT 'ledgerAccount' NOT NULL,
+	"$kind" text DEFAULT 'ledgerAccountType' NOT NULL,
 	"id" serial PRIMARY KEY NOT NULL,
 	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,

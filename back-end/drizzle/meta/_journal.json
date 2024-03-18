@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1710700896371,
+      "when": 1710760702586,
       "tag": "0000_lethal_doctor_doom",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1710717149591,
-      "tag": "0001_breezy_luckman",
       "breakpoints": true
     }
   ]
