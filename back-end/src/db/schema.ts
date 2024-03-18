@@ -767,7 +767,7 @@ export const ledgersRelations = relations(ledgers, ({ one, many }) => ({
 }));
 
 export const ledgerAccountTypes = pgTable("ledger_account_types", {
-  $kind: text("$kind").default("ledgerAccount").notNull(),
+  $kind: text("$kind").default("ledgerAccountType").notNull(),
   id: serial("id").primaryKey(),
   uuid: uuid("uuid").defaultRandom().notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })

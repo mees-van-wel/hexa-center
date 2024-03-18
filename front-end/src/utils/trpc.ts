@@ -41,3 +41,54 @@ export const trpc = createTRPCProxyClient<AppRouter>({
     }),
   ],
 });
+
+// export const getTrpcClientOnServer = () => {
+//   const refreshToken = cookies().get("refreshToken")?.value;
+//   const headersList = headers();
+
+//   console.log(headersList);
+
+//   return createTRPCProxyClient<AppRouter>({
+//     transformer: trpcTransformer,
+//     links: [
+//       httpBatchLink({
+//         url: `${process.env.NEXT_PUBLIC_API_URL}/trpc`,
+//         headers() {
+//           return {
+//             Authorization: `Bearer ${refreshToken}`,
+//             // "X-Subdomain": ,
+//           };
+//         },
+//         fetch(url, options) {
+//           return fetch(url, {
+//             ...options,
+//             credentials: "include",
+//           });
+//         },
+//       }),
+//     ],
+//   });
+// };
+
+// export const getTrpcClientOnClient = () => {
+//   return createTRPCProxyClient<AppRouter>({
+//     transformer: trpcTransformer,
+//     links: [
+//       httpBatchLink({
+//         url: `${process.env.NEXT_PUBLIC_API_URL}/trpc`,
+//         headers() {
+//           return {
+//             Authorization: undefined,
+//             "X-Subdomain": window.location.hostname.split(".")[0],
+//           };
+//         },
+//         fetch(url, options) {
+//           return fetch(url, {
+//             ...options,
+//             credentials: "include",
+//           });
+//         },
+//       }),
+//     ],
+//   });
+// };

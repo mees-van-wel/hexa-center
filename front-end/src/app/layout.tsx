@@ -47,7 +47,12 @@ export default async function RootLayout({
   try {
     if (refreshToken) setTRPCRefreshToken(refreshToken);
     user = await trpc.auth.currentUser.query();
-  } catch (error) {}
+
+    //  const trpc = getTrpcClientOnServer();
+    //  user = await trpc.auth.currentUser.query();
+  } catch (error) {
+    console.warn(error);
+  }
 
   // TODO Set redirect type to replace
   if (!user && pathname !== "/login") redirect("/login");
