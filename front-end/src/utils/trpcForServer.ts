@@ -2,10 +2,10 @@
 
 import { cookies, headers } from "next/headers";
 
-import type { AppRouter } from "@back-end/routes/_app";
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 
 import { isProduction } from "./environment";
+import { AppRouter } from "./trpc";
 import { trpcTransformer } from "./trpcTransformer";
 
 export const getTrpcClientOnServer = () => {

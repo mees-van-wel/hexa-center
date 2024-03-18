@@ -422,24 +422,6 @@ export const generateInvoicePdf = async (invoiceId: number) => {
 export const invertDecimalString = (decimalString: string) =>
   (-parseFloat(decimalString)).toString();
 
-export const calculateVatFromNetAmount = (
-  netAmount: Decimal | number | string,
-  vatRate: Decimal | number | string,
-) => {
-  const net = new Decimal(netAmount);
-  const rate = new Decimal(vatRate).div(100);
-  return net.mul(rate);
-};
-
-export const extractVatFromGrossAmount = (
-  grossAmount: Decimal | number | string,
-  vatRate: Decimal | number | string,
-) => {
-  const gross = new Decimal(grossAmount);
-  const rate = new Decimal(vatRate).div(100);
-  return gross.sub(gross.div(rate.add(1)));
-};
-
 export const roundDecimal = (decimal: number | string | Decimal) =>
   new Decimal(decimal).toDecimalPlaces(2, Decimal.ROUND_HALF_UP);
 
@@ -447,7 +429,7 @@ export const calculateInvoiceAmounts = (
   lines: {
     unitAmount: Decimal | number | string;
     quantity: Decimal | number | string;
-    vatRate: Decimal | number | string;
+    vatRate: Decimal | number | string | null;
   }[],
   priceEntryMode: Settings["priceEntryMode"],
 ) => {
@@ -458,7 +440,7 @@ export const calculateInvoiceAmounts = (
   const calculatedLines = lines.map((line) => {
     let unitAmount = new Decimal(line.unitAmount);
     const quantity = new Decimal(line.quantity);
-    const vatRate = new Decimal(line.vatRate).div(100);
+    const vatRate = new Decimal(line.vatRate || 0).div(100);
 
     let netAmount: Decimal;
     let vatAmount: Decimal;
@@ -508,7 +490,7 @@ type CreateInvoiceProps = {
     name: string;
     unitAmount: string;
     quantity: string;
-    vatRate: string;
+    vatRate: string | null;
   }[];
   notes?: string | null;
 };
@@ -681,6 +663,12 @@ export const issueInvoice = async (
     })
     .where(eq(invoices.id, invoiceId));
 
+  await db.insert(invoiceEvents).values({
+    createdById: userId,
+    invoiceId,
+    type: "issued",
+  });
+
   const integrationResult = await db
     .select()
     .from(integrationConnections)
@@ -694,12 +682,6 @@ export const issueInvoice = async (
     const { id, accessToken, companyCode } = await getTwinfieldAccessToken();
     const wsdlUrl = await getTwinfieldWsdlUrl(accessToken);
 
-    const VatRateToVatCodeMap = {
-      "21.00": "VH",
-      "9.00": "VL",
-      "0.00": "VN",
-    } as const;
-
     const customerMappingResult = await db
       .select()
       .from(integrationMappings)
@@ -710,6 +692,7 @@ export const issueInvoice = async (
         ),
       );
 
+    // @ts-ignore
     const externalCustomerCode = customerMappingResult[0]?.data?.code;
 
     if (!externalCustomerCode) {
@@ -726,9 +709,16 @@ export const issueInvoice = async (
       revenueAccountCode: string;
       netAmount: string;
       name: string;
-      vatCode: string;
+      vatCode: string | null;
       vatAmount: string;
     }[] = [];
+
+    // TODO store in db
+    const VatRateToVatCodeMap = {
+      "21.00": "VH",
+      "9.00": "VL",
+      "0.00": "VN",
+    } as const;
 
     for (const line of lines) {
       const revenueAccountMappingResult = await db
@@ -741,6 +731,7 @@ export const issueInvoice = async (
           ),
         );
 
+      // @ts-ignore
       const revenueAccountCode = revenueAccountMappingResult[0]?.data?.code;
 
       if (!revenueAccountCode) {
@@ -754,9 +745,12 @@ export const issueInvoice = async (
         revenueAccountCode,
         netAmount: line.netAmount,
         name: line.name,
-        vatCode:
-          line.vatRate in VatRateToVatCodeMap
-            ? VatRateToVatCodeMap[line.vatRate]
+        vatCode: !line.vatRate?.toString()
+          ? null
+          : line.vatRate in VatRateToVatCodeMap
+            ? VatRateToVatCodeMap[
+                line.vatRate as keyof typeof VatRateToVatCodeMap
+              ]
             : VatRateToVatCodeMap["0.00"],
         vatAmount: line.vatAmount,
       });
@@ -776,6 +770,7 @@ export const issueInvoice = async (
       );
 
     const externalBalanceAccountCode =
+      // @ts-ignore
       balanceAccountMappingResult[0]?.data?.code;
 
     if (!externalBalanceAccountCode) {
@@ -796,6 +791,7 @@ export const issueInvoice = async (
       );
 
     const externalTransactionTypeCode =
+      // @ts-ignore
       transactionTypeMappingResult[0]?.data?.code;
 
     if (!externalTransactionTypeCode) {
@@ -876,6 +872,7 @@ export const issueInvoice = async (
           );
 
         const externalBalanceAccountCode =
+          // @ts-ignore
           balanceAccountMappingResult[0]?.data?.code;
 
         if (!externalBalanceAccountCode) {
@@ -896,6 +893,7 @@ export const issueInvoice = async (
           );
 
         const externalTransactionTypeCode =
+          // @ts-ignore
           transactionTypeMappingResult[0]?.data?.code;
 
         if (!externalTransactionTypeCode) {
@@ -928,10 +926,8 @@ export const issueInvoice = async (
           { async: true },
         );
 
-        console.log(xml);
-
         try {
-          const res = await sendSoapRequest({
+          await sendSoapRequest({
             url: wsdlUrl,
             headers: {
               "Content-Type": "text/xml; charset=utf-8",
@@ -939,8 +935,6 @@ export const issueInvoice = async (
             },
             xml,
           });
-
-          console.log(JSON.stringify(res));
 
           await db.insert(logs).values({
             type: "info",
@@ -956,10 +950,4 @@ export const issueInvoice = async (
       console.warn(error);
     }
   }
-
-  await db.insert(invoiceEvents).values({
-    createdById: userId,
-    invoiceId,
-    type: "issued",
-  });
 };

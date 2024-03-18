@@ -602,7 +602,7 @@ export const invoiceLines = pgTable("invoice_lines", {
   quantity: numeric("quantity", { precision: 10, scale: 2 }).notNull(),
   netAmount: numeric("net_amount", { precision: 10, scale: 2 }).notNull(),
   vatAmount: numeric("vat_amount", { precision: 10, scale: 2 }).notNull(),
-  vatRate: numeric("vat_rate", { precision: 10, scale: 2 }).notNull(),
+  vatRate: numeric("vat_rate", { precision: 10, scale: 2 }),
   grossAmount: numeric("gross_amount", { precision: 10, scale: 2 }).notNull(),
 });
 
@@ -681,7 +681,7 @@ export const productTemplates = pgTable("product_templates", {
     .notNull(),
   name: text("name").notNull(),
   price: numeric("price", { precision: 10, scale: 2 }).notNull(),
-  vatRate: numeric("vat_rate", { precision: 10, scale: 2 }).notNull(),
+  vatRate: numeric("vat_rate", { precision: 10, scale: 2 }),
 });
 
 export const productTemplatesRelations = relations(
@@ -715,7 +715,7 @@ export const productInstances = pgTable("product_instances", {
     .notNull(),
   name: text("name").notNull(),
   price: numeric("price", { precision: 10, scale: 2 }).notNull(),
-  vatRate: numeric("vat_rate", { precision: 10, scale: 2 }).notNull(),
+  vatRate: numeric("vat_rate", { precision: 10, scale: 2 }),
 });
 
 export const productInstancesRelations = relations(

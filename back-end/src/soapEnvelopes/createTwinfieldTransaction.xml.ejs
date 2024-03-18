@@ -33,8 +33,10 @@
               <value><%= line.netAmount %></value>
               <debitcredit>credit</debitcredit>
               <description><![CDATA[<%- line.name %>]]></description>
+              <% if (line.vatCode) { %>
               <vatcode><%= line.vatCode %></vatcode>
               <vatvalue><%= line.vatAmount %></vatvalue>
+              <% } %>
             </line>
             <% }); %>
           </lines>

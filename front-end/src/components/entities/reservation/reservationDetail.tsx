@@ -364,7 +364,11 @@ export const ReservationDetail = ({
                             currency: "EUR",
                           }).format(parseFloat(productInstance.price))}
                         </Table.Td>
-                        <Table.Td>{productInstance.vatRate}%</Table.Td>
+                        <Table.Td>
+                          {!productInstance.vatRate
+                            ? "Not applicable"
+                            : productInstance.vatRate + "%"}
+                        </Table.Td>
                         <Table.Td>{quantity}x</Table.Td>
                         <Table.Td>{cycle}</Table.Td>
                         <Table.Td>

@@ -4,6 +4,7 @@ import { and, eq } from "drizzle-orm";
 import {
   date,
   nullable,
+  nullish,
   number,
   object,
   optional,
@@ -151,7 +152,7 @@ export const reservationRouter = router({
           productInstance: {
             ...junction.productInstance,
             price: junction.productInstance.price.toString(),
-            vatRate: junction.productInstance.vatRate.toString(),
+            vatRate: junction.productInstance.vatRate?.toString(),
           },
         }),
       ),
@@ -225,7 +226,7 @@ export const reservationRouter = router({
         name: string;
         unitAmount: string;
         quantity: string;
-        vatRate: string;
+        vatRate: string | null;
       }[] = [];
       const isFinalInvoice = dayjs(reservation.endDate).isSame(
         input.periodEndDate,
@@ -280,7 +281,7 @@ export const reservationRouter = router({
               name: productInstance.name,
               unitAmount: productInstance.price,
               quantity,
-              vatRate: productInstance.vatRate,
+              vatRate: productInstance.vatRate?.toString() || null,
             });
           },
         ),
@@ -327,7 +328,7 @@ export const reservationRouter = router({
           templateId: nullable(number()),
           name: string(),
           price: string(),
-          vatRate: string(),
+          vatRate: nullable(string()),
           quantity: string(),
           revenueAccountId: number(),
           cycle: picklist([
@@ -369,7 +370,7 @@ export const reservationRouter = router({
           instanceId: number(),
           name: optional(string()),
           price: optional(string()),
-          vatRate: optional(string()),
+          vatRate: nullish(string()),
           quantity: optional(string()),
           revenueAccountId: number(),
           cycle: optional(
