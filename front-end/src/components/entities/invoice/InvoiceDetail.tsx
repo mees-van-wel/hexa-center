@@ -41,6 +41,8 @@ import { IconDownload } from "@tabler/icons-react";
 
 import { IssueModal } from "./IssueModal";
 
+import styles from "./InvoiceDetail.module.scss";
+
 type InvoiceDetailProps = {
   invoice: RouterOutput["invoice"]["get"];
 };
@@ -307,8 +309,8 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
           {t("common.saved")}
         </Badge>
       </DashboardHeader>
-      <Group wrap="nowrap" align="stretch">
-        <Paper p="2rem">
+      <Group align="stretch">
+        <Paper p="2rem" style={{ flex: 1 }}>
           <Band
             title={
               <>
@@ -376,7 +378,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
             </Group>
           </Band>
         </Paper>
-        <Paper p="2rem" style={{ flex: 1 }}>
+        <Paper p="2rem" className={styles.invoiceInfo}>
           <Band.Group>
             <Band
               title={
@@ -554,7 +556,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
             </Band>
           </Band.Group>
         </Paper>
-        <Paper p="2rem">
+        <Paper p="2rem" style={{ flex: 1 }}>
           <Band title={<Title order={3}>Timeline</Title>} fh>
             <ScrollArea h={271} type="always" offsetScrollbars>
               <Timeline

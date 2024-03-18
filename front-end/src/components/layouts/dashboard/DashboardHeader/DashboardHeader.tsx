@@ -61,9 +61,14 @@ export const DashboardHeader = ({
   };
 
   return (
-    <Group w="100%" align="stretch" wrap="nowrap">
+    <Group w="100%" align="stretch">
       {(children || showBackButton) && (
-        <Paper component={Group} p="md" wrap="nowrap">
+        <Paper
+          component={Group}
+          p="md"
+          wrap="nowrap"
+          className={styles.changeOrderExtra}
+        >
           {showBackButton && (
             <Button
               variant="light"
@@ -81,7 +86,7 @@ export const DashboardHeader = ({
         </Paper>
       )}
       <Paper
-        className={styles.titleContainer}
+        className={[styles.titleContainer, styles.changeOrderTitle]}
         component={Group}
         wrap="nowrap"
         justify="center"
@@ -120,7 +125,13 @@ export const DashboardHeader = ({
           );
         })}
       </Paper>
-      <Paper component={Menu} trigger="hover" position="bottom-end" p="md">
+      <Paper
+        component={Menu}
+        trigger="hover"
+        position="bottom-end"
+        p="md"
+        className={styles.changeOrderAccount}
+      >
         <Menu.Target>
           <Group wrap="nowrap">
             <Stack ta="right" visibleFrom="md" gap={0}>

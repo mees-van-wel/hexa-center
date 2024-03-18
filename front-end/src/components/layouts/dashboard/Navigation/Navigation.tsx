@@ -23,7 +23,7 @@ export const Navigation = () => {
   const pathname = useMemo(() => `/${url.split("/")[1]}`, [url]);
 
   return (
-    <Stack pos="relative" h="100%">
+    <Stack className={styles.navigationContainer}>
       <nav>
         <Stack>
           <Button
