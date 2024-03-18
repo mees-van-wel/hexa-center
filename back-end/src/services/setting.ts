@@ -1,7 +1,7 @@
 import { eq, inArray } from "drizzle-orm";
 
-import db from "@/db/client";
 import { settings } from "@/db/schema";
+import { getCtx } from "@/utils/context";
 import { Settings } from "@front-end/constants/settings";
 
 // TODO Better error handling
@@ -10,6 +10,8 @@ export const getSetting = async <
 >(
   name: T,
 ) => {
+  const { db } = getCtx();
+
   const settingsResult = await db
     .select()
     .from(settings)
@@ -26,6 +28,8 @@ export const getSettings = async <
 >(
   names: T[],
 ): Promise<Record<T, Settings[T]>> => {
+  const { db } = getCtx();
+
   const settingsResult = await db
     .select()
     .from(settings)

@@ -2,8 +2,8 @@ import axios from "axios";
 import dayjs from "dayjs";
 import { eq, sql } from "drizzle-orm";
 
-import db from "@/db/client";
 import { integrationConnections, logs } from "@/db/schema";
+import { getCtx } from "@/utils/context";
 import { TRPCError } from "@trpc/server";
 
 type RequestRefreshTokenResponse = {
@@ -25,6 +25,8 @@ export type TwinfieldIntegrationData = {
 };
 
 export const connectTwinfield = async (code: string, userId: number) => {
+  const { db } = getCtx();
+
   const clientSecret = process.env.TWINFIELD_CLIENT_SECRET;
   if (!clientSecret)
     throw new Error("Missing TWINFIELD_CLIENT_SECRET in .env.local");
@@ -107,6 +109,8 @@ export const connectTwinfield = async (code: string, userId: number) => {
 };
 
 export const refreshTwinfield = async () => {
+  const { db } = getCtx();
+
   const clientSecret = process.env.TWINFIELD_CLIENT_SECRET;
   if (!clientSecret)
     throw new Error("Missing TWINFIELD_CLIENT_SECRET in .env.local");
@@ -174,6 +178,8 @@ export const refreshTwinfield = async () => {
 
 // Rename to getIntegrationData with typed response
 export const getTwinfieldAccessToken = async () => {
+  const { db } = getCtx();
+
   const result = await db
     .select({
       id: integrationConnections.id,

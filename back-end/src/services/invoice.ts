@@ -3,7 +3,6 @@ import Decimal from "decimal.js";
 import { and, eq, or, sql } from "drizzle-orm";
 import ejs from "ejs";
 
-import db from "@/db/client";
 import {
   customers,
   integrationConnections,
@@ -14,6 +13,7 @@ import {
   logs,
   properties,
 } from "@/db/schema";
+import { getCtx } from "@/utils/context";
 import { readFile } from "@/utils/fileSystem";
 import { generatePdf } from "@/utils/pdf";
 import { sendSoapRequest } from "@/utils/soap";
@@ -28,6 +28,8 @@ import {
 import { getSetting, getSettings } from "./setting";
 
 export const getInvoice = async (invoiceId: number) => {
+  const { db } = getCtx();
+
   const invoice = await db.query.invoices.findFirst({
     where: eq(invoices.id, invoiceId),
     with: {
@@ -520,6 +522,8 @@ export const createInvoice = async ({
   lines,
   notes,
 }: CreateInvoiceProps) => {
+  const { db } = getCtx();
+
   const priceEntryMode = await getSetting("priceEntryMode");
 
   const { totalNetAmount, totalVatAmount, totalGrossAmount, calculatedLines } =
@@ -573,6 +577,8 @@ export const issueInvoice = async (
   date: Date,
   userId: number,
 ) => {
+  const { db } = getCtx();
+
   const invoicesResult = await db
     .select()
     .from(invoices)

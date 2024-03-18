@@ -14,7 +14,7 @@ import { CALENDAR_VIEWS, CalendarView } from "@/constants/calendarViews";
 import { MONTH_VALUES } from "@/constants/months";
 import { WEEKDAY_VALUES } from "@/constants/weekdays";
 import { useTranslation } from "@/hooks/useTranslation";
-import { RouterOutput } from "@/utils/trpc";
+import { type RouterOutput } from "@/utils/trpc";
 import { Button, Group, Paper, Stack } from "@mantine/core";
 import { useSessionStorage } from "@mantine/hooks";
 import {

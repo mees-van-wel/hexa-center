@@ -2,7 +2,6 @@ import { and, eq, sql } from "drizzle-orm";
 import ejs from "ejs";
 import { number } from "valibot";
 
-import db from "@/db/client";
 import {
   customers,
   integrationConnections,
@@ -28,7 +27,7 @@ export const customerRouter = router({
   create: procedure
     .input(wrap(CustomerCreateSchema))
     .mutation(async ({ input, ctx }) => {
-      const result = await db
+      const result = await ctx.db
         .insert(customers)
         .values({
           ...input,
@@ -61,7 +60,7 @@ export const customerRouter = router({
 
       const customer = result[0];
 
-      const integrationResult = await db
+      const integrationResult = await ctx.db
         .select()
         .from(integrationConnections)
         .where(eq(integrationConnections.type, "twinfield"));
@@ -108,7 +107,7 @@ export const customerRouter = router({
             xml,
           });
 
-          await db.insert(logs).values({
+          await ctx.db.insert(logs).values({
             type: "info",
             event: "integrationSend",
             refType: "integration",
@@ -119,7 +118,7 @@ export const customerRouter = router({
             response.ProcessXmlDocumentResponse.ProcessXmlDocumentResult
               .dimensions.dimension.code;
 
-          await db.insert(integrationMappings).values({
+          await ctx.db.insert(integrationMappings).values({
             connectionId: id,
             refType: "customer",
             refId: customer.id,
@@ -132,8 +131,8 @@ export const customerRouter = router({
 
       return customer;
     }),
-  list: procedure.query(() =>
-    db
+  list: procedure.query(({ ctx }) =>
+    ctx.db
       .select({
         $kind: customers.$kind,
         id: customers.id,
@@ -146,8 +145,8 @@ export const customerRouter = router({
       })
       .from(customers),
   ),
-  get: procedure.input(wrap(number())).query(async ({ input }) => {
-    const result = await db
+  get: procedure.input(wrap(number())).query(async ({ input, ctx }) => {
+    const result = await ctx.db
       .select({
         $kind: customers.$kind,
         id: customers.id,
@@ -182,7 +181,7 @@ export const customerRouter = router({
     .input(wrap(CustomerUpdateSchema))
     .mutation(async ({ input, ctx }) => {
       try {
-        const result = await db
+        const result = await ctx.db
           .update(customers)
           .set({
             ...input,
@@ -215,7 +214,7 @@ export const customerRouter = router({
 
         const customer = result[0];
 
-        const integrationResult = await db
+        const integrationResult = await ctx.db
           .select()
           .from(integrationConnections)
           .where(eq(integrationConnections.type, "twinfield"));
@@ -223,7 +222,7 @@ export const customerRouter = router({
         const integration = integrationResult[0];
 
         if (integration) {
-          const result = await db
+          const result = await ctx.db
             .select({ data: integrationMappings.data })
             .from(integrationMappings)
             .where(
@@ -278,7 +277,7 @@ export const customerRouter = router({
               xml,
             });
 
-            await db.insert(logs).values({
+            await ctx.db.insert(logs).values({
               type: "info",
               event: "integrationSend",
               refType: "integration",
@@ -294,10 +293,10 @@ export const customerRouter = router({
         throw createPgException(error);
       }
     }),
-  delete: procedure.input(wrap(number())).mutation(async ({ input }) => {
-    await db.delete(customers).where(eq(customers.id, input));
+  delete: procedure.input(wrap(number())).mutation(async ({ input, ctx }) => {
+    await ctx.db.delete(customers).where(eq(customers.id, input));
 
-    const integrationResult = await db
+    const integrationResult = await ctx.db
       .select()
       .from(integrationConnections)
       .where(eq(integrationConnections.type, "twinfield"));
@@ -305,7 +304,7 @@ export const customerRouter = router({
     const integration = integrationResult[0];
 
     if (integration) {
-      const result = await db
+      const result = await ctx.db
         .select({ data: integrationMappings.data })
         .from(integrationMappings)
         .where(
@@ -349,14 +348,14 @@ export const customerRouter = router({
           xml,
         });
 
-        await db.insert(logs).values({
+        await ctx.db.insert(logs).values({
           type: "info",
           event: "integrationSend",
           refType: "integration",
           refId: id,
         });
 
-        await db
+        await ctx.db
           .delete(integrationMappings)
           .where(
             and(

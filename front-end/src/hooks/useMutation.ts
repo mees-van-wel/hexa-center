@@ -1,6 +1,7 @@
 import { useState } from "react";
 
-import { type RouterInput, type RouterOutput, trpc } from "@/utils/trpc";
+import { type RouterInput, type RouterOutput } from "@/utils/trpc";
+import { getTrpcClientOnClient } from "@/utils/trpcForClient";
 
 // TODO Error handling
 // TODO Caching
@@ -18,6 +19,8 @@ export const useMutation = <
     options?: { signal?: AbortSignal },
   ) => {
     setLoading(true);
+
+    const trpc = getTrpcClientOnClient();
 
     // @ts-ignore
     const result: RouterOutput[T][P] = await trpc[scope][procedure]

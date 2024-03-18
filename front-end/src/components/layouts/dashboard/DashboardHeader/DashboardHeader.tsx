@@ -9,7 +9,7 @@ import { useRecoilValue } from "recoil";
 import { useAuthUser } from "@/contexts/AuthContext";
 import { useTranslation } from "@/hooks/useTranslation";
 import { routeHistoryState } from "@/states/routeHistoryState";
-import { trpc } from "@/utils/trpc";
+import { getTrpcClientOnClient } from "@/utils/trpcForClient";
 import {
   Avatar,
   Button,
@@ -55,6 +55,7 @@ export const DashboardHeader = ({
     !!(previousRoute !== pathName && previousRoute) || !!backRouteFallback;
 
   const logoutHandler = async () => {
+    const trpc = getTrpcClientOnClient();
     await trpc.auth.logout.mutate();
     router.replace("/login");
   };

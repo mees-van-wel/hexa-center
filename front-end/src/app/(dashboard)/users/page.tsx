@@ -1,11 +1,8 @@
-import { cookies } from "next/headers";
-
 import { UsersOverview } from "@/components/entities/user/UsersOverview";
-import { setTRPCRefreshToken, trpc } from "@/utils/trpc";
+import { getTrpcClientOnServer } from "@/utils/trpcForServer";
 
 export default async function Page() {
-  const refreshToken = cookies().get("refreshToken")?.value;
-  if (refreshToken) setTRPCRefreshToken(refreshToken);
+  const trpc = getTrpcClientOnServer();
 
   const users = await trpc.user.list.query();
 

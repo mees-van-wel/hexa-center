@@ -2,7 +2,6 @@ import crypto from "crypto";
 import { and, eq } from "drizzle-orm";
 import { nullable, object, string } from "valibot";
 
-import db from "@/db/client";
 import { users, userSessions } from "@/db/schema";
 import { procedure, router } from "@/trpc";
 import { decrypt, encrypt } from "@/utils/encryption";
@@ -49,11 +48,11 @@ export const authRouter = router({
   sendEmailOtp: procedure
     .meta({ public: true })
     .input(wrap(SendEmailOtpSchema))
-    .mutation(({ input }) => {
+    .mutation(({ input, ctx }) => {
       const otp = createOtp();
 
       (async () => {
-        const result = await db
+        const result = await ctx.db
           .select({
             firstName: users.firstName,
             lastName: users.lastName,
@@ -94,11 +93,11 @@ export const authRouter = router({
   sendPhoneOtp: procedure
     .meta({ public: true })
     .input(wrap(SendPhoneOtpSchema))
-    .mutation(({ input }) => {
+    .mutation(({ input, ctx }) => {
       const otp = createOtp();
 
       (async () => {
-        const result = await db
+        const result = await ctx.db
           .select({ phone: users.phone })
           .from(users)
           .where(eq(users.phone, input.phone));
@@ -148,7 +147,7 @@ export const authRouter = router({
           message: "Invalid tokens or codes",
         });
 
-      const user = await db.query.users.findFirst({
+      const user = await ctx.db.query.users.findFirst({
         where: and(eq(users.email, input.email), eq(users.phone, input.phone)),
         columns: {
           id: true,
@@ -211,7 +210,7 @@ export const authRouter = router({
         let sessionId: number | null = null;
 
         if (ipAddress && trueUserAgent) {
-          const selectSessinosResult = await db
+          const selectSessinosResult = await ctx.db
             .select({ id: userSessions.id })
             .from(userSessions)
             .where(
@@ -226,7 +225,7 @@ export const authRouter = router({
         }
 
         if (sessionId) {
-          await db
+          await ctx.db
             .update(userSessions)
             .set({
               expiresAt,
@@ -236,7 +235,7 @@ export const authRouter = router({
             })
             .where(eq(userSessions.id, sessionId));
         } else
-          await db.insert(userSessions).values({
+          await ctx.db.insert(userSessions).values({
             expiresAt,
             refreshToken,
             userId: user.id,
@@ -272,7 +271,7 @@ export const authRouter = router({
     const refreshToken = ctx.req.cookies.refreshToken;
     if (!refreshToken) return;
 
-    await db
+    await ctx.db
       .delete(userSessions)
       .where(eq(userSessions.refreshToken, refreshToken));
 
@@ -287,5 +286,5 @@ export const authRouter = router({
 
     return;
   }),
-  read: procedure.query(() => db.select().from(userSessions)),
+  read: procedure.query(({ ctx }) => ctx.db.select().from(userSessions)),
 });

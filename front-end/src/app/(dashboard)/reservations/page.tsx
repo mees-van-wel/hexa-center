@@ -1,11 +1,8 @@
-import { cookies } from "next/headers";
-
 import { ReservationsOverview } from "@/components/entities/reservation/ReservationsOverview";
-import { setTRPCRefreshToken, trpc } from "@/utils/trpc";
+import { getTrpcClientOnServer } from "@/utils/trpcForServer";
 
 export default async function Page() {
-  const refreshToken = cookies().get("refreshToken")?.value;
-  if (refreshToken) setTRPCRefreshToken(refreshToken);
+  const trpc = getTrpcClientOnServer();
 
   const reservations = await trpc.reservation.list.query();
   const rooms = await trpc.room.list.query();

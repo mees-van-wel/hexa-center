@@ -20,7 +20,7 @@ import {
   ReservationCreateSchema,
   ReservationInputCreateSchema,
 } from "@/schemas/reservation";
-import { RouterOutput } from "@/utils/trpc";
+import { type RouterOutput } from "@/utils/trpc";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Button, Stack } from "@mantine/core";
 import { modals } from "@mantine/modals";

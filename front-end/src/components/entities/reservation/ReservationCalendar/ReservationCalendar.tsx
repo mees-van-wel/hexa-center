@@ -7,7 +7,7 @@ import isBetween from "dayjs/plugin/isBetween";
 
 import { useTranslation } from "@/hooks/useTranslation";
 import { Position } from "@/types/Position";
-import { RouterOutput } from "@/utils/trpc";
+import { type RouterOutput } from "@/utils/trpc";
 import { Button, Group } from "@mantine/core";
 import { IconArrowMoveLeft, IconArrowMoveRight } from "@tabler/icons-react";
 
