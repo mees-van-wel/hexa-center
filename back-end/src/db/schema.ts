@@ -733,6 +733,38 @@ export const productInstancesRelations = relations(
   }),
 );
 
+export const journals = pgTable("journals", {
+  $kind: text("$kind").default("journal").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .default(sql`now()`)
+    .notNull(),
+  createdById: integer("created_by_id").references(
+    (): AnyPgColumn => users.id,
+    { onDelete: "set null" },
+  ),
+  updatedById: integer("updated_by_id").references(
+    (): AnyPgColumn => users.id,
+    { onDelete: "set null" },
+  ),
+  name: text("name").unique().notNull(),
+});
+
+export const journalsRelations = relations(journals, ({ one }) => ({
+  createdBy: one(users, {
+    fields: [journals.createdById],
+    references: [users.id],
+  }),
+  updatedBy: one(users, {
+    fields: [journals.updatedById],
+    references: [users.id],
+  }),
+}));
+
 export const ledgers = pgTable("ledgers", {
   $kind: text("$kind").default("ledger").notNull(),
   id: serial("id").primaryKey(),
@@ -751,7 +783,7 @@ export const ledgers = pgTable("ledgers", {
     (): AnyPgColumn => users.id,
     { onDelete: "set null" },
   ),
-  name: text("name").notNull(),
+  name: text("name").unique().notNull(),
 });
 
 export const ledgersRelations = relations(ledgers, ({ one, many }) => ({
@@ -765,42 +797,6 @@ export const ledgersRelations = relations(ledgers, ({ one, many }) => ({
   }),
   accounts: many(ledgerAccounts),
 }));
-
-export const ledgerAccountTypes = pgTable("ledger_account_types", {
-  $kind: text("$kind").default("ledgerAccountType").notNull(),
-  id: serial("id").primaryKey(),
-  uuid: uuid("uuid").defaultRandom().notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .default(sql`now()`)
-    .notNull(),
-  createdById: integer("created_by_id").references(
-    (): AnyPgColumn => users.id,
-    { onDelete: "set null" },
-  ),
-  updatedById: integer("updated_by_id").references(
-    (): AnyPgColumn => users.id,
-    { onDelete: "set null" },
-  ),
-  name: text("name").notNull(),
-});
-
-export const ledgerAccountTypesRelations = relations(
-  ledgerAccountTypes,
-  ({ one, many }) => ({
-    createdBy: one(users, {
-      fields: [ledgerAccountTypes.createdById],
-      references: [users.id],
-    }),
-    updatedBy: one(users, {
-      fields: [ledgerAccountTypes.updatedById],
-      references: [users.id],
-    }),
-    accounts: many(ledgerAccounts),
-  }),
-);
 
 export const ledgerAccounts = pgTable("ledger_accounts", {
   $kind: text("$kind").default("ledgerAccount").notNull(),
@@ -825,12 +821,7 @@ export const ledgerAccounts = pgTable("ledger_accounts", {
       onDelete: "restrict",
     })
     .notNull(),
-  typeId: integer("type_id")
-    .references(() => ledgerAccountTypes.id, {
-      onDelete: "restrict",
-    })
-    .notNull(),
-  name: text("name").notNull(),
+  name: text("name").unique().notNull(),
 });
 
 export const ledgerAccountsRelations = relations(ledgerAccounts, ({ one }) => ({
@@ -845,10 +836,6 @@ export const ledgerAccountsRelations = relations(ledgerAccounts, ({ one }) => ({
   ledger: one(ledgers, {
     fields: [ledgerAccounts.ledgerId],
     references: [ledgers.id],
-  }),
-  type: one(ledgerAccountTypes, {
-    fields: [ledgerAccounts.typeId],
-    references: [ledgerAccountTypes.id],
   }),
 }));
 
@@ -934,7 +921,7 @@ export const integrationConnections = pgTable("integration_connections", {
 
 export const integrationMappingRefTypeEnum = pgEnum(
   "integration_mapping_ref_type",
-  ["customer", "ledgerAccount", "ledgerAccountType"],
+  ["customer", "ledgerAccount", "journal"],
 );
 
 export const integrationMappings = pgTable("integration_mappings", {
