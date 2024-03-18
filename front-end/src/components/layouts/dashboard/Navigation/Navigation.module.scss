@@ -1,7 +1,9 @@
 .version {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
   text-align: center;
+}
+
+.navigationContainer {
+  height: 100%;
+  overflow: auto;
+  justify-content: space-between;
 }
