@@ -790,11 +790,8 @@ export const issueInvoice = async (
       .from(integrationMappings)
       .where(
         and(
-          eq(integrationMappings.refType, "ledgerAccountType"),
-          eq(
-            integrationMappings.refId,
-            integration.data.transactionAccountTypeId,
-          ),
+          eq(integrationMappings.refType, "journal"),
+          eq(integrationMappings.refId, integration.data.transactionJournalId),
         ),
       );
 
@@ -803,7 +800,7 @@ export const issueInvoice = async (
 
     if (!externalTransactionTypeCode) {
       console.warn(
-        `Missing integration mapping for ledger account type: ${integration.data.transactionAccountTypeId}`,
+        `Missing integration mapping for journal: ${integration.data.transactionJournalId}`,
       );
       return;
     }
@@ -893,11 +890,8 @@ export const issueInvoice = async (
           .from(integrationMappings)
           .where(
             and(
-              eq(integrationMappings.refType, "ledgerAccountType"),
-              eq(
-                integrationMappings.refId,
-                integration.data.spreadAccountTypeId,
-              ),
+              eq(integrationMappings.refType, "journal"),
+              eq(integrationMappings.refId, integration.data.spreadJournalId),
             ),
           );
 
@@ -906,7 +900,7 @@ export const issueInvoice = async (
 
         if (!externalTransactionTypeCode) {
           console.warn(
-            `Missing integration mapping for ledger account type: ${integration.data.spreadAccountTypeId}`,
+            `Missing integration mapping for journal: ${integration.data.spreadJournalId}`,
           );
           return;
         }

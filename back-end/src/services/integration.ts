@@ -18,10 +18,10 @@ export type TwinfieldIntegrationData = {
   expiresOn: string;
   companyCode: string;
   reservationRevenueAccountId: number;
+  transactionJournalId: number;
   transactionBalanceAccountId: number;
-  transactionAccountTypeId: number;
+  spreadJournalId: number;
   spreadBalanceAccountId: number;
-  spreadAccountTypeId: number;
 };
 
 export const connectTwinfield = async (code: string, userId: number) => {
