@@ -123,3 +123,18 @@ body {
 .mantine-Paper-root {
   border-radius: 0.5rem;
 }
+
+.mantine-DateInput-day {
+  line-height: 0;
+
+  &[data-today] {
+    background-color: var(--mantine-color-error);
+    color: rgb(var(--color-text));
+    font-weight: bold;
+
+    &:hover {
+      background-color: var(--mantine-color-error);
+      opacity: 0.8;
+    }
+  }
+}

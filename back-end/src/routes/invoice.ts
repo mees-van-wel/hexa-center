@@ -16,7 +16,7 @@ import {
   invertDecimalString,
   issueInvoice,
 } from "@/services/invoice";
-import { getSettings } from "@/services/setting";
+import { getSetting, getSettings } from "@/services/setting";
 import { procedure, router } from "@/trpc";
 import { sendMail } from "@/utils/mail";
 import { wrap } from "@decs/typeschema";
@@ -62,7 +62,7 @@ export const invoiceRouter = router({
       ),
     )
     .mutation(({ input: { invoiceId, date }, ctx }) =>
-      issueInvoice(invoiceId, date, ctx.relation.id),
+      issueInvoice(invoiceId, date, ctx.user.id),
     ),
   generatePdf: procedure
     .input(wrap(number()))
@@ -81,21 +81,43 @@ export const invoiceRouter = router({
         message: "Missing invoice email settings",
       });
 
-    const name = invoice.customerName || invoice.customer?.name;
-    const emailAddress =
-      invoice.customerEmailAddress || invoice.customer?.emailAddress;
-
-    if (!name || !emailAddress)
+    const customerName = invoice.customerName || invoice.customer?.name;
+    if (!customerName)
       throw new TRPCError({
         code: "BAD_REQUEST",
-        message: "Missing customer name or email address",
+        message: "Missing customer name",
+      });
+
+    const customerEmail = invoice.customerEmail || invoice.customer?.email;
+    if (!customerEmail)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Missing customer email",
+      });
+
+    const companyName = invoice.companyName || invoice.company?.name;
+    if (!customerEmail)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Missing company name",
+      });
+
+    const companyLogoSrc = await getSetting("companyLogoSrc");
+    if (!companyLogoSrc)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Missing company logo src",
       });
 
     await sendMail({
+      logo: companyLogoSrc,
       title: invoiceEmailTitle,
+      from: {
+        name: companyName,
+      },
       to: {
-        name,
-        emailAddress,
+        name: customerName,
+        email: customerEmail,
       },
       attachments: [
         {
@@ -120,7 +142,7 @@ export const invoiceRouter = router({
     });
 
     await db.insert(invoiceEvents).values({
-      createdById: ctx.relation.id,
+      createdById: ctx.user.id,
       invoiceId: input,
       type: "mailed",
     });
@@ -149,7 +171,7 @@ export const invoiceRouter = router({
         db
           .insert(invoices)
           .values({
-            createdById: ctx.relation.id,
+            createdById: ctx.user.id,
             refType: invoice.refType,
             refId: invoice.refId,
             type: "credit",
@@ -203,7 +225,7 @@ export const invoiceRouter = router({
       db.insert(invoiceEvents).values({
         invoiceId: input,
         type: "credited",
-        createdById: ctx.relation.id,
+        createdById: ctx.user.id,
         refType: "invoice",
         refId: creditInvoiceId,
       }),
@@ -228,7 +250,7 @@ export const invoiceRouter = router({
       });
     }
 
-    await issueInvoice(creditInvoiceId, new Date(), ctx.relation.id);
+    await issueInvoice(creditInvoiceId, new Date(), ctx.user.id);
 
     return creditInvoiceId;
   }),

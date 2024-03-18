@@ -42,11 +42,11 @@ export const RoomsOverview = ({ rooms }: RoomsProps) => {
         columns={[
           {
             selector: "name",
-            label: t("entities.room.keys.name"),
+            label: t("common.name"),
           },
           {
             selector: "price",
-            label: t("entities.room.keys.price"),
+            label: t("entities.room.price"),
             format: ({ price }) =>
               Intl.NumberFormat("nl-NL", {
                 style: "currency",

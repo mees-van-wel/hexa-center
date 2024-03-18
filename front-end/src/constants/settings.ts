@@ -1,10 +1,8 @@
 // TODO convert to valibot schema
+// TODO Typed keys
 export type Settings = {
   companyPaymentTerms: string;
-  companyVatNumber: string;
-  companyCocNumber: string;
-  companyIban: string;
-  companySwiftBic: string;
+  companyLogoSrc: string;
   invoiceEmailTitle: string;
   invoiceEmailContent: string;
   invoiceHeaderImageSrc: string;

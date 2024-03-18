@@ -64,7 +64,7 @@ dayjs.extend(isBetween);
 type ReservationProps = {
   reservation: RouterOutput["reservation"]["get"];
   rooms: RouterOutput["room"]["list"];
-  relations: RouterOutput["relation"]["list"];
+  customers: RouterOutput["customer"]["list"];
   reservations: RouterOutput["reservation"]["list"];
   productTemplates: RouterOutput["product"]["list"];
   ledgerAccounts: RouterOutput["ledgerAccount"]["list"];
@@ -73,7 +73,7 @@ type ReservationProps = {
 export const ReservationDetail = ({
   reservation,
   rooms,
-  relations,
+  customers,
   reservations,
   productTemplates,
   ledgerAccounts,
@@ -174,7 +174,7 @@ export const ReservationDetail = ({
 
   const createProductHandler = () => {
     modals.open({
-      title: <Title order={3}>{t("entities.reservation.product.add")}</Title>,
+      title: <Title order={3}>{t("entities.product.add")}</Title>,
       children: (
         <AddProductModal
           templates={productTemplates}
@@ -189,7 +189,7 @@ export const ReservationDetail = ({
             router.refresh();
 
             notifications.show({
-              message: t("entities.reservation.product.addSucces"),
+              message: t("entities.product.addSucces"),
               color: "green",
             });
           }}
@@ -206,7 +206,7 @@ export const ReservationDetail = ({
     if (!productInstanceJunction) return;
 
     modals.open({
-      title: <Title order={3}>{t("entities.reservation.product.edit")}</Title>,
+      title: <Title order={3}>{t("entities.product.edit")}</Title>,
       children: (
         <EditProductModal
           ledgerAccounts={ledgerAccounts}
@@ -229,7 +229,7 @@ export const ReservationDetail = ({
             router.refresh();
 
             notifications.show({
-              message: t("entities.reservation.product.editSucces"),
+              message: t("entities.product.editSucces"),
               color: "green",
             });
           }}
@@ -251,7 +251,7 @@ export const ReservationDetail = ({
         router.refresh();
 
         notifications.show({
-          message: t("entities.reservation.product.resetSucces"),
+          message: t("entities.product.resetSucces"),
           color: "green",
         });
       },
@@ -268,7 +268,7 @@ export const ReservationDetail = ({
         router.refresh();
 
         notifications.show({
-          message: t("entities.reservation.product.deleted"),
+          message: t("entities.product.deleted"),
           color: "green",
         });
       },
@@ -321,14 +321,12 @@ export const ReservationDetail = ({
           </Button>
           <SaveBadge reservation={reservation} reservations={reservations} />
         </DashboardHeader>
-        <ReservationForm rooms={rooms} relations={relations} />
+        <ReservationForm rooms={rooms} customers={customers} />
         <Paper p="2rem">
           <Band
             title={
               <>
-                <Title order={3}>
-                  {t("entities.reservation.product.name")}
-                </Title>
+                <Title order={3}>{t("entities.product.singularName")}</Title>
                 <Button
                   onClick={createProductHandler}
                   leftSection={<IconPlus />}
@@ -341,32 +339,18 @@ export const ReservationDetail = ({
             }
           >
             {!reservation.productInstancesJunction.length ? (
-              <p>{t("entities.reservation.product.empty")}</p>
+              <p>{t("entities.product.empty")}</p>
             ) : (
               <Table>
                 <Table.Thead>
                   <Table.Tr>
-                    <Table.Th>
-                      {t("entities.reservation.product.keys.name")}
-                    </Table.Th>
-                    <Table.Th>
-                      {t("entities.reservation.product.keys.price")}
-                    </Table.Th>
-                    <Table.Th>
-                      {t("entities.reservation.product.keys.vatRate")}
-                    </Table.Th>
-                    <Table.Th>
-                      {t("entities.reservation.product.keys.quantity")}
-                    </Table.Th>
-                    <Table.Th>
-                      {t("entities.reservation.product.keys.cycle")}
-                    </Table.Th>
-                    <Table.Th>
-                      {t("entities.reservation.product.keys.status")}
-                    </Table.Th>
-                    <Table.Th>
-                      {t("entities.reservation.product.keys.actions")}
-                    </Table.Th>
+                    <Table.Th>{t("common.name")}</Table.Th>
+                    <Table.Th>{t("entities.product.price")}</Table.Th>
+                    <Table.Th>{t("entities.product.vatRate")}</Table.Th>
+                    <Table.Th>{t("entities.product.quantity")}</Table.Th>
+                    <Table.Th>{t("entities.product.cycle")}</Table.Th>
+                    <Table.Th>{t("entities.product.status")}</Table.Th>
+                    <Table.Th>{t("entities.product.actions")}</Table.Th>
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
@@ -712,7 +696,7 @@ const SaveBadge = ({ reservation, reservations }: SaveButtonProps) => {
 
       if (exception === "DB_UNIQUE_CONSTRAINT") {
         setError(data.column, {
-          message: `${t("entities.reservation.name.singular")} - ${getValues(
+          message: `${t("entities.reservation.singularName")} - ${getValues(
             data.column,
           )} - ${data.column}`,
         });

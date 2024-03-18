@@ -4,10 +4,10 @@ import { number } from "valibot";
 
 import db from "@/db/client";
 import {
+  customers,
   integrationConnections,
   integrationMappings,
   logs,
-  relations,
 } from "@/db/schema";
 import {
   getTwinfieldAccessToken,
@@ -19,52 +19,47 @@ import { readFile } from "@/utils/fileSystem";
 import { sendSoapRequest } from "@/utils/soap";
 import { wrap } from "@decs/typeschema";
 import {
-  RelationCreateSchema,
-  RelationUpdateSchema,
-} from "@front-end/schemas/relation";
+  CustomerCreateSchema,
+  CustomerUpdateSchema,
+} from "@front-end/schemas/customer";
 import { TRPCError } from "@trpc/server";
 
-export const relationRouter = router({
+export const customerRouter = router({
   create: procedure
-    .input(wrap(RelationCreateSchema))
+    .input(wrap(CustomerCreateSchema))
     .mutation(async ({ input, ctx }) => {
       const result = await db
-        .insert(relations)
+        .insert(customers)
         .values({
           ...input,
-          createdById: ctx.relation.id,
-          updatedById: ctx.relation.id,
+          createdById: ctx.user.id,
+          updatedById: ctx.user.id,
           propertyId: 1,
-          // Customer role
-          roleId: 2,
         })
         .returning({
-          $kind: relations.$kind,
-          id: relations.id,
-          createdAt: relations.createdAt,
-          createdById: relations.createdById,
-          updatedAt: relations.updatedAt,
-          updatedById: relations.updatedById,
-          type: relations.type,
-          name: relations.name,
-          emailAddress: relations.emailAddress,
-          phoneNumber: relations.phoneNumber,
-          street: relations.street,
-          houseNumber: relations.houseNumber,
-          postalCode: relations.postalCode,
-          city: relations.city,
-          region: relations.region,
-          country: relations.country,
-          dateOfBirth: relations.dateOfBirth,
-          sex: relations.sex,
-          vatNumber: relations.vatNumber,
-          cocNumber: relations.cocNumber,
-          businessContactName: relations.businessContactName,
-          businessContactEmailAddress: relations.businessContactEmailAddress,
-          businessContactPhoneNumber: relations.businessContactPhoneNumber,
+          $kind: customers.$kind,
+          id: customers.id,
+          createdAt: customers.createdAt,
+          createdById: customers.createdById,
+          updatedAt: customers.updatedAt,
+          updatedById: customers.updatedById,
+          name: customers.name,
+          email: customers.email,
+          phone: customers.phone,
+          billingAddressLineOne: customers.billingAddressLineOne,
+          billingAddressLineTwo: customers.billingAddressLineTwo,
+          billingCity: customers.billingCity,
+          billingRegion: customers.billingRegion,
+          billingPostalCode: customers.billingPostalCode,
+          billingCountry: customers.billingCountry,
+          cocNumber: customers.cocNumber,
+          vatId: customers.vatId,
+          contactPersonName: customers.contactPersonName,
+          contactPersonEmail: customers.contactPersonEmail,
+          contactPersonPhone: customers.contactPersonPhone,
         });
 
-      const relation = result[0];
+      const customer = result[0];
 
       const integrationResult = await db
         .select()
@@ -89,17 +84,16 @@ export const relationRouter = router({
           {
             accessToken,
             companyCode,
-            name: relation.name,
-            businessContactName: relation.businessContactName,
-            street: relation.street,
-            houseNumber: relation.houseNumber,
-            postalCode: relation.postalCode,
-            city: relation.city,
-            country: relation.country,
-            phoneNumber: relation.phoneNumber,
-            emailAddress: relation.emailAddress,
-            vatNumber: relation.vatNumber,
-            cocNumber: relation.cocNumber,
+            name: customer.name,
+            contactName: customer.contactPersonName,
+            addressLineOne: customer.billingAddressLineOne,
+            postalCode: customer.billingPostalCode,
+            city: customer.billingCity,
+            country: customer.billingCountry,
+            phone: customer.phone,
+            email: customer.email,
+            vatId: customer.vatId,
+            cocNumber: customer.cocNumber,
           },
           { async: true },
         );
@@ -127,8 +121,8 @@ export const relationRouter = router({
 
           await db.insert(integrationMappings).values({
             connectionId: id,
-            refType: "relation",
-            refId: relation.id,
+            refType: "customer",
+            refId: customer.id,
             data: sql`${{ code }}::jsonb`,
           });
         } catch (error) {
@@ -136,95 +130,90 @@ export const relationRouter = router({
         }
       }
 
-      return relation;
+      return customer;
     }),
   list: procedure.query(() =>
     db
       .select({
-        $kind: relations.$kind,
-        id: relations.id,
-        type: relations.type,
-        name: relations.name,
-        emailAddress: relations.emailAddress,
-        phoneNumber: relations.phoneNumber,
-        businessContactName: relations.businessContactName,
+        $kind: customers.$kind,
+        id: customers.id,
+        name: customers.name,
+        email: customers.email,
+        phone: customers.phone,
+        contactPersonName: customers.contactPersonName,
+        contactPersonEmail: customers.contactPersonEmail,
+        contactPersonPhone: customers.contactPersonPhone,
       })
-      .from(relations),
+      .from(customers),
   ),
   get: procedure.input(wrap(number())).query(async ({ input }) => {
     const result = await db
       .select({
-        $kind: relations.$kind,
-        id: relations.id,
-        createdAt: relations.createdAt,
-        createdById: relations.createdById,
-        updatedAt: relations.updatedAt,
-        updatedById: relations.updatedById,
-        type: relations.type,
-        name: relations.name,
-        emailAddress: relations.emailAddress,
-        phoneNumber: relations.phoneNumber,
-        street: relations.street,
-        houseNumber: relations.houseNumber,
-        postalCode: relations.postalCode,
-        city: relations.city,
-        region: relations.region,
-        country: relations.country,
-        dateOfBirth: relations.dateOfBirth,
-        sex: relations.sex,
-        vatNumber: relations.vatNumber,
-        cocNumber: relations.cocNumber,
-        businessContactName: relations.businessContactName,
-        businessContactEmailAddress: relations.businessContactEmailAddress,
-        businessContactPhoneNumber: relations.businessContactPhoneNumber,
+        $kind: customers.$kind,
+        id: customers.id,
+        createdAt: customers.createdAt,
+        createdById: customers.createdById,
+        updatedAt: customers.updatedAt,
+        updatedById: customers.updatedById,
+        name: customers.name,
+        email: customers.email,
+        phone: customers.phone,
+        billingAddressLineOne: customers.billingAddressLineOne,
+        billingAddressLineTwo: customers.billingAddressLineTwo,
+        billingCity: customers.billingCity,
+        billingRegion: customers.billingRegion,
+        billingPostalCode: customers.billingPostalCode,
+        billingCountry: customers.billingCountry,
+        cocNumber: customers.cocNumber,
+        vatId: customers.vatId,
+        contactPersonName: customers.contactPersonName,
+        contactPersonEmail: customers.contactPersonEmail,
+        contactPersonPhone: customers.contactPersonPhone,
       })
-      .from(relations)
-      .where(eq(relations.id, input));
+      .from(customers)
+      .where(eq(customers.id, input));
 
-    const relation = result[0];
-    if (!relation) throw new TRPCError({ code: "NOT_FOUND" });
+    const customer = result[0];
+    if (!customer) throw new TRPCError({ code: "NOT_FOUND" });
 
-    return relation;
+    return customer;
   }),
   update: procedure
-    .input(wrap(RelationUpdateSchema))
+    .input(wrap(CustomerUpdateSchema))
     .mutation(async ({ input, ctx }) => {
       try {
         const result = await db
-          .update(relations)
+          .update(customers)
           .set({
             ...input,
             updatedAt: new Date(),
-            updatedById: ctx.relation.id,
+            updatedById: ctx.user.id,
           })
-          .where(eq(relations.id, input.id))
+          .where(eq(customers.id, input.id))
           .returning({
-            $kind: relations.$kind,
-            id: relations.id,
-            createdAt: relations.createdAt,
-            createdById: relations.createdById,
-            updatedAt: relations.updatedAt,
-            updatedById: relations.updatedById,
-            type: relations.type,
-            name: relations.name,
-            emailAddress: relations.emailAddress,
-            phoneNumber: relations.phoneNumber,
-            street: relations.street,
-            houseNumber: relations.houseNumber,
-            postalCode: relations.postalCode,
-            city: relations.city,
-            region: relations.region,
-            country: relations.country,
-            dateOfBirth: relations.dateOfBirth,
-            sex: relations.sex,
-            vatNumber: relations.vatNumber,
-            cocNumber: relations.cocNumber,
-            businessContactName: relations.businessContactName,
-            businessContactEmailAddress: relations.businessContactEmailAddress,
-            businessContactPhoneNumber: relations.businessContactPhoneNumber,
+            $kind: customers.$kind,
+            id: customers.id,
+            createdAt: customers.createdAt,
+            createdById: customers.createdById,
+            updatedAt: customers.updatedAt,
+            updatedById: customers.updatedById,
+            name: customers.name,
+            email: customers.email,
+            phone: customers.phone,
+            billingAddressLineOne: customers.billingAddressLineOne,
+            billingAddressLineTwo: customers.billingAddressLineTwo,
+            billingCity: customers.billingCity,
+            billingRegion: customers.billingRegion,
+            billingPostalCode: customers.billingPostalCode,
+            billingCountry: customers.billingCountry,
+            cocNumber: customers.cocNumber,
+            vatId: customers.vatId,
+            contactPersonName: customers.contactPersonName,
+            contactPersonEmail: customers.contactPersonEmail,
+            contactPersonPhone: customers.contactPersonPhone,
           });
 
-        const relation = result[0];
+        const customer = result[0];
 
         const integrationResult = await db
           .select()
@@ -239,15 +228,15 @@ export const relationRouter = router({
             .from(integrationMappings)
             .where(
               and(
-                eq(integrationMappings.refType, "relation"),
-                eq(integrationMappings.refId, relation.id),
+                eq(integrationMappings.refType, "customer"),
+                eq(integrationMappings.refId, customer.id),
               ),
             );
 
-          const code = result[0]?.data?.code as string | undefined;
-          if (!code)
+          const externalCode = result[0]?.data?.code as string | undefined;
+          if (!externalCode)
             throw new Error(
-              `Missing twinfield customer code mapping for relation: ${input}`,
+              `Missing twinfield customer code mapping for customer: ${input}`,
             );
 
           const { id, accessToken, companyCode } =
@@ -264,18 +253,17 @@ export const relationRouter = router({
             {
               accessToken,
               companyCode,
-              code,
-              name: relation.name,
-              businessContactName: relation.businessContactName,
-              street: relation.street,
-              houseNumber: relation.houseNumber,
-              postalCode: relation.postalCode,
-              city: relation.city,
-              country: relation.country,
-              phoneNumber: relation.phoneNumber,
-              emailAddress: relation.emailAddress,
-              vatNumber: relation.vatNumber,
-              cocNumber: relation.cocNumber,
+              code: externalCode,
+              name: customer.name,
+              contactName: customer.contactPersonName,
+              addressLineOne: customer.billingAddressLineOne,
+              postalCode: customer.billingPostalCode,
+              city: customer.billingCity,
+              country: customer.billingCountry,
+              phone: customer.phone,
+              email: customer.email,
+              vatId: customer.vatId,
+              cocNumber: customer.cocNumber,
             },
             { async: true },
           );
@@ -301,13 +289,13 @@ export const relationRouter = router({
           }
         }
 
-        return relation;
+        return customer;
       } catch (error) {
         throw createPgException(error);
       }
     }),
   delete: procedure.input(wrap(number())).mutation(async ({ input }) => {
-    await db.delete(relations).where(eq(relations.id, input));
+    await db.delete(customers).where(eq(customers.id, input));
 
     const integrationResult = await db
       .select()
@@ -322,15 +310,15 @@ export const relationRouter = router({
         .from(integrationMappings)
         .where(
           and(
-            eq(integrationMappings.refType, "relation"),
+            eq(integrationMappings.refType, "customer"),
             eq(integrationMappings.refId, input),
           ),
         );
 
-      const code = result[0]?.data?.code as string | undefined;
-      if (!code)
+      const externalCode = result[0]?.data?.code as string | undefined;
+      if (!externalCode)
         throw new Error(
-          `Missing twinfield customer code mapping for relation: ${input}`,
+          `Missing twinfield customer code mapping for customer: ${input}`,
         );
 
       const { id, accessToken, companyCode } = await getTwinfieldAccessToken();
@@ -346,7 +334,7 @@ export const relationRouter = router({
         {
           accessToken,
           companyCode,
-          code,
+          code: externalCode,
         },
         { async: true },
       );
@@ -372,7 +360,7 @@ export const relationRouter = router({
           .delete(integrationMappings)
           .where(
             and(
-              eq(integrationMappings.refType, "relation"),
+              eq(integrationMappings.refType, "customer"),
               eq(integrationMappings.refId, input),
             ),
           );

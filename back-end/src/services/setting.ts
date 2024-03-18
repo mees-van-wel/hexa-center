@@ -5,7 +5,6 @@ import { settings } from "@/db/schema";
 import { Settings } from "@front-end/constants/settings";
 
 // TODO Better error handling
-
 export const getSetting = async <
   T extends (typeof settings.name.enumValues)[number],
 >(

@@ -3,7 +3,7 @@ import { and, eq } from "drizzle-orm";
 import { nullable, object, string } from "valibot";
 
 import db from "@/db/client";
-import { relations, sessions } from "@/db/schema";
+import { users, userSessions } from "@/db/schema";
 import { procedure, router } from "@/trpc";
 import { decrypt, encrypt } from "@/utils/encryption";
 import { isProduction } from "@/utils/environment";
@@ -35,12 +35,12 @@ const ValidateOtpSchema = object({
 });
 
 const LoginSchema = object({
-  emailAddress: string(),
-  emailAddressToken: string(),
-  emailAddressOtp: string(),
-  phoneNumber: string(),
-  phoneNumberToken: string(),
-  phoneNumberOtp: string(),
+  email: string(),
+  emailToken: string(),
+  emailOtp: string(),
+  phone: string(),
+  phoneToken: string(),
+  phoneOtp: string(),
   userAgent: nullable(string()),
   duration: string(),
 });
@@ -55,28 +55,27 @@ export const authRouter = router({
       (async () => {
         const result = await db
           .select({
-            name: relations.name,
-            emailAddress: relations.emailAddress,
+            firstName: users.firstName,
+            lastName: users.lastName,
+            email: users.email,
           })
-          .from(relations)
-          .where(eq(relations.emailAddress, input.emailAddress));
+          .from(users)
+          .where(eq(users.email, input.email));
 
-        const relation = result[0];
+        const user = result[0];
 
         if (!isProduction)
           return console.log(
-            relation
-              ? otp
-              : `No relation found with email address: '${input.emailAddress}'`,
+            user ? otp : `No user found with email address: '${input.email}'`,
           );
 
-        if (!relation) return;
+        if (!user) return;
 
         await sendMail({
           title: "Login email code",
           to: {
-            name: relation.name,
-            emailAddress: input.emailAddress,
+            name: `${user.firstName} ${user.lastName}`,
+            email: input.email,
           },
           template: "otp",
           variables: {
@@ -100,23 +99,21 @@ export const authRouter = router({
 
       (async () => {
         const result = await db
-          .select({ phoneNumber: relations.phoneNumber })
-          .from(relations)
-          .where(eq(relations.phoneNumber, input.phoneNumber));
+          .select({ phone: users.phone })
+          .from(users)
+          .where(eq(users.phone, input.phone));
 
-        const relation = result[0];
+        const user = result[0];
 
         if (!isProduction)
           return console.log(
-            relation
-              ? otp
-              : `No relation found with phone number: '${input.phoneNumber}'`,
+            user ? otp : `No user found with phone number: '${input.phone}'`,
           );
 
-        if (!relation) return;
+        if (!user) return;
 
         await sendSms({
-          to: input.phoneNumber,
+          to: input.phone,
           message: otp,
         });
       })();
@@ -134,49 +131,52 @@ export const authRouter = router({
     .meta({ public: true })
     .input(wrap(LoginSchema))
     .mutation(async ({ input, ctx }) => {
-      const [encryptedEmailOtp, encryptedPhoneNumberOtp] = await Promise.all([
-        verify(input.emailAddressToken),
-        verify(input.phoneNumberToken),
+      const [encryptedEmailOtp, encryptedPhoneOtp] = await Promise.all([
+        verify(input.emailToken),
+        verify(input.phoneToken),
       ]);
 
       const originalEmailOtp = decrypt(encryptedEmailOtp);
-      const originalPhoneNumberOtp = decrypt(encryptedPhoneNumberOtp);
+      const originalPhoneOtp = decrypt(encryptedPhoneOtp);
 
       if (
-        originalEmailOtp !== input.emailAddressOtp ||
-        originalPhoneNumberOtp !== input.phoneNumberOtp
+        originalEmailOtp !== input.emailOtp ||
+        originalPhoneOtp !== input.phoneOtp
       )
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: "Invalid tokens or codes",
         });
 
-      const relation = await db.query.relations.findFirst({
-        where: and(
-          eq(relations.emailAddress, input.emailAddress),
-          eq(relations.phoneNumber, input.phoneNumber),
-        ),
+      const user = await db.query.users.findFirst({
+        where: and(eq(users.email, input.email), eq(users.phone, input.phone)),
         columns: {
           id: true,
-          name: true,
-          emailAddress: true,
-          phoneNumber: true,
-          street: true,
-          houseNumber: true,
-          postalCode: true,
+          propertyId: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          phone: true,
+          addressLineOne: true,
+          addressLineTwo: true,
           city: true,
           region: true,
+          postalCode: true,
           country: true,
           sex: true,
-          dateOfBirth: true,
+          birthDate: true,
         },
         with: {
-          account: {
+          accountDetails: {
             columns: {
               locale: true,
               theme: true,
               color: true,
               timezone: true,
+              dateFormat: true,
+              decimalSeparator: true,
+              timeFormat: true,
+              firstDayOfWeek: true,
             },
             with: {
               workingHours: {
@@ -193,10 +193,10 @@ export const authRouter = router({
         },
       });
 
-      if (!relation)
+      if (!user)
         throw new TRPCError({
           code: "UNAUTHORIZED",
-          message: "Missing relation",
+          message: "Missing user",
         });
 
       const maxAge = MAX_AGE[input.duration as SessionDuration];
@@ -212,13 +212,13 @@ export const authRouter = router({
 
         if (ipAddress && trueUserAgent) {
           const selectSessinosResult = await db
-            .select({ id: sessions.id })
-            .from(sessions)
+            .select({ id: userSessions.id })
+            .from(userSessions)
             .where(
               and(
-                eq(sessions.relationId, relation.id),
-                eq(sessions.ipAddress, ipAddress),
-                eq(sessions.userAgent, trueUserAgent),
+                eq(userSessions.userId, user.id),
+                eq(userSessions.ipAddress, ipAddress),
+                eq(userSessions.userAgent, trueUserAgent),
               ),
             );
 
@@ -227,19 +227,19 @@ export const authRouter = router({
 
         if (sessionId) {
           await db
-            .update(sessions)
+            .update(userSessions)
             .set({
               expiresAt,
               refreshToken,
               issuedAt: now,
               lastAccessed: now,
             })
-            .where(eq(sessions.id, sessionId));
+            .where(eq(userSessions.id, sessionId));
         } else
-          await db.insert(sessions).values({
+          await db.insert(userSessions).values({
             expiresAt,
             refreshToken,
-            relationId: relation.id,
+            userId: user.id,
             ipAddress,
             userAgent: trueUserAgent,
           });
@@ -255,13 +255,13 @@ export const authRouter = router({
         maxAge,
       });
 
-      return relation;
+      return user;
     }),
-  currentRelation: procedure.query(({ ctx }) => ctx.relation),
+  currentUser: procedure.query(({ ctx }) => ctx.user),
   token: procedure.query(async ({ ctx }) => {
     const now = new Date();
     // TODO pass now to sign to sync time
-    const accessToken = await sign(encrypt(ctx.relation.id));
+    const accessToken = await sign(encrypt(ctx.user.id));
 
     return {
       accessToken,
@@ -272,7 +272,9 @@ export const authRouter = router({
     const refreshToken = ctx.req.cookies.refreshToken;
     if (!refreshToken) return;
 
-    await db.delete(sessions).where(eq(sessions.refreshToken, refreshToken));
+    await db
+      .delete(userSessions)
+      .where(eq(userSessions.refreshToken, refreshToken));
 
     ctx.res.cookie("refreshToken", "", {
       domain: isProduction ? ".hexa.center" : undefined,
@@ -285,5 +287,5 @@ export const authRouter = router({
 
     return;
   }),
-  read: procedure.query(() => db.select().from(sessions)),
+  read: procedure.query(() => db.select().from(userSessions)),
 });

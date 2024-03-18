@@ -42,16 +42,21 @@ export default async function RootLayout({
   const pathname = headers().get("x-pathname");
   if (!pathname) throw new Error("Missing pathname");
 
-  let relation: RouterOutput["auth"]["currentRelation"] | null = null;
+  let user: RouterOutput["auth"]["currentUser"] | null = null;
 
   try {
     if (refreshToken) setTRPCRefreshToken(refreshToken);
-    relation = await trpc.auth.currentRelation.query();
-  } catch (error) {}
+    user = await trpc.auth.currentUser.query();
+
+    //  const trpc = getTrpcClientOnServer();
+    //  user = await trpc.auth.currentUser.query();
+  } catch (error) {
+    console.warn(error);
+  }
 
   // TODO Set redirect type to replace
-  if (!relation && pathname !== "/login") redirect("/login");
-  if (relation && pathname === "/login") redirect("/");
+  if (!user && pathname !== "/login") redirect("/login");
+  if (user && pathname === "/login") redirect("/");
 
   return (
     <html lang="en">
@@ -63,7 +68,7 @@ export default async function RootLayout({
         data-theme={dark ? "dark" : "light"}
       >
         <Providers>
-          <AuthContextProvider currentRelation={relation}>
+          <AuthContextProvider currentUser={user}>
             <TranslationInitializer>
               <MantineProvider
                 defaultColorScheme={dark ? "dark" : "light"}

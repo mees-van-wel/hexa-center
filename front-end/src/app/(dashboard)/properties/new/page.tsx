@@ -25,14 +25,18 @@ export default function Page() {
     resolver: valibotResolver(PropertyCreateSchema),
     defaultValues: {
       name: "",
-      emailAddress: "",
-      phoneNumber: "",
-      street: "",
-      houseNumber: "",
+      email: "",
+      phone: "",
+      addressLineOne: "",
+      addressLineTwo: "",
       postalCode: "",
       city: "",
       region: "",
       country: null,
+      cocNumber: "",
+      vatId: "",
+      iban: "",
+      swiftBic: "",
     },
   });
 

@@ -6,19 +6,18 @@ import { Controller, useFormContext } from "react-hook-form";
 
 import { COUNTRY_VALUES } from "@/constants/countries";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Group, Select, TextInput } from "@mantine/core";
+import { Group, Select, Stack, TextInput } from "@mantine/core";
 import { useDidUpdate } from "@mantine/hooks";
 
 import { Combobox } from "../Combobox";
 
-enum AddressKey {
-  Street = "street",
-  HouseNumber = "houseNumber",
-  PostalCode = "postalCode",
-  City = "city",
-  Region = "region",
-  Country = "country",
-}
+const AddressKeys = {
+  AddressLineOne: "addressLineOne",
+  PostalCode: "postalCode",
+  City: "city",
+  Region: "region",
+  Country: "country",
+} as const;
 
 type AutocompleteResponse = {
   items: {
@@ -37,9 +36,14 @@ type AutocompleteResponse = {
 
 type AddressProps = {
   disabled?: boolean;
+  required?: boolean;
+  keyOverrides?: Record<
+    (typeof AddressKeys)[keyof typeof AddressKeys] | "addressLineTwo",
+    string
+  >;
 };
 
-export const Address = ({ disabled }: AddressProps) => {
+export const Address = ({ disabled, required, keyOverrides }: AddressProps) => {
   const t = useTranslation();
 
   const {
@@ -48,32 +52,25 @@ export const Address = ({ disabled }: AddressProps) => {
     watch,
     control,
     formState: { errors },
-  } = useFormContext<{
-    street?: string | null;
-    houseNumber?: string | null;
-    postalCode?: string | null;
-    city?: string | null;
-    region?: string | null;
-    country?: string | null;
-  }>();
+  } = useFormContext();
 
-  const street = watch("street");
-  const houseNumber = watch("houseNumber");
-  const defaultValue = useMemo(
-    () =>
-      street && houseNumber
-        ? `${street} ${houseNumber}`
-        : street ?? houseNumber,
-    [street, houseNumber],
-  );
+  const addressLineOneKey =
+    keyOverrides?.addressLineOne || AddressKeys.AddressLineOne;
+  const addressLineTwoKey = keyOverrides?.addressLineTwo || "addressLineTwo";
+  const postalCodeKey = keyOverrides?.postalCode || AddressKeys.PostalCode;
+  const cityKey = keyOverrides?.city || AddressKeys.City;
+  const regionKey = keyOverrides?.region || AddressKeys.Region;
+  const countryKey = keyOverrides?.country || AddressKeys.Country;
 
-  const [searchValue, setSearchValue] = useState(defaultValue);
+  const addressLineOne = watch(addressLineOneKey);
+
+  const [searchValue, setSearchValue] = useState(addressLineOne);
   const [options, setOptions] = useState<{ label: string; value: string }[]>(
-    defaultValue
+    addressLineOne
       ? [
           {
-            label: defaultValue,
-            value: defaultValue,
+            label: addressLineOne,
+            value: addressLineOne,
           },
         ]
       : [],
@@ -85,11 +82,11 @@ export const Address = ({ disabled }: AddressProps) => {
         return setOptions(
           searchValue?.length
             ? [{ value: searchValue, label: searchValue }]
-            : defaultValue
+            : addressLineOne
               ? [
                   {
-                    label: defaultValue,
-                    value: defaultValue,
+                    label: addressLineOne,
+                    value: addressLineOne,
                   },
                 ]
               : [],
@@ -125,12 +122,11 @@ export const Address = ({ disabled }: AddressProps) => {
             label: `${street} ${houseNumber}`,
             description: `${city} - ${state || postalCode} - ${countryName}`,
             value: JSON.stringify({
-              street,
-              houseNumber,
-              postalCode,
-              city,
-              region: state,
-              country: countryCode,
+              [addressLineOneKey]: `${street} ${houseNumber}`,
+              [postalCodeKey]: postalCode,
+              [cityKey]: city,
+              [regionKey]: state,
+              [countryKey]: countryCode,
             }),
           };
         });
@@ -139,25 +135,18 @@ export const Address = ({ disabled }: AddressProps) => {
     })();
   }, [searchValue]);
 
-  console.log(options);
-
   const selectHandler = useCallback(
     (option: string | null) => {
       if (!option) {
-        setValue("street", null, { shouldDirty: true, shouldTouch: true });
-        setValue("houseNumber", null, { shouldDirty: true, shouldTouch: true });
+        setValue(addressLineOneKey, "", {
+          shouldDirty: true,
+          shouldTouch: true,
+        });
         return;
       }
 
       if (option.substring(0, 2) !== '{"') {
-        const addressArray = option.split(/(\d+.*)/) as string[];
-        const street = addressArray.shift()?.trim() ?? null;
-
-        let houseNumber = "";
-        if (addressArray.length) houseNumber = addressArray.join("").trim();
-
-        setValue("street", street, { shouldDirty: true, shouldTouch: true });
-        setValue("houseNumber", houseNumber, {
+        setValue(addressLineOneKey, option, {
           shouldDirty: true,
           shouldTouch: true,
         });
@@ -166,15 +155,17 @@ export const Address = ({ disabled }: AddressProps) => {
 
       const selectedAddress = JSON.parse(option);
 
-      Object.values(AddressKey).forEach((key) => {
+      Object.values(AddressKeys).forEach((key) => {
+        // @ts-ignore
+        key = keyOverrides?.[key] || key;
         let value = selectedAddress[key];
 
-        if (key === AddressKey.Country)
+        if (key === countryKey)
           value = COUNTRY_VALUES.find(
             (countryObject) => countryObject.isoAlpha3 === value,
           )?.countryCode;
 
-        setValue(key, value, { shouldDirty: true, shouldTouch: true });
+        setValue(key, value || "", { shouldDirty: true, shouldTouch: true });
       });
     },
     [setValue],
@@ -191,58 +182,74 @@ export const Address = ({ disabled }: AddressProps) => {
 
   return (
     <Group grow>
-      <Combobox
-        autoComplete="none"
-        label={t("components.address.streetAndHouseNumber")}
-        onSearchChange={setSearchValue}
-        searchValue={searchValue || defaultValue || ""}
-        data={options}
-        onChange={selectHandler}
-        defaultValue={defaultValue}
-        disabled={disabled}
-        // positionDependencies={[options]}
-        error={errors.street?.message || errors.houseNumber?.message}
-        // filter={({ options }) => options}
-        searchable
-        clearable
-      />
-      <TextInput
-        {...register("postalCode")}
-        label={t("components.address.postalCode")}
-        error={errors.postalCode?.message}
-        autoComplete="none"
-        disabled={disabled}
-      />
-      <TextInput
-        {...register("city")}
-        autoComplete="none"
-        label={t("components.address.city")}
-        error={errors.city?.message}
-        disabled={disabled}
-      />
-      <TextInput
-        {...register("region")}
-        autoComplete="none"
-        label={t("components.address.region")}
-        error={errors.region?.message}
-        disabled={disabled}
-      />
-      <Controller
-        name="country"
-        control={control}
-        render={({ field, fieldState: { error } }) => (
-          <Select
-            {...field}
-            error={error?.message}
-            autoComplete="none"
-            label={t("components.address.country")}
-            data={countryOptions}
-            disabled={disabled}
-            searchable
-            clearable
-          />
-        )}
-      />
+      <Stack gap="xs">
+        <Combobox
+          autoComplete="none"
+          label={t("components.address.addressLineOne")}
+          onSearchChange={setSearchValue}
+          searchValue={searchValue || addressLineOne || ""}
+          data={options}
+          onChange={selectHandler}
+          defaultValue={addressLineOne}
+          disabled={disabled}
+          // positionDependencies={[options]}
+          error={errors[addressLineOneKey]?.message?.toString()}
+          // filter={({ options }) => options}
+          searchable
+          clearable
+          required={required}
+        />
+        <TextInput
+          {...register(addressLineTwoKey)}
+          label={t("components.address.addressLineTwo")}
+          error={errors[addressLineTwoKey]?.message?.toString()}
+          autoComplete="none"
+          disabled={disabled}
+        />
+      </Stack>
+      <Stack gap="xs">
+        <TextInput
+          {...register(postalCodeKey)}
+          label={t("components.address.postalCode")}
+          error={errors[postalCodeKey]?.message?.toString()}
+          autoComplete="none"
+          disabled={disabled}
+        />
+        <TextInput
+          {...register(regionKey)}
+          autoComplete="none"
+          label={t("components.address.region")}
+          error={errors[regionKey]?.message?.toString()}
+          disabled={disabled}
+        />
+      </Stack>
+      <Stack gap="xs">
+        <TextInput
+          {...register(cityKey)}
+          autoComplete="none"
+          label={t("components.address.city")}
+          error={errors[cityKey]?.message?.toString()}
+          disabled={disabled}
+          required={required}
+        />
+        <Controller
+          name={countryKey}
+          control={control}
+          render={({ field, fieldState: { error } }) => (
+            <Select
+              {...field}
+              error={error?.message}
+              autoComplete="none"
+              label={t("components.address.country")}
+              data={countryOptions}
+              disabled={disabled}
+              required={required}
+              searchable
+              clearable
+            />
+          )}
+        />
+      </Stack>
     </Group>
   );
 };

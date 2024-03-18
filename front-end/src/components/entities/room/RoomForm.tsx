@@ -34,7 +34,7 @@ export const RoomForm = () => {
                 field.onChange(test.toString());
               }}
               error={error?.message}
-              label={t("entities.room.keys.price")}
+              label={t("entities.room.price")}
               leftSection={<IconCurrencyEuro size="1rem" />}
               decimalScale={2}
               decimalSeparator=","

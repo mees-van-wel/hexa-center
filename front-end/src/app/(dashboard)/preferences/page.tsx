@@ -28,16 +28,16 @@ import {
   TimeFormat,
 } from "@/constants/timeFormats";
 import { TIMEZONES } from "@/constants/timezones";
-import { useAuthRelation } from "@/contexts/AuthContext";
+import { useAuthUser } from "@/contexts/AuthContext";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Group, Select, Stack } from "@mantine/core";
 import { IconSettings } from "@tabler/icons-react";
 
 export default function Preferences() {
   const t = useTranslation();
-  const { account } = useAuthRelation();
+  const { accountDetails } = useAuthUser();
 
-  const currentAccount = account || {
+  const currentAccountDetails = accountDetails || {
     locale: "en-US",
     theme: "DARK",
     color: "BLUE",
@@ -51,50 +51,50 @@ export default function Preferences() {
   const datePreview = useMemo(
     () =>
       new Intl.DateTimeFormat(
-        currentAccount.dateFormat === DATE_FORMATS.MDY
+        currentAccountDetails.dateFormat === DATE_FORMATS.MDY
           ? LOCALES.EN_US
-          : currentAccount.dateFormat === DATE_FORMATS.DMY
+          : currentAccountDetails.dateFormat === DATE_FORMATS.DMY
             ? LOCALES.NL_NL
             : undefined,
       ).format(new Date()),
-    [currentAccount.dateFormat],
+    [currentAccountDetails.dateFormat],
   );
 
   const separatorPreview = useMemo(
     () =>
       new Intl.NumberFormat(
-        currentAccount.decimalSeparator === DECIMAL_SEPARATORS.DOT
+        currentAccountDetails.decimalSeparator === DECIMAL_SEPARATORS.DOT
           ? LOCALES.EN_US
-          : currentAccount.decimalSeparator === DECIMAL_SEPARATORS.COMMA
+          : currentAccountDetails.decimalSeparator === DECIMAL_SEPARATORS.COMMA
             ? LOCALES.NL_NL
             : undefined,
       ).format(1234.56),
-    [currentAccount.decimalSeparator],
+    [currentAccountDetails.decimalSeparator],
   );
 
   const timePreview = useMemo(
     () =>
       new Intl.DateTimeFormat(
-        currentAccount.timeFormat === TIME_FORMATS.TWELVE
+        currentAccountDetails.timeFormat === TIME_FORMATS.TWELVE
           ? LOCALES.EN_US
-          : currentAccount.timeFormat === TIME_FORMATS.TWENTYFOUR
+          : currentAccountDetails.timeFormat === TIME_FORMATS.TWENTYFOUR
             ? LOCALES.NL_NL
             : undefined,
         { timeStyle: "short" },
       ).format(new Date()),
-    [currentAccount.timeFormat],
+    [currentAccountDetails.timeFormat],
   );
 
   const firstDayOfTheWeekPreview = useMemo(
     () =>
-      currentAccount.firstDayOfWeek === FIRST_DAYS_OF_THE_WEEK.AUTO
+      currentAccountDetails.firstDayOfWeek === FIRST_DAYS_OF_THE_WEEK.AUTO
         ? dayjs().startOf("week").format("dddd")
         : t(
             `constants.firstDaysOfTheWeek.${
-              currentAccount.firstDayOfWeek as FirstDayOfTheWeek
+              currentAccountDetails.firstDayOfWeek as FirstDayOfTheWeek
             }`,
           ),
-    [currentAccount.firstDayOfWeek, t],
+    [currentAccountDetails.firstDayOfWeek, t],
   );
 
   // TODO: update auth
@@ -109,7 +109,7 @@ export default function Preferences() {
           <Group grow>
             <Select
               label={t("preferencesPage.language")}
-              value={currentAccount.locale || "en-US"}
+              value={currentAccountDetails.locale || "en-US"}
               data={LOCALE_VALUES.map((locale: Locale) => ({
                 label: t(`constants.locales.${locale}`),
                 value: locale,
@@ -120,7 +120,7 @@ export default function Preferences() {
             />
             <Select
               label={t("preferencesPage.theme")}
-              value={currentAccount.theme}
+              value={currentAccountDetails.theme}
               data={THEME_VALUES.map((theme: ThemeKey) => ({
                 label: t(`constants.themes.${theme}`),
                 value: theme,
@@ -131,7 +131,7 @@ export default function Preferences() {
             />
             <Select
               label={t("preferencesPage.timezone")}
-              value={currentAccount.timezone}
+              value={currentAccountDetails.timezone}
               data={TIMEZONES}
               allowDeselect={false}
               searchable
@@ -143,7 +143,7 @@ export default function Preferences() {
             <Stack>
               <Select
                 label={t("preferencesPage.dateFormat")}
-                value={currentAccount.dateFormat}
+                value={currentAccountDetails.dateFormat}
                 data={DATE_FORMAT_VALUES.map((dateformat: DateFormatKey) => ({
                   label: t(`constants.dateFormats.${dateformat}`),
                   value: dateformat,
@@ -157,7 +157,7 @@ export default function Preferences() {
             <Stack>
               <Select
                 label={t("preferencesPage.decimalSeparator")}
-                value={currentAccount.decimalSeparator}
+                value={currentAccountDetails.decimalSeparator}
                 data={DECIMAL_SEPARATOR_VALUES.map(
                   (separator: DecimalSeparatorKey) => ({
                     label: t(`constants.separators.${separator}`),
@@ -173,7 +173,7 @@ export default function Preferences() {
             <Stack>
               <Select
                 label={t("preferencesPage.timeNotation")}
-                value={currentAccount.timeFormat}
+                value={currentAccountDetails.timeFormat}
                 data={TIME_FORMAT_VALUES.map((timeformat: TimeFormat) => ({
                   label: t(`constants.timeFormats.${timeformat}`),
                   value: timeformat,
@@ -187,7 +187,7 @@ export default function Preferences() {
             <Stack>
               <Select
                 label={t("preferencesPage.firstDayOfWeek")}
-                value={currentAccount.firstDayOfWeek}
+                value={currentAccountDetails.firstDayOfWeek}
                 data={FIRST_DAY_OF_THE_WEEK_VALUES.map(
                   (firstDayOfWeek: FirstDayOfTheWeek) => ({
                     label: t(`constants.firstDaysOfTheWeek.${firstDayOfWeek}`),
@@ -204,7 +204,7 @@ export default function Preferences() {
         </Stack>
       </Sheet>
       <Group align="flex-start" grow>
-        {/* <Workinghours account={currentAccount} />
+        {/* <Workinghours accountDetails={currentAccountDetails} />
         <Sheet title={t("preferencesPage.storage")}>
           <Group justify="space-between">
             <p>MB</p>

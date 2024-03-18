@@ -25,16 +25,14 @@ export const EmailInput = () => {
     resolver: valibotResolver(SendEmailOtpSchema),
   });
 
-  const onSubmit: SubmitHandler<SendEmailOtpSchema> = async ({
-    emailAddress,
-  }) => {
+  const onSubmit: SubmitHandler<SendEmailOtpSchema> = async ({ email }) => {
     const emailToken = await sendEmailOtp.mutate({
-      emailAddress,
+      email,
     });
 
     setLoginState({
       step: "EMAIL_OTP",
-      emailAddress,
+      email,
       emailToken,
     });
   };
@@ -43,10 +41,10 @@ export const EmailInput = () => {
     <form autoComplete="on" onSubmit={handleSubmit(onSubmit)}>
       <Stack>
         <TextInput
-          {...register("emailAddress")}
-          defaultValue={loginState.emailAddress}
-          error={errors.emailAddress?.message}
-          label={t("loginPage.emailAddress")}
+          {...register("email")}
+          defaultValue={loginState.email}
+          error={errors.email?.message}
+          label={t("loginPage.email")}
           type="email"
           autoComplete="email"
           withAsterisk

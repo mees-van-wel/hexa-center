@@ -3,7 +3,6 @@ import { DateFormatKey } from "@/constants/dateFormats";
 import { DecimalSeparatorKey } from "@/constants/decimalSeparators";
 import { FirstDayOfTheWeekKey } from "@/constants/firstDayOfTheWeek";
 import { Locale } from "@/constants/locales";
-import { RelationType } from "@/constants/relationTypes";
 import { Sex } from "@/constants/sexes";
 import { ThemeKey } from "@/constants/themes";
 import { TimeFormatKey } from "@/constants/timeFormats";
@@ -32,6 +31,8 @@ export type Translation = {
     day: string;
     show: string;
     hide: string;
+    email: string;
+    phone: string;
   };
   modules: {
     essentials: string;
@@ -40,96 +41,50 @@ export type Translation = {
     system: string;
   };
   entities: {
-    relation: {
-      name: {
-        singular: string;
-        plural: string;
-      };
-      keys: {
-        type: string;
-        name: string;
-        emailAddress: string;
-        phoneNumber: string;
-        dateOfBirth: string;
-        sex: string;
-        vatNumber: string;
-        cocNumber: string;
-        businessContactName: string;
-        businessContactEmailAddress: string;
-        businessContactPhoneNumber: string;
-      };
+    user: {
+      singularName: string;
+      pluralName: string;
+      firstName: string;
+      lastName: string;
+      sex: string;
+      birthDate: string;
       createdNotification: string;
       deletedNotification: string;
-      isSelfAlert: {
-        title: string;
-        message: string;
-        button: string;
-      };
+      isSelfAlertTitle: string;
+      isSelfAlertMessage: string;
+      isSelfAlertButton: string;
     };
     property: {
-      name: {
-        singular: string;
-        plural: string;
-      };
-      keys: {
-        name: string;
-        email: string;
-        phoneNumber: string;
-        street: string;
-        houseNumber: string;
-      };
-      deletedNotification: string;
+      singularName: string;
+      pluralName: string;
+      cocNumber: string;
+      vatId: string;
+      iban: string;
+      swiftBic: string;
       createdNotification: string;
+      deletedNotification: string;
     };
     room: {
-      name: {
-        singular: string;
-        plural: string;
-      };
-      keys: {
-        name: string;
-        price: string;
-      };
+      singularName: string;
+      pluralName: string;
+      price: string;
       createdNotification: string;
       deletedNotification: string;
     };
     reservation: {
-      name: {
-        singular: string;
-        plural: string;
-      };
-      keys: {
-        roomId: string;
-        customerId: string;
-        startDate: string;
-        endDate: string;
-        priceOverride: string;
-        guestName: string;
-        reservationNotes: string;
-        invoiceNotes: string;
-      };
+      singularName: string;
+      pluralName: string;
+      roomId: string;
+      customerId: string;
+      startDate: string;
+      endDate: string;
+      priceOverride: string;
+      guestName: string;
+      reservationNotes: string;
+      invoiceNotes: string;
       invoicePeriod: {
         name: string;
         succes: string;
-      };
-      product: {
-        keys: {
-          name: string;
-          quantity: string;
-          price: string;
-          vatRate: string;
-          cycle: string;
-          status: string;
-          actions: string;
-        };
-        name: string;
-        edit: string;
-        editSucces: string;
-        add: string;
-        addSucces: string;
-        resetSucces: string;
-        deleted: string;
-        empty: string;
       };
       calendar: {
         roomName: string;
@@ -139,6 +94,34 @@ export type Translation = {
       roomDeleted: string;
       dateError: string;
       overlapError: string;
+    };
+    product: {
+      singularName: string;
+      pluralName: string;
+      quantity: string;
+      price: string;
+      vatRate: string;
+      cycle: string;
+      status: string;
+      actions: string;
+      edit: string;
+      editSucces: string;
+      add: string;
+      addSucces: string;
+      resetSucces: string;
+      deleted: string;
+      empty: string;
+    };
+    customer: {
+      singularName: string;
+      pluralName: string;
+      cocNumber: string;
+      vatId: string;
+      contactPersonName: string;
+      contactPersonEmail: string;
+      contactPersonPhone: string;
+      createdNotification: string;
+      deletedNotification: string;
     };
     invoice: {
       singularName: string;
@@ -228,7 +211,7 @@ export type Translation = {
   };
   loginPage: {
     login: string;
-    emailAddress: string;
+    email: string;
     sendEmailOtp: string;
     emailOtpSent: string;
     emailRequiredError: string;
@@ -236,11 +219,11 @@ export type Translation = {
     sendAgain: string;
     otp: string;
     invalidOtpError: string;
-    phoneNumber: string;
+    phone: string;
     sendPhoneOtp: string;
     phoneOtpSent: string;
-    phoneNumberRequiredError: string;
-    phoneNumberFormatError: string;
+    phoneRequiredError: string;
+    phoneFormatError: string;
     rememberMeFor: string;
     thisSessionOnly: {
       label: string;
@@ -315,10 +298,11 @@ export type Translation = {
   };
   components: {
     address: {
-      streetAndHouseNumber: string;
-      postalCode: string;
+      addressLineOne: string;
+      addressLineTwo: string;
       city: string;
       region: string;
+      postalCode: string;
       country: string;
     };
     metadata: {
@@ -350,7 +334,6 @@ export type Translation = {
   // };
   constants: {
     sexes: Record<Sex, string>;
-    relationTypes: Record<RelationType, string>;
     dateFormats: Record<DateFormatKey, string>;
     separators: Record<DecimalSeparatorKey, string>;
     timeFormats: Record<TimeFormatKey, string>;

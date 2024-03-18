@@ -11,6 +11,7 @@ import {
   IconHome,
   IconHotelService,
   IconPlugConnected,
+  IconUserDollar,
   IconUsers,
 } from "@tabler/icons-react";
 
@@ -40,15 +41,15 @@ export const Navigation = () => {
             <Stack gap={0}>
               <Button
                 component={Link}
-                href="/relations"
-                variant={pathname === "/relations" ? "filled" : "subtle"}
+                href="/users"
+                variant={pathname === "/users" ? "filled" : "subtle"}
                 leftSection={<IconUsers />}
                 fullWidth
                 justify="left"
               >
-                {t("entities.relation.name.plural")}
+                {t("entities.user.pluralName")}
               </Button>
-              {/* <Button
+              {/* <Button 
                 component={Link}
                 href="/roles"
                 variant={pathname === "/roles" ? "filled" : "subtle"}
@@ -98,6 +99,16 @@ export const Navigation = () => {
           <Stack gap="xs">
             <Title order={4}>{t("modules.sales")}</Title>
             <Stack gap={0}>
+              <Button
+                component={Link}
+                href="/customers"
+                variant={pathname === "/customers" ? "filled" : "subtle"}
+                leftSection={<IconUserDollar />}
+                fullWidth
+                justify="left"
+              >
+                {t("entities.customer.pluralName")}
+              </Button>
               <Button
                 component={Link}
                 href="/invoices"

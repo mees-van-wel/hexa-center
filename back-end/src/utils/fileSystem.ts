@@ -15,7 +15,7 @@ const Type = {
 
 const Files = {
   [Type.mail]: ["_base.mjml", "_footer.mjml", "invoice.mjml", "otp.mjml"],
-  [Type.pdf]: ["invoice.ejs"],
+  [Type.pdf]: ["invoice.html.ejs"],
   [Type.soapEnvelope]: [
     "listTwinfieldOffices.xml.ejs",
     "createTwinfieldCustomer.xml.ejs",

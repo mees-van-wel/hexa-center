@@ -7,7 +7,7 @@ import parse from "html-react-parser";
 import { NewsItem } from "@/app/(dashboard)/page";
 import { Sheet } from "@/components/common/Sheet";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
-import { useAuthRelation } from "@/contexts/AuthContext";
+import { useAuthUser } from "@/contexts/AuthContext";
 import { useTranslation } from "@/hooks/useTranslation";
 import {
   Badge,
@@ -24,7 +24,7 @@ import styles from "./HomePage.module.scss";
 
 export default function HomePage({ newsItems }: { newsItems: NewsItem[] }) {
   const t = useTranslation();
-  const authUser = useAuthRelation();
+  const authUser = useAuthUser();
   const greeting = useMemo(() => {
     const hour = new Date().getHours();
     if (hour >= 5 && hour < 12) return t("homePage.goodMorning");
@@ -38,7 +38,7 @@ export default function HomePage({ newsItems }: { newsItems: NewsItem[] }) {
       <Group justify="space-between" align="flex-start" p="md">
         <Sheet title={t("homePage.welcome")} glass>
           <Title>
-            {greeting} {authUser.name}
+            {greeting} {authUser.firstName}
           </Title>
         </Sheet>
         <Sheet title={t("homePage.news")} glass>
