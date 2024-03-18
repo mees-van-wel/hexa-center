@@ -2,7 +2,8 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 
-import { RouterOutput, trpc } from "@/utils/trpc";
+import { type RouterOutput } from "@/utils/trpc";
+import { getTrpcClientOnClient } from "@/utils/trpcForClient";
 
 type CurrentUser = RouterOutput["auth"]["currentUser"];
 
@@ -39,12 +40,12 @@ export const AuthContextProvider = ({
     let timeoutRef: NodeJS.Timeout | null = null;
 
     const setToken = async () => {
+      const trpc = getTrpcClientOnClient();
+
       try {
         const { accessToken, expiresAt } = await trpc.auth.token.query(
           undefined,
-          {
-            signal: abortController.signal,
-          },
+          { signal: abortController.signal },
         );
         setAuth({ ...auth, accessToken });
         const timeout = expiresAt.getTime() - Date.now() - 60000;

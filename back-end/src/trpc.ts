@@ -5,7 +5,6 @@ import { trpcTransformer } from "@/utils/trpcTransformer";
 import { initTRPC, TRPCError } from "@trpc/server";
 import * as trpcExpress from "@trpc/server/adapters/express";
 
-import db from "./db/client";
 import { users, userSessions } from "./db/schema";
 
 export const createContext = async ({
@@ -14,11 +13,12 @@ export const createContext = async ({
 }: trpcExpress.CreateExpressContextOptions) => {
   let refreshToken = req.cookies.refreshToken;
   const authHeader = req.headers.authorization;
+  const db = req.db;
 
   if (authHeader && authHeader.startsWith("Bearer "))
     refreshToken = authHeader.substring(7, authHeader.length);
 
-  if (!refreshToken) return { req, res, user: null };
+  if (!refreshToken) return { req, res, db, user: null };
 
   const now = new Date();
 
@@ -48,7 +48,7 @@ export const createContext = async ({
       maxAge: 0,
     });
 
-    return { req, res, user: null };
+    return { req, res, db, user: null };
   }
 
   const user = await db.query.users.findFirst({
@@ -120,7 +120,7 @@ export const createContext = async ({
       .where(eq(userSessions.id, session.id));
   })();
 
-  return { req, res, user: user || null };
+  return { req, res, db, user: user || null };
 };
 
 type Context = Awaited<ReturnType<typeof createContext>>;

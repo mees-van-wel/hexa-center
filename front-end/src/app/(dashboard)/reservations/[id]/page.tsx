@@ -1,7 +1,5 @@
-import { cookies } from "next/headers";
-
 import { ReservationDetail } from "@/components/entities/reservation/reservationDetail";
-import { setTRPCRefreshToken, trpc } from "@/utils/trpc";
+import { getTrpcClientOnServer } from "@/utils/trpcForServer";
 
 type ReservationPageParams = {
   params: {
@@ -10,8 +8,7 @@ type ReservationPageParams = {
 };
 
 export default async function Page({ params }: ReservationPageParams) {
-  const refreshToken = cookies().get("refreshToken")?.value;
-  if (refreshToken) setTRPCRefreshToken(refreshToken);
+  const trpc = getTrpcClientOnServer();
 
   const reservationId = parseInt(params.id);
 

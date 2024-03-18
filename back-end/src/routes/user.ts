@@ -1,7 +1,6 @@
 import { eq } from "drizzle-orm";
 import { number } from "valibot";
 
-import db from "@/db/client";
 import { users } from "@/db/schema";
 import { procedure, router } from "@/trpc";
 import { createPgException } from "@/utils/exception";
@@ -13,7 +12,7 @@ export const userRouter = router({
   create: procedure
     .input(wrap(UserCreateSchema))
     .mutation(async ({ input, ctx }) => {
-      const result = await db
+      const result = await ctx.db
         .insert(users)
         .values({
           ...input,
@@ -47,8 +46,8 @@ export const userRouter = router({
 
       return user;
     }),
-  list: procedure.query(() =>
-    db
+  list: procedure.query(({ ctx }) =>
+    ctx.db
       .select({
         $kind: users.$kind,
         id: users.id,
@@ -59,8 +58,8 @@ export const userRouter = router({
       })
       .from(users),
   ),
-  get: procedure.input(wrap(number())).query(async ({ input }) => {
-    const result = await db
+  get: procedure.input(wrap(number())).query(async ({ input, ctx }) => {
+    const result = await ctx.db
       .select({
         $kind: users.$kind,
         id: users.id,
@@ -93,7 +92,7 @@ export const userRouter = router({
     .input(wrap(UserUpdateSchema))
     .mutation(async ({ input, ctx }) => {
       try {
-        const result = await db
+        const result = await ctx.db
           .update(users)
           .set({
             ...input,
@@ -131,5 +130,7 @@ export const userRouter = router({
     }),
   delete: procedure
     .input(wrap(number()))
-    .mutation(({ input }) => db.delete(users).where(eq(users.id, input))),
+    .mutation(({ input, ctx }) =>
+      ctx.db.delete(users).where(eq(users.id, input)),
+    ),
 });

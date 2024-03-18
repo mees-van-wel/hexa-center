@@ -6,7 +6,7 @@ import dayjs from "dayjs";
 import { FIRST_DAYS_OF_THE_WEEK } from "@/constants/firstDayOfTheWeek";
 import { Weekday, WEEKDAY_VALUES, WEEKDAYS } from "@/constants/weekdays";
 import { useTranslation } from "@/hooks/useTranslation";
-import { RouterOutput } from "@back-end/routes/_app";
+import { type RouterOutput } from "@back-end/routes/_app";
 import { Button, Group, SegmentedControl, Stack } from "@mantine/core";
 import { TimeInput } from "@mantine/dates";
 import { IconMinus, IconPlus } from "@tabler/icons-react";

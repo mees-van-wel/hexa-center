@@ -11,7 +11,6 @@ import {
   string,
 } from "valibot";
 
-import db from "@/db/client";
 import {
   productInstances,
   reservations,
@@ -32,7 +31,7 @@ export const reservationRouter = router({
   create: procedure
     .input(wrap(ReservationCreateSchema))
     .mutation(async ({ input, ctx }) => {
-      const result = await db
+      const result = await ctx.db
         .insert(reservations)
         .values({
           ...input,
@@ -61,8 +60,8 @@ export const reservationRouter = router({
 
       return reservation;
     }),
-  list: procedure.query(() =>
-    db.query.reservations.findMany({
+  list: procedure.query(({ ctx }) =>
+    ctx.db.query.reservations.findMany({
       with: {
         customer: true,
         room: true,
@@ -80,8 +79,8 @@ export const reservationRouter = router({
       },
     }),
   ),
-  get: procedure.input(wrap(number())).query(async ({ input }) => {
-    const reservation = await db.query.reservations.findFirst({
+  get: procedure.input(wrap(number())).query(async ({ input, ctx }) => {
+    const reservation = await ctx.db.query.reservations.findFirst({
       where: eq(reservations.id, input),
       with: {
         customer: true,
@@ -161,7 +160,7 @@ export const reservationRouter = router({
   update: procedure
     .input(wrap(ReservationUpdateSchema))
     .mutation(async ({ input, ctx }) => {
-      const result = await db
+      const result = await ctx.db
         .update(reservations)
         .set({
           ...input,
@@ -193,8 +192,8 @@ export const reservationRouter = router({
     }),
   delete: procedure
     .input(wrap(number()))
-    .mutation(({ input }) =>
-      db.delete(reservations).where(eq(reservations.id, input)),
+    .mutation(({ input, ctx }) =>
+      ctx.db.delete(reservations).where(eq(reservations.id, input)),
     ),
   invoicePeriod: procedure
     .input(
@@ -207,7 +206,7 @@ export const reservationRouter = router({
       ),
     )
     .mutation(async ({ input, ctx }) => {
-      const reservation = await db.query.reservations.findFirst({
+      const reservation = await ctx.db.query.reservations.findFirst({
         with: {
           room: true,
           productInstancesJunction: {
@@ -260,7 +259,7 @@ export const reservationRouter = router({
             if (cycle === "perNightOnEnd")
               quantity = new Decimal(quantity).mul(totalNights).toString();
 
-            await db
+            await ctx.db
               .update(reservationsToProductInstances)
               .set({ status })
               .where(
@@ -311,7 +310,7 @@ export const reservationRouter = router({
         ],
       });
 
-      await db.insert(reservationsToInvoices).values({
+      await ctx.db.insert(reservationsToInvoices).values({
         reservationId: reservation.id,
         invoiceId,
         periodStartDate: input.periodStartDate,
@@ -340,8 +339,8 @@ export const reservationRouter = router({
         }),
       ),
     )
-    .mutation(async ({ input }) => {
-      const result = await db
+    .mutation(async ({ input, ctx }) => {
+      const result = await ctx.db
         .insert(productInstances)
         .values({
           templateId: input.templateId,
@@ -354,7 +353,7 @@ export const reservationRouter = router({
 
       const productInstanceId = result[0].id;
 
-      await db.insert(reservationsToProductInstances).values({
+      await ctx.db.insert(reservationsToProductInstances).values({
         reservationId: input.reservationId,
         productInstanceId,
         quantity: input.quantity,
@@ -384,9 +383,9 @@ export const reservationRouter = router({
         }),
       ),
     )
-    .mutation(({ input }) =>
+    .mutation(({ input, ctx }) =>
       Promise.all([
-        db
+        ctx.db
           .update(productInstances)
           .set({
             name: input.name,
@@ -395,7 +394,7 @@ export const reservationRouter = router({
             revenueAccountId: input.revenueAccountId,
           })
           .where(eq(productInstances.id, input.instanceId)),
-        db
+        ctx.db
           .update(reservationsToProductInstances)
           .set({
             quantity: input.quantity,
@@ -424,8 +423,8 @@ export const reservationRouter = router({
         }),
       ),
     )
-    .mutation(({ input }) =>
-      db
+    .mutation(({ input, ctx }) =>
+      ctx.db
         .update(reservationsToProductInstances)
         .set({ status: "notInvoiced" })
         .where(

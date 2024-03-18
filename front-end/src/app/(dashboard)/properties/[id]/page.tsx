@@ -1,7 +1,5 @@
-import { cookies } from "next/headers";
-
 import { PropertyDetail } from "@/components/entities/property/PropertyDetail";
-import { setTRPCRefreshToken, trpc } from "@/utils/trpc";
+import { getTrpcClientOnServer } from "@/utils/trpcForServer";
 
 type PropertyPageParams = {
   params: {
@@ -10,8 +8,7 @@ type PropertyPageParams = {
 };
 
 export default async function Page({ params }: PropertyPageParams) {
-  const refreshToken = cookies().get("refreshToken")?.value;
-  if (refreshToken) setTRPCRefreshToken(refreshToken);
+  const trpc = getTrpcClientOnServer();
 
   const property = await trpc.property.get.query(parseInt(params.id));
 

@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 
-import { RouterOutput } from "@back-end/routes/_app";
+import { type RouterOutput } from "@back-end/routes/_app";
 import {
   Button,
   ButtonGroup,

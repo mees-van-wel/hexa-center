@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { Table } from "@/components/common/Table";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { useTranslation } from "@/hooks/useTranslation";
-import { RouterOutput } from "@/utils/trpc";
+import { type RouterOutput } from "@/utils/trpc";
 import { Button, Stack } from "@mantine/core";
 import { IconBed, IconPlus } from "@tabler/icons-react";
 

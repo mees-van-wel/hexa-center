@@ -1,11 +1,8 @@
-import { cookies } from "next/headers";
-
 import { PropertiesOverview } from "@/components/entities/property/PropertiesOverview";
-import { setTRPCRefreshToken, trpc } from "@/utils/trpc";
+import { getTrpcClientOnServer } from "@/utils/trpcForServer";
 
 export default async function Page() {
-  const refreshToken = cookies().get("refreshToken")?.value;
-  if (refreshToken) setTRPCRefreshToken(refreshToken);
+  const trpc = getTrpcClientOnServer();
 
   const properties = await trpc.property.list.query();
 

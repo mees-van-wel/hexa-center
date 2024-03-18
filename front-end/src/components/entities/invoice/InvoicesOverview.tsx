@@ -8,7 +8,7 @@ import Decimal from "decimal.js";
 import { Table } from "@/components/common/Table";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { useTranslation } from "@/hooks/useTranslation";
-import { RouterOutput } from "@/utils/trpc";
+import { type RouterOutput } from "@/utils/trpc";
 import { AreaChart } from "@mantine/charts";
 import { Badge, Paper, Stack, Title } from "@mantine/core";
 import { IconFileEuro } from "@tabler/icons-react";

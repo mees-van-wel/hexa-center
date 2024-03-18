@@ -10,9 +10,11 @@ import { createServer } from "http";
 
 import * as trpcExpress from "@trpc/server/adapters/express";
 
-import db from "./db/client";
 import { customers, integrationMappings, rooms } from "./db/schema";
 import { appRouter } from "./routes/_app";
+import { ctx } from "./utils/context";
+import { getDatabaseClient } from "./utils/database";
+import { isProduction } from "./utils/environment";
 import { createContext } from "./trpc";
 
 import "firebase/firestore";
@@ -34,6 +36,7 @@ const app = express();
 
 app.use(helmet());
 app.use(compression());
+app.set("trust proxy", true);
 
 // Setting IP
 app.use((req, _, next) => {
@@ -49,7 +52,32 @@ app.use((req, _, next) => {
   next();
 });
 
-app.set("trust proxy", true);
+// Initiating database connection
+app.use(async (req, res, next) => {
+  let subdomain = req.headers["x-subdomain"];
+  if (!isProduction) subdomain = "hexa-center";
+
+  if (!subdomain || typeof subdomain !== "string") {
+    console.warn("Missing subdomain header", JSON.stringify(req.headers));
+    throw new Error("Missing subdomain header");
+  }
+
+  try {
+    const db = await getDatabaseClient(subdomain);
+    ctx.run({ db }, () => {
+      req.db = db;
+      next();
+    });
+  } catch (error) {
+    console.warn(error);
+
+    return res
+      .status(418)
+      .send(
+        "418 I'm a teapot - This subdomain does not have its own kettle to brew content.",
+      );
+  }
+});
 
 app.use(cors(corsOptions));
 app.use(cookieParser());
@@ -99,7 +127,7 @@ httpServer.listen(3001, async () => {
   // await migrateFirebase();
 });
 
-const migrateFirebase = async () => {
+const migrateFirebase = async (db: any) => {
   const app = initializeApp({
     apiKey: "AIzaSyAxEhAUNP-eZxPthXM0ascC0oWcfUpKa5Y",
     authDomain: "local-residence.firebaseapp.com",

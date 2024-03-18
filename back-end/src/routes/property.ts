@@ -1,7 +1,6 @@
 import { eq } from "drizzle-orm";
 import { number } from "valibot";
 
-import db from "@/db/client";
 import { properties } from "@/db/schema";
 import { procedure, router } from "@/trpc";
 import { wrap } from "@decs/typeschema";
@@ -15,7 +14,7 @@ export const propertyRouter = router({
   create: procedure
     .input(wrap(PropertyCreateSchema))
     .mutation(async ({ input, ctx }) => {
-      const result = await db
+      const result = await ctx.db
         .insert(properties)
         .values({
           ...input,
@@ -46,8 +45,8 @@ export const propertyRouter = router({
 
       return result[0];
     }),
-  list: procedure.query(() =>
-    db
+  list: procedure.query(({ ctx }) =>
+    ctx.db
       .select({
         $kind: properties.$kind,
         id: properties.id,
@@ -57,8 +56,8 @@ export const propertyRouter = router({
       })
       .from(properties),
   ),
-  get: procedure.input(wrap(number())).query(async ({ input }) => {
-    const result = await db
+  get: procedure.input(wrap(number())).query(async ({ input, ctx }) => {
+    const result = await ctx.db
       .select({
         $kind: properties.$kind,
         id: properties.id,
@@ -92,7 +91,7 @@ export const propertyRouter = router({
   update: procedure
     .input(wrap(PropertyUpdateSchema))
     .mutation(async ({ input, ctx }) => {
-      const result = await db
+      const result = await ctx.db
         .update(properties)
         .set({
           ...input,
@@ -126,7 +125,7 @@ export const propertyRouter = router({
     }),
   delete: procedure
     .input(wrap(number()))
-    .mutation(({ input }) =>
-      db.delete(properties).where(eq(properties.id, input)),
+    .mutation(({ input, ctx }) =>
+      ctx.db.delete(properties).where(eq(properties.id, input)),
     ),
 });

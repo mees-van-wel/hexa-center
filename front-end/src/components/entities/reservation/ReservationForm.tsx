@@ -8,7 +8,7 @@ import {
   ReservationInputCreateSchema,
   ReservationInputUpdateSchema,
 } from "@/schemas/reservation";
-import { RouterOutput } from "@/utils/trpc";
+import { type RouterOutput } from "@/utils/trpc";
 import {
   Group,
   NumberInput,

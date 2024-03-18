@@ -11,7 +11,7 @@ import { CountryKey } from "@/constants/countries";
 import { INVOICE_EVENT_TYPE_META } from "@/constants/invoiceEventTypes";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
-import { RouterOutput } from "@/utils/trpc";
+import { type RouterOutput } from "@/utils/trpc";
 import {
   Badge,
   Button,

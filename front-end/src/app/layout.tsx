@@ -2,15 +2,17 @@
 
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { cookies, headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { headers } from "next/headers";
+import { redirect, RedirectType } from "next/navigation";
 
 import { AuthContextProvider } from "@/contexts/AuthContext";
 import { TranslationInitializer } from "@/initializers/TranslationInitializer";
-import { RouterOutput, setTRPCRefreshToken, trpc } from "@/utils/trpc";
+import { AppRouter, type RouterOutput } from "@/utils/trpc";
+import { getTrpcClientOnServer } from "@/utils/trpcForServer";
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
 import { Notifications } from "@mantine/notifications";
+import { TRPCClientError } from "@trpc/client";
 
 import Providers from "./providers";
 
@@ -38,25 +40,23 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const refreshToken = cookies().get("refreshToken")?.value;
   const pathname = headers().get("x-pathname");
   if (!pathname) throw new Error("Missing pathname");
 
   let user: RouterOutput["auth"]["currentUser"] | null = null;
 
   try {
-    if (refreshToken) setTRPCRefreshToken(refreshToken);
+    const trpc = getTrpcClientOnServer();
     user = await trpc.auth.currentUser.query();
-
-    //  const trpc = getTrpcClientOnServer();
-    //  user = await trpc.auth.currentUser.query();
-  } catch (error) {
-    console.warn(error);
+  } catch (e) {
+    const error = e as TRPCClientError<AppRouter>;
+    const code = error.meta?.response?.status as number | undefined;
+    if (code === 418)
+      redirect("https://www.hexa.center/", RedirectType.replace);
   }
 
-  // TODO Set redirect type to replace
-  if (!user && pathname !== "/login") redirect("/login");
-  if (user && pathname === "/login") redirect("/");
+  if (!user && pathname !== "/login") redirect("/login", RedirectType.replace);
+  if (user && pathname === "/login") redirect("/", RedirectType.replace);
 
   return (
     <html lang="en">

@@ -5,7 +5,6 @@ import { wrap } from "@decs/typeschema";
 import { RoomCreateSchema, RoomUpdateSchema } from "@front-end/schemas/room";
 import { TRPCError } from "@trpc/server";
 
-import db from "../db/client";
 import { rooms } from "../db/schema";
 import { procedure, router } from "../trpc";
 
@@ -13,7 +12,7 @@ export const roomRouter = router({
   create: procedure
     .input(wrap(RoomCreateSchema))
     .mutation(async ({ input, ctx }) => {
-      const result = await db
+      const result = await ctx.db
         .insert(rooms)
         .values({
           ...input,
@@ -37,8 +36,8 @@ export const roomRouter = router({
 
       return room;
     }),
-  list: procedure.query(() =>
-    db
+  list: procedure.query(({ ctx }) =>
+    ctx.db
       .select({
         id: rooms.id,
         name: rooms.name,
@@ -46,8 +45,8 @@ export const roomRouter = router({
       })
       .from(rooms),
   ),
-  get: procedure.input(wrap(number())).query(async ({ input }) => {
-    const result = await db
+  get: procedure.input(wrap(number())).query(async ({ input, ctx }) => {
+    const result = await ctx.db
       .select({
         id: rooms.id,
         name: rooms.name,
@@ -68,7 +67,7 @@ export const roomRouter = router({
   update: procedure
     .input(wrap(RoomUpdateSchema))
     .mutation(async ({ input, ctx }) => {
-      const result = await db
+      const result = await ctx.db
         .update(rooms)
         .set({
           ...input,
@@ -94,5 +93,7 @@ export const roomRouter = router({
     }),
   delete: procedure
     .input(wrap(number()))
-    .mutation(({ input }) => db.delete(rooms).where(eq(rooms.id, input))),
+    .mutation(({ input, ctx }) =>
+      ctx.db.delete(rooms).where(eq(rooms.id, input)),
+    ),
 });

@@ -6,7 +6,7 @@ import Link from "next/link";
 import twinfieldLogo from "@/assets/images/twinfield-logo.png";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { useTranslation } from "@/hooks/useTranslation";
-import { RouterOutput } from "@/utils/trpc";
+import { type RouterOutput } from "@/utils/trpc";
 import { Button, Indicator, Paper, Stack, Text } from "@mantine/core";
 import { IconPlugConnected } from "@tabler/icons-react";
 

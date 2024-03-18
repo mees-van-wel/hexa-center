@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { RouterOutput } from "@/utils/trpc";
+import { type RouterOutput } from "@/utils/trpc";
 import {
   Button,
   ButtonGroup,

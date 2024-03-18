@@ -3,7 +3,6 @@ import duration from "dayjs/plugin/duration.js";
 import { and, desc, eq } from "drizzle-orm";
 import { date, number, object } from "valibot";
 
-import db from "@/db/client";
 import {
   invoiceEvents,
   invoiceLines,
@@ -25,8 +24,8 @@ import { TRPCError } from "@trpc/server";
 dayjs.extend(duration);
 
 export const invoiceRouter = router({
-  list: procedure.query(() =>
-    db.query.invoices.findMany({
+  list: procedure.query(({ ctx }) =>
+    ctx.db.query.invoices.findMany({
       with: {
         customer: {
           columns: {
@@ -141,14 +140,14 @@ export const invoiceRouter = router({
       },
     });
 
-    await db.insert(invoiceEvents).values({
+    await ctx.db.insert(invoiceEvents).values({
       createdById: ctx.user.id,
       invoiceId: input,
       type: "mailed",
     });
   }),
   credit: procedure.input(wrap(number())).mutation(async ({ input, ctx }) => {
-    const invoicesResult = await db
+    const invoicesResult = await ctx.db
       .select({
         refType: invoices.refType,
         refId: invoices.refId,
@@ -168,7 +167,7 @@ export const invoiceRouter = router({
 
     const [createCreditInvoiceResponse, invoiceLinesResult] = await Promise.all(
       [
-        db
+        ctx.db
           .insert(invoices)
           .values({
             createdById: ctx.user.id,
@@ -184,7 +183,7 @@ export const invoiceRouter = router({
             companyId: invoice.companyId,
           })
           .returning({ id: invoices.id }),
-        db
+        ctx.db
           .select({
             revenueAccountId: invoiceLines.revenueAccountId,
             name: invoiceLines.name,
@@ -197,7 +196,7 @@ export const invoiceRouter = router({
           })
           .from(invoiceLines)
           .where(eq(invoiceLines.invoiceId, input)),
-        db
+        ctx.db
           .update(invoices)
           .set({
             status: "credited",
@@ -209,7 +208,7 @@ export const invoiceRouter = router({
     const creditInvoiceId = createCreditInvoiceResponse[0].id;
 
     await Promise.all([
-      db.insert(invoiceLines).values(
+      ctx.db.insert(invoiceLines).values(
         invoiceLinesResult.map((invoiceLine) => ({
           invoiceId: creditInvoiceId,
           revenueAccountId: invoiceLine.revenueAccountId,
@@ -222,7 +221,7 @@ export const invoiceRouter = router({
           grossAmount: invertDecimalString(invoiceLine.grossAmount),
         })),
       ),
-      db.insert(invoiceEvents).values({
+      ctx.db.insert(invoiceEvents).values({
         invoiceId: input,
         type: "credited",
         createdById: ctx.user.id,
@@ -232,7 +231,7 @@ export const invoiceRouter = router({
     ]);
 
     if (invoice.refType === "reservation") {
-      const reservationsToInvoicesResult = await db
+      const reservationsToInvoicesResult = await ctx.db
         .select()
         .from(reservationsToInvoices)
         .where(
@@ -244,7 +243,7 @@ export const invoiceRouter = router({
 
       const reservationsToInvoice = reservationsToInvoicesResult[0];
 
-      await db.insert(reservationsToInvoices).values({
+      await ctx.db.insert(reservationsToInvoices).values({
         ...reservationsToInvoice,
         invoiceId: creditInvoiceId,
       });
@@ -256,7 +255,7 @@ export const invoiceRouter = router({
   }),
   delete: procedure
     .input(wrap(number()))
-    .mutation(async ({ input }) =>
-      db.delete(invoices).where(eq(invoices.id, input)),
+    .mutation(async ({ input, ctx }) =>
+      ctx.db.delete(invoices).where(eq(invoices.id, input)),
     ),
 });
