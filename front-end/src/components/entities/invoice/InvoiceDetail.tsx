@@ -683,11 +683,12 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                       }).format(parseFloat(netAmount))}
                     </Table.Td>
                     <Table.Td>
-                      {Intl.NumberFormat("nl-NL", {
-                        style: "currency",
-                        currency: "EUR",
-                      }).format(parseFloat(vatAmount))}{" "}
-                      ({vatRate}%)
+                      {vatRate?.toString()
+                        ? Intl.NumberFormat("nl-NL", {
+                            style: "currency",
+                            currency: "EUR",
+                          }).format(parseFloat(vatAmount)) + ` (${vatRate}%)`
+                        : "Not applicable"}
                     </Table.Td>
                     <Table.Td>
                       {Intl.NumberFormat("nl-NL", {

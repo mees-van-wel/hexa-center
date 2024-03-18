@@ -205,8 +205,12 @@
               <td><%= line.quantity %>x</td>
               <td><%= line.netAmount %></td>
               <td>
+                <% if (line.vatRate === null) { %>
+                Not applicable
+                <% } else { %>
                 <%= line.vatAmount %>
                 (<%= line.vatRate %>%)
+                <% }  %>
               </td>
               <td><%= line.grossAmount %></td>
             </tr>

@@ -69,15 +69,16 @@ export const EditProductModal = ({
         />
         <NumberInput
           label="VAT Rate"
-          value={values.vatRate}
+          value={!values.vatRate ? "" : values.vatRate}
           onChange={(vatRate) => {
-            changeHandler({ vatRate: vatRate.toString() });
+            changeHandler({
+              vatRate: vatRate === "" ? null : vatRate.toString(),
+            });
           }}
           decimalScale={2}
           decimalSeparator=","
           fixedDecimalScale
           hideControls
-          withAsterisk
           rightSection="%"
         />
         <NumberInput

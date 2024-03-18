@@ -25,8 +25,6 @@ export const UsersOverview = ({ users }: UsersOverviewProps) => {
     router.refresh();
   }, []);
 
-  console.log(users);
-
   return (
     <Stack>
       <DashboardHeader

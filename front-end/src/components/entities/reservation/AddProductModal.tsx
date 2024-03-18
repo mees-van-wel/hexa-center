@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 
-import { type RouterOutput } from "@back-end/routes/_app";
+import { RouterOutput } from "@/utils/trpc";
 import {
   Button,
   ButtonGroup,
@@ -23,7 +23,7 @@ export type Cycle =
 export type ReservationProductValues = {
   name: string;
   price: string;
-  vatRate: string;
+  vatRate: string | null;
   quantity: string;
   cycle: Cycle;
   revenueAccountId: number;
@@ -121,15 +121,16 @@ export const AddProductModal = ({
         />
         <NumberInput
           label="VAT Rate"
-          value={values.vatRate}
+          value={!values.vatRate ? "" : values.vatRate}
           onChange={(vatRate) => {
-            changeHandler({ vatRate: vatRate.toString() });
+            changeHandler({
+              vatRate: vatRate === "" ? null : vatRate.toString(),
+            });
           }}
           decimalScale={2}
           decimalSeparator=","
           fixedDecimalScale
           hideControls
-          withAsterisk
           rightSection="%"
         />
         <NumberInput
@@ -198,9 +199,7 @@ export const AddProductModal = ({
           Back
         </Button>
         <Button
-          disabled={
-            !values.name || !values.price || !values.vatRate || !values.cycle
-          }
+          disabled={!values.name || !values.price || !values.cycle}
           onClick={confirmHandler}
           fullWidth
         >
