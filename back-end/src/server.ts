@@ -54,18 +54,18 @@ app.use((req, _, next) => {
 
 // Initiating database connection
 app.use(async (req, res, next) => {
-  let subdomain = req.headers["x-subdomain"];
-  if (!isProduction) subdomain = "hexa-center";
-
-  if (!subdomain || typeof subdomain !== "string") {
-    console.warn("Missing subdomain header", JSON.stringify(req.headers));
-    throw new Error("Missing subdomain header");
+  const origin = req.headers["origin"];
+  if (!origin || typeof origin !== "string") {
+    console.warn("Missing origin header", JSON.stringify(req.headers));
+    throw new Error("Missing origin header");
   }
 
+  const subdomain = isProduction
+    ? new URL(origin).hostname.split(".")[0]
+    : "hexa-center";
+
   try {
-    const db = await getDatabaseClient(
-      isProduction ? subdomain + "?sslmode=require" : subdomain,
-    );
+    const db = await getDatabaseClient(subdomain);
     ctx.run({ db }, () => {
       req.db = db;
       next();

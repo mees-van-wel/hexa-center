@@ -11,9 +11,9 @@ import { trpcTransformer } from "./trpcTransformer";
 export const getTrpcClientOnServer = () => {
   const refreshToken = cookies().get("refreshToken")?.value;
   const host = headers().get("host");
-  const subdomain = host?.split(".")[0];
+  // const subdomain = host?.split(".")[0];
 
-  if (isProduction && !subdomain) throw new Error("Missing subdomain");
+  if (isProduction && !host) throw new Error("Missing host header");
 
   return createTRPCProxyClient<AppRouter>({
     transformer: trpcTransformer,
@@ -21,8 +21,8 @@ export const getTrpcClientOnServer = () => {
       httpBatchLink({
         url: `${process.env.NEXT_PUBLIC_API_URL}/trpc`,
         headers: () => ({
-          Authorization: `Bearer ${refreshToken}`,
-          ...(isProduction ? { "X-Subdomain": subdomain } : {}),
+          ...(refreshToken ? { Authorization: `Bearer ${refreshToken}` } : {}),
+          ...(isProduction ? { origin: `https://${host}/` } : {}),
         }),
         fetch: (url, options) =>
           fetch(url, {

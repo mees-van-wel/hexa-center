@@ -3,8 +3,8 @@
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
-import IsSameOrAfter from "dayjs/plugin/IsSameOrAfter";
-import IsSameOrBefore from "dayjs/plugin/IsSameOrBefore";
+import IsSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import IsSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import {
   FormProvider,
   SubmitHandler,

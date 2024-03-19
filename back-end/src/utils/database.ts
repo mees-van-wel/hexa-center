@@ -23,11 +23,11 @@ const createDynamicConnection = async (databaseName: string) => {
   dbUrl = parts.join("/");
 
   // TODO put as deployment step
-  await migrate(drizzle(postgres(dbUrl, { max: 1 })), {
+  await migrate(drizzle(postgres(dbUrl, { ssl: "require", max: 1 })), {
     migrationsFolder: "drizzle",
   });
 
-  return drizzle(postgres(dbUrl), { schema });
+  return drizzle(postgres(dbUrl, { ssl: "require" }), { schema });
 };
 
 export const getDatabaseClient = async (tenantName: string) => {
