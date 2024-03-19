@@ -7,10 +7,11 @@
 }
 
 .changeOrderExtra {
-  flex: 1;
+  flex: 0;
 
   @media (max-width: 112em) {
     order: 2;
+    flex: 1;
   }
 }
 

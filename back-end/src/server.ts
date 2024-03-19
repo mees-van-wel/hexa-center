@@ -63,7 +63,9 @@ app.use(async (req, res, next) => {
   }
 
   try {
-    const db = await getDatabaseClient(subdomain);
+    const db = await getDatabaseClient(
+      isProduction ? subdomain + "?sslmode=require" : subdomain,
+    );
     ctx.run({ db }, () => {
       req.db = db;
       next();

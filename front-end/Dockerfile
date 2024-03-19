@@ -3,8 +3,7 @@ FROM node:20-alpine AS base
 ENV PNPM_HOME="/pnpm" \
     PATH="$PNPM_HOME:$PATH" \
     NEXT_TELEMETRY_DISABLED=1 \
-    NEXT_SHARP_PATH=/node_modules/sharp \
-    NEXT_PUBLIC_API_URL=https://1-3-0-api.hexa.center
+    NEXT_SHARP_PATH=/node_modules/sharp
 
 RUN corepack enable
 
