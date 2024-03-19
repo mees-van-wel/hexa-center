@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1710760702586,
+      "when": 1710865234819,
       "tag": "0000_lethal_doctor_doom",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1710793099844,
-      "tag": "0001_gigantic_sunset_bain",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1710796057442,
-      "tag": "0002_illegal_logan",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1710849957180,
-      "tag": "0003_nostalgic_squadron_sinister",
       "breakpoints": true
     }
   ]

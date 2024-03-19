@@ -5,7 +5,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "integration_mapping_ref_type" AS ENUM('customer', 'ledgerAccount', 'ledgerAccountType');
+ CREATE TYPE "integration_mapping_ref_type" AS ENUM('customer', 'ledgerAccount', 'journal');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -76,6 +76,30 @@ EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "businesses" (
+	"$kind" text DEFAULT 'business' NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
+	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	"created_by_id" integer,
+	"updated_by_id" integer,
+	"name" text NOT NULL,
+	"email" text NOT NULL,
+	"phone" text NOT NULL,
+	"address_line_one" text NOT NULL,
+	"address_line_two" text,
+	"city" text NOT NULL,
+	"region" text,
+	"postal_code" text,
+	"country" text NOT NULL,
+	"coc_number" text NOT NULL,
+	"vat_id" text NOT NULL,
+	"iban" text NOT NULL,
+	"swift_bic" text NOT NULL,
+	CONSTRAINT "businesses_name_unique" UNIQUE("name")
+);
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "customers" (
 	"$kind" text DEFAULT 'customer' NOT NULL,
 	"id" serial PRIMARY KEY NOT NULL,
@@ -84,7 +108,7 @@ CREATE TABLE IF NOT EXISTS "customers" (
 	"updated_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	"created_by_id" integer,
 	"updated_by_id" integer,
-	"property_id" integer NOT NULL,
+	"business_id" integer NOT NULL,
 	"name" text NOT NULL,
 	"email" text,
 	"phone" text,
@@ -144,7 +168,7 @@ CREATE TABLE IF NOT EXISTS "invoice_lines" (
 	"quantity" numeric(10, 2) NOT NULL,
 	"net_amount" numeric(10, 2) NOT NULL,
 	"vat_amount" numeric(10, 2) NOT NULL,
-	"vat_rate" numeric(10, 2) NOT NULL,
+	"vat_rate" numeric(10, 2),
 	"gross_amount" numeric(10, 2) NOT NULL
 );
 --> statement-breakpoint
@@ -195,15 +219,16 @@ CREATE TABLE IF NOT EXISTS "invoices" (
 	CONSTRAINT "invoices_number_unique" UNIQUE("number")
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "ledger_account_types" (
-	"$kind" text DEFAULT 'ledgerAccountType' NOT NULL,
+CREATE TABLE IF NOT EXISTS "journals" (
+	"$kind" text DEFAULT 'journal' NOT NULL,
 	"id" serial PRIMARY KEY NOT NULL,
 	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"created_by_id" integer,
 	"updated_by_id" integer,
-	"name" text NOT NULL
+	"name" text NOT NULL,
+	CONSTRAINT "journals_name_unique" UNIQUE("name")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "ledger_accounts" (
@@ -215,8 +240,8 @@ CREATE TABLE IF NOT EXISTS "ledger_accounts" (
 	"created_by_id" integer,
 	"updated_by_id" integer,
 	"ledger_id" integer NOT NULL,
-	"type_id" integer NOT NULL,
-	"name" text NOT NULL
+	"name" text NOT NULL,
+	CONSTRAINT "ledger_accounts_name_unique" UNIQUE("name")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "ledgers" (
@@ -227,7 +252,8 @@ CREATE TABLE IF NOT EXISTS "ledgers" (
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"created_by_id" integer,
 	"updated_by_id" integer,
-	"name" text NOT NULL
+	"name" text NOT NULL,
+	CONSTRAINT "ledgers_name_unique" UNIQUE("name")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "logs" (
@@ -257,7 +283,7 @@ CREATE TABLE IF NOT EXISTS "product_instances" (
 	"revenue_account_id" integer NOT NULL,
 	"name" text NOT NULL,
 	"price" numeric(10, 2) NOT NULL,
-	"vat_rate" numeric(10, 2) NOT NULL
+	"vat_rate" numeric(10, 2)
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "product_templates" (
@@ -271,31 +297,7 @@ CREATE TABLE IF NOT EXISTS "product_templates" (
 	"revenue_account_id" integer NOT NULL,
 	"name" text NOT NULL,
 	"price" numeric(10, 2) NOT NULL,
-	"vat_rate" numeric(10, 2) NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "properties" (
-	"$kind" text DEFAULT 'property' NOT NULL,
-	"id" serial PRIMARY KEY NOT NULL,
-	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	"created_by_id" integer,
-	"updated_by_id" integer,
-	"name" text NOT NULL,
-	"email" text NOT NULL,
-	"phone" text NOT NULL,
-	"address_line_one" text NOT NULL,
-	"address_line_two" text,
-	"city" text NOT NULL,
-	"region" text,
-	"postal_code" text,
-	"country" text NOT NULL,
-	"coc_number" text NOT NULL,
-	"vat_id" text NOT NULL,
-	"iban" text NOT NULL,
-	"swift_bic" text NOT NULL,
-	CONSTRAINT "properties_name_unique" UNIQUE("name")
+	"vat_rate" numeric(10, 2)
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "reservations" (
@@ -353,7 +355,7 @@ CREATE TABLE IF NOT EXISTS "rooms" (
 	"updated_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	"created_by_id" integer,
 	"updated_by_id" integer,
-	"property_id" integer NOT NULL,
+	"business_id" integer NOT NULL,
 	"name" text NOT NULL,
 	"price" numeric(10, 2) NOT NULL,
 	CONSTRAINT "rooms_name_unique" UNIQUE("name")
@@ -414,7 +416,7 @@ CREATE TABLE IF NOT EXISTS "users" (
 	"updated_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	"created_by_id" integer,
 	"updated_by_id" integer,
-	"property_id" integer NOT NULL,
+	"business_id" integer NOT NULL,
 	"role_id" integer NOT NULL,
 	"first_name" text NOT NULL,
 	"last_name" text NOT NULL,
@@ -433,6 +435,18 @@ CREATE TABLE IF NOT EXISTS "users" (
 );
 --> statement-breakpoint
 DO $$ BEGIN
+ ALTER TABLE "businesses" ADD CONSTRAINT "businesses_created_by_id_users_id_fk" FOREIGN KEY ("created_by_id") REFERENCES "users"("id") ON DELETE set null ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "businesses" ADD CONSTRAINT "businesses_updated_by_id_users_id_fk" FOREIGN KEY ("updated_by_id") REFERENCES "users"("id") ON DELETE set null ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  ALTER TABLE "customers" ADD CONSTRAINT "customers_created_by_id_users_id_fk" FOREIGN KEY ("created_by_id") REFERENCES "users"("id") ON DELETE set null ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
@@ -445,7 +459,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "customers" ADD CONSTRAINT "customers_property_id_properties_id_fk" FOREIGN KEY ("property_id") REFERENCES "properties"("id") ON DELETE restrict ON UPDATE no action;
+ ALTER TABLE "customers" ADD CONSTRAINT "customers_business_id_businesses_id_fk" FOREIGN KEY ("business_id") REFERENCES "businesses"("id") ON DELETE restrict ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -493,19 +507,19 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "invoices" ADD CONSTRAINT "invoices_company_id_properties_id_fk" FOREIGN KEY ("company_id") REFERENCES "properties"("id") ON DELETE set null ON UPDATE no action;
+ ALTER TABLE "invoices" ADD CONSTRAINT "invoices_company_id_businesses_id_fk" FOREIGN KEY ("company_id") REFERENCES "businesses"("id") ON DELETE set null ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "ledger_account_types" ADD CONSTRAINT "ledger_account_types_created_by_id_users_id_fk" FOREIGN KEY ("created_by_id") REFERENCES "users"("id") ON DELETE set null ON UPDATE no action;
+ ALTER TABLE "journals" ADD CONSTRAINT "journals_created_by_id_users_id_fk" FOREIGN KEY ("created_by_id") REFERENCES "users"("id") ON DELETE set null ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "ledger_account_types" ADD CONSTRAINT "ledger_account_types_updated_by_id_users_id_fk" FOREIGN KEY ("updated_by_id") REFERENCES "users"("id") ON DELETE set null ON UPDATE no action;
+ ALTER TABLE "journals" ADD CONSTRAINT "journals_updated_by_id_users_id_fk" FOREIGN KEY ("updated_by_id") REFERENCES "users"("id") ON DELETE set null ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -529,12 +543,6 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "ledger_accounts" ADD CONSTRAINT "ledger_accounts_type_id_ledger_account_types_id_fk" FOREIGN KEY ("type_id") REFERENCES "ledger_account_types"("id") ON DELETE restrict ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
  ALTER TABLE "ledgers" ADD CONSTRAINT "ledgers_created_by_id_users_id_fk" FOREIGN KEY ("created_by_id") REFERENCES "users"("id") ON DELETE set null ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
@@ -553,7 +561,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "permissions" ADD CONSTRAINT "permissions_role_id_properties_id_fk" FOREIGN KEY ("role_id") REFERENCES "properties"("id") ON DELETE restrict ON UPDATE no action;
+ ALTER TABLE "permissions" ADD CONSTRAINT "permissions_role_id_businesses_id_fk" FOREIGN KEY ("role_id") REFERENCES "businesses"("id") ON DELETE restrict ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -584,18 +592,6 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "product_templates" ADD CONSTRAINT "product_templates_revenue_account_id_ledger_accounts_id_fk" FOREIGN KEY ("revenue_account_id") REFERENCES "ledger_accounts"("id") ON DELETE restrict ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "properties" ADD CONSTRAINT "properties_created_by_id_users_id_fk" FOREIGN KEY ("created_by_id") REFERENCES "users"("id") ON DELETE set null ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "properties" ADD CONSTRAINT "properties_updated_by_id_users_id_fk" FOREIGN KEY ("updated_by_id") REFERENCES "users"("id") ON DELETE set null ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -673,7 +669,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "rooms" ADD CONSTRAINT "rooms_property_id_properties_id_fk" FOREIGN KEY ("property_id") REFERENCES "properties"("id") ON DELETE restrict ON UPDATE no action;
+ ALTER TABLE "rooms" ADD CONSTRAINT "rooms_business_id_businesses_id_fk" FOREIGN KEY ("business_id") REFERENCES "businesses"("id") ON DELETE restrict ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -715,7 +711,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "users" ADD CONSTRAINT "users_property_id_properties_id_fk" FOREIGN KEY ("property_id") REFERENCES "properties"("id") ON DELETE restrict ON UPDATE no action;
+ ALTER TABLE "users" ADD CONSTRAINT "users_business_id_businesses_id_fk" FOREIGN KEY ("business_id") REFERENCES "businesses"("id") ON DELETE restrict ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
