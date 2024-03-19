@@ -18,14 +18,14 @@ import {
   reservationsToInvoices,
   reservationsToProductInstances,
 } from "@/db/schema";
+import {
+  ReservationCreateSchema,
+  ReservationUpdateSchema,
+} from "@/schemas/reservation";
 import { createInvoice } from "@/services/invoice";
 import { getSetting } from "@/services/setting";
 import { procedure, router } from "@/trpc";
 import { wrap } from "@decs/typeschema";
-import {
-  ReservationCreateSchema,
-  ReservationUpdateSchema,
-} from "@front-end/schemas/reservation";
 import { TRPCError } from "@trpc/server";
 
 export const reservationRouter = router({

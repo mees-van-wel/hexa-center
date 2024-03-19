@@ -2,12 +2,9 @@ import { eq } from "drizzle-orm";
 import { number } from "valibot";
 
 import { businesses } from "@/db/schema";
+import { BusinessCreateSchema, BusinessUpdateSchema } from "@/schemas/business";
 import { procedure, router } from "@/trpc";
 import { wrap } from "@decs/typeschema";
-import {
-  BusinessCreateSchema,
-  BusinessUpdateSchema,
-} from "@front-end/schemas/business";
 import { TRPCError } from "@trpc/server";
 
 export const businessRouter = router({

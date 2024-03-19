@@ -2,10 +2,10 @@ import { eq } from "drizzle-orm";
 import { number } from "valibot";
 
 import { users } from "@/db/schema";
+import { UserCreateSchema, UserUpdateSchema } from "@/schemas/user";
 import { procedure, router } from "@/trpc";
 import { createPgException } from "@/utils/exception";
 import { wrap } from "@decs/typeschema";
-import { UserCreateSchema, UserUpdateSchema } from "@front-end/schemas/user";
 import { TRPCError } from "@trpc/server";
 
 export const userRouter = router({

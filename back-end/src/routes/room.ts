@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
 import { number } from "valibot";
 
+import { RoomCreateSchema, RoomUpdateSchema } from "@/schemas/room";
 import { wrap } from "@decs/typeschema";
-import { RoomCreateSchema, RoomUpdateSchema } from "@front-end/schemas/room";
 import { TRPCError } from "@trpc/server";
 
 import { rooms } from "../db/schema";

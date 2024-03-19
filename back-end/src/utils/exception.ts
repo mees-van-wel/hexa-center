@@ -1,4 +1,4 @@
-import type { Exception } from "@front-end/constants/exceptions";
+import type { Exception } from "@/constants/exceptions";
 import { TRPCError } from "@trpc/server";
 
 const PG_EXCEPTION_MAP: Record<string, Exception> = {

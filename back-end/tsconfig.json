@@ -11,8 +11,7 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@/*": ["./src/*"],
-      "@front-end/*": ["../front-end/src/*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": ["src/**/*"],

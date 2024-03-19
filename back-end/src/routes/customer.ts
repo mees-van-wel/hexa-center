@@ -8,6 +8,7 @@ import {
   integrationMappings,
   logs,
 } from "@/db/schema";
+import { CustomerCreateSchema, CustomerUpdateSchema } from "@/schemas/customer";
 import {
   getTwinfieldAccessToken,
   getTwinfieldWsdlUrl,
@@ -17,10 +18,6 @@ import { createPgException } from "@/utils/exception";
 import { readFile } from "@/utils/fileSystem";
 import { sendSoapRequest } from "@/utils/soap";
 import { wrap } from "@decs/typeschema";
-import {
-  CustomerCreateSchema,
-  CustomerUpdateSchema,
-} from "@front-end/schemas/customer";
 import { TRPCError } from "@trpc/server";
 
 export const customerRouter = router({

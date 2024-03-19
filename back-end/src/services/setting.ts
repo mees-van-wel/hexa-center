@@ -1,8 +1,8 @@
 import { eq, inArray } from "drizzle-orm";
 
+import { Settings } from "@/constants/settings";
 import { settings } from "@/db/schema";
 import { getCtx } from "@/utils/context";
-import { Settings } from "@front-end/constants/settings";
 
 // TODO Better error handling
 export const getSetting = async <

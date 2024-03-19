@@ -3,6 +3,7 @@ import Decimal from "decimal.js";
 import { and, eq, or, sql } from "drizzle-orm";
 import ejs from "ejs";
 
+import { Settings } from "@/constants/settings";
 import {
   businesses,
   customers,
@@ -18,7 +19,6 @@ import { getCtx } from "@/utils/context";
 import { readFile } from "@/utils/fileSystem";
 import { generatePdf } from "@/utils/pdf";
 import { sendSoapRequest } from "@/utils/soap";
-import { Settings } from "@front-end/constants/settings";
 import { TRPCError } from "@trpc/server";
 
 import {
