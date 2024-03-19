@@ -8,9 +8,10 @@ RUN corepack enable
 FROM base AS deps
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml .puppeteerrc.cjs ./
 
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN pnpm exec puppeteer browsers install chrome
 
 FROM base AS builder
 WORKDIR /app
@@ -19,7 +20,6 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 RUN pnpm run build
-RUN pnpm exec puppeteer browsers install chrome
 
 FROM base AS runner
 WORKDIR /app
