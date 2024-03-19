@@ -39,7 +39,7 @@
     "node-cache": "^5.1.2",
     "postgres": "^3.4.3",
     "postmark": "^4.0.2",
-    "puppeteer": "^21.7.0",
+    "puppeteer": "^22.5.0",
     "redis": "^4.6.11",
     "socket.io": "^4.7.2",
     "superjson": "^2.2.1",
