@@ -67,7 +67,7 @@ export const RoomUpdate = ({ room }: RoomProps) => {
           title={[
             {
               icon: <IconBed />,
-              label: t("dashboardLayout.rooms"),
+              label: t("entities.room.pluralName"),
               href: "/rooms",
             },
             { label: room.name },

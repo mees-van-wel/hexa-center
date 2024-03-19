@@ -151,7 +151,7 @@ export const authRouter = router({
         where: and(eq(users.email, input.email), eq(users.phone, input.phone)),
         columns: {
           id: true,
-          propertyId: true,
+          businessId: true,
           firstName: true,
           lastName: true,
           email: true,

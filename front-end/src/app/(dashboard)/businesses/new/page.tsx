@@ -3,14 +3,14 @@
 import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 
-import { PropertyForm } from "@/components/entities/property/PropertyForm";
+import { BusinessForm } from "@/components/entities/business/BusinessForm";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
 import {
-  PropertyCreateInputSchema,
-  PropertyCreateSchema,
-} from "@/schemas/property";
+  BusinessCreateInputSchema,
+  BusinessCreateSchema,
+} from "@/schemas/business";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Button, Stack } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
@@ -19,10 +19,10 @@ import { IconBuilding, IconDeviceFloppy } from "@tabler/icons-react";
 export default function Page() {
   const t = useTranslation();
   const router = useRouter();
-  const createProperty = useMutation("property", "create");
+  const createBusiness = useMutation("business", "create");
 
-  const formMethods = useForm<PropertyCreateInputSchema>({
-    resolver: valibotResolver(PropertyCreateSchema),
+  const formMethods = useForm<BusinessCreateInputSchema>({
+    resolver: valibotResolver(BusinessCreateSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -42,13 +42,13 @@ export default function Page() {
 
   const { handleSubmit, formState } = formMethods;
 
-  const onSubmit = async (values: PropertyCreateInputSchema) => {
-    const response = await createProperty.mutate(values);
+  const onSubmit = async (values: BusinessCreateInputSchema) => {
+    const response = await createBusiness.mutate(values);
     notifications.show({
-      message: t("entities.property.createdNotification"),
+      message: t("entities.business.createdNotification"),
       color: "green",
     });
-    router.push(`/properties/${response.id}`);
+    router.push(`/businesses/${response.id}`);
   };
 
   return (
@@ -56,12 +56,12 @@ export default function Page() {
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack>
           <DashboardHeader
-            backRouteFallback="/properties"
+            backRouteFallback="/businesses"
             title={[
               {
                 icon: <IconBuilding />,
-                label: t("dashboardLayout.properties"),
-                href: "/properties",
+                label: t("entities.business.pluralName"),
+                href: "/businesses",
               },
               { label: t("common.new") },
             ]}
@@ -74,7 +74,7 @@ export default function Page() {
               {t("common.save")}
             </Button>
           </DashboardHeader>
-          <PropertyForm />
+          <BusinessForm />
         </Stack>
       </form>
     </FormProvider>

@@ -12,7 +12,7 @@ import {
 
 import { toNull } from "@/valibotPipes/toNull";
 
-export const PropertyCreateSchema = object({
+export const BusinessCreateSchema = object({
   name: string([minLength(2)]),
   email: string([email()]),
   phone: string([minLength(2)]),
@@ -28,7 +28,7 @@ export const PropertyCreateSchema = object({
   swiftBic: string([minLength(2)]),
 });
 
-export const PropertyUpdateSchema = object({
+export const BusinessUpdateSchema = object({
   id: number(),
   name: optional(string([minLength(2)])),
   email: optional(string([email()])),
@@ -45,5 +45,5 @@ export const PropertyUpdateSchema = object({
   swiftBic: optional(string([minLength(2)])),
 });
 
-export type PropertyCreateInputSchema = Input<typeof PropertyCreateSchema>;
-export type PropertyUpdateInputSchema = Input<typeof PropertyUpdateSchema>;
+export type BusinessCreateInputSchema = Input<typeof BusinessCreateSchema>;
+export type BusinessUpdateInputSchema = Input<typeof BusinessUpdateSchema>;

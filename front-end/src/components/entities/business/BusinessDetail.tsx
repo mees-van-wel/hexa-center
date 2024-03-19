@@ -15,9 +15,9 @@ import { useAutosave } from "@/hooks/useAutosave";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
 import {
-  PropertyUpdateInputSchema,
-  PropertyUpdateSchema,
-} from "@/schemas/property";
+  BusinessUpdateInputSchema,
+  BusinessUpdateSchema,
+} from "@/schemas/business";
 import { type RouterOutput } from "@/utils/trpc";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Badge, Button, Loader, Stack } from "@mantine/core";
@@ -30,20 +30,20 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 
-import { PropertyForm } from "./PropertyForm";
+import { BusinessForm } from "./BusinessForm";
 
-type PropertyPageProps = {
-  property: RouterOutput["property"]["get"];
+type BusinessPageProps = {
+  business: RouterOutput["business"]["get"];
 };
 
-export const PropertyDetail = ({ property }: PropertyPageProps) => {
+export const BusinessDetail = ({ business }: BusinessPageProps) => {
   const t = useTranslation();
   const router = useRouter();
-  const deleteProperty = useMutation("property", "delete");
+  const deleteBusiness = useMutation("business", "delete");
 
-  const formMethods = useForm<PropertyUpdateInputSchema>({
-    defaultValues: property,
-    resolver: valibotResolver(PropertyUpdateSchema),
+  const formMethods = useForm<BusinessUpdateInputSchema>({
+    defaultValues: business,
+    resolver: valibotResolver(BusinessUpdateSchema),
   });
 
   const deletehandler = () => {
@@ -51,14 +51,14 @@ export const PropertyDetail = ({ property }: PropertyPageProps) => {
       title: t("common.areYouSure"),
       labels: { confirm: t("common.yes"), cancel: t("common.no") },
       onConfirm: async () => {
-        await deleteProperty.mutate(property.id);
+        await deleteBusiness.mutate(business.id);
 
         notifications.show({
-          message: t("entities.property.deletedNotification"),
+          message: t("entities.business.deletedNotification"),
           color: "green",
         });
 
-        router.push("/properties");
+        router.push("/businesses");
       },
     });
   };
@@ -67,14 +67,14 @@ export const PropertyDetail = ({ property }: PropertyPageProps) => {
     <FormProvider {...formMethods}>
       <Stack>
         <DashboardHeader
-          backRouteFallback="/properties"
+          backRouteFallback="/businesses"
           title={[
             {
               icon: <IconBuilding />,
-              label: t("dashboardLayout.properties"),
-              href: "/properties",
+              label: t("entities.business.pluralName"),
+              href: "/businesses",
             },
-            { label: property.name },
+            { label: business.name },
           ]}
         >
           <Button
@@ -87,7 +87,7 @@ export const PropertyDetail = ({ property }: PropertyPageProps) => {
           </Button>
           <SaveBadge />
         </DashboardHeader>
-        <PropertyForm />
+        <BusinessForm />
         <Metadata />
       </Stack>
     </FormProvider>
@@ -95,11 +95,11 @@ export const PropertyDetail = ({ property }: PropertyPageProps) => {
 };
 
 const SaveBadge = () => {
-  const updateProperty = useMutation("property", "update");
+  const updateBusiness = useMutation("business", "update");
   const t = useTranslation();
 
   const { control, getValues, reset, setError } =
-    useFormContext<PropertyUpdateInputSchema>();
+    useFormContext<BusinessUpdateInputSchema>();
   const { isDirty, errors } = useFormState({ control });
   const isError = useMemo(() => !!Object.keys(errors).length, [errors]);
 
@@ -115,12 +115,12 @@ const SaveBadge = () => {
     }
 
     try {
-      const updatedProperty = await updateProperty.mutate({
+      const updatedBusiness = await updateBusiness.mutate({
         ...values,
         id: getValues("id"),
       });
 
-      reset(updatedProperty);
+      reset(updatedBusiness);
     } catch (error) {
       const { success, json } = isJson((error as any).message);
       if (!success) {
@@ -138,7 +138,7 @@ const SaveBadge = () => {
 
       if (exception === "DB_UNIQUE_CONSTRAINT") {
         setError(data.column, {
-          message: `${t("entities.property.singularName")} - ${getValues(
+          message: `${t("entities.business.singularName")} - ${getValues(
             data.column,
           )} - ${data.column}`,
         });
@@ -150,12 +150,12 @@ const SaveBadge = () => {
     <Badge
       size="lg"
       color={
-        isError ? "red" : isDirty || updateProperty.loading ? "orange" : "green"
+        isError ? "red" : isDirty || updateBusiness.loading ? "orange" : "green"
       }
       leftSection={
         isError ? (
           <IconAlertTriangle size="1rem" />
-        ) : isDirty || updateProperty.loading ? (
+        ) : isDirty || updateBusiness.loading ? (
           <Loader color="orange" variant="oval" size="1rem" />
         ) : (
           <IconCheck size="1rem" />
@@ -165,7 +165,7 @@ const SaveBadge = () => {
     >
       {isError
         ? t("common.error")
-        : isDirty || updateProperty.loading
+        : isDirty || updateBusiness.loading
           ? t("common.saving")
           : t("common.saved")}
     </Badge>

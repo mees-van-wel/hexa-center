@@ -297,7 +297,7 @@ export const reservationRouter = router({
         refId: input.reservationId,
         type: "standard",
         customerId: reservation.customerId,
-        companyId: ctx.user.propertyId,
+        companyId: ctx.user.businessId,
         notes: reservation.invoiceNotes,
         lines: [
           {

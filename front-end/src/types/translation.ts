@@ -54,7 +54,7 @@ export type Translation = {
       isSelfAlertMessage: string;
       isSelfAlertButton: string;
     };
-    property: {
+    business: {
       singularName: string;
       pluralName: string;
       cocNumber: string;
@@ -204,10 +204,6 @@ export type Translation = {
       logout: string;
     };
     home: string;
-    properties: string;
-    roles: string;
-    reservations: string;
-    rooms: string;
   };
   loginPage: {
     login: string;

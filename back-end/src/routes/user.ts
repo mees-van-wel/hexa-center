@@ -18,7 +18,7 @@ export const userRouter = router({
           ...input,
           createdById: ctx.user.id,
           updatedById: ctx.user.id,
-          propertyId: 1,
+          businessId: 1,
           roleId: 1,
         })
         .returning({

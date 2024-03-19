@@ -55,7 +55,7 @@ export const createContext = async ({
     where: eq(users.id, session.userId),
     columns: {
       id: true,
-      propertyId: true,
+      businessId: true,
       firstName: true,
       lastName: true,
       email: true,

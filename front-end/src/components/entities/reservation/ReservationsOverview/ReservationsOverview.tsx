@@ -120,7 +120,7 @@ export const ReservationsOverview = ({
         title={[
           {
             icon: <IconHotelService />,
-            label: t("dashboardLayout.reservations"),
+            label: t("entities.reservation.pluralName"),
           },
         ]}
       >

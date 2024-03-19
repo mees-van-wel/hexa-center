@@ -18,7 +18,7 @@ import { toNull } from "@/valibotPipes/toNull";
 // TODO country picklist
 // TODO sex picklist
 export const UserCreateSchema = object({
-  // propertyId: number(),
+  // businessId: number(),
   // roleId: number(),
   firstName: string([minLength(2)]),
   lastName: string([minLength(2)]),
@@ -36,7 +36,7 @@ export const UserCreateSchema = object({
 
 export const UserUpdateSchema = object({
   id: number(),
-  // propertyId: optional(number()),
+  // businessId: optional(number()),
   // roleId: optional(number()),
   firstName: optional(string([minLength(2)])),
   lastName: optional(string([minLength(2)])),

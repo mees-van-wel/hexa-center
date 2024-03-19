@@ -294,7 +294,7 @@ export const ReservationDetail = ({
           title={[
             {
               icon: <IconHotelService />,
-              label: t("dashboardLayout.reservations"),
+              label: t("entities.reservation.pluralName"),
               href: "/reservations",
             },
             {
