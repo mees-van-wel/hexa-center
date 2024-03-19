@@ -15,7 +15,7 @@ import {
   invertDecimalString,
   issueInvoice,
 } from "@/services/invoice";
-import { getSetting, getSettings } from "@/services/setting";
+import { getSettings } from "@/services/setting";
 import { procedure, router } from "@/trpc";
 import { sendMail } from "@/utils/mail";
 import { wrap } from "@decs/typeschema";
@@ -69,10 +69,12 @@ export const invoiceRouter = router({
   mail: procedure.input(wrap(number())).mutation(async ({ input, ctx }) => {
     const { invoice, base64 } = await generateInvoicePdf(input);
 
-    const { invoiceEmailTitle, invoiceEmailContent } = await getSettings([
-      "invoiceEmailTitle",
-      "invoiceEmailContent",
-    ]);
+    const { companyLogoSrc, invoiceEmailTitle, invoiceEmailContent } =
+      await getSettings([
+        "companyLogoSrc",
+        "invoiceEmailTitle",
+        "invoiceEmailContent",
+      ]);
 
     if (!invoiceEmailTitle || !invoiceEmailContent)
       throw new TRPCError({
@@ -101,15 +103,8 @@ export const invoiceRouter = router({
         message: "Missing company name",
       });
 
-    const companyLogoSrc = await getSetting("companyLogoSrc");
-    if (!companyLogoSrc)
-      throw new TRPCError({
-        code: "BAD_REQUEST",
-        message: "Missing company logo src",
-      });
-
     await sendMail({
-      logo: companyLogoSrc,
+      logo: companyLogoSrc || undefined,
       title: invoiceEmailTitle,
       from: {
         name: companyName,

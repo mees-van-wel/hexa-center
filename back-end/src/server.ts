@@ -13,7 +13,7 @@ import * as trpcExpress from "@trpc/server/adapters/express";
 import { customers, integrationMappings, rooms } from "./db/schema";
 import { appRouter } from "./routes/_app";
 import { ctx } from "./utils/context";
-import { getDatabaseClient } from "./utils/database";
+import { createDynamicConnection, getDatabaseClient } from "./utils/database";
 import { isProduction } from "./utils/environment";
 import { createContext } from "./trpc";
 
@@ -27,8 +27,14 @@ process.on("uncaughtException", (error) => {
   console.error("Uncaught Exception:", error);
 });
 
+// TODO Make dynamic
 const corsOptions: CorsOptions = {
-  origin: ["http://localhost:3000", "https://1-3-0.hexa.center"],
+  origin: [
+    "http://localhost:3000",
+    "https://1-3-0.hexa.center",
+    "https://local-residence.hexa.center",
+    "https://longstay-breda.hexa.center",
+  ],
   credentials: true,
 };
 
@@ -129,7 +135,9 @@ httpServer.listen(3001, async () => {
   // await migrateFirebase();
 });
 
-const migrateFirebase = async (db: any) => {
+const migrateFirebase = async () => {
+  const db = await createDynamicConnection("hexa-center");
+
   const app = initializeApp({
     apiKey: "AIzaSyAxEhAUNP-eZxPthXM0ascC0oWcfUpKa5Y",
     authDomain: "local-residence.firebaseapp.com",

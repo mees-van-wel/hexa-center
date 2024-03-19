@@ -13,7 +13,7 @@ const drizzleClientCache = new NodeCache({
   useClones: false,
 });
 
-const createDynamicConnection = async (databaseName: string) => {
+export const createDynamicConnection = async (databaseName: string) => {
   let dbUrl = process.env.POSTGRES_URL;
   if (!dbUrl) {
     console.warn("Missing env POSTGRES_URL");
