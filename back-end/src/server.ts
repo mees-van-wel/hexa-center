@@ -55,7 +55,7 @@ app.use((req, _, next) => {
 // Initiating database connection
 app.use(async (req, res, next) => {
   const origin = req.headers["origin"];
-  if (!origin || typeof origin !== "string") {
+  if (isProduction && (!origin || typeof origin !== "string")) {
     console.warn("Missing origin header", JSON.stringify(req.headers));
     throw new Error("Missing origin header");
   }
