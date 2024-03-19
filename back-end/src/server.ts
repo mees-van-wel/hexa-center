@@ -150,7 +150,7 @@ const migrateFirebase = async (db: any) => {
       const newRoomResult = await db
         .insert(rooms)
         .values({
-          propertyId: 1,
+          businessId: 1,
           name: room.name,
           price: room.price.toString(),
         })
@@ -176,7 +176,7 @@ const migrateFirebase = async (db: any) => {
       const newCustomerResult = await db
         .insert(customers)
         .values({
-          propertyId: 1,
+          businessId: 1,
           name: customer.name,
           email:
             customer.email === "info@local-residence.com"

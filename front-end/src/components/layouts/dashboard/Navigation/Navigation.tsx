@@ -57,17 +57,17 @@ export const Navigation = () => {
                 fullWidth
                 justify="left"
               >
-                {t("dashboardLayout.roles")}
+                {t("entities.roles.pluralName")}
               </Button> */}
               <Button
                 component={Link}
-                href="/properties"
-                variant={pathname === "/properties" ? "filled" : "subtle"}
+                href="/businesses"
+                variant={pathname === "/businesses" ? "filled" : "subtle"}
                 leftSection={<IconBuilding />}
                 fullWidth
                 justify="left"
               >
-                {t("dashboardLayout.properties")}
+                {t("entities.business.pluralName")}
               </Button>
             </Stack>
           </Stack>
@@ -82,7 +82,7 @@ export const Navigation = () => {
                 fullWidth
                 justify="left"
               >
-                {t("dashboardLayout.reservations")}
+                {t("entities.reservation.pluralName")}
               </Button>
               <Button
                 component={Link}
@@ -92,7 +92,7 @@ export const Navigation = () => {
                 fullWidth
                 justify="left"
               >
-                {t("dashboardLayout.rooms")}
+                {t("entities.room.pluralName")}
               </Button>
             </Stack>
           </Stack>

@@ -27,7 +27,7 @@ export const RoomsOverview = ({ rooms }: RoomsProps) => {
   return (
     <Stack>
       <DashboardHeader
-        title={[{ icon: <IconBed />, label: t("dashboardLayout.rooms") }]}
+        title={[{ icon: <IconBed />, label: t("entities.room.pluralName") }]}
       >
         <Button component={Link} href="/rooms/new" leftSection={<IconPlus />}>
           {t("common.create")}

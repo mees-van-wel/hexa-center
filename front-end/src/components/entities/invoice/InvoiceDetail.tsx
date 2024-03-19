@@ -482,7 +482,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                       component={Link}
                       size="compact-md"
                       // @ts-ignore Router
-                      href={`/properties/${invoice.companyId}`}
+                      href={`/businesses/${invoice.companyId}`}
                       variant="light"
                       rightSection={<IconExternalLink size="1rem" />}
                     >

@@ -12,11 +12,11 @@ import { IconBuilding, IconPlus } from "@tabler/icons-react";
 import { Table } from "../../common/Table";
 import { DashboardHeader } from "../../layouts/dashboard/DashboardHeader";
 
-type PropertiesPageProps = {
-  properties: RouterOutput["property"]["list"];
+type BusinessPageProps = {
+  businesses: RouterOutput["business"]["list"];
 };
 
-export const PropertiesOverview = ({ properties }: PropertiesPageProps) => {
+export const BusinessesOverview = ({ businesses }: BusinessPageProps) => {
   const router = useRouter();
   const searchBarId = useId();
   const t = useTranslation();
@@ -29,13 +29,13 @@ export const PropertiesOverview = ({ properties }: PropertiesPageProps) => {
     <Stack>
       <DashboardHeader
         title={[
-          { icon: <IconBuilding />, label: t("dashboardLayout.properties") },
+          { icon: <IconBuilding />, label: t("entities.business.pluralName") },
         ]}
       >
         <Button
           leftSection={<IconPlus />}
           component={Link}
-          href="/properties/new"
+          href="/businesses/new"
         >
           {t("common.new")}
         </Button>
@@ -44,7 +44,7 @@ export const PropertiesOverview = ({ properties }: PropertiesPageProps) => {
       <Table
         searchBarId={searchBarId}
         onClick={({ id }) => {
-          router.push(`/properties/${id}`);
+          router.push(`/businesses/${id}`);
         }}
         columns={[
           {
@@ -64,7 +64,7 @@ export const PropertiesOverview = ({ properties }: PropertiesPageProps) => {
             label: t("common.number"),
           },
         ]}
-        elements={properties}
+        elements={businesses}
       />
     </Stack>
   );

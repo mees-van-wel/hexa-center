@@ -32,7 +32,7 @@ export const createPgException = (error: any) => {
       message: JSON.stringify({
         exception,
         // TODO retrieve depend name from error
-        data: { depend: "Properties" },
+        data: { depend: "Business" },
       }),
     });
 

@@ -35,7 +35,7 @@ export default function Page() {
       <Stack>
         <DashboardHeader
           title={[
-            { label: t("dashboardLayout.rooms"), href: "/rooms" },
+            { label: t("entities.room.pluralName"), href: "/rooms" },
             { label: t("common.new") },
           ]}
         >

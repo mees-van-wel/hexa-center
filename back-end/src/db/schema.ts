@@ -15,8 +15,8 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-export const properties = pgTable("properties", {
-  $kind: text("$kind").default("property").notNull(),
+export const businesses = pgTable("businesses", {
+  $kind: text("$kind").default("business").notNull(),
   id: serial("id").primaryKey(),
   uuid: uuid("uuid").defaultRandom().notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -27,15 +27,11 @@ export const properties = pgTable("properties", {
     .notNull(),
   createdById: integer("created_by_id").references(
     (): AnyPgColumn => users.id,
-    {
-      onDelete: "set null",
-    },
+    { onDelete: "set null" },
   ),
   updatedById: integer("updated_by_id").references(
     (): AnyPgColumn => users.id,
-    {
-      onDelete: "set null",
-    },
+    { onDelete: "set null" },
   ),
   name: text("name").unique().notNull(),
   email: text("email").notNull(),
@@ -52,13 +48,13 @@ export const properties = pgTable("properties", {
   swiftBic: text("swift_bic").notNull(),
 });
 
-export const propertiesRelations = relations(properties, ({ one }) => ({
+export const businessesRelations = relations(businesses, ({ one }) => ({
   createdBy: one(users, {
-    fields: [properties.createdById],
+    fields: [businesses.createdById],
     references: [users.id],
   }),
   updatedBy: one(users, {
-    fields: [properties.updatedById],
+    fields: [businesses.updatedById],
     references: [users.id],
   }),
 }));
@@ -75,15 +71,11 @@ export const roles = pgTable("roles", {
     .notNull(),
   createdById: integer("created_by_id").references(
     (): AnyPgColumn => users.id,
-    {
-      onDelete: "set null",
-    },
+    { onDelete: "set null" },
   ),
   updatedById: integer("updated_by_id").references(
     (): AnyPgColumn => users.id,
-    {
-      onDelete: "set null",
-    },
+    { onDelete: "set null" },
   ),
   name: text("name").unique().notNull(),
 });
@@ -103,7 +95,7 @@ export const permissions = pgTable(
   "permissions",
   {
     roleId: integer("role_id")
-      .references(() => properties.id, { onDelete: "restrict" })
+      .references(() => businesses.id, { onDelete: "restrict" })
       .notNull(),
     key: text("key").notNull(),
   },
@@ -137,8 +129,8 @@ export const users = pgTable("users", {
     (): AnyPgColumn => users.id,
     { onDelete: "set null" },
   ),
-  propertyId: integer("property_id")
-    .references(() => properties.id, { onDelete: "restrict" })
+  businessId: integer("business_id")
+    .references(() => businesses.id, { onDelete: "restrict" })
     .notNull(),
   roleId: integer("role_id")
     .references(() => roles.id, { onDelete: "restrict" })
@@ -166,9 +158,9 @@ export const usersRelations = relations(users, ({ one, many }) => ({
     fields: [users.updatedById],
     references: [users.id],
   }),
-  property: one(properties, {
-    fields: [users.propertyId],
-    references: [properties.id],
+  business: one(businesses, {
+    fields: [users.businessId],
+    references: [businesses.id],
   }),
   role: one(roles, {
     fields: [users.roleId],
@@ -267,18 +259,14 @@ export const rooms = pgTable("rooms", {
     .notNull(),
   createdById: integer("created_by_id").references(
     (): AnyPgColumn => users.id,
-    {
-      onDelete: "set null",
-    },
+    { onDelete: "set null" },
   ),
   updatedById: integer("updated_by_id").references(
     (): AnyPgColumn => users.id,
-    {
-      onDelete: "set null",
-    },
+    { onDelete: "set null" },
   ),
-  propertyId: integer("property_id")
-    .references(() => properties.id, { onDelete: "restrict" })
+  businessId: integer("business_id")
+    .references(() => businesses.id, { onDelete: "restrict" })
     .notNull(),
   name: text("name").unique().notNull(),
   price: numeric("price", { precision: 10, scale: 2 }).notNull(),
@@ -293,9 +281,9 @@ export const roomsRelations = relations(rooms, ({ one }) => ({
     fields: [rooms.updatedById],
     references: [users.id],
   }),
-  property: one(properties, {
-    fields: [rooms.propertyId],
-    references: [properties.id],
+  business: one(businesses, {
+    fields: [rooms.businessId],
+    references: [businesses.id],
   }),
 }));
 
@@ -311,15 +299,11 @@ export const reservations = pgTable("reservations", {
     .notNull(),
   createdById: integer("created_by_id").references(
     (): AnyPgColumn => users.id,
-    {
-      onDelete: "set null",
-    },
+    { onDelete: "set null" },
   ),
   updatedById: integer("updated_by_id").references(
     (): AnyPgColumn => users.id,
-    {
-      onDelete: "set null",
-    },
+    { onDelete: "set null" },
   ),
   customerId: integer("customer_id")
     .references(() => customers.id, { onDelete: "restrict" })
@@ -453,18 +437,14 @@ export const customers = pgTable("customers", {
     .notNull(),
   createdById: integer("created_by_id").references(
     (): AnyPgColumn => users.id,
-    {
-      onDelete: "set null",
-    },
+    { onDelete: "set null" },
   ),
   updatedById: integer("updated_by_id").references(
     (): AnyPgColumn => users.id,
-    {
-      onDelete: "set null",
-    },
+    { onDelete: "set null" },
   ),
-  propertyId: integer("property_id")
-    .references(() => properties.id, { onDelete: "restrict" })
+  businessId: integer("business_id")
+    .references(() => businesses.id, { onDelete: "restrict" })
     .notNull(),
   name: text("name").unique().notNull(),
   email: text("email").unique(),
@@ -491,9 +471,9 @@ export const customersRelations = relations(customers, ({ one }) => ({
     fields: [customers.updatedById],
     references: [users.id],
   }),
-  property: one(properties, {
-    fields: [customers.propertyId],
-    references: [properties.id],
+  business: one(businesses, {
+    fields: [customers.businessId],
+    references: [businesses.id],
   }),
 }));
 
@@ -552,7 +532,7 @@ export const invoices = pgTable("invoices", {
   customerBillingCountry: text("customer_billing_country"),
   customerVatId: text("customer_vat_id"),
   customerCocNumber: text("customer_coc_number"),
-  companyId: integer("company_id").references(() => properties.id, {
+  companyId: integer("company_id").references(() => businesses.id, {
     onDelete: "set null",
   }),
   companyName: text("company_name"),
@@ -579,9 +559,9 @@ export const invoicesRelations = relations(invoices, ({ one, many }) => ({
     fields: [invoices.customerId],
     references: [customers.id],
   }),
-  company: one(properties, {
+  company: one(businesses, {
     fields: [invoices.companyId],
-    references: [properties.id],
+    references: [businesses.id],
   }),
   lines: many(invoiceLines),
   events: many(invoiceEvents),
@@ -817,9 +797,7 @@ export const ledgerAccounts = pgTable("ledger_accounts", {
     { onDelete: "set null" },
   ),
   ledgerId: integer("ledger_id")
-    .references(() => ledgers.id, {
-      onDelete: "restrict",
-    })
+    .references(() => ledgers.id, { onDelete: "restrict" })
     .notNull(),
   name: text("name").unique().notNull(),
 });

@@ -4,6 +4,7 @@ import { and, eq, or, sql } from "drizzle-orm";
 import ejs from "ejs";
 
 import {
+  businesses,
   customers,
   integrationConnections,
   integrationMappings,
@@ -11,7 +12,6 @@ import {
   invoiceLines,
   invoices,
   logs,
-  properties,
   reservations,
 } from "@/db/schema";
 import { getCtx } from "@/utils/context";
@@ -587,10 +587,10 @@ export const issueInvoice = async (
       message: "Missing company id",
     });
 
-  const [customerResult, propertiesResult, companyPaymentTerms, countResult] =
+  const [customerResult, businessesResult, companyPaymentTerms, countResult] =
     await Promise.all([
       db.select().from(customers).where(eq(customers.id, invoice.customerId)),
-      db.select().from(properties).where(eq(properties.id, invoice.companyId)),
+      db.select().from(businesses).where(eq(businesses.id, invoice.companyId)),
       getSetting("companyPaymentTerms"),
       db
         .select({
@@ -612,7 +612,7 @@ export const issueInvoice = async (
       message: `customer ${invoice.customerId} not found`,
     });
 
-  const company = propertiesResult[0];
+  const company = businessesResult[0];
   if (!company)
     throw new TRPCError({
       code: "NOT_FOUND",

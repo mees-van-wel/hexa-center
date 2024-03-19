@@ -46,15 +46,15 @@ export default {
       isSelfAlertMessage: "Your own personal details are editable only on the",
       isSelfAlertButton: "Profile Page",
     },
-    property: {
-      singularName: "Property",
-      pluralName: "Properties",
+    business: {
+      singularName: "Business",
+      pluralName: "Businesses",
       cocNumber: "CoC-number",
       vatId: "VAT-ID",
       iban: "IBAN",
       swiftBic: "SWIFT/BIC",
-      createdNotification: "Property successfully created",
-      deletedNotification: "Property successfully deleted",
+      createdNotification: "Business successfully created",
+      deletedNotification: "Business successfully deleted",
     },
     room: {
       singularName: "Room",
@@ -197,10 +197,6 @@ export default {
       logout: "Logout",
     },
     home: "Home",
-    properties: "Properties",
-    roles: "Roles",
-    reservations: "Reservations",
-    rooms: "Rooms",
   },
   loginPage: {
     login: "Login",

@@ -6,19 +6,19 @@ import { Address } from "@/components/common/Address";
 import { PhoneInput } from "@/components/common/PhoneInput";
 import { useTranslation } from "@/hooks/useTranslation";
 import {
-  PropertyCreateInputSchema,
-  PropertyUpdateInputSchema,
-} from "@/schemas/property";
+  BusinessCreateInputSchema,
+  BusinessUpdateInputSchema,
+} from "@/schemas/business";
 import { Group, Paper, Stack, TextInput } from "@mantine/core";
 
-type PropertyFormProps = {
+type BusinessFormProps = {
   disabled?: boolean;
 };
 
-export const PropertyForm = ({ disabled }: PropertyFormProps) => {
+export const BusinessForm = ({ disabled }: BusinessFormProps) => {
   const t = useTranslation();
   const { register, control, formState } = useFormContext<
-    PropertyCreateInputSchema | PropertyUpdateInputSchema
+    BusinessCreateInputSchema | BusinessUpdateInputSchema
   >();
 
   return (
@@ -58,28 +58,28 @@ export const PropertyForm = ({ disabled }: PropertyFormProps) => {
         <Group align="end">
           <TextInput
             {...register("vatId")}
-            label={t("entities.property.vatId")}
+            label={t("entities.business.vatId")}
             error={formState.errors.vatId?.message}
             disabled={disabled}
             withAsterisk
           />
           <TextInput
             {...register("cocNumber")}
-            label={t("entities.property.cocNumber")}
+            label={t("entities.business.cocNumber")}
             error={formState.errors.cocNumber?.message}
             disabled={disabled}
             withAsterisk
           />
           <TextInput
             {...register("iban")}
-            label={t("entities.property.iban")}
+            label={t("entities.business.iban")}
             error={formState.errors.iban?.message}
             disabled={disabled}
             withAsterisk
           />
           <TextInput
             {...register("swiftBic")}
-            label={t("entities.property.swiftBic")}
+            label={t("entities.business.swiftBic")}
             error={formState.errors.swiftBic?.message}
             disabled={disabled}
             withAsterisk

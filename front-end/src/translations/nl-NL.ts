@@ -47,15 +47,15 @@ export default {
         "Je eigen persoonlijke gegevens zijn alleen bewerkbaar op de",
       isSelfAlertButton: "Profielpagina",
     },
-    property: {
-      singularName: "Vestiging",
-      pluralName: "Vestigingen",
+    business: {
+      singularName: "Bedrijf",
+      pluralName: "Bedrijven",
       cocNumber: "KVK-nummer",
       vatId: "btw-nummer",
       iban: "IBAN",
       swiftBic: "SWIFT/BIC",
-      createdNotification: "Vestiging succesvol aangemaakt",
-      deletedNotification: "Vestiging succesvol verwijderd",
+      createdNotification: "Bedrijf succesvol aangemaakt",
+      deletedNotification: "Bedrijf succesvol verwijderd",
     },
     room: {
       singularName: "Kamer",
@@ -197,10 +197,6 @@ export default {
       logout: "Logout",
     },
     home: "Home",
-    properties: "Vestigingen",
-    roles: "Rollen",
-    reservations: "Reservaties",
-    rooms: "Kamers",
   },
   loginPage: {
     login: "Inloggen",

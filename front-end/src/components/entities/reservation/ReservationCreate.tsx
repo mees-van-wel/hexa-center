@@ -79,7 +79,7 @@ export const ReservationCreate = ({
           title={[
             {
               icon: <IconHotelService />,
-              label: t("dashboardLayout.reservations"),
+              label: t("entities.reservation.pluralName"),
               href: "/reservations",
             },
             { label: t("common.new") },
