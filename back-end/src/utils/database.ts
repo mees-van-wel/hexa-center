@@ -5,6 +5,8 @@ import postgres from "postgres";
 
 import * as schema from "../db/schema";
 
+import { isProduction } from "./environment";
+
 const drizzleClientCache = new NodeCache({
   stdTTL: 3600,
   checkperiod: 900,
@@ -23,11 +25,16 @@ const createDynamicConnection = async (databaseName: string) => {
   dbUrl = parts.join("/");
 
   // TODO put as deployment step
-  await migrate(drizzle(postgres(dbUrl, { ssl: "require", max: 1 })), {
-    migrationsFolder: "drizzle",
-  });
+  await migrate(
+    drizzle(postgres(dbUrl, { ssl: isProduction ? "require" : false, max: 1 })),
+    {
+      migrationsFolder: "drizzle",
+    },
+  );
 
-  return drizzle(postgres(dbUrl, { ssl: "require" }), { schema });
+  return drizzle(postgres(dbUrl, { ssl: isProduction ? "require" : false }), {
+    schema,
+  });
 };
 
 export const getDatabaseClient = async (tenantName: string) => {

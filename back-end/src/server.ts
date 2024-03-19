@@ -61,7 +61,7 @@ app.use(async (req, res, next) => {
   }
 
   const subdomain = isProduction
-    ? new URL(origin).hostname.split(".")[0]
+    ? new URL(origin!).hostname.split(".")[0]
     : "hexa-center";
 
   try {
