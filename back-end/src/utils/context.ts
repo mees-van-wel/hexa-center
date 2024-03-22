@@ -5,6 +5,7 @@ import * as schema from "../db/schema";
 
 type Store = {
   db: PostgresJsDatabase<typeof schema>;
+  tenant: string;
 };
 
 export const ctx = new AsyncLocalStorage<Store>();

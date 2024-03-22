@@ -39,6 +39,7 @@ type SendMailProps<T extends keyof Mails> = {
   from?: {
     name?: string;
   };
+  replyToEmail?: string;
   to: {
     name: string;
     email: string;
@@ -55,6 +56,7 @@ export const sendMail = async <T extends keyof Mails>({
   from = {
     name: "Hexa Center",
   },
+  replyToEmail,
   company = from.name,
   to,
   template,
@@ -84,6 +86,7 @@ export const sendMail = async <T extends keyof Mails>({
 
   return await postmarkClient.sendEmail({
     From: `${from.name} <noreply@hexa.center>`,
+    ReplyTo: replyToEmail,
     To: `${to.name} <${to.email}>`,
     Subject: title,
     HtmlBody: html,

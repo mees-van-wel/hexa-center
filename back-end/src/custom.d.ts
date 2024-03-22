@@ -6,6 +6,7 @@ declare global {
   namespace Express {
     interface Request {
       db: PostgresJsDatabase<typeof schema>;
+      tenant: string;
     }
   }
 }

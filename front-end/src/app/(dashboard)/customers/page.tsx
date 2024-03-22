@@ -5,5 +5,9 @@ export default async function Page() {
   const trpc = getTrpcClientOnServer();
   const customers = await trpc.customer.list.query();
 
-  return <CustomersOverview customers={customers} />;
+  return (
+    <CustomersOverview
+      customers={customers.sort((a, b) => a.name.localeCompare(b.name))}
+    />
+  );
 }

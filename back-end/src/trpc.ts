@@ -11,7 +11,7 @@ export const createContext = async ({
   req,
   res,
 }: trpcExpress.CreateExpressContextOptions) => {
-  let refreshToken = req.cookies.refreshToken;
+  let refreshToken = req.cookies[`refreshToken_${req.tenant}`];
   const authHeader = req.headers.authorization;
   const db = req.db;
 
@@ -39,7 +39,7 @@ export const createContext = async ({
 
   const session = sessionsResult[0];
   if (!session) {
-    res.cookie("refreshToken", "", {
+    res.cookie(`refreshToken_${req.tenant}`, "", {
       domain: isProduction ? ".hexa.center" : undefined,
       sameSite: isProduction ? "none" : "lax",
       secure: isProduction,
@@ -99,7 +99,7 @@ export const createContext = async ({
   // TODO Token rotation (Causes infinte loop on front-end for some reason)
   // refreshToken = crypto.randomBytes(32).toString("base64url");
 
-  // res.cookie("refreshToken", refreshToken, {
+  // res.cookie(`refreshToken_${req.tenant}`, refreshToken, {
   //   domain: isProduction ? ".hexa.center" : undefined,
   //   sameSite: isProduction ? "none" : "lax",
   //   secure: isProduction,

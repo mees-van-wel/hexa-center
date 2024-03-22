@@ -311,10 +311,9 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
       </DashboardHeader>
       <Group align="stretch">
         <Paper p="2rem" style={{ flex: 1 }}>
-          <Band
-            title={
-              <>
-                <Title order={3}>Invoice</Title>
+          <Band title={<Title order={3}>Invoice</Title>} fh>
+            <Group align="stretch" justify="space-between" gap="2rem">
+              <Stack align="flex-start">
                 <Button
                   component={Link}
                   size="compact-md"
@@ -322,16 +321,10 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   // @ts-ignore Router
                   href={`/${invoice.refType}s/${invoice.refId}`}
                   variant="light"
-                  rightSection={<IconExternalLink size="1rem" />}
+                  leftSection={<IconExternalLink size="1rem" />}
                 >
                   {invoice.refType} {invoice.refId}
                 </Button>
-              </>
-            }
-            fh
-          >
-            <Group align="stretch" justify="space-between" gap="2rem">
-              <Stack align="flex-start">
                 <div>
                   <p>
                     <strong>{t("entities.invoice.type")}:</strong>{" "}
@@ -382,33 +375,30 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
           <Band.Group>
             <Band
               title={
-                <>
-                  <Title order={3}>{t("entities.invoice.customerName")}</Title>
-                  <Title order={3}>-</Title>
-                  {invoice.customerId ? (
-                    <Button
-                      component={Link}
-                      size="compact-md"
-                      // @ts-ignore Router
-                      href={`/customers/${invoice.customerId}`}
-                      variant="light"
-                      rightSection={<IconExternalLink size="1rem" />}
-                    >
-                      {invoice.customerName || invoice.customer?.name}
-                    </Button>
-                  ) : (
-                    <p
-                      style={{
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {invoice.customerName}
-                    </p>
-                  )}
-                </>
+                <Title order={3}>{t("entities.invoice.customerName")}</Title>
               }
             >
-              <Stack>
+              <Stack align="flex-start">
+                {invoice.customerId ? (
+                  <Button
+                    component={Link}
+                    size="compact-md"
+                    // @ts-ignore Router
+                    href={`/customers/${invoice.customerId}`}
+                    variant="light"
+                    leftSection={<IconExternalLink size="1rem" />}
+                  >
+                    {invoice.customerName || invoice.customer?.name}
+                  </Button>
+                ) : (
+                  <p
+                    style={{
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {invoice.customerName}
+                  </p>
+                )}
                 <div>
                   <p style={{ whiteSpace: "nowrap" }}>
                     {invoice.customerBillingAddressLineOne ||
@@ -472,35 +462,28 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                 )}
               </Stack>
             </Band>
-            <Band
-              title={
-                <>
-                  <Title order={3}>Your details</Title>
-                  <Title order={3}>-</Title>
-                  {invoice.customerId ? (
-                    <Button
-                      component={Link}
-                      size="compact-md"
-                      // @ts-ignore Router
-                      href={`/businesses/${invoice.companyId}`}
-                      variant="light"
-                      rightSection={<IconExternalLink size="1rem" />}
-                    >
-                      {invoice.companyName || invoice.company?.name}
-                    </Button>
-                  ) : (
-                    <p
-                      style={{
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {invoice.companyName}
-                    </p>
-                  )}
-                </>
-              }
-            >
-              <Stack>
+            <Band title={<Title order={3}>Your details</Title>}>
+              <Stack align="flex-start">
+                {invoice.customerId ? (
+                  <Button
+                    component={Link}
+                    size="compact-md"
+                    // @ts-ignore Router
+                    href={`/businesses/${invoice.companyId}`}
+                    variant="light"
+                    leftSection={<IconExternalLink size="1rem" />}
+                  >
+                    {invoice.companyName || invoice.company?.name}
+                  </Button>
+                ) : (
+                  <p
+                    style={{
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {invoice.companyName}
+                  </p>
+                )}
                 <div>
                   <p style={{ whiteSpace: "nowrap" }}>
                     {invoice.companyAddressLineOne ||
@@ -558,7 +541,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
         </Paper>
         <Paper p="2rem" style={{ flex: 1 }}>
           <Band title={<Title order={3}>Timeline</Title>} fh>
-            <ScrollArea h={271} type="always" offsetScrollbars>
+            <ScrollArea h={300} type="always" offsetScrollbars>
               <Timeline
                 active={invoice.events.length}
                 bulletSize="2rem"

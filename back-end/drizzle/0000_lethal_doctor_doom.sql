@@ -76,8 +76,8 @@ EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "businesses" (
-	"$kind" text DEFAULT 'business' NOT NULL,
+CREATE TABLE IF NOT EXISTS "companies" (
+	"$kind" text DEFAULT 'company' NOT NULL,
 	"id" serial PRIMARY KEY NOT NULL,
 	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS "businesses" (
 	"vat_id" text NOT NULL,
 	"iban" text NOT NULL,
 	"swift_bic" text NOT NULL,
-	CONSTRAINT "businesses_name_unique" UNIQUE("name")
+	CONSTRAINT "companies_name_unique" UNIQUE("name")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "customers" (
@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS "customers" (
 	"updated_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	"created_by_id" integer,
 	"updated_by_id" integer,
-	"business_id" integer NOT NULL,
+	"company_id" integer NOT NULL,
 	"name" text NOT NULL,
 	"email" text,
 	"phone" text,
@@ -123,9 +123,7 @@ CREATE TABLE IF NOT EXISTS "customers" (
 	"contact_person_name" text,
 	"contact_person_email" text,
 	"contact_person_phone" text,
-	CONSTRAINT "customers_name_unique" UNIQUE("name"),
-	CONSTRAINT "customers_email_unique" UNIQUE("email"),
-	CONSTRAINT "customers_phone_unique" UNIQUE("phone")
+	CONSTRAINT "customers_name_unique" UNIQUE("name")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "integration_connections" (
@@ -313,7 +311,7 @@ CREATE TABLE IF NOT EXISTS "reservations" (
 	"start_date" timestamp with time zone NOT NULL,
 	"end_date" timestamp with time zone NOT NULL,
 	"price_override" numeric(10, 2),
-	"guest_name" text NOT NULL,
+	"guest_name" text,
 	"reservation_notes" text,
 	"invoice_notes" text
 );
@@ -355,7 +353,7 @@ CREATE TABLE IF NOT EXISTS "rooms" (
 	"updated_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	"created_by_id" integer,
 	"updated_by_id" integer,
-	"business_id" integer NOT NULL,
+	"company_id" integer NOT NULL,
 	"name" text NOT NULL,
 	"price" numeric(10, 2) NOT NULL,
 	CONSTRAINT "rooms_name_unique" UNIQUE("name")
@@ -416,7 +414,7 @@ CREATE TABLE IF NOT EXISTS "users" (
 	"updated_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	"created_by_id" integer,
 	"updated_by_id" integer,
-	"business_id" integer NOT NULL,
+	"company_id" integer NOT NULL,
 	"role_id" integer NOT NULL,
 	"first_name" text NOT NULL,
 	"last_name" text NOT NULL,
@@ -435,13 +433,13 @@ CREATE TABLE IF NOT EXISTS "users" (
 );
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "businesses" ADD CONSTRAINT "businesses_created_by_id_users_id_fk" FOREIGN KEY ("created_by_id") REFERENCES "users"("id") ON DELETE set null ON UPDATE no action;
+ ALTER TABLE "companies" ADD CONSTRAINT "companies_created_by_id_users_id_fk" FOREIGN KEY ("created_by_id") REFERENCES "users"("id") ON DELETE set null ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "businesses" ADD CONSTRAINT "businesses_updated_by_id_users_id_fk" FOREIGN KEY ("updated_by_id") REFERENCES "users"("id") ON DELETE set null ON UPDATE no action;
+ ALTER TABLE "companies" ADD CONSTRAINT "companies_updated_by_id_users_id_fk" FOREIGN KEY ("updated_by_id") REFERENCES "users"("id") ON DELETE set null ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -459,7 +457,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "customers" ADD CONSTRAINT "customers_business_id_businesses_id_fk" FOREIGN KEY ("business_id") REFERENCES "businesses"("id") ON DELETE restrict ON UPDATE no action;
+ ALTER TABLE "customers" ADD CONSTRAINT "customers_company_id_companies_id_fk" FOREIGN KEY ("company_id") REFERENCES "companies"("id") ON DELETE restrict ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -507,7 +505,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "invoices" ADD CONSTRAINT "invoices_company_id_businesses_id_fk" FOREIGN KEY ("company_id") REFERENCES "businesses"("id") ON DELETE set null ON UPDATE no action;
+ ALTER TABLE "invoices" ADD CONSTRAINT "invoices_company_id_companies_id_fk" FOREIGN KEY ("company_id") REFERENCES "companies"("id") ON DELETE set null ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -561,7 +559,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "permissions" ADD CONSTRAINT "permissions_role_id_businesses_id_fk" FOREIGN KEY ("role_id") REFERENCES "businesses"("id") ON DELETE restrict ON UPDATE no action;
+ ALTER TABLE "permissions" ADD CONSTRAINT "permissions_role_id_roles_id_fk" FOREIGN KEY ("role_id") REFERENCES "roles"("id") ON DELETE restrict ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -669,7 +667,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "rooms" ADD CONSTRAINT "rooms_business_id_businesses_id_fk" FOREIGN KEY ("business_id") REFERENCES "businesses"("id") ON DELETE restrict ON UPDATE no action;
+ ALTER TABLE "rooms" ADD CONSTRAINT "rooms_company_id_companies_id_fk" FOREIGN KEY ("company_id") REFERENCES "companies"("id") ON DELETE restrict ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -711,7 +709,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "users" ADD CONSTRAINT "users_business_id_businesses_id_fk" FOREIGN KEY ("business_id") REFERENCES "businesses"("id") ON DELETE restrict ON UPDATE no action;
+ ALTER TABLE "users" ADD CONSTRAINT "users_company_id_companies_id_fk" FOREIGN KEY ("company_id") REFERENCES "companies"("id") ON DELETE restrict ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

@@ -6,5 +6,7 @@ export default async function Page() {
 
   const rooms = await trpc.room.list.query();
 
-  return <RoomsOverview rooms={rooms} />;
+  return (
+    <RoomsOverview rooms={rooms.sort((a, b) => a.name.localeCompare(b.name))} />
+  );
 }

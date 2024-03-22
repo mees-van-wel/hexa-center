@@ -242,7 +242,7 @@ export const authRouter = router({
       })();
 
       // TODO cookie util
-      ctx.res.cookie("refreshToken", refreshToken, {
+      ctx.res.cookie(`refreshToken_${ctx.req.tenant}`, refreshToken, {
         domain: isProduction ? ".hexa.center" : undefined,
         sameSite: isProduction ? "none" : "lax",
         secure: isProduction,
@@ -265,14 +265,14 @@ export const authRouter = router({
     };
   }),
   logout: procedure.meta({ public: true }).mutation(async ({ ctx }) => {
-    const refreshToken = ctx.req.cookies.refreshToken;
+    const refreshToken = ctx.req.cookies[`refreshToken_${ctx.req.tenant}`];
     if (!refreshToken) return;
 
     await ctx.db
       .delete(userSessions)
       .where(eq(userSessions.refreshToken, refreshToken));
 
-    ctx.res.cookie("refreshToken", "", {
+    ctx.res.cookie(`refreshToken_${ctx.req.tenant}`, "", {
       domain: isProduction ? ".hexa.center" : undefined,
       sameSite: isProduction ? "none" : "lax",
       secure: isProduction,

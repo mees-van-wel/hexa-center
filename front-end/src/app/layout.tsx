@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 };
 
 // TODO variable light dark theme
-const dark = true;
+const dark = false;
 
 export default async function RootLayout({
   children,

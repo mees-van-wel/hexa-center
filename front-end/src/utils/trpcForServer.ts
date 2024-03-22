@@ -9,11 +9,12 @@ import { AppRouter } from "./trpc";
 import { trpcTransformer } from "./trpcTransformer";
 
 export const getTrpcClientOnServer = () => {
-  const refreshToken = cookies().get("refreshToken")?.value;
   const host = headers().get("host");
-  // const subdomain = host?.split(".")[0];
 
   if (isProduction && !host) throw new Error("Missing host header");
+
+  const subdomain = host?.split(".")[0];
+  const refreshToken = cookies().get(`refreshToken_${subdomain}`)?.value;
 
   return createTRPCProxyClient<AppRouter>({
     transformer: trpcTransformer,

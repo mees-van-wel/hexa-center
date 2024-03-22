@@ -67,9 +67,9 @@ export const ReservationForm = ({ rooms, customers }: ReservationForm) => {
     if (getFieldState("guestName").isTouched) return;
 
     const customer = customers.find(({ id }) => id === customerId);
-    if (!customer) return;
+    if (!customer?.contactPersonName) return;
 
-    setValue("guestName", customer.contactPersonName || customer.name);
+    setValue("guestName", customer.contactPersonName);
   }, [customerId]);
 
   return (
@@ -150,7 +150,6 @@ export const ReservationForm = ({ rooms, customers }: ReservationForm) => {
                 {...field}
                 error={error?.message}
                 label={t("entities.reservation.guestName")}
-                withAsterisk
               />
             )}
           />

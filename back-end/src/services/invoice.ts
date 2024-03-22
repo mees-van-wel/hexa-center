@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import Decimal from "decimal.js";
-import { and, eq, or, sql } from "drizzle-orm";
+import { and, desc, eq, or, sql } from "drizzle-orm";
 import ejs from "ejs";
 
 import { Settings } from "@/constants/settings";
@@ -587,23 +587,41 @@ export const issueInvoice = async (
       message: "Missing company id",
     });
 
-  const [customerResult, businessesResult, companyPaymentTerms, countResult] =
-    await Promise.all([
-      db.select().from(customers).where(eq(customers.id, invoice.customerId)),
-      db.select().from(businesses).where(eq(businesses.id, invoice.companyId)),
-      getSetting("companyPaymentTerms"),
-      db
-        .select({
-          count: sql<number>`CAST(COUNT(*) AS INT)`,
-        })
-        .from(invoices)
-        .where(
-          and(
-            sql`EXTRACT(YEAR FROM ${invoices.date}) = ${date.getFullYear()}`,
-            or(eq(invoices.type, "standard"), eq(invoices.type, "credit")),
-          ),
+  const [
+    customerResult,
+    businessesResult,
+    companyPaymentTerms,
+    countResult,
+    highestNumber,
+  ] = await Promise.all([
+    db.select().from(customers).where(eq(customers.id, invoice.customerId)),
+    db.select().from(businesses).where(eq(businesses.id, invoice.companyId)),
+    getSetting("companyPaymentTerms"),
+    db
+      .select({
+        count: sql<number>`CAST(COUNT(*) AS INT)`,
+      })
+      .from(invoices)
+      .where(
+        and(
+          sql`EXTRACT(YEAR FROM ${invoices.date}) = ${date.getFullYear()}`,
+          or(eq(invoices.type, "standard"), eq(invoices.type, "credit")),
         ),
-    ]);
+      ),
+    db
+      .select({
+        number: invoices.number,
+      })
+      .from(invoices)
+      .where(
+        and(
+          sql`EXTRACT(YEAR FROM ${invoices.date}) = ${date.getFullYear()}`,
+          or(eq(invoices.type, "standard"), eq(invoices.type, "credit")),
+        ),
+      )
+      .orderBy(desc(invoices.number))
+      .limit(1),
+  ]);
 
   const customer = customerResult[0];
   if (!customer)
@@ -622,9 +640,22 @@ export const issueInvoice = async (
   const { count } = countResult[0];
 
   const dueDate = dayjs(date).add(dayjs.duration(companyPaymentTerms));
-  const invoiceNumber =
-    invoice.number ||
-    date.getFullYear() + (count + 1).toString().padStart(4, "0");
+
+  let invoiceNumber: string = (count + 1).toString().padStart(4, "0");
+  const highestInvoiceNumber = highestNumber[0]?.number?.split("-")[0].slice(4);
+
+  if (
+    highestInvoiceNumber &&
+    highestInvoiceNumber.localeCompare(invoiceNumber, undefined, {
+      numeric: true,
+    }) > 0
+  ) {
+    invoiceNumber = (parseInt(highestInvoiceNumber) + 1)
+      .toString()
+      .padStart(4, "0");
+  }
+
+  invoiceNumber = date.getFullYear() + invoiceNumber;
 
   // TODO only update when empty (customer/company)
   await db
@@ -636,7 +667,7 @@ export const issueInvoice = async (
         invoice.type !== "credit" && invoice.type !== "quotation"
           ? dueDate.toDate()
           : undefined,
-      number: invoiceNumber,
+      number: invoice.number || invoiceNumber,
       customerName: customer.name,
       customerEmail: customer.email,
       customerPhone: customer.phone,

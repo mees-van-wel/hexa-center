@@ -15,8 +15,8 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-export const businesses = pgTable("businesses", {
-  $kind: text("$kind").default("business").notNull(),
+export const businesses = pgTable("companies", {
+  $kind: text("$kind").default("company").notNull(),
   id: serial("id").primaryKey(),
   uuid: uuid("uuid").defaultRandom().notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -95,7 +95,7 @@ export const permissions = pgTable(
   "permissions",
   {
     roleId: integer("role_id")
-      .references(() => businesses.id, { onDelete: "restrict" })
+      .references(() => roles.id, { onDelete: "restrict" })
       .notNull(),
     key: text("key").notNull(),
   },
@@ -129,7 +129,7 @@ export const users = pgTable("users", {
     (): AnyPgColumn => users.id,
     { onDelete: "set null" },
   ),
-  businessId: integer("business_id")
+  businessId: integer("company_id")
     .references(() => businesses.id, { onDelete: "restrict" })
     .notNull(),
   roleId: integer("role_id")
@@ -265,7 +265,7 @@ export const rooms = pgTable("rooms", {
     (): AnyPgColumn => users.id,
     { onDelete: "set null" },
   ),
-  businessId: integer("business_id")
+  businessId: integer("company_id")
     .references(() => businesses.id, { onDelete: "restrict" })
     .notNull(),
   name: text("name").unique().notNull(),
@@ -314,7 +314,7 @@ export const reservations = pgTable("reservations", {
   startDate: timestamp("start_date", { withTimezone: true }).notNull(),
   endDate: timestamp("end_date", { withTimezone: true }).notNull(),
   priceOverride: numeric("price_override", { precision: 10, scale: 2 }),
-  guestName: text("guest_name").notNull(),
+  guestName: text("guest_name"),
   reservationNotes: text("reservation_notes"),
   invoiceNotes: text("invoice_notes"),
 });
@@ -443,12 +443,12 @@ export const customers = pgTable("customers", {
     (): AnyPgColumn => users.id,
     { onDelete: "set null" },
   ),
-  businessId: integer("business_id")
+  businessId: integer("company_id")
     .references(() => businesses.id, { onDelete: "restrict" })
     .notNull(),
   name: text("name").unique().notNull(),
-  email: text("email").unique(),
-  phone: text("phone").unique(),
+  email: text("email"),
+  phone: text("phone"),
   billingAddressLineOne: text("billing_address_line_one").notNull(),
   billingAddressLineTwo: text("billing_address_line_two"),
   billingCity: text("billing_city").notNull(),

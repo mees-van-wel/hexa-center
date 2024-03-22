@@ -109,6 +109,7 @@ export const invoiceRouter = router({
       from: {
         name: companyName,
       },
+      replyToEmail: invoice.companyEmail || invoice.company?.email || undefined,
       to: {
         name: customerName,
         email: customerEmail,
