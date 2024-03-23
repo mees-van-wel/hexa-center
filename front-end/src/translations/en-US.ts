@@ -70,6 +70,25 @@ export default {
       createdNotification: "Property successfully created",
       deletedNotification: "Property successfully deleted",
     },
+    appointmentType: {
+      name: {
+        singular: "Appointment type",
+        plural: "Appointment types",
+      },
+      keys: {
+        name: "Name",
+        start: "Start",
+        end: "End",
+        color: "Color",
+        number: "Number",
+      },
+      duration: "Duration",
+      hours: "Hours",
+      minutes: "Minutes",
+      appointmentDescription: "Appointment description",
+      createdNotification: "Appointment type successfully created",
+      deletedNotification: "Appointment type successfully deleted",
+    },
     room: {
       name: {
         singular: "Room",
@@ -185,6 +204,7 @@ export default {
       logout: "Logout",
     },
     home: "Home",
+    appointmentTypes: "Appointment Types",
     properties: "Properties",
     roles: "Roles",
     reservations: "Reservations",

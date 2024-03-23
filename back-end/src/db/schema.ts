@@ -59,6 +59,48 @@ export const propertiesRelations = relationBuilder(properties, ({ one }) => ({
   }),
 }));
 
+export const appointmentTypes = pgTable("appointmentTypes", {
+  $kind: text("$kind").default("appointmentTypes").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  createdById: integer("created_by_id").references(
+    (): AnyPgColumn => relations.id,
+    {
+      onDelete: "set null",
+    },
+  ),
+  updatedById: integer("updated_by_id").references(
+    (): AnyPgColumn => relations.id,
+    {
+      onDelete: "set null",
+    },
+  ),
+  name: text("name").unique().notNull(),
+  color: text("color").notNull(),
+  appointmentDescription: text("appointmentDescription"),
+  appointmentDuration: text("appointmentDuration"),
+});
+
+export const appointmentTypesRelations = relationBuilder(
+  appointmentTypes,
+  ({ one }) => ({
+    createdBy: one(relations, {
+      fields: [appointmentTypes.createdById],
+      references: [relations.id],
+    }),
+    updatedBy: one(relations, {
+      fields: [appointmentTypes.updatedById],
+      references: [relations.id],
+    }),
+  }),
+);
+
 export const roles = pgTable("roles", {
   $kind: text("$kind").default("role").notNull(),
   id: serial("id").primaryKey(),

@@ -79,6 +79,25 @@ export type Translation = {
       deletedNotification: string;
       createdNotification: string;
     };
+    appointmentType: {
+      name: {
+        singular: string;
+        plural: string;
+      };
+      keys: {
+        name: string;
+        start: string;
+        end: string;
+        color: string;
+        number: string;
+      };
+      duration: string;
+      hours: string;
+      minutes: string;
+      appointmentDescription: string;
+      deletedNotification: string;
+      createdNotification: string;
+    };
     room: {
       name: {
         singular: string;
@@ -195,6 +214,7 @@ export type Translation = {
     };
     home: string;
     properties: string;
+    appointmentTypes: string;
     roles: string;
     reservations: string;
     rooms: string;

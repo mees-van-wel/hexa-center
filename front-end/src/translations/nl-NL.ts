@@ -70,6 +70,25 @@ export default {
       createdNotification: "Vestiging succesvol aangemaakt",
       deletedNotification: "Vestiging succesvol verwijderd",
     },
+    appointmentType: {
+      name: {
+        singular: "Afspraaktype",
+        plural: "Afspraaktypes",
+      },
+      keys: {
+        name: "Naam",
+        start: "Start",
+        end: "Einde",
+        color: "Kleur",
+        number: "Nummer",
+      },
+      duration: "Tijdsduur",
+      hours: "Uren",
+      minutes: "Minuten",
+      appointmentDescription: "Afspraakbeschrijving",
+      createdNotification: "Afspraaktype succesvol aangemaakt",
+      deletedNotification: "Afsrpaaktype succesvol verwijderd",
+    },
     room: {
       name: {
         singular: "Kamer",
@@ -185,6 +204,7 @@ export default {
       logout: "Logout",
     },
     home: "Home",
+    appointmentTypes: "Afspraak Types",
     properties: "Vestigingen",
     roles: "Rollen",
     reservations: "Reservaties",
