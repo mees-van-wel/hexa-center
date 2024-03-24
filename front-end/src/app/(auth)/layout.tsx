@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import background from "@/assets/images/bg.jpeg";
-import icon from "@/assets/images/icon-white.svg";
+import icon from "@/assets/images/icon-black.svg";
 import { useCompanyName } from "@/hooks/useCompanyName";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Button, Group, Stack, Title } from "@mantine/core";

@@ -30,7 +30,7 @@ export const Sheet = ({ title, showDefault, children, glass }: SheetProps) => {
           [styles.glass]: glass,
         })}
       >
-        <Group gap={0}>
+        <Group gap={0} align="stretch">
           <Title order={3} className={styles.title}>
             {title}
           </Title>

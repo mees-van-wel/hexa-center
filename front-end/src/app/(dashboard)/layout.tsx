@@ -89,7 +89,7 @@ export default function DashboardLayout({
           <Paper
             component={Stack}
             pos="relative"
-            h="100%"
+            mih="100%"
             visibleFrom="md"
             p="md"
             style={{ flexShrink: 0 }}

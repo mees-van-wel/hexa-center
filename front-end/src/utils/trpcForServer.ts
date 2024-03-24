@@ -13,7 +13,7 @@ export const getTrpcClientOnServer = () => {
 
   if (isProduction && !host) throw new Error("Missing host header");
 
-  const subdomain = host?.split(".")[0];
+  const subdomain = isProduction ? host?.split(".")[0] : "hexa-center";
   const refreshToken = cookies().get(`refreshToken_${subdomain}`)?.value;
 
   return createTRPCProxyClient<AppRouter>({

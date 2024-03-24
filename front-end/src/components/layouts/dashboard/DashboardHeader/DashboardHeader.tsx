@@ -4,6 +4,7 @@ import { Fragment } from "react";
 import type { Route } from "next";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import clsx from "clsx";
 import { useRecoilValue } from "recoil";
 
 import { useAuthUser } from "@/contexts/AuthContext";
@@ -86,7 +87,7 @@ export const DashboardHeader = ({
         </Paper>
       )}
       <Paper
-        className={[styles.titleContainer, styles.changeOrderTitle]}
+        className={clsx([styles.titleContainer, styles.changeOrderTitle])}
         component={Group}
         wrap="nowrap"
         justify="center"

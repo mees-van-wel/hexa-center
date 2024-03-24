@@ -82,15 +82,11 @@ export default function Profile() {
           <Stack>
             <Group>
               <p>{t("common.email")}:</p>
-              <Badge variant="dot" color="orange">
-                {authUser.email}
-              </Badge>
+              <Badge variant="dot">{authUser.email}</Badge>
             </Group>
             <Group>
               <p>{t("common.phone")}:</p>
-              <Badge variant="dot" color="orange">
-                {authUser.phone}
-              </Badge>
+              <Badge variant="dot">{authUser.phone}</Badge>
             </Group>
           </Stack>
         </Sheet>

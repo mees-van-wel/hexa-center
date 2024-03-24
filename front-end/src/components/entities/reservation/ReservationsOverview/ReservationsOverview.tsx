@@ -115,7 +115,7 @@ export const ReservationsOverview = ({
   );
 
   return (
-    <Stack h="100%">
+    <Stack mih="100%">
       <DashboardHeader
         title={[
           {
@@ -136,8 +136,8 @@ export const ReservationsOverview = ({
       <Group
         wrap="nowrap"
         gap={sidebarToggle ? "md" : 0}
-        align="stretch"
-        h="100%"
+        align="flex-start"
+        mih="100%"
         className={styles.calendarOverview}
       >
         <div className={styles.calendarContainer}>
@@ -170,7 +170,6 @@ export const ReservationsOverview = ({
                   </div>
                 ))}
               </Group>
-
               <Stack gap={0} w="100%">
                 <ReservationCalendar
                   currentWeek={currentWeek}

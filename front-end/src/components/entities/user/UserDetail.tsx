@@ -18,7 +18,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { UserUpdateInputSchema, UserUpdateSchema } from "@/schemas/user";
 import { type RouterOutput } from "@/utils/trpc";
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { Alert, Badge, Button, Loader, Stack } from "@mantine/core";
+import { Alert, Badge, Button, Loader, Paper, Stack } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import {
@@ -94,17 +94,19 @@ export const UserDetail = ({ user }: UserDetailProps) => {
           )}
         </DashboardHeader>
         {isSelf && (
-          <Alert
-            icon={<IconAlertTriangle />}
-            color="orange"
-            title={t("entities.user.isSelfAlertTitle")}
-          >
-            {/* {t("entities.user.isSelfAlertMessage") + " "}
+          <Paper>
+            <Alert
+              icon={<IconAlertTriangle />}
+              color="orange"
+              title={t("entities.user.isSelfAlertTitle")}
+            >
+              {/* {t("entities.user.isSelfAlertMessage") + " "}
             <Link href="/profile">
               {t("entities.user.isSelfAlertButton")}
             </Link>
             . */}
-          </Alert>
+            </Alert>
+          </Paper>
         )}
         <UserForm disabled={isSelf} />
         {!isSelf && <Metadata />}
