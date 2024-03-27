@@ -228,13 +228,16 @@ export const reservationRouter = router({
         quantity: string;
         vatRate: string | null;
       }[] = [];
+
       const isFinalInvoice = dayjs(reservation.endDate).isSame(
         input.periodEndDate,
       );
+
       const periodNights = dayjs(input.periodEndDate).diff(
         input.periodStartDate,
         "days",
       );
+
       const totalNights = dayjs(reservation.endDate).diff(
         reservation.startDate,
         "days",

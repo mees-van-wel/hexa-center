@@ -485,6 +485,7 @@ type CreateInvoiceProps = {
   type: "standard" | "quotation" | "credit";
   customerId: number;
   companyId: number;
+  customerBusinessContactPerson?: string;
   lines: {
     revenueAccountId: number;
     name: string;
@@ -502,6 +503,7 @@ export const createInvoice = async ({
   type,
   customerId,
   companyId,
+  customerBusinessContactPerson,
   lines,
   notes,
 }: CreateInvoiceProps) => {
@@ -520,6 +522,7 @@ export const createInvoice = async ({
       refId,
       type,
       status: "draft",
+      customerBusinessContactPerson,
       netAmount: roundDecimal(totalNetAmount).toString(),
       vatAmount: roundDecimal(totalVatAmount).toString(),
       grossAmount: roundDecimal(totalGrossAmount).toString(),
@@ -677,6 +680,8 @@ export const issueInvoice = async (
       customerBillingRegion: customer.billingRegion,
       customerBillingPostalCode: customer.billingPostalCode,
       customerBillingCountry: customer.billingCountry,
+      customerBusinessContactPerson:
+        invoice.customerBusinessContactPerson || customer.contactPersonName,
       customerVatId: customer?.vatId,
       companyName: company.name,
       companyEmail: company.email,
