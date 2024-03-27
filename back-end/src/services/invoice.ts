@@ -485,7 +485,7 @@ type CreateInvoiceProps = {
   type: "standard" | "quotation" | "credit";
   customerId: number;
   companyId: number;
-  customerBusinessContactPerson?: string;
+  customerBusinessContactPerson?: string | null;
   lines: {
     revenueAccountId: number;
     name: string;

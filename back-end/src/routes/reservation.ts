@@ -302,6 +302,7 @@ export const reservationRouter = router({
         customerId: reservation.customerId,
         companyId: ctx.user.businessId,
         notes: reservation.invoiceNotes,
+        customerBusinessContactPerson: reservation.guestName,
         lines: [
           {
             revenueAccountId: reservationRevenueAccountId,
