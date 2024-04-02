@@ -45,8 +45,6 @@ export const integrationRouter = router({
   //   const { id, accessToken, companyCode } = await getTwinfieldAccessToken();
   //   const wsdlUrl = await getTwinfieldWsdlUrl(accessToken);
 
-  //   console.log(companyCode);
-
   //   let xml = await readFile("soapEnvelope", "listTwinfieldOffices.xml.ejs");
   //   xml = await ejs.render(xml, { accessToken }, { async: true });
 
@@ -77,7 +75,7 @@ export const integrationRouter = router({
 
   //     return offices;
   //   } catch (error) {
-  //     console.log(error);
+  //     console.warn(error);
   //   }
   // }),
 });

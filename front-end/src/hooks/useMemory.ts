@@ -1,51 +1,140 @@
-// import { memoryState } from "@/states/memoryState";
-// import { useEffect, useState } from "react";
-// import { useRecoilState } from "recoil";
+import { useCallback, useMemo } from "react";
+import merge from "deepmerge";
+import isEqual from "fast-deep-equal";
+import { useRecoilState } from "recoil";
 
-// type Action = (...args: any[]) => Promise<any>;
+import { memoryState } from "@/states/memoryState";
+import { type RouterInput } from "@/utils/trpc";
 
-// type UseMemoryProps<T extends Action> = {
-//   name: string;
-//   action: T;
-//   params?: Parameters<T>;
-//   skip?: boolean;
-//   initialData?: Awaited<ReturnType<T>>;
-// };
+export type AbstractEntity = {
+  $kind: string;
+  id: number;
+  [key: string]: any;
+};
 
-// type Return<T extends Action> = {
-//   fetch: (...params: Parameters<T>) => ReturnType<T>;
-// };
+export const useMemory = <
+  T extends keyof RouterInput,
+  P extends keyof RouterInput[T],
+>(
+  scope: T,
+  procedure: P,
+  params?: RouterInput[T][P],
+) => {
+  const [memoryStore, setMemoryStore] = useRecoilState(memoryState);
 
-// function useMemory<T extends Action>(
-//   props: UseMemoryProps<T> & { initialData: Awaited<ReturnType<T>> },
-// ): [Awaited<ReturnType<T>>, Return<T>];
-// function useMemory<T extends Action>(
-//   props: UseMemoryProps<T>,
-// ): [Awaited<ReturnType<T>> | undefined, Return<T>];
+  const key = useMemo(
+    () =>
+      `${scope}-${procedure as string}${
+        params ? "-" + JSON.stringify(params) : ""
+      }`,
+    [params, procedure, scope],
+  );
 
-// function useMemory<T extends Action>({
-//   name,
-//   action,
-//   params,
-//   initialData,
-//   skip = !!initialData,
-// }: UseMemoryProps<T>) {
-//   const [cacheMemory, setMemoryStore] = useRecoilState(memoryState);
-//   const [data, setData] = useState<Awaited<ReturnType<T>> | undefined>(
-//     initialData,
-//   );
+  const cacheProcessor = useCallback(
+    (updatedCache: Record<string, any>) => {
+      const clone = { ...memoryStore };
 
-//   const fetch = async () => {
-//     const result = await action(params);
-//     return result;
-//   };
+      for (const cacheKey in updatedCache) {
+        const value = updatedCache[cacheKey];
 
-//   useEffect(() => {
-//     if (skip) return;
-//     // Your useEffect logic
-//   }, []);
+        if (value === undefined) delete clone[cacheKey];
+        else clone[cacheKey] = value;
+      }
 
-//   return [data, { fetch }];
-// }
+      setMemoryStore(clone);
+    },
+    [memoryStore, setMemoryStore],
+  );
 
-// export default useMemory;
+  const update = useCallback(
+    (dataToUpdate: AbstractEntity) => {
+      const { cacheUpdates } = flatten(dataToUpdate, memoryStore);
+
+      console.log("[MEMORY]", "🔵", "Manual update", key);
+
+      cacheProcessor(cacheUpdates);
+    },
+    [key, memoryStore, cacheProcessor],
+  );
+
+  return { update };
+};
+
+export const flatten = (
+  // key: string,
+  rawData: any,
+  cacheStore: Record<string, any> = {},
+  // append?: boolean
+) => {
+  const cacheUpdates: Record<string, any> = {};
+
+  const processData = (data: any): any => {
+    if (Array.isArray(data)) return data.map((entry) => processData(entry));
+
+    if (
+      data !== null &&
+      typeof data === "object" &&
+      "$kind" in data &&
+      "id" in data
+    ) {
+      const refrence = `${data.$kind}:${data.id}`;
+
+      const flattened: Partial<AbstractEntity> = {};
+
+      for (const key in data) {
+        flattened[key] = processData(data[key]);
+      }
+
+      if (refrence in cacheStore) {
+        if (isEqual(cacheStore[refrence], flattened)) return refrence;
+        cacheUpdates[refrence] = merge(cacheStore[refrence], flattened);
+      } else cacheUpdates[refrence] = flattened;
+
+      return refrence;
+    }
+
+    return data;
+  };
+
+  const result = processData(rawData);
+
+  return { result, cacheUpdates };
+
+  // cacheUpdates[key] =
+  //   append &&
+  //   Array.isArray(result) &&
+  //   key in cacheStore &&
+  //   Array.isArray(cacheStore[key])
+  //     ? [...cacheStore[key], ...result]
+  //     : result;
+};
+
+export const unflatten = (key: string, memoryStore: Record<string, any>) => {
+  if (!(key in memoryStore)) return;
+
+  const processCache = (data: any): any => {
+    if (Array.isArray(data)) return data.map((entry) => processCache(entry));
+
+    if (
+      data !== null &&
+      typeof data === "object" &&
+      "$kind" in data &&
+      "id" in data
+    ) {
+      const unFlattened: Partial<AbstractEntity> = {};
+
+      for (const key in data) {
+        unFlattened[key] = processCache(data[key]);
+      }
+
+      return unFlattened;
+    }
+
+    if (typeof data === "string" && data.includes(":") && data in memoryStore)
+      return processCache(memoryStore[data]);
+
+    return data;
+  };
+
+  return processCache(memoryStore[key]);
+};

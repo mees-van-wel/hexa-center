@@ -391,12 +391,11 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                     {invoice.customerName || invoice.customer?.name}
                   </Button>
                 ) : (
-                  <p
-                    style={{
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {invoice.customerName}
+                  <p style={{ whiteSpace: "nowrap" }}>{invoice.customerName}</p>
+                )}
+                {invoice.customerBusinessContactPerson && (
+                  <p style={{ whiteSpace: "nowrap" }}>
+                    Attn: {invoice.customerBusinessContactPerson}
                   </p>
                 )}
                 <div>

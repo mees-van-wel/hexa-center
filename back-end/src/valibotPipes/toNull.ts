@@ -11,5 +11,5 @@ export const toNull = () =>
       );
     }
 
-    return input ? input.trim() : null;
+    return input || null;
   });

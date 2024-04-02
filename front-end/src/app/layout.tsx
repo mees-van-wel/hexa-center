@@ -7,6 +7,7 @@ import { redirect, RedirectType } from "next/navigation";
 
 import { AuthContextProvider } from "@/contexts/AuthContext";
 import { TranslationInitializer } from "@/initializers/TranslationInitializer";
+import { isProduction } from "@/utils/environment";
 import { AppRouter, type RouterOutput } from "@/utils/trpc";
 import { getTrpcClientOnServer } from "@/utils/trpcForServer";
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
@@ -33,7 +34,7 @@ export const metadata: Metadata = {
 };
 
 // TODO variable light dark theme
-const dark = false;
+const dark = !isProduction;
 
 export default async function RootLayout({
   children,

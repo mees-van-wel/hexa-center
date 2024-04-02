@@ -144,7 +144,7 @@ export const ReservationDetail = ({
                 periodStartDate,
                 periodEndDate,
                 "day",
-                "[]",
+                "[)",
               ),
             )
           }
