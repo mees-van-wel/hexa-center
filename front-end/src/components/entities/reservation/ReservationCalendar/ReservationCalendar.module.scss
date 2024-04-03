@@ -14,6 +14,7 @@
 .reservationContainer {
   position: relative;
   margin-top: 0.5rem;
+  max-width: none;
 
   .reservation {
     position: absolute;

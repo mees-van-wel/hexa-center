@@ -9,10 +9,12 @@
   .roomName {
     width: 150px;
     flex-grow: 0;
+    max-width: none;
   }
 
   .weekDays {
     display: flex;
+    max-width: none;
     justify-content: center;
 
     .currentDay {
