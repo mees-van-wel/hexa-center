@@ -203,7 +203,6 @@ export type Translation = {
       preferences: string;
       logout: string;
     };
-    home: string;
   };
   loginPage: {
     login: string;
@@ -240,6 +239,7 @@ export type Translation = {
     loggedInSuccess: string;
   };
   homePage: {
+    name: string;
     goodMorning: string;
     goodAfternoon: string;
     goodEvening: string;
@@ -293,6 +293,11 @@ export type Translation = {
     };
   };
   components: {
+    table: {
+      searchNar: {
+        quickSearch: string;
+      };
+    };
     address: {
       addressLineOne: string;
       addressLineTwo: string;

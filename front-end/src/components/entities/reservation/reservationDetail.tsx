@@ -308,6 +308,7 @@ export const ReservationDetail = ({
             loading={invoicePeriod.loading}
             disabled={hasFinalInvoice}
           >
+            {/* TODO */}
             Invoice period
           </Button>
           <Button

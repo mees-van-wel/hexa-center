@@ -34,7 +34,7 @@ export const Navigation = () => {
             fullWidth
             justify="left"
           >
-            {t("dashboardLayout.home")}
+            {t("homePage.name")}
           </Button>
           <Stack gap="xs">
             <Title order={4}>{t("modules.essentials")}</Title>

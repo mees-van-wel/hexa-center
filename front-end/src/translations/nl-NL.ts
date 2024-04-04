@@ -196,7 +196,6 @@ export default {
       preferences: "Preferences",
       logout: "Logout",
     },
-    home: "Home",
   },
   loginPage: {
     login: "Inloggen",
@@ -236,6 +235,7 @@ export default {
     loggedInSuccess: "U bent succesvol ingelogd",
   },
   homePage: {
+    name: "Home",
     goodMorning: "Goedemorgen",
     goodAfternoon: "Goedemiddag",
     goodEvening: "Goedenavond",
@@ -289,6 +289,11 @@ export default {
     },
   },
   components: {
+    table: {
+      searchNar: {
+        quickSearch: "Snelzoeken",
+      },
+    },
     address: {
       addressLineOne: "Adres regel 1",
       addressLineTwo: "Adres regel 2",
