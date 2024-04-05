@@ -24,7 +24,6 @@ export const PhoneInput = () => {
 
   const onSubmit: SubmitHandler<SendPhoneOtpSchema> = async ({ phone }) => {
     const phoneToken = await sendPhoneOtp.mutate({ phone });
-
     setLoginState({
       step: "PHONE_OTP",
       phone,
@@ -38,11 +37,11 @@ export const PhoneInput = () => {
         <Controller
           control={control}
           name="phone"
+          defaultValue={loginState.phone}
           render={({ field, fieldState: { error } }) => (
             <PhoneInputComponent
               {...field}
               value={field.value}
-              defaultValue={loginState.phone}
               error={error?.message}
               label={t("loginPage.phone")}
               autoComplete
