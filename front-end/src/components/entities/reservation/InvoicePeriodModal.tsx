@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { useTranslation } from "@/hooks/useTranslation";
 import { Button, Group, Stack } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import { modals } from "@mantine/modals";
@@ -21,6 +22,7 @@ export const InvoicePeriodModal = ({
   onCancel,
   onConfirm,
 }: InvoicePeriodModalProps) => {
+  const t = useTranslation();
   const [invoicePeriod, setInvoicePeriod] = useState<
     [Date | null, Date | null]
   >([null, null]);
@@ -51,13 +53,13 @@ export const InvoicePeriodModal = ({
       />
       <Group justify="space-evenly" w="100%">
         <Button variant="light" onClick={cancelHandler}>
-          Back
+          {t("common.back")}
         </Button>
         <Button
           disabled={!invoicePeriod[0] || !invoicePeriod[1]}
           onClick={confirmHandler}
         >
-          Create invoice
+          {t("entities.reservation.invoicePeriod.create")}
         </Button>
       </Group>
     </Stack>

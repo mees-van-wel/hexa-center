@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 
+import { useTranslation } from "@/hooks/useTranslation";
 import { RouterOutput } from "@/utils/trpc";
 import {
   Button,
@@ -44,6 +45,7 @@ export const AddProductModal = ({
   onConfirm,
 }: AddProductModalProps) => {
   const [templateId, setTemplateId] = useState<number | null>(null);
+  const t = useTranslation();
 
   const template = useMemo(
     () =>
@@ -84,7 +86,7 @@ export const AddProductModal = ({
   return (
     <Stack>
       <Select
-        label="Use template"
+        label={t("common.useTemplate")}
         value={templateId?.toString() || null}
         onChange={(value) => {
           setTemplateId(value ? parseInt(value) : null);
@@ -96,10 +98,10 @@ export const AddProductModal = ({
         searchable
         clearable
       />
-      <Divider label="Values" />
+      <Divider label={t("common.values")} />
       <SimpleGrid cols={2} verticalSpacing="xs">
         <TextInput
-          label="Name"
+          label={t("common.name")}
           value={values.name}
           onChange={(event) => {
             changeHandler({ name: event.target.value });
@@ -107,7 +109,7 @@ export const AddProductModal = ({
           withAsterisk
         />
         <NumberInput
-          label="Price"
+          label={t("entities.product.price")}
           value={values.price}
           onChange={(price) => {
             changeHandler({ price: price.toString() });
@@ -120,7 +122,7 @@ export const AddProductModal = ({
           withAsterisk
         />
         <NumberInput
-          label="VAT Rate"
+          label={t("entities.product.vatRate")}
           value={!values.vatRate ? "" : values.vatRate}
           onChange={(vatRate) => {
             changeHandler({
@@ -134,7 +136,7 @@ export const AddProductModal = ({
           rightSection="%"
         />
         <NumberInput
-          label="Quantity"
+          label={t("entities.product.quantity")}
           value={values.quantity}
           onChange={(quantity) => {
             changeHandler({ quantity: quantity.toString() });
@@ -146,7 +148,7 @@ export const AddProductModal = ({
           withAsterisk
         />
         <Select
-          label="Revenue account"
+          label={t("entities.product.revenueAccount")}
           data={ledgerAccounts.map(({ id, name }) => ({
             label: name,
             value: id.toString(),
@@ -160,23 +162,23 @@ export const AddProductModal = ({
           withAsterisk
         />
         <Select
-          label="Cycle"
+          label={t("entities.product.cycle.name")}
           data={[
             {
               value: "oneTimeOnNext",
-              label: "One-Time - On Next Invoice",
+              label: t("entities.product.cycle.oneTimeOnNext"),
             },
             {
               value: "oneTimeOnEnd",
-              label: "One-Time - On Final Invoice",
+              label: t("entities.product.cycle.oneTimeOnEnd"),
             },
             {
               value: "perNightThroughout",
-              label: "Per Night - On Every Invoice",
+              label: t("entities.product.cycle.perNightThroughout"),
             },
             {
               value: "perNightOnEnd",
-              label: "Per Night - On Final Invoice",
+              label: t("entities.product.cycle.perNightOnEnd"),
             },
           ]}
           value={values.cycle}
@@ -196,14 +198,14 @@ export const AddProductModal = ({
           }}
           fullWidth
         >
-          Back
+          {t("common.back")}
         </Button>
         <Button
           disabled={!values.name || !values.price || !values.cycle}
           onClick={confirmHandler}
           fullWidth
         >
-          Apply
+          {t("common.apply")}
         </Button>
       </ButtonGroup>
     </Stack>
