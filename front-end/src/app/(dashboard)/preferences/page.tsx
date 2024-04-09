@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import dayjs from "dayjs";
 
 import { Sheet } from "@/components/common/Sheet/Sheet";
+import { Workinghours } from "@/components/common/Workinghours";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import {
   DATE_FORMAT_VALUES,
@@ -204,8 +205,8 @@ export default function Preferences() {
         </Stack>
       </Sheet>
       <Group align="flex-start" grow>
-        {/* <Workinghours accountDetails={currentAccountDetails} />
-        <Sheet title={t("preferencesPage.storage")}>
+        <Workinghours accountDetails={currentAccountDetails} />
+        {/* <Sheet title={t("preferencesPage.storage")}>
           <Group justify="space-between">
             <p>MB</p>
             <p>%</p>
