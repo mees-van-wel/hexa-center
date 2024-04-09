@@ -3,6 +3,7 @@ import {
   AnyPgColumn,
   date,
   integer,
+  interval,
   jsonb,
   numeric,
   pgEnum,
@@ -60,7 +61,7 @@ export const propertiesRelations = relationBuilder(properties, ({ one }) => ({
 }));
 
 export const appointmentTypes = pgTable("appointmentTypes", {
-  $kind: text("$kind").default("appointmentTypes").notNull(),
+  $kind: text("$kind").default("appointmentType").notNull(),
   id: serial("id").primaryKey(),
   uuid: uuid("uuid").defaultRandom().notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -71,20 +72,16 @@ export const appointmentTypes = pgTable("appointmentTypes", {
     .notNull(),
   createdById: integer("created_by_id").references(
     (): AnyPgColumn => relations.id,
-    {
-      onDelete: "set null",
-    },
+    { onDelete: "set null" },
   ),
   updatedById: integer("updated_by_id").references(
     (): AnyPgColumn => relations.id,
-    {
-      onDelete: "set null",
-    },
+    { onDelete: "set null" },
   ),
   name: text("name").unique().notNull(),
   color: text("color").notNull(),
   appointmentDescription: text("appointmentDescription"),
-  appointmentDuration: text("appointmentDuration"),
+  appointmentDuration: interval("appointmentDuration"),
 });
 
 export const appointmentTypesRelations = relationBuilder(

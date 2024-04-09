@@ -50,7 +50,7 @@ export default function Page() {
             title={[
               {
                 icon: <IconCalendarStats />,
-                label: t("dashboardLayout.properties"),
+                label: t("dashboardLayout.appointmentTypes"),
                 href: "/appointmentType",
               },
               { label: t("common.new") },

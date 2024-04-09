@@ -58,13 +58,15 @@ export const AppointmentTypeForm = ({ disabled }: AppointmentTypeFormProps) => {
                 field.value ? dayjs.duration(field.value).format("HH:mm") : ""
               }
               onChange={(event) => {
-                if (event) {
-                  const time = event.target.value;
-                  const isoValue = dayjs
-                    .duration(`PT${time.split(":")[0]}H${time.split(":")[1]}M`)
-                    .toISOString();
-                  field.onChange(isoValue);
-                }
+                const time = event.target.value;
+                const isoValue = time
+                  ? dayjs
+                      .duration(
+                        `PT${time.split(":")[0]}H${time.split(":")[1]}M`,
+                      )
+                      .toISOString()
+                  : null;
+                field.onChange(isoValue);
               }}
               label={t("entities.appointmentType.duration")}
               error={error?.message}

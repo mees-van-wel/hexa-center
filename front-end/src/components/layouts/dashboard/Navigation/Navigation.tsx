@@ -70,8 +70,8 @@ export const Navigation = () => {
               </Button>
               <Button
                 component={Link}
-                href="/appointmentType"
-                variant={pathname === "/appointmentType" ? "filled" : "subtle"}
+                href="/appointmentTypes"
+                variant={pathname === "/appointmentTypes" ? "filled" : "subtle"}
                 leftSection={<IconCalendarStats />}
                 fullWidth
                 justify="left"

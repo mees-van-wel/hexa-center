@@ -60,7 +60,7 @@ export const AppointmentTypeDetail = ({
           color: "green",
         });
 
-        router.push("/appointmentType");
+        router.push("/appointmentTypes");
       },
     });
   };
@@ -69,12 +69,12 @@ export const AppointmentTypeDetail = ({
     <FormProvider {...formMethods}>
       <Stack>
         <DashboardHeader
-          backRouteFallback="/appointmentType"
+          backRouteFallback="/appointmentTypes"
           title={[
             {
               icon: <IconCalendarStats />,
               label: t("dashboardLayout.appointmentTypes"),
-              href: "/appointmentType",
+              href: "/appointmentTypes",
             },
             { label: appointmentType.name },
           ]}

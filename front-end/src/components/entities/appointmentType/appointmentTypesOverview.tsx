@@ -4,13 +4,12 @@ import { useId } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import { Table } from "@/components/common/Table";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { useTranslation } from "@/hooks/useTranslation";
 import { RouterOutput } from "@back-end/routes/_app";
 import { Button, ColorSwatch, Stack } from "@mantine/core";
 import { IconCalendarStats, IconPlus } from "@tabler/icons-react";
-
-import { Table } from "../../common/Table";
 
 type AppointmentTypesPageProps = {
   appointmentTypes: RouterOutput["appointmentType"]["list"];
@@ -45,7 +44,7 @@ export const AppointmentTypesOverview = ({
       <Table
         searchBarId={searchBarId}
         onClick={({ id }) => {
-          router.push(`/appointmentType/${id}`);
+          router.push(`/appointmentTypes/${id}`);
         }}
         columns={[
           {

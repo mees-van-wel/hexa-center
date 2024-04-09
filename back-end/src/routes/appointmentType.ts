@@ -64,11 +64,11 @@ export const appointmentTypeRouter = router({
       .from(appointmentTypes)
       .where(eq(appointmentTypes.id, input));
 
-    const property = result[0];
+    const appointmentType = result[0];
 
-    if (!property) throw new TRPCError({ code: "NOT_FOUND" });
+    if (!appointmentType) throw new TRPCError({ code: "NOT_FOUND" });
 
-    return property;
+    return appointmentType;
   }),
   update: procedure
     .input(wrap(AppointmentTypeUpdateSchema))
