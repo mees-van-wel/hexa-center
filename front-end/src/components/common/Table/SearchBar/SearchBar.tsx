@@ -26,7 +26,7 @@ export const SearchBar = ({ id }: SearchBarProps) => {
   return (
     <TextInput
       value={value || ""}
-      placeholder={t("components.table.searchNar.quickSearch")}
+      placeholder={t("components.table.searchBar.quickSearch")}
       className={styles.input}
       onChange={(e) => {
         setSearch({ ...search, [id]: e.target.value });

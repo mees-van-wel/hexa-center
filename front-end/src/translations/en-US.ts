@@ -33,7 +33,7 @@ export default {
     to: "To",
     viewDetails: "View details",
     mail: "Mail",
-    remail: "Remail",
+    remail: "Re-mail",
     downloadPdf: "Download PDF",
     print: "Print",
     total: "Total",
@@ -58,7 +58,7 @@ export default {
       isSelfAlertMessage: "Your own personal details are editable only on the",
       isSelfAlertButton: "Profile Page",
     },
-    business: {
+    company: {
       singularName: "Business",
       pluralName: "Businesses",
       cocNumber: "CoC-number",
@@ -309,17 +309,17 @@ export default {
     yourDetails: "Your details",
     timeline: "Timeline",
     lines: {
-      name: "Lines",
+      name: "Invoice lines",
       unitPrice: "Unit price",
       quantity: "Quantity",
       totalNetAmount: "Total net amount",
       vat: "VAT",
       totalGrossAmount: "Total gross amount",
     },
-    totalRevenueThis: "Total revenue this year",
-    revenueThis: "Revenue this year",
-    totalRevenueLast: "Total revenue last year",
-    revenueLast: "Revenue previous year",
+    totalRevenueThisYear: "Total revenue this year",
+    revenueThisYear: "Revenue this year",
+    totalRevenueLastYear: "Total revenue last year",
+    revenueLastYear: "Revenue last year",
   },
   generic: {
     authentication: "Authentication",
@@ -339,9 +339,7 @@ export default {
   },
   components: {
     table: {
-      searchNar: {
-        quickSearch: "Quick Search",
-      },
+      quickSearch: "Quick Search",
     },
     address: {
       addressLineOne: "Address line 1",

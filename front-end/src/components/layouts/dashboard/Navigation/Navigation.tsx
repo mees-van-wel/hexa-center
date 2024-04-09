@@ -67,7 +67,7 @@ export const Navigation = () => {
                 fullWidth
                 justify="left"
               >
-                {t("entities.business.pluralName")}
+                {t("entities.company.pluralName")}
               </Button>
             </Stack>
           </Stack>

@@ -81,7 +81,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
         });
       } catch (error) {
         notifications.show({
-          title: t("entities.invoice.issuedErrorMessage"),
+          title: t("entities.invoice.issuedfailed"),
           // @ts-ignore
           message: error?.message || "...",
           color: "red",
@@ -184,7 +184,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
             title: t("entities.invoice.creditSucces"),
             // @ts-ignore
             message: error?.message || "...",
-            color: t("entities.invoice.creditFailed"),
+            color: "red",
           });
         }
       },
@@ -542,11 +542,11 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                 </div>
                 <div>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    {t("entities.business.iban")}:{" "}
+                    {t("entities.company.iban")}:{" "}
                     {invoice.companyIban || invoice.company?.iban}
                   </p>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    {t("entities.business.swiftBic")}:{" "}
+                    {t("entities.company.swiftBic")}:{" "}
                     {invoice.companySwiftBic || invoice.company?.swiftBic}
                   </p>
                 </div>

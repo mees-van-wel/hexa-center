@@ -58,28 +58,28 @@ export const BusinessForm = ({ disabled }: BusinessFormProps) => {
         <Group align="end">
           <TextInput
             {...register("vatId")}
-            label={t("entities.business.vatId")}
+            label={t("entities.company.vatId")}
             error={formState.errors.vatId?.message}
             disabled={disabled}
             withAsterisk
           />
           <TextInput
             {...register("cocNumber")}
-            label={t("entities.business.cocNumber")}
+            label={t("entities.company.cocNumber")}
             error={formState.errors.cocNumber?.message}
             disabled={disabled}
             withAsterisk
           />
           <TextInput
             {...register("iban")}
-            label={t("entities.business.iban")}
+            label={t("entities.company.iban")}
             error={formState.errors.iban?.message}
             disabled={disabled}
             withAsterisk
           />
           <TextInput
             {...register("swiftBic")}
-            label={t("entities.business.swiftBic")}
+            label={t("entities.company.swiftBic")}
             error={formState.errors.swiftBic?.message}
             disabled={disabled}
             withAsterisk

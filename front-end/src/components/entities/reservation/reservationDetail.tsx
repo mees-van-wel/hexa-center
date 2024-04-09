@@ -600,7 +600,6 @@ export const ReservationDetail = ({
                               borderBottomLeftRadius: "0.5rem",
                             }}
                           >
-                            {/* TODO */}
                             {t(`entities.invoice.status.${invoice.status}`)}
                           </Badge>
                         </Card>

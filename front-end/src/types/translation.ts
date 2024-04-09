@@ -66,7 +66,7 @@ export type Translation = {
       isSelfAlertMessage: string;
       isSelfAlertButton: string;
     };
-    business: {
+    company: {
       singularName: string;
       pluralName: string;
       cocNumber: string;
@@ -322,10 +322,10 @@ export type Translation = {
       vat: string;
       totalGrossAmount: string;
     };
-    totalRevenueThis: string;
-    revenueThis: string;
-    totalRevenueLast: string;
-    revenueLast: string;
+    totalRevenueThisYear: string;
+    revenueThisYear: string;
+    totalRevenueLastYear: string;
+    revenueLastYear: string;
   };
   generic: {
     authentication: string;
@@ -345,9 +345,7 @@ export type Translation = {
   };
   components: {
     table: {
-      searchNar: {
-        quickSearch: string;
-      };
+      quickSearch: string;
     };
     address: {
       addressLineOne: string;

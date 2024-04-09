@@ -45,7 +45,7 @@ export default function Page() {
   const onSubmit = async (values: BusinessCreateInputSchema) => {
     const response = await createBusiness.mutate(values);
     notifications.show({
-      message: t("entities.business.createdNotification"),
+      message: t("entities.company.createdNotification"),
       color: "green",
     });
     router.push(`/businesses/${response.id}`);
@@ -60,7 +60,7 @@ export default function Page() {
             title={[
               {
                 icon: <IconBuilding />,
-                label: t("entities.business.pluralName"),
+                label: t("entities.company.pluralName"),
                 href: "/businesses",
               },
               { label: t("common.new") },
