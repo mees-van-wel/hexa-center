@@ -437,7 +437,7 @@ export const ReservationDetail = ({
         {!!invoices.length && (
           <Paper p="2rem">
             <Band title={<Title order={3}>Invoices</Title>}>
-              <ScrollArea>
+              <ScrollArea maw="77.5vw">
                 <Group gap="2rem" p="md" wrap="nowrap">
                   {invoices.map(
                     ({ invoice, periodStartDate, periodEndDate }) => {
