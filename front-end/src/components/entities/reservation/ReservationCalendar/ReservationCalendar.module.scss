@@ -5,6 +5,7 @@
     display: flex;
     flex-grow: 0 !important;
     width: 150px;
+    max-width: none;
     align-items: center;
     border-right: solid 1px rgb(var(--color-background));
     padding: 0.5rem;
