@@ -6,11 +6,13 @@ import {
   SESSION_DURATIONS,
   type SessionDuration,
 } from "@/constants/sessionDurations";
-import { users, userSessions } from "@/db/schema";
+import { userAccountDetails, users, userSessions } from "@/db/schema";
 import { SendEmailOtpSchema, SendPhoneOtpSchema } from "@/schemas/auth";
+import { AccountDetailsUpdateSchema } from "@/schemas/updateAuth";
 import { procedure, router } from "@/trpc";
 import { decrypt, encrypt } from "@/utils/encryption";
 import { isProduction } from "@/utils/environment";
+import { createPgException } from "@/utils/exception";
 import { sign, verify } from "@/utils/jwt";
 import { sendMail } from "@/utils/mail";
 import { createOtp } from "@/utils/otp";
@@ -254,6 +256,49 @@ export const authRouter = router({
       return user;
     }),
   currentUser: procedure.query(({ ctx }) => ctx.user),
+  updateAccountDetails: procedure
+    .input(wrap(AccountDetailsUpdateSchema))
+    .mutation(async ({ ctx, input }) => {
+      console.log(input);
+      try {
+        const result = await ctx.db
+          .update(userAccountDetails)
+          .set({
+            ...input,
+          })
+          .where(eq(userAccountDetails.id, input.id))
+          .returning({
+            // firstName: users.firstName,
+            // lastName: users.lastName,
+            // email: users.email,
+            // phone: users.phone,
+            // addressLineOne: users.addressLineOne,
+            // addressLineTwo: users.addressLineTwo,
+            // city: users.city,
+            // region: users.region,
+            // postalCode: users.postalCode,
+            // country: users.country,
+            // sex: users.sex,
+            // birthDate: users.birthDate,
+            accountDetails: {
+              locale: userAccountDetails.locale,
+              theme: userAccountDetails.theme,
+              color: userAccountDetails.color,
+              timezone: userAccountDetails.timezone,
+              dateFormat: userAccountDetails.dateFormat,
+              decimalSeparator: userAccountDetails.decimalSeparator,
+              timeFormat: userAccountDetails.timeFormat,
+              firstDayOfWeek: userAccountDetails.firstDayOfWeek,
+            },
+          });
+
+        const userAccountDetail = result[0];
+
+        return userAccountDetail;
+      } catch (error) {
+        throw createPgException(error);
+      }
+    }),
   token: procedure.query(async ({ ctx }) => {
     const now = new Date();
     // TODO pass now to sign to sync time
