@@ -308,7 +308,7 @@ export const ReservationDetail = ({
             loading={invoicePeriod.loading}
             disabled={hasFinalInvoice}
           >
-            Invoice period
+            {t("entities.reservation.invoicePeriod.name")}
           </Button>
           <Button
             variant="light"
@@ -348,8 +348,8 @@ export const ReservationDetail = ({
                     <Table.Th>{t("entities.product.price")}</Table.Th>
                     <Table.Th>{t("entities.product.vatRate")}</Table.Th>
                     <Table.Th>{t("entities.product.quantity")}</Table.Th>
-                    <Table.Th>{t("entities.product.cycle")}</Table.Th>
-                    <Table.Th>{t("entities.product.status")}</Table.Th>
+                    <Table.Th>{t("entities.product.cycle.name")}</Table.Th>
+                    <Table.Th>{t("entities.product.status.name")}</Table.Th>
                     <Table.Th>{t("entities.product.actions")}</Table.Th>
                   </Table.Tr>
                 </Table.Thead>
@@ -370,7 +370,9 @@ export const ReservationDetail = ({
                             : productInstance.vatRate + "%"}
                         </Table.Td>
                         <Table.Td>{quantity}x</Table.Td>
-                        <Table.Td>{cycle}</Table.Td>
+                        <Table.Td>
+                          {t(`entities.product.cycle.${cycle}`)}
+                        </Table.Td>
                         <Table.Td>
                           <Badge
                             variant="light"
@@ -382,14 +384,14 @@ export const ReservationDetail = ({
                                   : "green"
                             }
                           >
-                            {status}
+                            {t(`entities.product.status.${status}`)}
                           </Badge>
                         </Table.Td>
                         <Table.Td>
                           <Group gap="xs">
                             <Button
                               size="compact-md"
-                              title="Edit"
+                              title={t("common.edit")}
                               variant="light"
                               onClick={() => {
                                 editProductHandler(productInstance.id);
@@ -401,7 +403,7 @@ export const ReservationDetail = ({
                             {status !== "notInvoiced" && (
                               <Button
                                 size="compact-md"
-                                title="Reset status"
+                                title={t("entities.product.resetStatus")}
                                 variant="light"
                                 color="orange"
                                 onClick={() => {
@@ -414,7 +416,7 @@ export const ReservationDetail = ({
                             )}
                             <Button
                               size="compact-md"
-                              title="Delete"
+                              title={t("common.delete")}
                               variant="light"
                               color="red"
                               onClick={() => {
@@ -436,7 +438,11 @@ export const ReservationDetail = ({
         </Paper>
         {!!invoices.length && (
           <Paper p="2rem">
-            <Band title={<Title order={3}>Invoices</Title>}>
+            <Band
+              title={
+                <Title order={3}>{t("entities.invoice.pluralName")}</Title>
+              }
+            >
               <ScrollArea>
                 <Group gap="2rem" p="md" wrap="nowrap">
                   {invoices.map(
@@ -530,28 +536,29 @@ export const ReservationDetail = ({
                           <Stack my="md" px="md">
                             <Text fw="bold">
                               {invoice.type === "credit"
-                                ? "Credit Invoice"
+                                ? t("entities.invoice.creditInvoice")
                                 : isFinalInvoice
-                                  ? "Final Invoice"
-                                  : "Invoice"}
+                                  ? t("entities.invoice.finalInvoice")
+                                  : t("entities.invoice.singularName")}
                               : {invoice.number || invoice.id}
                             </Text>
                             <Text size="sm">
-                              From:{" "}
+                              {t("common.from")}:{" "}
                               {dayjs(periodStartDate).format("DD-MM-YYYY")}
                               <br />
-                              To: {dayjs(periodEndDate).format("DD-MM-YYYY")}
+                              {t("common.to")}:{" "}
+                              {dayjs(periodEndDate).format("DD-MM-YYYY")}
                             </Text>
                           </Stack>
                           <Divider />
                           <Stack my="md" px="md">
                             <Text size="sm" c="dimmed">
-                              Invoice date:{" "}
+                              {t("entities.invoice.invoiceDate")}:{" "}
                               {dayjs(invoice.date || invoice.createdAt).format(
                                 "DD-MM-YYYY",
                               )}
                               <br />
-                              Amount:{" "}
+                              {t("entities.invoice.totalGrossAmount")}:{" "}
                               {Intl.NumberFormat("nl-NL", {
                                 style: "currency",
                                 currency: "EUR",
@@ -565,7 +572,7 @@ export const ReservationDetail = ({
                             href={`/invoices/${invoice.id}`}
                             radius={0}
                           >
-                            View Details
+                            {t("common.viewDetails")}
                           </Button>
                           <Badge
                             variant="light"
@@ -578,9 +585,9 @@ export const ReservationDetail = ({
                             }}
                           >
                             {invoice.type === "credit"
-                              ? "Credit"
+                              ? t("entities.invoice.credit")
                               : isFinalInvoice
-                                ? "Final"
+                                ? t("entities.invoice.final")
                                 : invoice.type}
                           </Badge>
                           <Badge
@@ -593,7 +600,7 @@ export const ReservationDetail = ({
                               borderBottomLeftRadius: "0.5rem",
                             }}
                           >
-                            {invoice.status}
+                            {t(`entities.invoice.status.${invoice.status}`)}
                           </Badge>
                         </Card>
                       );

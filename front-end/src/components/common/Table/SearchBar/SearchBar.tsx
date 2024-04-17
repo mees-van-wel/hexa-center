@@ -1,5 +1,6 @@
 import { useRecoilState } from "recoil";
 
+import { useTranslation } from "@/hooks/useTranslation";
 import { searchState } from "@/states/searchState";
 import { TextInput } from "@mantine/core";
 import { IconX } from "@tabler/icons-react";
@@ -12,6 +13,7 @@ type SearchBarProps = {
 
 export const SearchBar = ({ id }: SearchBarProps) => {
   const [search, setSearch] = useRecoilState(searchState);
+  const t = useTranslation();
 
   const clearHandler = () => {
     const clone = Object.assign({}, search);
@@ -24,7 +26,7 @@ export const SearchBar = ({ id }: SearchBarProps) => {
   return (
     <TextInput
       value={value || ""}
-      placeholder="Quick Search"
+      placeholder={t("components.table.searchBar.quickSearch")}
       className={styles.input}
       onChange={(e) => {
         setSearch({ ...search, [id]: e.target.value });

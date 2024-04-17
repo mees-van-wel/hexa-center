@@ -54,7 +54,7 @@ export const BusinessDetail = ({ business }: BusinessPageProps) => {
         await deleteBusiness.mutate(business.id);
 
         notifications.show({
-          message: t("entities.business.deletedNotification"),
+          message: t("entities.company.deletedNotification"),
           color: "green",
         });
 
@@ -71,7 +71,7 @@ export const BusinessDetail = ({ business }: BusinessPageProps) => {
           title={[
             {
               icon: <IconBuilding />,
-              label: t("entities.business.pluralName"),
+              label: t("entities.company.pluralName"),
               href: "/businesses",
             },
             { label: business.name },
@@ -138,7 +138,7 @@ const SaveBadge = () => {
 
       if (exception === "DB_UNIQUE_CONSTRAINT") {
         setError(data.column, {
-          message: `${t("entities.business.singularName")} - ${getValues(
+          message: `${t("entities.company.singularName")} - ${getValues(
             data.column,
           )} - ${data.column}`,
         });

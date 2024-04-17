@@ -34,7 +34,7 @@ export const INVOICE_EVENT_TYPE_META: Record<
 > = {
   [INVOICE_EVENT_TYPES.ISSUED]: {
     IconComponent: IconFileArrowRight,
-    title: "entities.invoice.issued",
+    title: "entities.invoice.status.issued",
     message: "entities.invoice.issuedMessage",
   },
   [INVOICE_EVENT_TYPES.MAILED]: {
@@ -44,7 +44,7 @@ export const INVOICE_EVENT_TYPE_META: Record<
   },
   [INVOICE_EVENT_TYPES.CREDITED]: {
     IconComponent: IconFileArrowLeft,
-    title: "entities.invoice.credited",
+    title: "entities.invoice.status.credited",
     message: "entities.invoice.creditedMessage",
   },
 };

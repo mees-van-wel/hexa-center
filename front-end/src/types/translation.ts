@@ -12,6 +12,7 @@ export type Translation = {
   common: {
     back: string;
     create: string;
+    edit: string;
     add: string;
     new: string;
     save: string;
@@ -33,6 +34,17 @@ export type Translation = {
     hide: string;
     email: string;
     phone: string;
+    useTemplate: string;
+    values: string;
+    apply: string;
+    from: string;
+    to: string;
+    viewDetails: string;
+    mail: string;
+    remail: string;
+    downloadPdf: string;
+    print: string;
+    total: string;
   };
   modules: {
     essentials: string;
@@ -54,7 +66,7 @@ export type Translation = {
       isSelfAlertMessage: string;
       isSelfAlertButton: string;
     };
-    business: {
+    company: {
       singularName: string;
       pluralName: string;
       cocNumber: string;
@@ -84,6 +96,7 @@ export type Translation = {
       invoiceNotes: string;
       invoicePeriod: {
         name: string;
+        create: string;
         succes: string;
       };
       calendar: {
@@ -101,8 +114,21 @@ export type Translation = {
       quantity: string;
       price: string;
       vatRate: string;
-      cycle: string;
-      status: string;
+      revenueAccount: string;
+      cycle: {
+        name: string;
+        oneTimeOnNext: string;
+        oneTimeOnEnd: string;
+        perNightThroughout: string;
+        perNightOnEnd: string;
+      };
+      status: {
+        name: string;
+        notInvoiced: string;
+        partiallyInvoiced: string;
+        fullyInvoiced: string;
+      };
+      resetStatus: string;
       actions: string;
       edit: string;
       editSucces: string;
@@ -126,23 +152,41 @@ export type Translation = {
     invoice: {
       singularName: string;
       pluralName: string;
-      type: string;
-      standard: string;
-      quotation: string;
+      type: {
+        name: string;
+        standard: string;
+        quotation: string;
+        credit: string;
+      };
+      notes: string;
+      creditInvoice: string;
+      finalInvoice: string;
       credit: string;
       final: string;
+      issue: string;
       customerName: string;
       date: string;
       dueDate: string;
+      invoiceDate: string;
       totalGrossAmount: string;
-      status: string;
-      draft: string;
-      issued: string;
+      status: {
+        name: string;
+        draft: string;
+        issued: string;
+        credited: string;
+      };
       mailed: string;
-      credited: string;
+      deleted: string;
       issuedMessage: string;
+      issuedSucces: string;
+      issuedfailed: string;
       mailedMessage: string;
+      mailedSucces: string;
+      mailedFailed: string;
       creditedMessage: string;
+      creditSucces: string;
+      creditFailed: string;
+      printDocumentAlert: string;
     };
   };
   dates: {
@@ -203,7 +247,6 @@ export type Translation = {
       preferences: string;
       logout: string;
     };
-    home: string;
   };
   loginPage: {
     login: string;
@@ -240,6 +283,7 @@ export type Translation = {
     loggedInSuccess: string;
   };
   homePage: {
+    name: string;
     goodMorning: string;
     goodAfternoon: string;
     goodEvening: string;
@@ -267,16 +311,23 @@ export type Translation = {
       overlaps: string;
     };
   };
-  generic: {
-    weekdayNames: {
-      FRIDAY: string;
-      MONDAY: string;
-      SATURDAY: string;
-      SUNDAY: string;
-      THURSDAY: string;
-      TUESDAY: string;
-      WEDNESDAY: string;
+  invoicePage: {
+    yourDetails: string;
+    timeline: string;
+    lines: {
+      name: string;
+      unitPrice: string;
+      quantity: string;
+      totalNetAmount: string;
+      vat: string;
+      totalGrossAmount: string;
     };
+    totalRevenueThisYear: string;
+    revenueThisYear: string;
+    totalRevenueLastYear: string;
+    revenueLastYear: string;
+  };
+  generic: {
     authentication: string;
   };
   roomsPage: {
@@ -293,6 +344,9 @@ export type Translation = {
     };
   };
   components: {
+    table: {
+      quickSearch: string;
+    };
     address: {
       addressLineOne: string;
       addressLineTwo: string;
