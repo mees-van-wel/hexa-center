@@ -50,8 +50,6 @@ export default function Page({ params }: PageParams) {
     initialParams: parseInt(params.id),
   });
 
-  console.log(data);
-
   if (loading || !data)
     return (
       <Flex
