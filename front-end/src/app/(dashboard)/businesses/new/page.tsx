@@ -1,10 +1,17 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { FormProvider, useForm } from "react-hook-form";
+import {
+  FormProvider,
+  SubmitHandler,
+  useForm,
+  useFormContext,
+  useFormState,
+} from "react-hook-form";
 
 import { BusinessForm } from "@/components/entities/business/BusinessForm";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
+import { useMemory } from "@/hooks/useMemory";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
 import {
@@ -18,8 +25,6 @@ import { IconBuilding, IconDeviceFloppy } from "@tabler/icons-react";
 
 export default function Page() {
   const t = useTranslation();
-  const router = useRouter();
-  const createBusiness = useMutation("business", "create");
 
   const formMethods = useForm<BusinessCreateInputSchema>({
     resolver: valibotResolver(BusinessCreateSchema),
@@ -40,43 +45,72 @@ export default function Page() {
     },
   });
 
-  const { handleSubmit, formState } = formMethods;
+  return (
+    <FormProvider {...formMethods}>
+      <Stack>
+        <DashboardHeader
+          backRouteFallback="/businesses"
+          title={[
+            {
+              icon: <IconBuilding />,
+              label: t("entities.business.pluralName"),
+              href: "/businesses",
+            },
+            { label: t("common.new") },
+          ]}
+        >
+          <SaveButton />
+        </DashboardHeader>
+        <BusinessForm />
+      </Stack>
+    </FormProvider>
+  );
+}
 
-  const onSubmit = async (values: BusinessCreateInputSchema) => {
+const SaveButton = () => {
+  const createBusiness = useMutation("business", "create");
+  const router = useRouter();
+  const memory = useMemory();
+  const t = useTranslation();
+
+  const { control, handleSubmit } = useFormContext<BusinessCreateInputSchema>();
+  const { isDirty } = useFormState({ control });
+
+  const submitHandler: SubmitHandler<BusinessCreateInputSchema> = async (
+    values,
+  ) => {
     const response = await createBusiness.mutate(values);
+
+    memory.write(response, [
+      {
+        scope: "business",
+        procedure: "get",
+        params: response.id,
+      },
+      {
+        scope: "business",
+        procedure: "list",
+        as: ({ current, result }) =>
+          current ? [...current, result] : undefined,
+      },
+    ]);
+
     notifications.show({
       message: t("entities.business.createdNotification"),
       color: "green",
     });
+
     router.push(`/businesses/${response.id}`);
   };
 
   return (
-    <FormProvider {...formMethods}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Stack>
-          <DashboardHeader
-            backRouteFallback="/businesses"
-            title={[
-              {
-                icon: <IconBuilding />,
-                label: t("entities.business.pluralName"),
-                href: "/businesses",
-              },
-              { label: t("common.new") },
-            ]}
-          >
-            <Button
-              type="submit"
-              leftSection={<IconDeviceFloppy />}
-              disabled={!formState.isDirty}
-            >
-              {t("common.save")}
-            </Button>
-          </DashboardHeader>
-          <BusinessForm />
-        </Stack>
-      </form>
-    </FormProvider>
+    <Button
+      onClick={handleSubmit(submitHandler)}
+      leftSection={<IconDeviceFloppy />}
+      disabled={!isDirty}
+      loading={createBusiness.loading}
+    >
+      {t("common.save")}
+    </Button>
   );
-}
+};

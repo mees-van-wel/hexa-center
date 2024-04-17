@@ -39,11 +39,7 @@ import {
   IconUsers,
 } from "@tabler/icons-react";
 
-type PageParams = {
-  params: {
-    id: string;
-  };
-};
+type PageParams = { params: { id: string } };
 
 export default function Page({ params }: PageParams) {
   const { data, loading } = useQuery("user", "get", {
@@ -65,14 +61,14 @@ export default function Page({ params }: PageParams) {
       </Flex>
     );
 
-  return <UpdateForm user={data} />;
+  return <Detail user={data} />;
 }
 
-type UserFormProps = {
+type DetailProps = {
   user: RouterOutput["user"]["get"];
 };
 
-const UpdateForm = ({ user }: UserFormProps) => {
+const Detail = ({ user }: DetailProps) => {
   const deleteUser = useMutation("user", "delete");
   const authUser = useAuthUser();
   const memory = useMemory();

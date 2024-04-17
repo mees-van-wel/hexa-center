@@ -1,10 +1,78 @@
-import { BusinessesOverview } from "@/components/entities/business/BusinessesOverview";
-import { getTrpcClientOnServer } from "@/utils/trpcForServer";
+"use client";
 
-export default async function Page() {
-  const trpc = getTrpcClientOnServer();
+import { useId } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
-  const businesses = await trpc.business.list.query();
+import { Table } from "@/components/common/Table";
+import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
+import { useQuery } from "@/hooks/useQuery";
+import { useTranslation } from "@/hooks/useTranslation";
+import { Button, Flex, Loader, Paper, Stack } from "@mantine/core";
+import { IconBuilding, IconPlus } from "@tabler/icons-react";
 
-  return <BusinessesOverview businesses={businesses} />;
+export default function Page() {
+  const router = useRouter();
+  const searchBarId = useId();
+  const t = useTranslation();
+
+  const { data, loading } = useQuery("business", "list");
+
+  return (
+    <Stack>
+      <DashboardHeader
+        title={[
+          { icon: <IconBuilding />, label: t("entities.business.pluralName") },
+        ]}
+      >
+        <Button
+          leftSection={<IconPlus />}
+          component={Link}
+          href="/businesses/new"
+        >
+          {t("common.new")}
+        </Button>
+        <Table.SearchBar id={searchBarId} />
+      </DashboardHeader>
+      {loading || !data ? (
+        <Flex
+          gap="md"
+          justify="center"
+          align="center"
+          direction="row"
+          wrap="wrap"
+          component={Paper}
+          p="md"
+        >
+          <Loader />
+        </Flex>
+      ) : (
+        <Table
+          elements={data}
+          searchBarId={searchBarId}
+          onClick={({ id }) => {
+            router.push(`/businesses/${id}`);
+          }}
+          columns={[
+            {
+              selector: "name",
+              label: t("common.name"),
+            },
+            {
+              selector: "email",
+              label: t("common.email"),
+            },
+            {
+              selector: "phone",
+              label: t("common.phone"),
+            },
+            {
+              selector: "id",
+              label: t("common.number"),
+            },
+          ]}
+        />
+      )}
+    </Stack>
+  );
 }
