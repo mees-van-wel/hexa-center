@@ -11,6 +11,7 @@ import {
 
 import { UserForm } from "@/components/entities/user/UserForm";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
+import { useMemory } from "@/hooks/useMemory";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
 import { UserCreateInputSchema, UserCreateSchema } from "@/schemas/user";
@@ -65,6 +66,7 @@ export default function Page() {
 const SaveButton = () => {
   const createUser = useMutation("user", "create");
   const router = useRouter();
+  const memory = useMemory();
   const t = useTranslation();
 
   const { control, handleSubmit } = useFormContext<UserCreateInputSchema>();
@@ -74,6 +76,20 @@ const SaveButton = () => {
     values,
   ) => {
     const response = await createUser.mutate(values);
+
+    memory.write(response, [
+      {
+        scope: "user",
+        procedure: "get",
+        params: response.id,
+      },
+      {
+        scope: "user",
+        procedure: "list",
+        as: ({ current, result }) =>
+          current ? [...current, result] : undefined,
+      },
+    ]);
 
     notifications.show({
       message: t("entities.user.createdNotification"),

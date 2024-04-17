@@ -41,7 +41,7 @@ export const Overview = ({ integrations }: OverviewProps) => {
           }
           styles={{
             indicator: {
-              border: "solid 0.3rem black",
+              border: "solid 0.3rem rgb(var(--color-foreground))",
             },
           }}
         >

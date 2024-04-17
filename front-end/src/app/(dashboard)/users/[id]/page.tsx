@@ -50,6 +50,8 @@ export default function Page({ params }: PageParams) {
     initialParams: parseInt(params.id),
   });
 
+  console.log(data);
+
   if (loading || !data)
     return (
       <Flex
@@ -75,6 +77,7 @@ type UserFormProps = {
 const UpdateForm = ({ user }: UserFormProps) => {
   const deleteUser = useMutation("user", "delete");
   const authUser = useAuthUser();
+  const memory = useMemory();
   const router = useRouter();
   const t = useTranslation();
 
@@ -92,6 +95,8 @@ const UpdateForm = ({ user }: UserFormProps) => {
       onConfirm: async () => {
         await deleteUser.mutate(user.id);
 
+        memory.evict(user);
+
         notifications.show({
           message: t("entities.user.deletedNotification"),
           color: "green",
@@ -101,8 +106,6 @@ const UpdateForm = ({ user }: UserFormProps) => {
       },
     });
   };
-
-  console.log(user);
 
   return (
     <FormProvider {...formMethods}>
@@ -157,14 +160,13 @@ const UpdateForm = ({ user }: UserFormProps) => {
 
 const SaveBadge = () => {
   const updateUser = useMutation("user", "update");
+  const memory = useMemory();
   const t = useTranslation();
 
   const { control, getValues, reset, setError } =
     useFormContext<UserUpdateInputSchema>();
   const { isDirty, errors } = useFormState({ control });
   const isError = useMemo(() => !!Object.keys(errors).length, [errors]);
-
-  const { update } = useMemory("user", "get", getValues("id"));
 
   useAutosave(control, async (values) => {
     function isJson(str: string) {
@@ -183,8 +185,8 @@ const SaveBadge = () => {
         id: getValues("id"),
       });
 
+      memory.update(updatedUser);
       reset(updatedUser);
-      update(updatedUser);
     } catch (error) {
       // TODO Fix typings
       const { success, json } = isJson((error as any).message);

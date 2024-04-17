@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import merge from "deepmerge";
 import isEqual from "fast-deep-equal";
 import { useRecoilState } from "recoil";
@@ -12,23 +12,18 @@ export type AbstractEntity = {
   [key: string]: any;
 };
 
-export const useMemory = <
+type UpdateKeyFn<
   T extends keyof RouterInput,
   P extends keyof RouterInput[T],
->(
-  scope: T,
-  procedure: P,
-  params?: RouterInput[T][P],
-) => {
-  const [memoryStore, setMemoryStore] = useRecoilState(memoryState);
+> = {
+  scope: T;
+  procedure: P;
+  params?: RouterInput[T][P];
+  as?: ({ current, result }: { current: any; result: any }) => any;
+};
 
-  const key = useMemo(
-    () =>
-      `${scope}-${procedure as string}${
-        params ? "-" + JSON.stringify(params) : ""
-      }`,
-    [params, procedure, scope],
-  );
+export const useMemory = () => {
+  const [memoryStore, setMemoryStore] = useRecoilState(memoryState);
 
   const cacheProcessor = useCallback(
     (updatedCache: Record<string, any>) => {
@@ -46,18 +41,64 @@ export const useMemory = <
     [memoryStore, setMemoryStore],
   );
 
-  const update = useCallback(
-    (dataToUpdate: AbstractEntity) => {
-      const { cacheUpdates } = flatten(dataToUpdate, memoryStore);
+  const write = useCallback(
+    <T extends keyof RouterInput, P extends keyof RouterInput[T]>(
+      dataToWrite: AbstractEntity,
+      keysToUpdate: UpdateKeyFn<T, P>[] | UpdateKeyFn<T, P>,
+    ) => {
+      const { cacheUpdates, result } = flatten(dataToWrite, memoryStore);
+      const clone = { ...cacheUpdates };
 
-      console.log("[MEMORY]", "🔵", "Manual update", key);
+      (Array.isArray(keysToUpdate) ? keysToUpdate : [keysToUpdate]).forEach(
+        ({ scope, procedure, params, as }) => {
+          const key = getCacheKey(scope, procedure, params);
+          const current = memoryStore[key];
+          const value = as ? as({ current, result }) : result;
 
-      cacheProcessor(cacheUpdates);
+          if (value !== undefined) {
+            clone[key] = value;
+          }
+        },
+      );
+
+      cacheProcessor(clone);
+
+      console.log("[MEMORY]", "🔵", "Manual write, ref:", result);
     },
-    [key, memoryStore, cacheProcessor],
+    [cacheProcessor, memoryStore],
   );
 
-  return { update };
+  const update = useCallback(
+    (dataToUpdate: AbstractEntity) => {
+      const { cacheUpdates, result } = flatten(dataToUpdate, memoryStore);
+      cacheProcessor(cacheUpdates);
+
+      console.log("[MEMORY]", "🔵", "Manual update, ref:", result);
+    },
+    [memoryStore, cacheProcessor],
+  );
+
+  const evict = useCallback(
+    (dataToEvict: AbstractEntity) => {
+      const ref = getCacheRef(dataToEvict);
+
+      const cacheUpdates: Record<string, any> = { [ref]: undefined };
+
+      Object.entries(memoryStore).forEach(([cacheKey, cachedValue]) => {
+        if (typeof cachedValue === "string" && cachedValue === ref)
+          cacheUpdates[cacheKey] = undefined;
+        else if (Array.isArray(cachedValue) && cachedValue.includes(ref))
+          cacheUpdates[cacheKey] = cachedValue.filter((item) => item !== ref);
+      });
+
+      cacheProcessor(cacheUpdates);
+
+      console.log("[MEMORY]", "🔵", "Manual evict, ref:", ref);
+    },
+    [cacheProcessor, memoryStore],
+  );
+
+  return { write, update, evict };
 };
 
 export const flatten = (
@@ -77,7 +118,7 @@ export const flatten = (
       "$kind" in data &&
       "id" in data
     ) {
-      const refrence = `${data.$kind}:${data.id}`;
+      const ref = getCacheRef(data);
 
       const flattened: Partial<AbstractEntity> = {};
 
@@ -85,12 +126,12 @@ export const flatten = (
         flattened[key] = processData(data[key]);
       }
 
-      if (refrence in cacheStore) {
-        if (isEqual(cacheStore[refrence], flattened)) return refrence;
-        cacheUpdates[refrence] = merge(cacheStore[refrence], flattened);
-      } else cacheUpdates[refrence] = flattened;
+      if (ref in cacheStore) {
+        if (isEqual(cacheStore[ref], flattened)) return ref;
+        cacheUpdates[ref] = merge(cacheStore[ref], flattened);
+      } else cacheUpdates[ref] = flattened;
 
-      return refrence;
+      return ref;
     }
 
     return data;
@@ -138,3 +179,15 @@ export const unflatten = (key: string, memoryStore: Record<string, any>) => {
 
   return processCache(memoryStore[key]);
 };
+
+export const getCacheKey = <
+  T extends keyof RouterInput,
+  P extends keyof RouterInput[T],
+>(
+  scope: T,
+  procedure: P,
+  params?: RouterInput[T][P],
+) => `${scope}-${procedure as string}(${params ? JSON.stringify(params) : ""})`;
+
+export const getCacheRef = (entity: AbstractEntity) =>
+  `${entity.$kind}:${entity.id}`;

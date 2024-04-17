@@ -4,8 +4,9 @@ import { useRecoilState } from "recoil";
 import { memoryState } from "@/states/memoryState";
 import { type RouterInput, type RouterOutput } from "@/utils/trpc";
 import { getTrpcClientOnClient } from "@/utils/trpcForClient";
+import { useDidUpdate } from "@mantine/hooks";
 
-import { flatten, unflatten } from "./useMemory";
+import { flatten, getCacheKey, unflatten } from "./useMemory";
 import { useStrictModeEffect } from "./useStrictModeEffect";
 
 // TODO Error handling
@@ -25,12 +26,7 @@ export const useQuery = <
   const [loading, setLoading] = useState(!options?.skipInitial);
 
   const key = useMemo(
-    () =>
-      `${scope}-${procedure as string}${
-        options?.initialParams
-          ? "-" + JSON.stringify(options.initialParams)
-          : ""
-      }`,
+    () => getCacheKey(scope, procedure, options?.initialParams),
     [options?.initialParams, procedure, scope],
   );
 
@@ -52,8 +48,6 @@ export const useQuery = <
 
   const query = useCallback(
     async (params?: RouterInput[T][P], abortController?: AbortController) => {
-      console.log("[MEMORY]", "🔵", "Manual fetch", key);
-
       setLoading(true);
 
       const trpc = getTrpcClientOnClient();
@@ -73,28 +67,45 @@ export const useQuery = <
       updateCacheHandler({ ...cacheUpdates, [key]: result });
       setData(response);
 
-      console.log("[MEMORY]", "🟢", "Initial fetch success", key);
+      console.log("[MEMORY]", "🔵", "Fetching from back-end, key:", key);
 
       return response;
     },
     [key, memoryStore, procedure, scope, updateCacheHandler],
   );
 
+  const updateDeps = useMemo(
+    () => [
+      memoryStore[key],
+      ...(Array.isArray(memoryStore[key])
+        ? memoryStore[key]
+        : [memoryStore[key]]
+      ).map((ref: string) => memoryStore[ref]),
+    ],
+    [key, memoryStore],
+  );
+
+  useDidUpdate(() => {
+    if (!data) return;
+
+    // TODO Optimise, only unflatten current updateDeps instead of whole memoryStore
+    const unflattenedMemoryStore = unflatten(key, memoryStore);
+    setData(unflattenedMemoryStore);
+  }, updateDeps);
+
   useStrictModeEffect(() => {
     if (data || options?.skipInitial) return;
 
     if (key in memoryStore) {
       const unflattenedMemoryStore = unflatten(key, memoryStore);
-      console.log("[MEMORY]", "🟢", "Memory read success", key);
-
-      console.log(memoryStore);
+      console.log("[MEMORY]", "🟢", "Memory hit, key:", key);
 
       setData(unflattenedMemoryStore);
       setLoading(false);
       return;
     }
 
-    console.log("[MEMORY]", "🔴", "Memory read not found", key);
+    console.log("[MEMORY]", "🔴", "Memory miss, key:", key);
 
     const abortController = new AbortController();
 
