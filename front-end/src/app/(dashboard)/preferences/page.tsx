@@ -35,11 +35,15 @@ import {
   TimeFormat,
 } from "@/constants/timeFormats";
 import { TIMEZONES } from "@/constants/timezones";
-import { useAuthUser } from "@/contexts/AuthContext";
+import { AuthState, CurrentUser, useAuthUser } from "@/contexts/AuthContext";
 import { useAutosave } from "@/hooks/useAutosave";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
-import { AccountDetailsUpdateInputSchema } from "@back-end/schemas/updateAuth";
+import {
+  AccountDetailsUpdateInputSchema,
+  AccountDetailsUpdateSchema,
+} from "@/schemas/auth";
+import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Badge, Group, Loader, Select, Stack } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import {
@@ -50,9 +54,12 @@ import {
 
 export default function Preferences() {
   const t = useTranslation();
-  const { accountDetails } = useAuthUser();
+  const {
+    auth: { user },
+    setAuth,
+  } = useAuthUser();
 
-  const currentAccountDetails = accountDetails || {
+  const currentAccountDetails = user.accountDetails || {
     locale: "en-US",
     theme: "DARK",
     color: "BLUE",
@@ -114,15 +121,11 @@ export default function Preferences() {
 
   // TODO: update auth
   const formMethods = useForm({
-    defaultValues: accountDetails,
-    // resolver: valibotResolver(AccountDetailsUpdateSchema),
+    defaultValues: { id: user.id, ...user.accountDetails },
+    resolver: valibotResolver(AccountDetailsUpdateSchema),
   });
 
-  const {
-    register,
-    control,
-    formState: { errors },
-  } = formMethods;
+  const { control } = formMethods;
 
   return (
     <FormProvider {...formMethods}>
@@ -130,7 +133,7 @@ export default function Preferences() {
         <DashboardHeader
           title={[{ label: t("preferencesPage.name"), icon: <IconSettings /> }]}
         >
-          <SaveBadge />
+          <SaveBadge user={user} setAuth={setAuth} />
         </DashboardHeader>
         <Sheet title={t("preferencesPage.system")}>
           <Stack>
@@ -143,7 +146,6 @@ export default function Preferences() {
                     {...field}
                     error={error?.message}
                     label={t("preferencesPage.language")}
-                    // value={currentAccountDetails.locale || "en-US"}
                     data={LOCALE_VALUES.map((locale: Locale) => ({
                       label: t(`constants.locales.${locale}`),
                       value: locale,
@@ -153,82 +155,128 @@ export default function Preferences() {
                   />
                 )}
               />
-              <Select
-                label={t("preferencesPage.theme")}
-                value={currentAccountDetails.theme}
-                data={THEME_VALUES.map((theme: ThemeKey) => ({
-                  label: t(`constants.themes.${theme}`),
-                  value: theme,
-                }))}
-                allowDeselect={false}
-                withAsterisk
+              <Controller
+                name="theme"
+                control={control}
+                render={({ field, fieldState: { error } }) => (
+                  <Select
+                    {...field}
+                    error={error?.message}
+                    label={t("preferencesPage.theme")}
+                    data={THEME_VALUES.map((theme: ThemeKey) => ({
+                      label: t(`constants.themes.${theme}`),
+                      value: theme,
+                    }))}
+                    allowDeselect={false}
+                    withAsterisk
+                  />
+                )}
               />
-              <Select
-                label={t("preferencesPage.timezone")}
-                value={currentAccountDetails.timezone}
-                data={TIMEZONES}
-                allowDeselect={false}
-                searchable
-                withAsterisk
+              <Controller
+                name="timezone"
+                control={control}
+                render={({ field, fieldState: { error } }) => (
+                  <Select
+                    {...field}
+                    error={error?.message}
+                    label={t("preferencesPage.timezone")}
+                    data={TIMEZONES}
+                    allowDeselect={false}
+                    searchable
+                    withAsterisk
+                  />
+                )}
               />
             </Group>
             <Group grow>
               <Stack>
-                <Select
-                  label={t("preferencesPage.dateFormat")}
-                  value={currentAccountDetails.dateFormat}
-                  data={DATE_FORMAT_VALUES.map((dateformat: DateFormatKey) => ({
-                    label: t(`constants.dateFormats.${dateformat}`),
-                    value: dateformat,
-                  }))}
-                  allowDeselect={false}
-                  withAsterisk
-                  description={datePreview}
-                />
-              </Stack>
-              <Stack>
-                <Select
-                  label={t("preferencesPage.decimalSeparator")}
-                  value={currentAccountDetails.decimalSeparator}
-                  data={DECIMAL_SEPARATOR_VALUES.map(
-                    (separator: DecimalSeparatorKey) => ({
-                      label: t(`constants.separators.${separator}`),
-                      value: separator,
-                    }),
+                <Controller
+                  name="dateFormat"
+                  control={control}
+                  render={({ field, fieldState: { error } }) => (
+                    <Select
+                      {...field}
+                      error={error?.message}
+                      label={t("preferencesPage.dateFormat")}
+                      data={DATE_FORMAT_VALUES.map(
+                        (dateformat: DateFormatKey) => ({
+                          label: t(`constants.dateFormats.${dateformat}`),
+                          value: dateformat,
+                        }),
+                      )}
+                      allowDeselect={false}
+                      withAsterisk
+                      description={datePreview}
+                    />
                   )}
-                  allowDeselect={false}
-                  withAsterisk
-                  description={separatorPreview}
                 />
               </Stack>
               <Stack>
-                <Select
-                  label={t("preferencesPage.timeNotation")}
-                  value={currentAccountDetails.timeFormat}
-                  data={TIME_FORMAT_VALUES.map((timeformat: TimeFormat) => ({
-                    label: t(`constants.timeFormats.${timeformat}`),
-                    value: timeformat,
-                  }))}
-                  allowDeselect={false}
-                  withAsterisk
-                  description={timePreview}
-                />
-              </Stack>
-              <Stack>
-                <Select
-                  label={t("preferencesPage.firstDayOfWeek")}
-                  value={currentAccountDetails.firstDayOfWeek}
-                  data={FIRST_DAY_OF_THE_WEEK_VALUES.map(
-                    (firstDayOfWeek: FirstDayOfTheWeek) => ({
-                      label: t(
-                        `constants.firstDaysOfTheWeek.${firstDayOfWeek}`,
-                      ),
-                      value: firstDayOfWeek,
-                    }),
+                <Controller
+                  name="decimalSeparator"
+                  control={control}
+                  render={({ field, fieldState: { error } }) => (
+                    <Select
+                      {...field}
+                      error={error?.message}
+                      label={t("preferencesPage.decimalSeparator")}
+                      data={DECIMAL_SEPARATOR_VALUES.map(
+                        (separator: DecimalSeparatorKey) => ({
+                          label: t(`constants.separators.${separator}`),
+                          value: separator,
+                        }),
+                      )}
+                      allowDeselect={false}
+                      withAsterisk
+                      description={separatorPreview}
+                    />
                   )}
-                  allowDeselect={false}
-                  withAsterisk
-                  description={firstDayOfTheWeekPreview}
+                />
+              </Stack>
+              <Stack>
+                <Controller
+                  name="timeFormat"
+                  control={control}
+                  render={({ field, fieldState: { error } }) => (
+                    <Select
+                      {...field}
+                      error={error?.message}
+                      label={t("preferencesPage.timeNotation")}
+                      data={TIME_FORMAT_VALUES.map(
+                        (timeformat: TimeFormat) => ({
+                          label: t(`constants.timeFormats.${timeformat}`),
+                          value: timeformat,
+                        }),
+                      )}
+                      allowDeselect={false}
+                      withAsterisk
+                      description={timePreview}
+                    />
+                  )}
+                />
+              </Stack>
+              <Stack>
+                <Controller
+                  name="firstDayOfWeek"
+                  control={control}
+                  render={({ field, fieldState: { error } }) => (
+                    <Select
+                      {...field}
+                      error={error?.message}
+                      label={t("preferencesPage.firstDayOfWeek")}
+                      data={FIRST_DAY_OF_THE_WEEK_VALUES.map(
+                        (firstDayOfWeek: FirstDayOfTheWeek) => ({
+                          label: t(
+                            `constants.firstDaysOfTheWeek.${firstDayOfWeek}`,
+                          ),
+                          value: firstDayOfWeek,
+                        }),
+                      )}
+                      allowDeselect={false}
+                      withAsterisk
+                      description={firstDayOfTheWeekPreview}
+                    />
+                  )}
                 />
               </Stack>
             </Group>
@@ -250,7 +298,12 @@ export default function Preferences() {
   );
 }
 
-const SaveBadge = () => {
+type SaveBadgeProps = {
+  user: CurrentUser | null;
+  setAuth: (auth: AuthState) => any;
+};
+
+const SaveBadge = ({ user, setAuth }: SaveBadgeProps) => {
   const updatePreferences = useMutation("auth", "updateAccountDetails");
   const t = useTranslation();
 
@@ -258,6 +311,8 @@ const SaveBadge = () => {
     useFormContext<AccountDetailsUpdateInputSchema>();
   const { isDirty, errors } = useFormState({ control });
   const isError = useMemo(() => !!Object.keys(errors).length, [errors]);
+
+  console.log(errors);
 
   useAutosave(control, async (values) => {
     function isJson(str: string) {
@@ -271,18 +326,16 @@ const SaveBadge = () => {
     }
 
     try {
-      console.log({
-        ...values,
-        // id: getValues("id"),
-        id: 1,
-      });
       const updatedUser = await updatePreferences.mutate({
         ...values,
-        // id: getValues("id"),
-        id: 1,
+        id: user.id,
       });
 
-      reset(updatedUser);
+      setAuth({
+        user: { ...user, updatedUser },
+      });
+
+      reset({ id: user.id, ...updatedUser });
     } catch (error) {
       // TODO Fix typings
       const { success, json } = isJson((error as any).message);

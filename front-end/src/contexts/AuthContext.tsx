@@ -5,11 +5,11 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { type RouterOutput } from "@/utils/trpc";
 import { getTrpcClientOnClient } from "@/utils/trpcForClient";
 
-type CurrentUser = RouterOutput["auth"]["currentUser"];
+export type CurrentUser = RouterOutput["auth"]["currentUser"];
 
-type AuthState = {
-  user: CurrentUser | null;
-  accessToken: string | null;
+export type AuthState = {
+  user?: CurrentUser | null;
+  accessToken?: string | null;
 };
 
 type AuthContext = {
@@ -88,5 +88,5 @@ export const useAuthUser = () => {
   if (!authContext?.auth.user)
     throw new Error("useAuthUser must be used within authenticated pages only");
 
-  return authContext.auth.user;
+  return authContext;
 };

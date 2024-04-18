@@ -8,7 +8,7 @@ import {
 } from "@/constants/sessionDurations";
 import { userAccountDetails, users, userSessions } from "@/db/schema";
 import { SendEmailOtpSchema, SendPhoneOtpSchema } from "@/schemas/auth";
-import { AccountDetailsUpdateSchema } from "@/schemas/updateAuth";
+import { AccountDetailsUpdateSchema } from "@/schemas/auth";
 import { procedure, router } from "@/trpc";
 import { decrypt, encrypt } from "@/utils/encryption";
 import { isProduction } from "@/utils/environment";
@@ -259,7 +259,6 @@ export const authRouter = router({
   updateAccountDetails: procedure
     .input(wrap(AccountDetailsUpdateSchema))
     .mutation(async ({ ctx, input }) => {
-      console.log(input);
       try {
         const result = await ctx.db
           .update(userAccountDetails)
@@ -268,28 +267,14 @@ export const authRouter = router({
           })
           .where(eq(userAccountDetails.id, input.id))
           .returning({
-            // firstName: users.firstName,
-            // lastName: users.lastName,
-            // email: users.email,
-            // phone: users.phone,
-            // addressLineOne: users.addressLineOne,
-            // addressLineTwo: users.addressLineTwo,
-            // city: users.city,
-            // region: users.region,
-            // postalCode: users.postalCode,
-            // country: users.country,
-            // sex: users.sex,
-            // birthDate: users.birthDate,
-            accountDetails: {
-              locale: userAccountDetails.locale,
-              theme: userAccountDetails.theme,
-              color: userAccountDetails.color,
-              timezone: userAccountDetails.timezone,
-              dateFormat: userAccountDetails.dateFormat,
-              decimalSeparator: userAccountDetails.decimalSeparator,
-              timeFormat: userAccountDetails.timeFormat,
-              firstDayOfWeek: userAccountDetails.firstDayOfWeek,
-            },
+            locale: userAccountDetails.locale,
+            theme: userAccountDetails.theme,
+            color: userAccountDetails.color,
+            timezone: userAccountDetails.timezone,
+            dateFormat: userAccountDetails.dateFormat,
+            decimalSeparator: userAccountDetails.decimalSeparator,
+            timeFormat: userAccountDetails.timeFormat,
+            firstDayOfWeek: userAccountDetails.firstDayOfWeek,
           });
 
         const userAccountDetail = result[0];
