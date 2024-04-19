@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import clsx from "clsx";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 
 import { CalendarSidebar } from "@/components/common/CalendarSidebar";
 import { ReservationCalendar } from "@/components/entities/reservation/ReservationCalendar";
@@ -23,6 +24,8 @@ import {
 } from "@tabler/icons-react";
 
 import styles from "./page.module.scss";
+
+dayjs.extend(utc);
 
 const preferredStartDayIndex = 1;
 
