@@ -88,10 +88,10 @@ export const useQuery = <
   useDidUpdate(() => {
     if (!data) return;
 
-    // TODO Stop inital update
     // TODO Optimise, only unflatten current updateDeps instead of whole memoryStore
     const unflattenedMemoryStore = unflatten(key, memoryStore);
-    setData(unflattenedMemoryStore);
+    // TODO Stop inital update and remove this workaround
+    if (unflattenedMemoryStore) setData(unflattenedMemoryStore);
   }, updateDeps);
 
   useStrictModeEffect(() => {
