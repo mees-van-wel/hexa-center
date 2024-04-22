@@ -24,7 +24,9 @@ import styles from "./HomePage.module.scss";
 
 export default function HomePage({ newsItems }: { newsItems: NewsItem[] }) {
   const t = useTranslation();
-  const authUser = useAuthUser();
+  const {
+    auth: { user },
+  } = useAuthUser();
   const greeting = useMemo(() => {
     const hour = new Date().getHours();
     if (hour >= 5 && hour < 12) return t("homePage.goodMorning");
@@ -38,7 +40,7 @@ export default function HomePage({ newsItems }: { newsItems: NewsItem[] }) {
       <Group justify="space-between" align="flex-start" p="md">
         <Sheet title={t("homePage.welcome")} glass>
           <Title>
-            {greeting} {authUser.firstName}
+            {greeting} {user.firstName}
           </Title>
         </Sheet>
         <Sheet title={t("homePage.news")} glass>

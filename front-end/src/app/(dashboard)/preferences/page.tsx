@@ -119,8 +119,7 @@ export default function Preferences() {
     [currentAccountDetails.firstDayOfWeek, t],
   );
 
-  // TODO: update auth
-  const formMethods = useForm({
+  const formMethods = useForm<AccountDetailsUpdateInputSchema>({
     defaultValues: { id: user.id, ...user.accountDetails },
     resolver: valibotResolver(AccountDetailsUpdateSchema),
   });
@@ -307,12 +306,9 @@ const SaveBadge = ({ user, setAuth }: SaveBadgeProps) => {
   const updatePreferences = useMutation("auth", "updateAccountDetails");
   const t = useTranslation();
 
-  const { control, getValues, reset, setError } =
-    useFormContext<AccountDetailsUpdateInputSchema>();
+  const { control, reset } = useFormContext<AccountDetailsUpdateInputSchema>();
   const { isDirty, errors } = useFormState({ control });
   const isError = useMemo(() => !!Object.keys(errors).length, [errors]);
-
-  console.log(errors);
 
   useAutosave(control, async (values) => {
     function isJson(str: string) {
@@ -326,19 +322,19 @@ const SaveBadge = ({ user, setAuth }: SaveBadgeProps) => {
     }
 
     try {
-      const updatedUser = await updatePreferences.mutate({
+      const updatedPreferences = await updatePreferences.mutate({
         ...values,
         id: user.id,
       });
 
       setAuth({
-        user: { ...user, updatedUser },
+        user: { ...user, accountDetails: { ...updatedPreferences } },
       });
 
-      reset({ id: user.id, ...updatedUser });
+      reset({ id: user.id, ...updatedPreferences });
     } catch (error) {
       // TODO Fix typings
-      const { success, json } = isJson((error as any).message);
+      const { success } = isJson((error as any).message);
       if (!success) {
         notifications.show({
           message: t("common.oops"),
@@ -349,33 +345,6 @@ const SaveBadge = ({ user, setAuth }: SaveBadgeProps) => {
 
         return;
       }
-
-      const { exception, data } = json;
-
-      if (exception === "DB_UNIQUE_CONSTRAINT") {
-        setError(data.column, {
-          message: `${t("entities.user.singularName")} - ${getValues(
-            data.column,
-          )} - ${data.column}`,
-
-          // TODO Fix translations with arguments
-
-          // message: t("exceptions.DB_UNIQUE_CONSTRAINT", {
-          //   entity: t("entities.user.singularName"),
-          //   value: getValues(data.column),
-          //   column: data.column,
-          // }),
-        });
-      }
-
-      // if (exception === "DB_KEY_CONSTRAINT")
-      //   notifications.show({
-      //     message: t("exceptions.DB_KEY_CONSTRAINT", {
-      //       depend: data.depend,
-      //       entity: t("entities.user.singularName"),
-      //     }),
-      //     color: "red",
-      //   });
     }
   });
 

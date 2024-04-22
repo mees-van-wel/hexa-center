@@ -7,12 +7,15 @@ import {
   type SessionDuration,
 } from "@/constants/sessionDurations";
 import { userAccountDetails, users, userSessions } from "@/db/schema";
-import { SendEmailOtpSchema, SendPhoneOtpSchema } from "@/schemas/auth";
+import {
+  SendEmailOtpSchema,
+  SendPhoneOtpSchema,
+  UserUpdateSchema,
+} from "@/schemas/auth";
 import { AccountDetailsUpdateSchema } from "@/schemas/auth";
 import { procedure, router } from "@/trpc";
 import { decrypt, encrypt } from "@/utils/encryption";
 import { isProduction } from "@/utils/environment";
-import { createPgException } from "@/utils/exception";
 import { sign, verify } from "@/utils/jwt";
 import { sendMail } from "@/utils/mail";
 import { createOtp } from "@/utils/otp";
@@ -281,7 +284,38 @@ export const authRouter = router({
 
         return userAccountDetail;
       } catch (error) {
-        throw createPgException(error);
+        return error;
+      }
+    }),
+  updateProfile: procedure
+    .input(wrap(UserUpdateSchema))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const result = await ctx.db
+          .update(users)
+          .set({
+            ...input,
+          })
+          .where(eq(users.id, input.id))
+          .returning({
+            id: users.id,
+            firstName: users.firstName,
+            lastName: users.lastName,
+            addressLineOne: users.addressLineOne,
+            addressLineTwo: users.addressLineTwo,
+            city: users.city,
+            region: users.region,
+            postalCode: users.postalCode,
+            country: users.country,
+            sex: users.sex,
+            birthDate: users.birthDate,
+          });
+
+        const user = result[0];
+
+        return user;
+      } catch (error) {
+        return error;
       }
     }),
   token: procedure.query(async ({ ctx }) => {

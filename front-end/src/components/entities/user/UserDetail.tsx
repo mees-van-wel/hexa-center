@@ -36,7 +36,9 @@ type UserDetailProps = {
 
 export const UserDetail = ({ user }: UserDetailProps) => {
   const deleteUser = useMutation("user", "delete");
-  const authUser = useAuthUser();
+  const {
+    auth: { user: authUser },
+  } = useAuthUser();
   const router = useRouter();
   const t = useTranslation();
 

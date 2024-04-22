@@ -49,7 +49,9 @@ export const DashboardHeader = ({
   const t = useTranslation();
   const router = useRouter();
   const pathName = usePathname();
-  const authUser = useAuthUser();
+  const {
+    auth: { user },
+  } = useAuthUser();
   const routeHistory = useRecoilValue(routeHistoryState);
   const previousRoute = routeHistory.at(-2);
   const showBackButton =
@@ -143,7 +145,7 @@ export const DashboardHeader = ({
                   whiteSpace: "nowrap",
                 }}
               >
-                {authUser.firstName} {authUser.lastName}
+                {user.firstName} {user.lastName}
               </Text>
               <Text
                 size="xs"
@@ -151,7 +153,7 @@ export const DashboardHeader = ({
                   whiteSpace: "nowrap",
                 }}
               >
-                {authUser.email}
+                {user.email}
               </Text>
             </Stack>
             <Avatar />
