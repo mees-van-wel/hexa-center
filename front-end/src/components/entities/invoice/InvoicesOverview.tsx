@@ -173,10 +173,10 @@ export const InvoicesOverview = ({ invoices }: InvoicesOverviewProps) => {
       </DashboardHeader>
       <Paper p="md">
         <Title order={3}>
-          {t("invoicePage.totalRevenueThis")}: {totalRevenueThisYear}
+          {t("invoicePage.totalRevenueThisYear")}: {totalRevenueThisYear}
         </Title>
         <Title order={4} mb="md" c="dimmed">
-          {t("invoicePage.totalRevenueLast")}: {totalRevenuePreviousYear}
+          {t("invoicePage.totalRevenueLastYear")}: {totalRevenuePreviousYear}
         </Title>
         <AreaChart
           h={200}
@@ -186,12 +186,12 @@ export const InvoicesOverview = ({ invoices }: InvoicesOverviewProps) => {
           series={[
             {
               name: "revenueThisYear",
-              label: t("invoicePage.revenueThis"),
+              label: t("invoicePage.revenueThisYear"),
               color: "blue.6",
             },
             {
               name: "revenuePreviousYear",
-              label: t("invoicePage.revenueLast"),
+              label: t("invoicePage.revenueLastYear"),
               color: "gray.6",
             },
           ]}
