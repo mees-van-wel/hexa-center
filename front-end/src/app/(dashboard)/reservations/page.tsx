@@ -32,11 +32,8 @@ const preferredStartDayIndex = 1;
 export default function Page() {
   const t = useTranslation();
 
-  const { data: rooms, loading: loadingRooms } = useQuery("room", "list");
-  const { data: reservations, loading: loadingReservations } = useQuery(
-    "reservation",
-    "list",
-  );
+  const listRooms = useQuery("room", "list");
+  const listReservations = useQuery("reservation", "list");
 
   const [calendarCurrentDay, setCalendarCurrentDay] = useSessionStorage({
     key: "calendarCurrentDay",
@@ -77,30 +74,36 @@ export default function Page() {
     return filteredWeek;
   }, [calendarView, calendarCurrentDay]);
 
-  const currentRooms = useMemo(
-    () => rooms,
-    // showAll
-    //   ? rooms
-    //   : rooms.reduce<RouterOutput["room"]["list"]>((array, current) => {
-    //       if (
-    //         reservations.some(
-    //           (reservation) =>
-    //             current.name === reservation.room.name &&
-    //             currentWeek.some((weekDay) =>
-    //               weekDay.isBetween(
-    //                 dayjs(reservation.startDate),
-    //                 dayjs(reservation.endDate),
-    //                 "day",
-    //                 "[]",
-    //               ),
-    //             ),
-    //         )
-    //       )
-    //         array.push(current);
-    //       return array;
-    //     }, []),
-    [rooms],
-  );
+  // const currentRooms = useMemo(
+  //   () => listRooms.data,
+  //   // showAll
+  //   //   ? rooms
+  //   //   : rooms.reduce<RouterOutput["room"]["list"]>((array, current) => {
+  //   //       if (
+  //   //         reservations.some(
+  //   //           (reservation) =>
+  //   //             current.name === reservation.room.name &&
+  //   //             currentWeek.some((weekDay) =>
+  //   //               weekDay.isBetween(
+  //   //                 dayjs(reservation.startDate),
+  //   //                 dayjs(reservation.endDate),
+  //   //                 "day",
+  //   //                 "[]",
+  //   //               ),
+  //   //             ),
+  //   //         )
+  //   //       )
+  //   //         array.push(current);
+  //   //       return array;
+  //   //     }, []),
+  //   [listRooms.data],
+  // );
+
+  const loading =
+    listRooms.loading ||
+    listReservations.loading ||
+    !listRooms.data ||
+    !listReservations.data;
 
   return (
     <Stack mih="100%">
@@ -120,7 +123,7 @@ export default function Page() {
           {t("common.new")}
         </Button>
       </DashboardHeader>
-      {loadingRooms || loadingReservations || !reservations || !rooms ? (
+      {loading ? (
         <Flex
           gap="md"
           justify="center"
@@ -173,8 +176,8 @@ export default function Page() {
                 <Stack gap={0} w="100%">
                   <ReservationCalendar
                     currentWeek={currentWeek}
-                    currentRooms={currentRooms}
-                    reservations={reservations}
+                    currentRooms={listRooms.data}
+                    reservations={listReservations.data}
                   />
                 </Stack>
               </Stack>

@@ -36,11 +36,11 @@ import {
 type PageParams = { params: { id: string } };
 
 export default function Page({ params }: PageParams) {
-  const { data, loading } = useQuery("business", "get", {
+  const getBusiness = useQuery("business", "get", {
     initialParams: parseInt(params.id),
   });
 
-  if (loading || !data)
+  if (getBusiness.loading || !getBusiness.data)
     return (
       <Flex
         gap="md"
@@ -55,7 +55,7 @@ export default function Page({ params }: PageParams) {
       </Flex>
     );
 
-  return <Detail business={data} />;
+  return <Detail business={getBusiness.data} />;
 }
 
 type DetailProps = {

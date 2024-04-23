@@ -16,7 +16,7 @@ export default function Page() {
   const searchBarId = useId();
   const t = useTranslation();
 
-  const { data, loading } = useQuery("business", "list");
+  const listBusinesses = useQuery("business", "list");
 
   return (
     <Stack>
@@ -34,7 +34,7 @@ export default function Page() {
         </Button>
         <Table.SearchBar id={searchBarId} />
       </DashboardHeader>
-      {loading || !data ? (
+      {listBusinesses.loading || !listBusinesses.data ? (
         <Flex
           gap="md"
           justify="center"
@@ -48,7 +48,7 @@ export default function Page() {
         </Flex>
       ) : (
         <Table
-          elements={data}
+          elements={listBusinesses.data}
           searchBarId={searchBarId}
           onClick={({ id }) => {
             router.push(`/businesses/${id}`);

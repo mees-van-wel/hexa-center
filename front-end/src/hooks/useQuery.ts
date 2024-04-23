@@ -32,18 +32,20 @@ export const useQuery = <
 
   const updateCacheHandler = useCallback(
     (updatedCache: Record<string, any>) => {
-      const clone = { ...memoryStore };
+      setMemoryStore((current) => {
+        const clone = { ...current };
 
-      for (const cacheKey in updatedCache) {
-        const value = updatedCache[cacheKey];
+        for (const cacheKey in updatedCache) {
+          const value = updatedCache[cacheKey];
 
-        if (value === undefined) delete clone[cacheKey];
-        else clone[cacheKey] = value;
-      }
+          if (value === undefined) delete clone[cacheKey];
+          else clone[cacheKey] = value;
+        }
 
-      setMemoryStore(clone);
+        return clone;
+      });
     },
-    [memoryStore, setMemoryStore],
+    [setMemoryStore],
   );
 
   const query = useCallback(
@@ -74,16 +76,17 @@ export const useQuery = <
     [key, memoryStore, procedure, scope, updateCacheHandler],
   );
 
-  const updateDeps = useMemo(
-    () => [
-      memoryStore[key],
-      ...(Array.isArray(memoryStore[key])
-        ? memoryStore[key]
-        : [memoryStore[key]]
-      ).map((ref: string) => memoryStore[ref]),
-    ],
-    [key, memoryStore],
-  );
+  // TODO React errors to console
+  // const updateDeps = useMemo(
+  //   () => [
+  //     memoryStore[key],
+  //     ...(Array.isArray(memoryStore[key])
+  //       ? memoryStore[key]
+  //       : [memoryStore[key]]
+  //     ).map((ref: string) => memoryStore[ref]),
+  //   ],
+  //   [key, memoryStore],
+  // );
 
   useDidUpdate(() => {
     if (!data) return;
@@ -92,7 +95,7 @@ export const useQuery = <
     const unflattenedMemoryStore = unflatten(key, memoryStore);
     // TODO Stop inital update and remove this workaround
     if (unflattenedMemoryStore) setData(unflattenedMemoryStore);
-  }, updateDeps);
+  }, [memoryStore]);
 
   useStrictModeEffect(() => {
     if (data || options?.skipInitial) return;
