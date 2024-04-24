@@ -12,6 +12,7 @@ import { productRouter } from "./product";
 import { reservationRouter } from "./reservation";
 import { roomRouter } from "./room";
 import { userRouter } from "./user";
+import { workingHourRouter } from "./workingHour";
 
 export const appRouter = router({
   auth: authRouter,
@@ -24,6 +25,7 @@ export const appRouter = router({
   product: productRouter,
   ledgerAccount: ledgerAccountRouter,
   integration: integrationRouter,
+  workingHour: workingHourRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -72,6 +72,7 @@ export const createContext = async ({
     with: {
       accountDetails: {
         columns: {
+          id: true,
           locale: true,
           theme: true,
           color: true,

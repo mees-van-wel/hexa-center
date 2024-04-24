@@ -165,6 +165,7 @@ export const authRouter = router({
         with: {
           accountDetails: {
             columns: {
+              id: true,
               locale: true,
               theme: true,
               color: true,

@@ -5,10 +5,12 @@ import dayjs from "dayjs";
 
 import { FIRST_DAYS_OF_THE_WEEK } from "@/constants/firstDayOfTheWeek";
 import { Weekday, WEEKDAY_VALUES, WEEKDAYS } from "@/constants/weekdays";
+import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
 import { RouterOutput } from "@/utils/trpc";
 import { Button, Group, SegmentedControl, Stack } from "@mantine/core";
 import { TimeInput } from "@mantine/dates";
+import { showNotification } from "@mantine/notifications";
 import { IconMinus, IconPlus } from "@tabler/icons-react";
 
 import { Sheet } from "../Sheet";
@@ -20,7 +22,70 @@ type workinghoursProps = {
 };
 
 export const Workinghours = ({ accountDetails }: workinghoursProps) => {
+  var customParseFormat = require("dayjs/plugin/customParseFormat");
+  var isBetween = require("dayjs/plugin/isBetween");
+  dayjs.extend(isBetween);
+  dayjs.extend(customParseFormat);
   const t = useTranslation();
+  const [currentStartTime, setCurrentStartTime] = useState("09:00");
+  const [currentEndTime, setCurrentEndTime] = useState("17:00");
+  const addWorkingHour = useMutation("workingHour", "create");
+
+  const overlap = () => {
+    for (let item of accountDetails.workingHours) {
+      const start = item.startTime;
+      const end = item.endTime;
+      const dayStart = item.startDay;
+      const dayEnd = item.endDay;
+
+      if (
+        dayStart === dayEnd &&
+        ((currentStartTime < end && currentStartTime > start) ||
+          (currentEndTime < end && currentEndTime > start) ||
+          (start < currentEndTime && start > currentStartTime) ||
+          (end < currentEndTime && end > currentStartTime))
+      ) {
+        return true;
+      } else if (dayStart !== dayEnd && currentEndTime > start) {
+        return true;
+      } else if (
+        currentEndTime < currentStartTime &&
+        currentStartTime < start
+      ) {
+        return true;
+      }
+    }
+  };
+
+  const createHandler = () => {
+    const startDay = sortedWeekdays.indexOf(currentWeekday);
+    const endDay =
+      currentEndTime < currentStartTime
+        ? sortedWeekdays.indexOf(currentWeekday) === 6
+          ? 0
+          : sortedWeekdays.indexOf(currentWeekday) + 1
+        : sortedWeekdays.indexOf(currentWeekday);
+    if (overlap() === true) {
+      return showNotification({
+        message: t("preferencesPage.workingHours.overlaps"),
+        color: "red",
+      });
+    }
+
+    addWorkingHour.mutate({
+      accountId: accountDetails.id,
+      startDay: startDay,
+      endDay: endDay,
+      startTime: currentStartTime,
+      endTime: currentEndTime,
+    });
+  };
+
+  const deleteWorkingHour = useMutation("workingHour", "delete");
+
+  const deleteHandler = (workingHourId: number) => {
+    deleteWorkingHour.mutate(workingHourId);
+  };
 
   const [currentWeekday, setCurrentWeekday] = useState<Weekday>(
     WEEKDAYS.MONDAY,
@@ -55,9 +120,19 @@ export const Workinghours = ({ accountDetails }: workinghoursProps) => {
           weekday !== currentWeekday ? null : (
             <Stack key={weekday} className={styles.workingHours}>
               <Group align="flex-end">
-                <TimeInput label="Start" />
-                <TimeInput label="End" />
-                <Button>
+                <TimeInput
+                  onChange={(event) => {
+                    setCurrentStartTime(event.target.value);
+                  }}
+                  label="Start"
+                />
+                <TimeInput
+                  onChange={(event) => {
+                    setCurrentEndTime(event.target.value);
+                  }}
+                  label="End"
+                />
+                <Button onClick={createHandler}>
                   <IconPlus />
                 </Button>
               </Group>
@@ -102,7 +177,10 @@ export const Workinghours = ({ accountDetails }: workinghoursProps) => {
                             disabled
                           />
                         )}
-                        <Button variant="light">
+                        <Button
+                          variant="light"
+                          onClick={() => deleteHandler(id)}
+                        >
                           <IconMinus />
                         </Button>
                       </Group>
