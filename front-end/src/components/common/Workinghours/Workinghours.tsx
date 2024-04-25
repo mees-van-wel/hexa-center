@@ -22,10 +22,6 @@ type workinghoursProps = {
 };
 
 export const Workinghours = ({ accountDetails }: workinghoursProps) => {
-  var customParseFormat = require("dayjs/plugin/customParseFormat");
-  var isBetween = require("dayjs/plugin/isBetween");
-  dayjs.extend(isBetween);
-  dayjs.extend(customParseFormat);
   const t = useTranslation();
   const [currentStartTime, setCurrentStartTime] = useState("09:00");
   const [currentEndTime, setCurrentEndTime] = useState("17:00");
