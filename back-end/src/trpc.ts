@@ -1,7 +1,6 @@
 import { and, eq, gt, isNull, or } from "drizzle-orm";
 
 import { isProduction } from "@/utils/environment";
-import { trpcTransformer } from "@/utils/trpcTransformer";
 import { initTRPC, TRPCError } from "@trpc/server";
 import * as trpcExpress from "@trpc/server/adapters/express";
 
@@ -130,7 +129,7 @@ type Meta = {
 };
 
 const t = initTRPC.context<Context>().meta<Meta>().create({
-  transformer: trpcTransformer,
+  // transformer: trpcTransformer,
 });
 
 const authMiddleware = t.middleware(({ meta, next, ctx }) => {

@@ -30,8 +30,11 @@ dependencies:
     specifier: ^2.44.0
     version: 2.44.0(react@18.2.0)
   '@trpc/client':
-    specifier: ^10.44.1
-    version: 10.44.1(@trpc/server@10.44.1)
+    specifier: 11.0.0-rc.351
+    version: 11.0.0-rc.351(@trpc/server@11.0.0-rc.351)
+  '@trpc/server':
+    specifier: 11.0.0-rc.351
+    version: 11.0.0-rc.351
   awesome-phonenumber:
     specifier: ^6.2.0
     version: 6.2.0
@@ -740,17 +743,16 @@ packages:
     resolution: {integrity: sha512-WPPtihDcAwEm1QZM9MXQw6+r/R2/qx7KMU1eegsi9DsqBLAb0W2kbt6e/syvd6j9c+6XNpRVBW1ziGqSWQAWOg==}
     dev: false
 
-  /@trpc/client@10.44.1(@trpc/server@10.44.1):
-    resolution: {integrity: sha512-vTWsykNcgz1LnwePVl2fKZnhvzP9N3GaaLYPkfGINo314ZOS0OBqe9x0ytB2LLUnRVTAAZ2WoONzARd8nHiqrA==}
+  /@trpc/client@11.0.0-rc.351(@trpc/server@11.0.0-rc.351):
+    resolution: {integrity: sha512-48LKVO6pSk6/NSKmwZ1ixzQm/S3DD8iAI5j+L9Pqou/IPbS52qJepaCWd1bTWO+iDgXa9MxcsD0Gr8/IL5TznQ==}
     peerDependencies:
-      '@trpc/server': 10.44.1
+      '@trpc/server': 11.0.0-rc.351+a9b03d7f3
     dependencies:
-      '@trpc/server': 10.44.1
+      '@trpc/server': 11.0.0-rc.351
     dev: false
 
-  /@trpc/server@10.44.1:
-    resolution: {integrity: sha512-mF7B+K6LjuboX8I1RZgKE5GA/fJhsJ8tKGK2UBt3Bwik7hepEPb4NJgNr7vO6BK5IYwPdBLRLTctRw6XZx0sRg==}
-    engines: {node: '>=18.0.0'}
+  /@trpc/server@11.0.0-rc.351:
+    resolution: {integrity: sha512-Y1Iw9iiF9LCJ2ldS/af+2RXzIbgWvQ4DHVVgHYOGB+uINpAugsUmogoEkZ6rYOgusNz6qkRzY8JKOSR7FQ1aUg==}
     dev: false
 
   /@types/d3-array@3.2.1:

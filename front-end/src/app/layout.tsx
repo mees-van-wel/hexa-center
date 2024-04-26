@@ -7,7 +7,6 @@ import { redirect, RedirectType } from "next/navigation";
 
 import { AuthContextProvider } from "@/contexts/AuthContext";
 import { TranslationInitializer } from "@/initializers/TranslationInitializer";
-import { AppRouter, type RouterOutput } from "@/utils/trpc";
 import { getTrpcClientOnServer } from "@/utils/trpcForServer";
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
@@ -15,6 +14,7 @@ import { Notifications } from "@mantine/notifications";
 import { TRPCClientError } from "@trpc/client";
 
 import Providers from "./providers";
+import { AppRouter, RouterOutput } from "./trpc";
 
 import "modern-normalize/modern-normalize.css";
 import "@mantine/core/styles.css";

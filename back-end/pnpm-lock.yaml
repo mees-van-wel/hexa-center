@@ -15,8 +15,8 @@ dependencies:
     specifier: ^5.1.0
     version: 5.1.0
   '@trpc/server':
-    specifier: ^10.44.1
-    version: 10.44.1
+    specifier: 11.0.0-rc.351
+    version: 11.0.0-rc.351
   '@vonage/auth':
     specifier: ^1.7.0
     version: 1.7.0
@@ -923,9 +923,8 @@ packages:
     resolution: {integrity: sha512-C5Mc6rdnsaJDjO3UpGW/CQTHtCKaYlScZTly4JIu97Jxo/odCiH0ITnDXSJPTOrEKk/ycSZ0AOgTmkDtkOsvIA==}
     dev: false
 
-  /@trpc/server@10.44.1:
-    resolution: {integrity: sha512-mF7B+K6LjuboX8I1RZgKE5GA/fJhsJ8tKGK2UBt3Bwik7hepEPb4NJgNr7vO6BK5IYwPdBLRLTctRw6XZx0sRg==}
-    engines: {node: '>=18.0.0'}
+  /@trpc/server@11.0.0-rc.351:
+    resolution: {integrity: sha512-Y1Iw9iiF9LCJ2ldS/af+2RXzIbgWvQ4DHVVgHYOGB+uINpAugsUmogoEkZ6rYOgusNz6qkRzY8JKOSR7FQ1aUg==}
     dev: false
 
   /@types/body-parser@1.19.5:
