@@ -46,6 +46,10 @@ export type Translation = {
     print: string;
     total: string;
   };
+  exceptions: {
+    DB_UNIQUE: string;
+    DB_STRICT: string;
+  };
   modules: {
     essentials: string;
     sales: string;

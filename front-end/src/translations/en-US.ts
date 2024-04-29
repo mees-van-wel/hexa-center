@@ -38,6 +38,10 @@ export default {
     print: "Print",
     total: "Total",
   },
+  exceptions: {
+    DB_UNIQUE: "already exists inside another",
+    DB_STRICT: "",
+  },
   modules: {
     essentials: "Essentials",
     sales: "Sales",

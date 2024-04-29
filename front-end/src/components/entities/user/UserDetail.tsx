@@ -13,6 +13,7 @@ import { Metadata } from "@/components/common/Metadata";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { useAuthUser } from "@/contexts/AuthContext";
 import { useAutosave } from "@/hooks/useAutosave";
+import { useException } from "@/hooks/useException";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
 import { UserUpdateInputSchema, UserUpdateSchema } from "@/schemas/user";
@@ -118,23 +119,13 @@ export const UserDetail = ({ user }: UserDetailProps) => {
 const SaveBadge = () => {
   const updateUser = useMutation("user", "update");
   const t = useTranslation();
+  const { handleJsonResult } = useException();
 
-  const { control, getValues, reset, setError } =
-    useFormContext<UserUpdateInputSchema>();
+  const { control, getValues, reset } = useFormContext<UserUpdateInputSchema>();
   const { isDirty, errors } = useFormState({ control });
   const isError = useMemo(() => !!Object.keys(errors).length, [errors]);
 
   useAutosave(control, async (values) => {
-    function isJson(str: string) {
-      if (!str) return { success: false, json: undefined };
-
-      try {
-        return { success: true, json: JSON.parse(str) };
-      } catch (e) {
-        return { success: false, json: undefined };
-      }
-    }
-
     try {
       const updatedUser = await updateUser.mutate({
         ...values,
@@ -143,45 +134,7 @@ const SaveBadge = () => {
 
       reset(updatedUser);
     } catch (error) {
-      // TODO Fix typings
-      const { success, json } = isJson((error as any).message);
-      if (!success) {
-        notifications.show({
-          message: t("common.oops"),
-          color: "red",
-        });
-
-        reset();
-
-        return;
-      }
-
-      const { exception, data } = json;
-
-      if (exception === "DB_UNIQUE_CONSTRAINT") {
-        setError(data.column, {
-          message: `${t("entities.user.singularName")} - ${getValues(
-            data.column,
-          )} - ${data.column}`,
-
-          // TODO Fix translations with arguments
-
-          // message: t("exceptions.DB_UNIQUE_CONSTRAINT", {
-          //   entity: t("entities.user.singularName"),
-          //   value: getValues(data.column),
-          //   column: data.column,
-          // }),
-        });
-      }
-
-      // if (exception === "DB_KEY_CONSTRAINT")
-      //   notifications.show({
-      //     message: t("exceptions.DB_KEY_CONSTRAINT", {
-      //       depend: data.depend,
-      //       entity: t("entities.user.singularName"),
-      //     }),
-      //     color: "red",
-      //   });
+      handleJsonResult(error, t("entities.user.singularName"));
     }
   });
 
