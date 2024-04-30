@@ -1,0 +1,2 @@
+ALTER TABLE "reservations_to_invoices" ALTER COLUMN "period_start_date" SET DATA TYPE date USING "period_start_date"::date;--> statement-breakpoint
+ALTER TABLE "reservations_to_invoices" ALTER COLUMN "period_end_date" SET DATA TYPE date USING "period_end_date"::date;

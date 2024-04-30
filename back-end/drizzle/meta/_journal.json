@@ -15,6 +15,13 @@
       "when": 1714473902993,
       "tag": "0001_mysterious_chamber",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1714475888326,
+      "tag": "0002_overconfident_iron_patriot",
+      "breakpoints": true
     }
   ]
 }

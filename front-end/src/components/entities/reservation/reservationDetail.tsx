@@ -122,12 +122,14 @@ export const ReservationDetail = ({
   };
 
   const invoicePeriodHandler = async () => {
-    const countingInvoices = invoices.filter(
+    const filteredInvoices = invoices.filter(
       ({ invoice }) =>
         invoice.status !== "credited" && invoice.type !== "credit",
     );
 
-    const lastInvoicedDate = countingInvoices[0]?.periodEndDate;
+    const latestInvoicedDate = filteredInvoices
+      .sort((a, b) => a.periodEndDate.getTime() - b.periodEndDate.getTime())
+      .at(-1)?.periodEndDate;
 
     modals.open({
       title: (
@@ -139,18 +141,23 @@ export const ReservationDetail = ({
           minDate={reservation.startDate}
           maxDate={reservation.endDate}
           excludeDate={(date) =>
-            countingInvoices.some(({ periodStartDate, periodEndDate }) =>
+            filteredInvoices.some(({ periodStartDate, periodEndDate }, index) =>
               dayjs(date).isBetween(
                 periodStartDate,
                 periodEndDate,
                 "day",
-                "[)",
+                `${
+                  !!index ||
+                  dayjs(periodStartDate).isSame(reservation.startDate, "day")
+                    ? "["
+                    : "("
+                })`,
               ),
             )
           }
           defaultDate={
-            lastInvoicedDate
-              ? dayjs(lastInvoicedDate).add(1, "day").toDate()
+            latestInvoicedDate
+              ? dayjs(latestInvoicedDate).add(1, "day").toDate()
               : reservation.startDate
           }
           onConfirm={async (periodStartDate, periodEndDate) => {

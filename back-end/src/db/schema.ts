@@ -398,12 +398,8 @@ export const reservationsToInvoices = pgTable(
     invoiceId: integer("invoice_id")
       .notNull()
       .references(() => invoices.id, { onDelete: "cascade" }),
-    periodStartDate: timestamp("period_start_date", {
-      withTimezone: false,
-    }).notNull(),
-    periodEndDate: timestamp("period_end_date", {
-      withTimezone: false,
-    }).notNull(),
+    periodStartDate: date("period_start_date", { mode: "date" }).notNull(),
+    periodEndDate: date("period_end_date", { mode: "date" }).notNull(),
   },
   (t) => ({
     pk: primaryKey({ columns: [t.reservationId, t.invoiceId] }),
