@@ -19,6 +19,7 @@ export const PhoneInput = () => {
   const t = useTranslation();
 
   const { control, handleSubmit } = useForm<SendPhoneOtpSchema>({
+    defaultValues: { phone: loginState.phone },
     resolver: valibotResolver(SendPhoneOtpSchema),
   });
 
@@ -37,11 +38,10 @@ export const PhoneInput = () => {
         <Controller
           control={control}
           name="phone"
-          defaultValue={loginState.phone}
           render={({ field, fieldState: { error } }) => (
             <PhoneInputComponent
               {...field}
-              value={field.value}
+              value={control._defaultValues.phone}
               error={error?.message}
               label={t("loginPage.phone")}
               autoComplete
