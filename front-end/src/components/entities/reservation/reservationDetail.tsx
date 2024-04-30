@@ -443,7 +443,7 @@ export const ReservationDetail = ({
                 <Title order={3}>{t("entities.invoice.pluralName")}</Title>
               }
             >
-              <ScrollArea>
+              <ScrollArea maw="77.5vw">
                 <Group gap="2rem" p="md" wrap="nowrap">
                   {invoices.map(
                     ({ invoice, periodStartDate, periodEndDate }) => {

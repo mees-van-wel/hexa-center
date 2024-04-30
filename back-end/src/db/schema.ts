@@ -399,10 +399,10 @@ export const reservationsToInvoices = pgTable(
       .notNull()
       .references(() => invoices.id, { onDelete: "cascade" }),
     periodStartDate: timestamp("period_start_date", {
-      withTimezone: true,
+      withTimezone: false,
     }).notNull(),
     periodEndDate: timestamp("period_end_date", {
-      withTimezone: true,
+      withTimezone: false,
     }).notNull(),
   },
   (t) => ({
