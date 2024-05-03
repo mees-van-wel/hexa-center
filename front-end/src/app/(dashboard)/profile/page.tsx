@@ -7,7 +7,7 @@ import { Address } from "@/components/common/Address";
 import { Sheet } from "@/components/common/Sheet";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { SEX_VALUES, SexKey } from "@/constants/sexes";
-import { useAuthRelation } from "@/contexts/AuthContext";
+import { useAuthUser } from "@/contexts/AuthContext";
 import { useTranslation } from "@/hooks/useTranslation";
 import {
   Avatar,
@@ -23,7 +23,7 @@ import { IconUser } from "@tabler/icons-react";
 
 export default function Profile() {
   const t = useTranslation();
-  const authUser = useAuthRelation();
+  const authUser = useAuthUser();
 
   const formMethods = useForm({
     defaultValues: authUser,
@@ -51,18 +51,24 @@ export default function Profile() {
             <Group align="end">
               <Avatar size="lg" />
               <TextInput
-                label={t("entities.relation.keys.name")}
-                value={authUser.name}
+                label={t("entities.user.firstName")}
+                value={authUser.firstName}
+                required
+                disabled
+              />
+              <TextInput
+                label={t("entities.user.lastName")}
+                value={authUser.lastName}
                 required
                 disabled
               />
               <DateInput
-                label={t("entities.relation.keys.dateOfBirth")}
-                value={authUser.dateOfBirth}
+                label={t("entities.user.birthDate")}
+                value={authUser.birthDate}
                 disabled
               />
               <Select
-                label={t("entities.relation.keys.sex")}
+                label={t("entities.user.sex")}
                 data={sexOptions}
                 value={authUser.sex}
                 allowDeselect={false}
@@ -75,16 +81,12 @@ export default function Profile() {
         <Sheet title={t("generic.authentication")}>
           <Stack>
             <Group>
-              <p>{t("entities.relation.keys.emailAddress")}:</p>
-              <Badge variant="dot" color="orange">
-                {authUser.emailAddress}
-              </Badge>
+              <p>{t("common.email")}:</p>
+              <Badge variant="dot">{authUser.email}</Badge>
             </Group>
             <Group>
-              <p>{t("entities.relation.keys.phoneNumber")}:</p>
-              <Badge variant="dot" color="orange">
-                {authUser.phoneNumber}
-              </Badge>
+              <p>{t("common.phone")}:</p>
+              <Badge variant="dot">{authUser.phone}</Badge>
             </Group>
           </Stack>
         </Sheet>

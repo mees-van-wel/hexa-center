@@ -1,8 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import dayjs, { Dayjs } from "dayjs";
+import { useRouter } from "next/navigation";
+import clsx from "clsx";
+import dayjs from "dayjs";
+import isBetween from "dayjs/plugin/isBetween";
 import utc from "dayjs/plugin/utc";
 
 import { CalendarSidebar } from "@/components/common/CalendarSidebar";
@@ -11,7 +14,7 @@ import { CALENDAR_VIEWS, CalendarView } from "@/constants/calendarViews";
 import { MONTH_VALUES } from "@/constants/months";
 import { WEEKDAY_VALUES } from "@/constants/weekdays";
 import { useTranslation } from "@/hooks/useTranslation";
-import { RouterOutput } from "@/utils/trpc";
+import { type RouterOutput } from "@/utils/trpc";
 import { Button, Group, Paper, Stack } from "@mantine/core";
 import { useSessionStorage } from "@mantine/hooks";
 import {
@@ -26,26 +29,12 @@ import { ReservationCalendar } from "../ReservationCalendar";
 import styles from "./ReservationsOverview.module.scss";
 
 dayjs.extend(utc);
+dayjs.extend(isBetween);
 
 type ReservationsProps = {
   reservations: RouterOutput["reservation"]["list"];
   rooms: RouterOutput["room"]["list"];
   showAll?: boolean;
-};
-
-export const isBetween = (
-  betweenDate: Dayjs,
-  startDate: Dayjs,
-  endDate: Dayjs,
-) => {
-  const between = betweenDate.startOf("day");
-  const start = startDate.startOf("day");
-  const end = endDate.startOf("day");
-
-  return (
-    (between.isSame(start) || between.isAfter(start)) &&
-    (between.isSame(end) || between.isBefore(end))
-  );
 };
 
 export const ReservationsOverview = ({
@@ -54,6 +43,11 @@ export const ReservationsOverview = ({
   showAll,
 }: ReservationsProps) => {
   const t = useTranslation();
+  const router = useRouter();
+
+  useEffect(() => {
+    router.refresh();
+  }, []);
 
   const [calendarCurrentDay, setCalendarCurrentDay] = useSessionStorage({
     key: "calendarCurrentDay",
@@ -78,7 +72,10 @@ export const ReservationsOverview = ({
     let filteredWeek = fullWeek;
 
     if (calendarView === CALENDAR_VIEWS.WORKWEEK) {
-      filteredWeek = fullWeek.filter((day) => [1, 2].includes(day.day()));
+      // TODO: use real workingHours
+      filteredWeek = fullWeek.filter((day) =>
+        [1, 2, 3, 4, 5].includes(day.day()),
+      );
     } else if (calendarView !== CALENDAR_VIEWS.WEEK) {
       filteredWeek = [dayjs(calendarCurrentDay)];
     }
@@ -102,10 +99,11 @@ export const ReservationsOverview = ({
                 (reservation) =>
                   current.name === reservation.room.name &&
                   currentWeek.some((weekDay) =>
-                    isBetween(
-                      weekDay,
+                    weekDay.isBetween(
                       dayjs(reservation.startDate),
                       dayjs(reservation.endDate),
+                      "day",
+                      "[]",
                     ),
                   ),
               )
@@ -117,12 +115,12 @@ export const ReservationsOverview = ({
   );
 
   return (
-    <Stack h="100%">
+    <Stack mih="100%">
       <DashboardHeader
         title={[
           {
             icon: <IconHotelService />,
-            label: t("dashboardLayout.reservations"),
+            label: t("entities.reservation.pluralName"),
           },
         ]}
       >
@@ -138,29 +136,40 @@ export const ReservationsOverview = ({
       <Group
         wrap="nowrap"
         gap={sidebarToggle ? "md" : 0}
-        align="stretch"
-        h="100%"
+        align="flex-start"
+        mih="100%"
         className={styles.calendarOverview}
       >
         <div className={styles.calendarContainer}>
           <Paper p="1rem">
             <Stack>
               <Group wrap="nowrap" grow gap={0} ta="center" fw="700">
-                <div>Room name</div>
+                <div className={styles.roomName}>
+                  {t("entities.reservation.calendar.roomName")}
+                </div>
                 {currentWeek.map((weekDay, index) => (
-                  <div key={`${weekDay.date()}-${index}`}>
-                    {t(
-                      `dates.weekdayNamesShort.${
-                        WEEKDAY_VALUES[weekDay.day()]
-                      }`,
-                    )}{" "}
-                    {weekDay.date()}
-                    <br />
-                    {t(`dates.monthsLong.${MONTH_VALUES[weekDay.month()]}`)}
+                  <div
+                    key={`${weekDay.date()}-${index}`}
+                    className={styles.weekDays}
+                  >
+                    <div
+                      className={clsx({
+                        [styles.currentDay]:
+                          weekDay.date() === new Date().getDate(),
+                      })}
+                    >
+                      {t(
+                        `dates.weekdayNamesShort.${
+                          WEEKDAY_VALUES[weekDay.day()]
+                        }`,
+                      )}{" "}
+                      {weekDay.date()}
+                      <br />
+                      {t(`dates.monthsLong.${MONTH_VALUES[weekDay.month()]}`)}
+                    </div>
                   </div>
                 ))}
               </Group>
-
               <Stack gap={0} w="100%">
                 <ReservationCalendar
                   currentWeek={currentWeek}

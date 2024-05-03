@@ -19,17 +19,15 @@ export const PhoneInput = () => {
   const t = useTranslation();
 
   const { control, handleSubmit } = useForm<SendPhoneOtpSchema>({
+    defaultValues: { phone: loginState.phone },
     resolver: valibotResolver(SendPhoneOtpSchema),
   });
 
-  const onSubmit: SubmitHandler<SendPhoneOtpSchema> = async ({
-    phoneNumber,
-  }) => {
-    const phoneToken = await sendPhoneOtp.mutate({ phoneNumber });
-
+  const onSubmit: SubmitHandler<SendPhoneOtpSchema> = async ({ phone }) => {
+    const phoneToken = await sendPhoneOtp.mutate({ phone });
     setLoginState({
       step: "PHONE_OTP",
-      phoneNumber,
+      phone,
       phoneToken,
     });
   };
@@ -39,14 +37,13 @@ export const PhoneInput = () => {
       <Stack>
         <Controller
           control={control}
-          name="phoneNumber"
+          name="phone"
           render={({ field, fieldState: { error } }) => (
             <PhoneInputComponent
               {...field}
-              value={field.value}
-              defaultValue={loginState.phoneNumber}
+              value={control._defaultValues.phone}
               error={error?.message}
-              label={t("loginPage.phoneNumber")}
+              label={t("loginPage.phone")}
               autoComplete
               withAsterisk
               autoFocus

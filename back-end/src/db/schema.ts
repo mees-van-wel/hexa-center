@@ -1,4 +1,4 @@
-import { relations as relationBuilder, sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   AnyPgColumn,
   date,
@@ -16,8 +16,8 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-export const properties = pgTable("properties", {
-  $kind: text("$kind").default("property").notNull(),
+export const businesses = pgTable("companies", {
+  $kind: text("$kind").default("company").notNull(),
   id: serial("id").primaryKey(),
   uuid: uuid("uuid").defaultRandom().notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -27,36 +27,36 @@ export const properties = pgTable("properties", {
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
   createdById: integer("created_by_id").references(
-    (): AnyPgColumn => relations.id,
-    {
-      onDelete: "set null",
-    },
+    (): AnyPgColumn => users.id,
+    { onDelete: "set null" },
   ),
   updatedById: integer("updated_by_id").references(
-    (): AnyPgColumn => relations.id,
-    {
-      onDelete: "set null",
-    },
+    (): AnyPgColumn => users.id,
+    { onDelete: "set null" },
   ),
   name: text("name").unique().notNull(),
-  emailAddress: text("email_address"),
-  phoneNumber: text("phone_number"),
-  street: text("street"),
-  houseNumber: text("house_number"),
-  postalCode: text("postal_code"),
-  city: text("city"),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  addressLineOne: text("address_line_one").notNull(),
+  addressLineTwo: text("address_line_two"),
+  city: text("city").notNull(),
   region: text("region"),
-  country: text("country"),
+  postalCode: text("postal_code"),
+  country: text("country").notNull(),
+  cocNumber: text("coc_number").notNull(),
+  vatId: text("vat_id").notNull(),
+  iban: text("iban").notNull(),
+  swiftBic: text("swift_bic").notNull(),
 });
 
-export const propertiesRelations = relationBuilder(properties, ({ one }) => ({
-  createdBy: one(relations, {
-    fields: [properties.createdById],
-    references: [relations.id],
+export const businessesRelations = relations(businesses, ({ one }) => ({
+  createdBy: one(users, {
+    fields: [businesses.createdById],
+    references: [users.id],
   }),
-  updatedBy: one(relations, {
-    fields: [properties.updatedById],
-    references: [relations.id],
+  updatedBy: one(users, {
+    fields: [businesses.updatedById],
+    references: [users.id],
   }),
 }));
 
@@ -109,28 +109,24 @@ export const roles = pgTable("roles", {
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
   createdById: integer("created_by_id").references(
-    (): AnyPgColumn => relations.id,
-    {
-      onDelete: "set null",
-    },
+    (): AnyPgColumn => users.id,
+    { onDelete: "set null" },
   ),
   updatedById: integer("updated_by_id").references(
-    (): AnyPgColumn => relations.id,
-    {
-      onDelete: "set null",
-    },
+    (): AnyPgColumn => users.id,
+    { onDelete: "set null" },
   ),
   name: text("name").unique().notNull(),
 });
 
-export const rolesRelations = relationBuilder(roles, ({ one }) => ({
-  createdBy: one(relations, {
+export const rolesRelations = relations(roles, ({ one }) => ({
+  createdBy: one(users, {
     fields: [roles.createdById],
-    references: [relations.id],
+    references: [users.id],
   }),
-  updatedBy: one(relations, {
+  updatedBy: one(users, {
     fields: [roles.updatedById],
-    references: [relations.id],
+    references: [users.id],
   }),
 }));
 
@@ -138,7 +134,7 @@ export const permissions = pgTable(
   "permissions",
   {
     roleId: integer("role_id")
-      .references(() => properties.id, { onDelete: "restrict" })
+      .references(() => roles.id, { onDelete: "restrict" })
       .notNull(),
     key: text("key").notNull(),
   },
@@ -147,20 +143,15 @@ export const permissions = pgTable(
   }),
 );
 
-export const permissionsRelations = relationBuilder(permissions, ({ one }) => ({
+export const permissionsRelations = relations(permissions, ({ one }) => ({
   role: one(roles, {
     fields: [permissions.roleId],
     references: [roles.id],
   }),
 }));
 
-export const relationTypeEnum = pgEnum("relation_type", [
-  "individual",
-  "business",
-]);
-
-export const relations = pgTable("relations", {
-  $kind: text("$kind").default("relation").notNull(),
+export const users = pgTable("users", {
+  $kind: text("$kind").default("user").notNull(),
   id: serial("id").primaryKey(),
   uuid: uuid("uuid").defaultRandom().notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -170,72 +161,60 @@ export const relations = pgTable("relations", {
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
   createdById: integer("created_by_id").references(
-    (): AnyPgColumn => relations.id,
-    {
-      onDelete: "set null",
-    },
+    (): AnyPgColumn => users.id,
+    { onDelete: "set null" },
   ),
   updatedById: integer("updated_by_id").references(
-    (): AnyPgColumn => relations.id,
-    {
-      onDelete: "set null",
-    },
+    (): AnyPgColumn => users.id,
+    { onDelete: "set null" },
   ),
-  propertyId: integer("property_id")
-    .references(() => properties.id, { onDelete: "restrict" })
+  businessId: integer("company_id")
+    .references(() => businesses.id, { onDelete: "restrict" })
     .notNull(),
   roleId: integer("role_id")
     .references(() => roles.id, { onDelete: "restrict" })
     .notNull(),
-  type: relationTypeEnum("type").notNull(),
-  name: text("name").notNull(),
-  emailAddress: text("email_address").unique(),
-  phoneNumber: text("phone_number").unique(),
-  street: text("street"),
-  houseNumber: text("house_number"),
-  postalCode: text("postal_code"),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
+  email: text("email").unique(),
+  phone: text("phone").unique(),
+  addressLineOne: text("address_line_one"),
+  addressLineTwo: text("address_line_two"),
   city: text("city"),
   region: text("region"),
+  postalCode: text("postal_code"),
   country: text("country"),
   sex: text("sex"),
-  dateOfBirth: date("date_of_birth", { mode: "date" }),
-  vatNumber: text("vat_number"),
-  cocNumber: text("coc_number"),
-  businessContactName: text("business_contact_name"),
-  businessContactEmailAddress: text("business_contact_email_address"),
-  businessContactPhoneNumber: text("business_contact_phone_number"),
+  birthDate: date("birth_date", { mode: "date" }),
 });
 
-export const relationsRelations = relationBuilder(
-  relations,
-  ({ one, many }) => ({
-    createdBy: one(relations, {
-      fields: [relations.createdById],
-      references: [relations.id],
-    }),
-    updatedBy: one(relations, {
-      fields: [relations.updatedById],
-      references: [relations.id],
-    }),
-    property: one(properties, {
-      fields: [relations.propertyId],
-      references: [properties.id],
-    }),
-    role: one(roles, {
-      fields: [relations.roleId],
-      references: [roles.id],
-    }),
-    sessions: many(sessions),
-    account: one(accounts, {
-      fields: [relations.id],
-      references: [accounts.relationId],
-    }),
+export const usersRelations = relations(users, ({ one, many }) => ({
+  createdBy: one(users, {
+    fields: [users.createdById],
+    references: [users.id],
   }),
-);
+  updatedBy: one(users, {
+    fields: [users.updatedById],
+    references: [users.id],
+  }),
+  business: one(businesses, {
+    fields: [users.businessId],
+    references: [businesses.id],
+  }),
+  role: one(roles, {
+    fields: [users.roleId],
+    references: [roles.id],
+  }),
+  accountDetails: one(userAccountDetails),
+  sessions: many(userSessions),
+}));
 
-export const sessions = pgTable("sessions", {
+export const userSessions = pgTable("user_sessions", {
   id: serial("id").primaryKey(),
   uuid: uuid("uuid").defaultRandom().notNull(),
+  userId: integer("user_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
   issuedAt: timestamp("issued_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -243,26 +222,23 @@ export const sessions = pgTable("sessions", {
     .defaultNow()
     .notNull(),
   expiresAt: timestamp("expires_at", { withTimezone: true }),
-  relationId: integer("relation_id")
-    .references(() => relations.id, { onDelete: "cascade" })
-    .notNull(),
   refreshToken: text("refresh_token").unique().notNull(),
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
 });
 
-export const sessionsRelations = relationBuilder(sessions, ({ one }) => ({
-  relation: one(relations, {
-    fields: [sessions.relationId],
-    references: [relations.id],
+export const userSessionsRelations = relations(userSessions, ({ one }) => ({
+  user: one(users, {
+    fields: [userSessions.userId],
+    references: [users.id],
   }),
 }));
 
-export const accounts = pgTable("accounts", {
+export const userAccountDetails = pgTable("user_account_details", {
   id: serial("id").primaryKey(),
   uuid: uuid("uuid").defaultRandom().notNull(),
-  relationId: integer("relation_id")
-    .references(() => relations.id, { onDelete: "cascade" })
+  userId: integer("user_id")
+    .references(() => users.id, { onDelete: "cascade" })
     .notNull(),
   locale: text("locale").notNull(),
   theme: text("theme").notNull(),
@@ -274,28 +250,38 @@ export const accounts = pgTable("accounts", {
   firstDayOfWeek: text("firstDayOfWeek").notNull(),
 });
 
-export const accountsRelations = relationBuilder(accounts, ({ many }) => ({
-  workingHours: many(workingHours),
-}));
+export const userAccountDetailsRelations = relations(
+  userAccountDetails,
+  ({ one, many }) => ({
+    user: one(users, {
+      fields: [userAccountDetails.userId],
+      references: [users.id],
+    }),
+    workingHours: many(userAccountDetailsWorkingHours),
+  }),
+);
 
-export const workingHours = pgTable("working_hours", {
-  id: serial("id").primaryKey(),
-  uuid: uuid("uuid").defaultRandom().notNull(),
-  accountId: integer("account_id")
-    .references(() => accounts.id, { onDelete: "cascade" })
-    .notNull(),
-  startDay: integer("start_day").notNull(),
-  endDay: integer("end_day").notNull(),
-  startTime: time("start_time", { withTimezone: true }).notNull(),
-  endTime: time("end_time", { withTimezone: true }).notNull(),
-});
+export const userAccountDetailsWorkingHours = pgTable(
+  "user_account_details_working_hours",
+  {
+    id: serial("id").primaryKey(),
+    uuid: uuid("uuid").defaultRandom().notNull(),
+    accountId: integer("account_id")
+      .references(() => userAccountDetails.id, { onDelete: "cascade" })
+      .notNull(),
+    startDay: integer("start_day").notNull(),
+    endDay: integer("end_day").notNull(),
+    startTime: time("start_time", { withTimezone: true }).notNull(),
+    endTime: time("end_time", { withTimezone: true }).notNull(),
+  },
+);
 
-export const workingHoursRelations = relationBuilder(
-  workingHours,
+export const workingHoursRelations = relations(
+  userAccountDetailsWorkingHours,
   ({ one }) => ({
-    account: one(accounts, {
-      fields: [workingHours.accountId],
-      references: [accounts.id],
+    account: one(userAccountDetails, {
+      fields: [userAccountDetailsWorkingHours.accountId],
+      references: [userAccountDetails.id],
     }),
   }),
 );
@@ -311,39 +297,32 @@ export const rooms = pgTable("rooms", {
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
   createdById: integer("created_by_id").references(
-    (): AnyPgColumn => relations.id,
-    {
-      onDelete: "set null",
-    },
+    (): AnyPgColumn => users.id,
+    { onDelete: "set null" },
   ),
   updatedById: integer("updated_by_id").references(
-    (): AnyPgColumn => relations.id,
-    {
-      onDelete: "set null",
-    },
+    (): AnyPgColumn => users.id,
+    { onDelete: "set null" },
   ),
-  propertyId: integer("property_id")
-    .references(() => properties.id, { onDelete: "restrict" })
+  businessId: integer("company_id")
+    .references(() => businesses.id, { onDelete: "restrict" })
     .notNull(),
   name: text("name").unique().notNull(),
-  price: numeric("price", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
+  price: numeric("price", { precision: 10, scale: 2 }).notNull(),
 });
 
-export const roomsRelations = relationBuilder(rooms, ({ one }) => ({
-  createdBy: one(relations, {
+export const roomsRelations = relations(rooms, ({ one }) => ({
+  createdBy: one(users, {
     fields: [rooms.createdById],
-    references: [relations.id],
+    references: [users.id],
   }),
-  updatedBy: one(relations, {
+  updatedBy: one(users, {
     fields: [rooms.updatedById],
-    references: [relations.id],
+    references: [users.id],
   }),
-  property: one(properties, {
-    fields: [rooms.propertyId],
-    references: [properties.id],
+  business: one(businesses, {
+    fields: [rooms.businessId],
+    references: [businesses.id],
   }),
 }));
 
@@ -358,57 +337,180 @@ export const reservations = pgTable("reservations", {
     .default(sql`now()`)
     .notNull(),
   createdById: integer("created_by_id").references(
-    (): AnyPgColumn => relations.id,
-    {
-      onDelete: "set null",
-    },
+    (): AnyPgColumn => users.id,
+    { onDelete: "set null" },
   ),
   updatedById: integer("updated_by_id").references(
-    (): AnyPgColumn => relations.id,
-    {
-      onDelete: "set null",
-    },
+    (): AnyPgColumn => users.id,
+    { onDelete: "set null" },
   ),
+  customerId: integer("customer_id")
+    .references(() => customers.id, { onDelete: "restrict" })
+    .notNull(),
   roomId: integer("room_id")
     .references(() => rooms.id, { onDelete: "restrict" })
     .notNull(),
-  customerId: integer("customer_id")
-    .references(() => relations.id, { onDelete: "restrict" })
-    .notNull(),
   startDate: timestamp("start_date", { withTimezone: true }).notNull(),
   endDate: timestamp("end_date", { withTimezone: true }).notNull(),
-  priceOverride: numeric("price_override", {
-    precision: 10,
-    scale: 2,
-  }),
-  guestName: text("guest_name").notNull(),
+  priceOverride: numeric("price_override", { precision: 10, scale: 2 }),
+  guestName: text("guest_name"),
   reservationNotes: text("reservation_notes"),
   invoiceNotes: text("invoice_notes"),
 });
 
-export const reservationsRelations = relationBuilder(
+export const reservationsRelations = relations(
   reservations,
   ({ one, many }) => ({
-    createdBy: one(relations, {
+    createdBy: one(users, {
       fields: [reservations.createdById],
-      references: [relations.id],
+      references: [users.id],
     }),
-    updatedBy: one(relations, {
+    updatedBy: one(users, {
       fields: [reservations.updatedById],
-      references: [relations.id],
+      references: [users.id],
     }),
-    customer: one(relations, {
+    customer: one(customers, {
       fields: [reservations.customerId],
-      references: [relations.id],
+      references: [customers.id],
     }),
     room: one(rooms, {
       fields: [reservations.roomId],
       references: [rooms.id],
     }),
     invoicesJunction: many(reservationsToInvoices),
-    invoicesExtrasJunction: many(reservationsToInvoiceExtraInstances),
+    productInstancesJunction: many(reservationsToProductInstances),
   }),
 );
+
+// TODO Add support for perInvoice, perPerson, perPersonPerNight, perItem, perDay and perHour
+// TODO Add start, Maybe support uponUsage, when invoked show on next invoice only
+export const reservationsToProductInstancesCycleEnum = pgEnum(
+  "reservations_to_product_instances_cycle",
+  ["oneTimeOnNext", "oneTimeOnEnd", "perNightThroughout", "perNightOnEnd"],
+);
+
+export const reservationsToProductInstancesStatusEnum = pgEnum(
+  "reservations_to_product_instances_status",
+  ["notInvoiced", "partiallyInvoiced", "fullyInvoiced"],
+);
+
+export const reservationsToProductInstances = pgTable(
+  "reservations_to_product_instances",
+  {
+    reservationId: integer("reservation_id")
+      .references(() => reservations.id, { onDelete: "cascade" })
+      .notNull(),
+    productInstanceId: integer("product_instance_id")
+      .references(() => productInstances.id, { onDelete: "cascade" })
+      .notNull(),
+    quantity: numeric("quantity", { precision: 10, scale: 2 })
+      .default("1")
+      .notNull(),
+    cycle: reservationsToProductInstancesCycleEnum("cycle").notNull(),
+    status: reservationsToProductInstancesStatusEnum("status").notNull(),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.reservationId, t.productInstanceId] }),
+  }),
+);
+
+export const reservationsToProductInstancesRelations = relations(
+  reservationsToProductInstances,
+  ({ one }) => ({
+    reservation: one(reservations, {
+      fields: [reservationsToProductInstances.reservationId],
+      references: [reservations.id],
+    }),
+    productInstance: one(productInstances, {
+      fields: [reservationsToProductInstances.productInstanceId],
+      references: [productInstances.id],
+    }),
+  }),
+);
+
+export const reservationsToInvoices = pgTable(
+  "reservations_to_invoices",
+  {
+    reservationId: integer("reservation_id")
+      .notNull()
+      .references(() => reservations.id, { onDelete: "cascade" }),
+    invoiceId: integer("invoice_id")
+      .notNull()
+      .references(() => invoices.id, { onDelete: "cascade" }),
+    periodStartDate: date("period_start_date", { mode: "date" }).notNull(),
+    periodEndDate: date("period_end_date", { mode: "date" }).notNull(),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.reservationId, t.invoiceId] }),
+  }),
+);
+
+export const reservationsToInvoicesRelations = relations(
+  reservationsToInvoices,
+  ({ one }) => ({
+    reservation: one(reservations, {
+      fields: [reservationsToInvoices.reservationId],
+      references: [reservations.id],
+    }),
+    invoice: one(invoices, {
+      fields: [reservationsToInvoices.invoiceId],
+      references: [invoices.id],
+    }),
+  }),
+);
+
+// TODO Shipping address
+export const customers = pgTable("customers", {
+  $kind: text("$kind").default("customer").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  createdById: integer("created_by_id").references(
+    (): AnyPgColumn => users.id,
+    { onDelete: "set null" },
+  ),
+  updatedById: integer("updated_by_id").references(
+    (): AnyPgColumn => users.id,
+    { onDelete: "set null" },
+  ),
+  businessId: integer("company_id")
+    .references(() => businesses.id, { onDelete: "restrict" })
+    .notNull(),
+  name: text("name").unique().notNull(),
+  email: text("email"),
+  phone: text("phone"),
+  billingAddressLineOne: text("billing_address_line_one").notNull(),
+  billingAddressLineTwo: text("billing_address_line_two"),
+  billingCity: text("billing_city").notNull(),
+  billingRegion: text("billing_region"),
+  billingPostalCode: text("billing_postal_code"),
+  billingCountry: text("billing_country").notNull(),
+  cocNumber: text("coc_number"),
+  vatId: text("vat_id"),
+  contactPersonName: text("contact_person_name"),
+  contactPersonEmail: text("contact_person_email"),
+  contactPersonPhone: text("contact_person_phone"),
+});
+
+export const customersRelations = relations(customers, ({ one }) => ({
+  createdBy: one(users, {
+    fields: [customers.createdById],
+    references: [users.id],
+  }),
+  updatedBy: one(users, {
+    fields: [customers.updatedById],
+    references: [users.id],
+  }),
+  business: one(businesses, {
+    fields: [customers.businessId],
+    references: [businesses.id],
+  }),
+}));
 
 export const invoiceRefTypeEnum = pgEnum("invoice_ref_type", [
   "invoice",
@@ -436,73 +538,65 @@ export const invoices = pgTable("invoices", {
     .defaultNow()
     .notNull(),
   createdById: integer("created_by_id").references(
-    (): AnyPgColumn => relations.id,
+    (): AnyPgColumn => users.id,
     { onDelete: "set null" },
   ),
   refType: invoiceRefTypeEnum("ref_type").notNull(),
   refId: integer("ref_id").notNull(),
   type: invoiceTypeEnum("type").notNull(),
   status: invoiceStatusEnum("status").notNull(),
-  netAmount: numeric("net_amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
-  vatAmount: numeric("vat_amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
-  grossAmount: numeric("gross_amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
-  number: text("number"),
+  netAmount: numeric("net_amount", { precision: 10, scale: 2 }).notNull(),
+  vatAmount: numeric("vat_amount", { precision: 10, scale: 2 }).notNull(),
+  grossAmount: numeric("gross_amount", { precision: 10, scale: 2 }).notNull(),
+  number: text("number").unique(),
   notes: text("notes"),
   date: date("date", { mode: "date" }),
   dueDate: date("due_date", { mode: "date" }),
-  customerId: integer("customer_id").references(() => relations.id, {
+  customerId: integer("customer_id").references(() => customers.id, {
     onDelete: "set null",
   }),
   customerName: text("customer_name"),
-  customerEmailAddress: text("customer_email_address"),
-  customerPhoneNumber: text("customer_phone_number"),
-  customerStreet: text("customer_street"),
-  customerHouseNumber: text("customer_house_number"),
-  customerPostalCode: text("customer_postal_code"),
-  customerCity: text("customer_city"),
-  customerRegion: text("customer_region"),
-  customerCountry: text("customer_country"),
-  customerVatNumber: text("customer_vat_number"),
+  customerBusinessContactPerson: text("customer_business_contact_person"),
+  customerEmail: text("customer_email"),
+  customerPhone: text("customer_phone"),
+  customerBillingAddressLineOne: text("customer_billing_address_line_one"),
+  customerBillingAddressLineTwo: text("customer_billing_address_line_two"),
+  customerBillingCity: text("customer_billing_city"),
+  customerBillingRegion: text("customer_billing_region"),
+  customerBillingPostalCode: text("customer_billing_postal_code"),
+  customerBillingCountry: text("customer_billing_country"),
+  customerVatId: text("customer_vat_id"),
   customerCocNumber: text("customer_coc_number"),
-  companyId: integer("company_id").references(() => properties.id, {
+  companyId: integer("company_id").references(() => businesses.id, {
     onDelete: "set null",
   }),
   companyName: text("company_name"),
-  companyEmailAddress: text("company_email_address"),
-  companyPhoneNumber: text("company_phone_number"),
-  companyStreet: text("company_street"),
-  companyHouseNumber: text("company_house_number"),
+  companyEmail: text("company_email"),
+  companyPhone: text("company_phone"),
+  companyAddressLineOne: text("company_address_line_one"),
+  companyAddressLineTwo: text("company_address_line_two"),
   companyPostalCode: text("company_postal_code"),
   companyCity: text("company_city"),
   companyRegion: text("company_region"),
   companyCountry: text("company_country"),
-  companyVatNumber: text("company_vat_number"),
+  companyVatId: text("company_vat_id"),
   companyCocNumber: text("company_coc_number"),
   companyIban: text("company_iban"),
   companySwiftBic: text("company_swift_bic"),
 });
 
-export const invoicesRelations = relationBuilder(invoices, ({ one, many }) => ({
-  createdBy: one(relations, {
+export const invoicesRelations = relations(invoices, ({ one, many }) => ({
+  createdBy: one(users, {
     fields: [invoices.createdById],
-    references: [relations.id],
+    references: [users.id],
   }),
-  customer: one(relations, {
+  customer: one(customers, {
     fields: [invoices.customerId],
-    references: [relations.id],
+    references: [customers.id],
   }),
-  company: one(properties, {
+  company: one(businesses, {
     fields: [invoices.companyId],
-    references: [properties.id],
+    references: [businesses.id],
   }),
   lines: many(invoiceLines),
   events: many(invoiceEvents),
@@ -515,39 +609,28 @@ export const invoiceLines = pgTable("invoice_lines", {
   invoiceId: integer("invoice_id")
     .references(() => invoices.id, { onDelete: "cascade" })
     .notNull(),
+  revenueAccountId: integer("revenue_account_id")
+    .references(() => ledgerAccounts.id, { onDelete: "restrict" })
+    .notNull(),
   name: text("name").notNull(),
-  unitAmount: numeric("unit_amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
+  unitAmount: numeric("unit_amount", { precision: 10, scale: 2 }).notNull(),
   quantity: numeric("quantity", { precision: 10, scale: 2 }).notNull(),
-  netAmount: numeric("net_amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
-  vatAmount: numeric("vat_amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
-  vatRate: numeric("vat_rate", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
-  grossAmount: numeric("gross_amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
+  netAmount: numeric("net_amount", { precision: 10, scale: 2 }).notNull(),
+  vatAmount: numeric("vat_amount", { precision: 10, scale: 2 }).notNull(),
+  vatRate: numeric("vat_rate", { precision: 10, scale: 2 }),
+  grossAmount: numeric("gross_amount", { precision: 10, scale: 2 }).notNull(),
 });
 
-export const invoiceLinesRelations = relationBuilder(
-  invoiceLines,
-  ({ one }) => ({
-    invoice: one(invoices, {
-      fields: [invoiceLines.invoiceId],
-      references: [invoices.id],
-    }),
+export const invoiceLinesRelations = relations(invoiceLines, ({ one }) => ({
+  invoice: one(invoices, {
+    fields: [invoiceLines.invoiceId],
+    references: [invoices.id],
   }),
-);
+  revenueAccount: one(ledgerAccounts, {
+    fields: [invoiceLines.revenueAccountId],
+    references: [ledgerAccounts.id],
+  }),
+}));
 
 export const invoiceEventTypeEnum = pgEnum("invoice_event_type", [
   "issued",
@@ -566,7 +649,7 @@ export const invoiceEvents = pgTable("invoice_events", {
     .defaultNow()
     .notNull(),
   createdById: integer("created_by_id").references(
-    (): AnyPgColumn => relations.id,
+    (): AnyPgColumn => users.id,
     { onDelete: "set null" },
   ),
   invoiceId: integer("invoice_id")
@@ -577,25 +660,21 @@ export const invoiceEvents = pgTable("invoice_events", {
   refId: integer("ref_id"),
 });
 
-export const invoiceEventsRelations = relationBuilder(
-  invoiceEvents,
-  ({ one }) => ({
-    createdBy: one(relations, {
-      fields: [invoiceEvents.createdById],
-      references: [relations.id],
-    }),
-    invoice: one(invoices, {
-      fields: [invoiceEvents.invoiceId],
-      references: [invoices.id],
-    }),
+export const invoiceEventsRelations = relations(invoiceEvents, ({ one }) => ({
+  createdBy: one(users, {
+    fields: [invoiceEvents.createdById],
+    references: [users.id],
   }),
-);
+  invoice: one(invoices, {
+    fields: [invoiceEvents.invoiceId],
+    references: [invoices.id],
+  }),
+}));
 
-// TODO Add percentage
-export const invoiceExtraUnitEnum = pgEnum("invoice_extra_unit", ["currency"]);
-
-export const invoiceExtraTemplates = pgTable("invoice_extra_templates", {
-  $kind: text("$kind").default("invoiceExtraTemplate").notNull(),
+// TODO Inventory
+// TODO COGS account
+export const productTemplates = pgTable("product_templates", {
+  $kind: text("$kind").default("productTemplate").notNull(),
   id: serial("id").primaryKey(),
   uuid: uuid("uuid").defaultRandom().notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -605,192 +684,277 @@ export const invoiceExtraTemplates = pgTable("invoice_extra_templates", {
     .default(sql`now()`)
     .notNull(),
   createdById: integer("created_by_id").references(
-    (): AnyPgColumn => relations.id,
+    (): AnyPgColumn => users.id,
     { onDelete: "set null" },
   ),
   updatedById: integer("updated_by_id").references(
-    (): AnyPgColumn => relations.id,
+    (): AnyPgColumn => users.id,
     { onDelete: "set null" },
   ),
+  revenueAccountId: integer("revenue_account_id")
+    .references(() => ledgerAccounts.id, { onDelete: "restrict" })
+    .notNull(),
   name: text("name").notNull(),
-  quantity: numeric("quantity", {
-    precision: 10,
-    scale: 2,
-  })
-    .default("1")
-    .notNull(),
-  description: text("description"),
-  amount: numeric("amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
-  unit: invoiceExtraUnitEnum("unit").notNull(),
-  vatRate: numeric("vat_rate", {
-    precision: 10,
-    scale: 2,
-  })
-    .default("0")
-    .notNull(),
+  price: numeric("price", { precision: 10, scale: 2 }).notNull(),
+  vatRate: numeric("vat_rate", { precision: 10, scale: 2 }),
 });
 
-export const invoiceExtraTemplatesRelations = relationBuilder(
-  invoiceExtraTemplates,
+export const productTemplatesRelations = relations(
+  productTemplates,
   ({ one, many }) => ({
-    createdBy: one(relations, {
-      fields: [invoiceExtraTemplates.createdById],
-      references: [relations.id],
+    createdBy: one(users, {
+      fields: [productTemplates.createdById],
+      references: [users.id],
     }),
-    updatedBy: one(relations, {
-      fields: [invoiceExtraTemplates.updatedById],
-      references: [relations.id],
+    updatedBy: one(users, {
+      fields: [productTemplates.updatedById],
+      references: [users.id],
     }),
-    instances: many(invoiceExtraInstances),
+    revenueAccount: one(ledgerAccounts, {
+      fields: [productTemplates.revenueAccountId],
+      references: [ledgerAccounts.id],
+    }),
+    instances: many(productInstances),
   }),
 );
 
-export const reservationsToInvoiceExtraInstancesStatusEnum = pgEnum(
-  "reservations_to_invoice_extra_instances_status",
-  ["notApplied", "partiallyApplied", "fullyApplied"],
-);
-
-export const invoiceExtraInstances = pgTable("invoice_extra_instances", {
-  $kind: text("$kind").default("invoiceExtraInstance").notNull(),
+export const productInstances = pgTable("product_instances", {
+  $kind: text("$kind").default("productInstance").notNull(),
   id: serial("id").primaryKey(),
   uuid: uuid("uuid").defaultRandom().notNull(),
-  templateId: integer("template_id").references(
-    () => invoiceExtraTemplates.id,
-    { onDelete: "set null" },
-  ),
+  templateId: integer("template_id").references(() => productTemplates.id, {
+    onDelete: "set null",
+  }),
+  revenueAccountId: integer("revenue_account_id")
+    .references(() => ledgerAccounts.id, { onDelete: "restrict" })
+    .notNull(),
   name: text("name").notNull(),
-  quantity: numeric("quantity", {
-    precision: 10,
-    scale: 2,
-  })
-    .default("1")
-    .notNull(),
-  amount: numeric("amount", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
-  unit: invoiceExtraUnitEnum("unit").notNull(),
-  vatRate: numeric("vat_rate", {
-    precision: 10,
-    scale: 2,
-  })
-    .default("0")
-    .notNull(),
-  status: reservationsToInvoiceExtraInstancesStatusEnum("status")
-    .default("notApplied")
-    .notNull(),
+  price: numeric("price", { precision: 10, scale: 2 }).notNull(),
+  vatRate: numeric("vat_rate", { precision: 10, scale: 2 }),
 });
 
-export const invoiceExtraInstancesRelations = relationBuilder(
-  invoiceExtraInstances,
+export const productInstancesRelations = relations(
+  productInstances,
   ({ one, many }) => ({
-    template: one(invoiceExtraTemplates, {
-      fields: [invoiceExtraInstances.templateId],
-      references: [invoiceExtraTemplates.id],
+    template: one(productTemplates, {
+      fields: [productInstances.templateId],
+      references: [productTemplates.id],
     }),
-    reservationsJunction: many(reservationsToInvoiceExtraInstances),
+    revenueAccount: one(ledgerAccounts, {
+      fields: [productInstances.revenueAccountId],
+      references: [ledgerAccounts.id],
+    }),
+    reservationsJunction: many(reservationsToProductInstances),
   }),
 );
 
-// TODO Add support for perInvoice, perPerson, perPersonPerNight, perItem, perDay and perHour
-// TODO Add start, Maybe support uponUsage, when invoked show on next invoice only
-export const reservationsToInvoiceExtraInstancesCycleEnum = pgEnum(
-  "reservations_to_invoice_extra_instances_cycle",
-  ["oneTimeOnNext", "oneTimeOnEnd", "perNightThroughout", "perNightOnEnd"],
-);
+export const journals = pgTable("journals", {
+  $kind: text("$kind").default("journal").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .default(sql`now()`)
+    .notNull(),
+  createdById: integer("created_by_id").references(
+    (): AnyPgColumn => users.id,
+    { onDelete: "set null" },
+  ),
+  updatedById: integer("updated_by_id").references(
+    (): AnyPgColumn => users.id,
+    { onDelete: "set null" },
+  ),
+  name: text("name").unique().notNull(),
+});
 
-export const reservationsToInvoiceExtraInstances = pgTable(
-  "reservations_to_invoice_extra_instances",
-  {
-    reservationId: integer("reservation_id")
-      .references(() => reservations.id, { onDelete: "cascade" })
-      .notNull(),
-    instanceId: integer("instance_id")
-      .references(() => invoiceExtraInstances.id, { onDelete: "cascade" })
-      .notNull(),
-    cycle: reservationsToInvoiceExtraInstancesCycleEnum("cycle").notNull(),
-  },
-  (t) => ({
-    pk: primaryKey({ columns: [t.reservationId, t.instanceId] }),
+export const journalsRelations = relations(journals, ({ one }) => ({
+  createdBy: one(users, {
+    fields: [journals.createdById],
+    references: [users.id],
   }),
-);
+  updatedBy: one(users, {
+    fields: [journals.updatedById],
+    references: [users.id],
+  }),
+}));
 
-export const reservationsToInvoiceExtraInstancesRelations = relationBuilder(
-  reservationsToInvoiceExtraInstances,
-  ({ one }) => ({
-    reservation: one(reservations, {
-      fields: [reservationsToInvoiceExtraInstances.reservationId],
-      references: [reservations.id],
-    }),
-    instance: one(invoiceExtraInstances, {
-      fields: [reservationsToInvoiceExtraInstances.instanceId],
-      references: [invoiceExtraInstances.id],
-    }),
-  }),
-);
+export const ledgers = pgTable("ledgers", {
+  $kind: text("$kind").default("ledger").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .default(sql`now()`)
+    .notNull(),
+  createdById: integer("created_by_id").references(
+    (): AnyPgColumn => users.id,
+    { onDelete: "set null" },
+  ),
+  updatedById: integer("updated_by_id").references(
+    (): AnyPgColumn => users.id,
+    { onDelete: "set null" },
+  ),
+  name: text("name").unique().notNull(),
+});
 
-export const reservationsToInvoices = pgTable(
-  "reservations_to_invoices",
-  {
-    reservationId: integer("reservation_id")
-      .notNull()
-      .references(() => reservations.id, { onDelete: "cascade" }),
-    invoiceId: integer("invoice_id")
-      .notNull()
-      .references(() => invoices.id, { onDelete: "cascade" }),
-    startDate: timestamp("start_date", { withTimezone: true }).notNull(),
-    endDate: timestamp("end_date", { withTimezone: true }).notNull(),
-  },
-  (t) => ({
-    pk: primaryKey({ columns: [t.reservationId, t.invoiceId] }),
+export const ledgersRelations = relations(ledgers, ({ one, many }) => ({
+  createdBy: one(users, {
+    fields: [ledgers.createdById],
+    references: [users.id],
   }),
-);
+  updatedBy: one(users, {
+    fields: [ledgers.updatedById],
+    references: [users.id],
+  }),
+  accounts: many(ledgerAccounts),
+}));
 
-export const reservationsToInvoicesRelations = relationBuilder(
-  reservationsToInvoices,
-  ({ one }) => ({
-    reservation: one(reservations, {
-      fields: [reservationsToInvoices.reservationId],
-      references: [reservations.id],
-    }),
-    invoice: one(invoices, {
-      fields: [reservationsToInvoices.invoiceId],
-      references: [invoices.id],
-    }),
+export const ledgerAccounts = pgTable("ledger_accounts", {
+  $kind: text("$kind").default("ledgerAccount").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .default(sql`now()`)
+    .notNull(),
+  createdById: integer("created_by_id").references(
+    (): AnyPgColumn => users.id,
+    { onDelete: "set null" },
+  ),
+  updatedById: integer("updated_by_id").references(
+    (): AnyPgColumn => users.id,
+    { onDelete: "set null" },
+  ),
+  ledgerId: integer("ledger_id")
+    .references(() => ledgers.id, { onDelete: "restrict" })
+    .notNull(),
+  name: text("name").unique().notNull(),
+});
+
+export const ledgerAccountsRelations = relations(ledgerAccounts, ({ one }) => ({
+  createdBy: one(users, {
+    fields: [ledgerAccounts.createdById],
+    references: [users.id],
   }),
-);
+  updatedBy: one(users, {
+    fields: [ledgerAccounts.updatedById],
+    references: [users.id],
+  }),
+  ledger: one(ledgers, {
+    fields: [ledgerAccounts.ledgerId],
+    references: [ledgers.id],
+  }),
+}));
 
 export const settingNameEnum = pgEnum("setting_name", [
   "companyPaymentTerms",
-  "companyVatNumber",
-  "companyCocNumber",
-  "companyIban",
-  "companySwiftBic",
+  "companyLogoSrc",
   "invoiceEmailTitle",
   "invoiceEmailContent",
   "invoiceHeaderImageSrc",
   "invoiceFooterImageSrc",
   "priceEntryMode",
+  "reservationRevenueAccountId",
 ]);
 
 export const settings = pgTable("settings", {
+  $kind: text("$kind").default("setting").notNull(),
   id: serial("id").primaryKey(),
   uuid: uuid("uuid").defaultRandom().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   updatedById: integer("updated_by_id").references(
-    (): AnyPgColumn => relations.id,
+    (): AnyPgColumn => users.id,
     { onDelete: "set null" },
   ),
   name: settingNameEnum("name").notNull(),
   value: jsonb("value"),
 });
 
-export const settingRelations = relationBuilder(settings, ({ one }) => ({
-  updatedAt: one(relations, {
-    fields: [settings.updatedAt],
-    references: [relations.id],
+export const settingsRelations = relations(settings, ({ one }) => ({
+  updatedBy: one(users, {
+    fields: [settings.updatedById],
+    references: [users.id],
   }),
 }));
+
+export const logTypeEnum = pgEnum("log_type", ["info", "warning", "error"]);
+
+export const logEventEnum = pgEnum("log_event", [
+  "integrationConnect",
+  "integrationRefreshAuth",
+  "integrationSend",
+  "integrationSync",
+  "integrationDisconnect",
+]);
+
+export const logRefTypeEnum = pgEnum("log_ref_type", ["integration"]);
+
+export const logs = pgTable("logs", {
+  $kind: text("$kind").default("log").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  userId: integer("user_id").references((): AnyPgColumn => users.id, {
+    onDelete: "set null",
+  }),
+  type: logTypeEnum("type").notNull(),
+  event: logEventEnum("event").notNull(),
+  refType: logRefTypeEnum("ref_type"),
+  refId: integer("ref_id"),
+  data: jsonb("data"),
+});
+
+export const logsRelations = relations(logs, ({ one }) => ({
+  user: one(users, {
+    fields: [logs.userId],
+    references: [users.id],
+  }),
+}));
+
+export const integrationConnectionTypeEnum = pgEnum(
+  "integration_connection_type",
+  ["twinfield"],
+);
+
+export const integrationConnections = pgTable("integration_connections", {
+  $kind: text("$kind").default("integrationConnection").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  type: integrationConnectionTypeEnum("type").unique().notNull(),
+  data: jsonb("data").notNull(),
+});
+
+export const integrationMappingRefTypeEnum = pgEnum(
+  "integration_mapping_ref_type",
+  ["customer", "ledgerAccount", "journal"],
+);
+
+export const integrationMappings = pgTable("integration_mappings", {
+  $kind: text("$kind").default("integrationMapping").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  connectionId: integer("connection_id")
+    .references(() => integrationConnections.id, { onDelete: "cascade" })
+    .notNull(),
+  refType: integrationMappingRefTypeEnum("ref_type").notNull(),
+  refId: integer("ref_id").notNull(),
+  data: jsonb("data").notNull(),
+});
+
+export const integrationEntitiesRelations = relations(
+  integrationMappings,
+  ({ one }) => ({
+    connection: one(integrationConnections, {
+      fields: [integrationMappings.connectionId],
+      references: [integrationConnections.id],
+    }),
+  }),
+);

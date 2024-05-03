@@ -5,3 +5,30 @@
 .dashboardHeaderLink {
   color: var(--color-text);
 }
+
+.changeOrderExtra {
+  flex: 0;
+
+  @media (max-width: 112em) {
+    order: 2;
+    flex: 1;
+  }
+}
+
+.changeOrderTitle {
+  flex: 1;
+
+  @media (max-width: 112em) {
+    order: 1;
+    flex: 0 0 100%;
+  }
+}
+
+.changeOrderAccount {
+  justify-content: right;
+
+  @media (max-width: 112em) {
+    flex: 1;
+    order: 2;
+  }
+}

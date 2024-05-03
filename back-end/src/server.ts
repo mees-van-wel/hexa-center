@@ -8,7 +8,11 @@ import { createServer } from "http";
 import * as trpcExpress from "@trpc/server/adapters/express";
 
 import { appRouter } from "./routes/_app";
+import { ctx } from "./utils/context";
+import { getDatabaseClient } from "./utils/database";
+import { isProduction } from "./utils/environment";
 import { createContext } from "./trpc";
+
 // import { Server } from "socket.io";
 // import { createAdapter } from "@socket.io/redis-adapter";
 // import { Emitter } from "@socket.io/redis-emitter";
@@ -18,8 +22,14 @@ process.on("uncaughtException", (error) => {
   console.error("Uncaught Exception:", error);
 });
 
+// TODO Make dynamic
 const corsOptions: CorsOptions = {
-  origin: ["http://localhost:3000", "https://1-3-0.hexa.center"],
+  origin: [
+    "http://localhost:3000",
+    "https://1-3-0.hexa.center",
+    "https://local-residence.hexa.center",
+    "https://longstay-breda.hexa.center",
+  ],
   credentials: true,
 };
 
@@ -27,6 +37,7 @@ const app = express();
 
 app.use(helmet());
 app.use(compression());
+app.set("trust proxy", true);
 
 // Setting IP
 app.use((req, _, next) => {
@@ -42,7 +53,35 @@ app.use((req, _, next) => {
   next();
 });
 
-app.set("trust proxy", true);
+// Initiating database connection
+app.use(async (req, res, next) => {
+  const origin = req.headers["origin"];
+  if (isProduction && (!origin || typeof origin !== "string")) {
+    console.warn("Missing origin header", JSON.stringify(req.headers));
+    throw new Error("Missing origin header");
+  }
+
+  const subdomain = isProduction
+    ? new URL(origin!).hostname.split(".")[0]
+    : "hexa-center";
+
+  try {
+    const db = await getDatabaseClient(subdomain);
+    ctx.run({ db, tenant: subdomain }, () => {
+      req.db = db;
+      req.tenant = subdomain;
+      next();
+    });
+  } catch (error) {
+    console.warn(error);
+
+    return res
+      .status(418)
+      .send(
+        "418 I'm a teapot - This subdomain does not have its own kettle to brew content.",
+      );
+  }
+});
 
 app.use(cors(corsOptions));
 app.use(cookieParser());
@@ -86,6 +125,6 @@ const httpServer = createServer(app);
 //   });
 // });
 
-httpServer.listen(3001, () => {
+httpServer.listen(3001, async () => {
   console.log("back-end started");
 });

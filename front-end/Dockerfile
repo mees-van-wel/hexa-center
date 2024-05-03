@@ -3,8 +3,8 @@ FROM node:20-alpine AS base
 ENV PNPM_HOME="/pnpm" \
     PATH="$PNPM_HOME:$PATH" \
     NEXT_TELEMETRY_DISABLED=1 \
-    NEXT_SHARP_PATH=/node_modules/sharp \
-    NEXT_PUBLIC_API_URL=https://1-3-0-api.hexa.center
+    NEXT_PUBLIC_API_URL=https://api.hexa.center \
+    NEXT_PUBLIC_HERE_API_KEY=i7x1CajK2fNAoRjooM5lQWgMMqaeHc6Kr2PaF2pinWw
 
 RUN corepack enable
 
@@ -27,7 +27,8 @@ RUN pnpm run build
 FROM base AS runner
 WORKDIR /app
 
-ENV NODE_ENV=production
+ENV NODE_ENV=production \
+    NEXT_SHARP_PATH=/app/node_modules/sharp
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs

@@ -1,6 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import dayjs from "dayjs";
+import isBetween from "dayjs/plugin/isBetween";
+import IsSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import IsSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import {
   FormProvider,
   SubmitHandler,
@@ -16,22 +20,41 @@ import {
   ReservationCreateSchema,
   ReservationInputCreateSchema,
 } from "@/schemas/reservation";
-import { RouterOutput } from "@/utils/trpc";
+import { type RouterOutput } from "@/utils/trpc";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Button, Stack } from "@mantine/core";
+import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { IconDeviceFloppy, IconHotelService } from "@tabler/icons-react";
 
 import { ReservationForm } from "./ReservationForm";
 
+dayjs.extend(IsSameOrAfter);
+dayjs.extend(IsSameOrBefore);
+dayjs.extend(isBetween);
+
+export const overlapDates = (
+  newStart: Date,
+  newEnd: Date,
+  reservationStart: Date,
+  reservationEnd: Date,
+) => {
+  return (
+    dayjs(reservationStart).isBetween(newStart, newEnd, "day", "[]") ||
+    dayjs(reservationEnd).isBetween(newStart, newEnd, "day", "[]")
+  );
+};
+
 type ReservationCreateProps = {
   rooms: RouterOutput["room"]["list"];
-  relations: RouterOutput["relation"]["list"];
+  customers: RouterOutput["customer"]["list"];
+  reservations: RouterOutput["reservation"]["list"];
 };
 
 export const ReservationCreate = ({
   rooms,
-  relations,
+  customers,
+  reservations,
 }: ReservationCreateProps) => {
   const t = useTranslation();
 
@@ -42,7 +65,7 @@ export const ReservationCreate = ({
       customerId: undefined,
       startDate: undefined,
       endDate: undefined,
-      priceOverride: undefined,
+      priceOverride: null,
       guestName: "",
       reservationNotes: "",
       invoiceNotes: "",
@@ -56,22 +79,26 @@ export const ReservationCreate = ({
           title={[
             {
               icon: <IconHotelService />,
-              label: t("dashboardLayout.reservations"),
+              label: t("entities.reservation.pluralName"),
               href: "/reservations",
             },
             { label: t("common.new") },
           ]}
           backRouteFallback="/reservations"
         >
-          <SaveButton />
+          <SaveButton reservations={reservations} />
         </DashboardHeader>
-        <ReservationForm rooms={rooms} relations={relations} />
+        <ReservationForm rooms={rooms} customers={customers} />
       </Stack>
     </FormProvider>
   );
 };
 
-const SaveButton = () => {
+type SaveButtonProps = {
+  reservations: RouterOutput["reservation"]["list"];
+};
+
+const SaveButton = ({ reservations }: SaveButtonProps) => {
   const createReservation = useMutation("reservation", "create");
   const router = useRouter();
   const t = useTranslation();
@@ -83,6 +110,17 @@ const SaveButton = () => {
   const submitHandler: SubmitHandler<ReservationInputCreateSchema> = async (
     values,
   ) => {
+    const overlaps = reservations.some((reservation) => {
+      if (values.roomId !== reservation.roomId) return;
+
+      return overlapDates(
+        values.startDate,
+        values.endDate,
+        reservation.startDate,
+        reservation.endDate,
+      );
+    });
+
     if (values.startDate > values.endDate) {
       notifications.show({
         message: t("entities.reservation.dateError"),
@@ -90,8 +128,23 @@ const SaveButton = () => {
       });
 
       return;
+    } else if (overlaps) {
+      modals.openConfirmModal({
+        title: t("common.areYouSure"),
+        children: <div>{t("entities.reservation.overlapError")}</div>,
+        labels: { confirm: t("common.yes"), cancel: t("common.no") },
+        onConfirm: async () => {
+          createHandler(values);
+        },
+      });
+
+      return;
     }
 
+    createHandler(values);
+  };
+
+  const createHandler = async (values: ReservationInputCreateSchema) => {
     const response = await createReservation.mutate(values);
 
     notifications.show({

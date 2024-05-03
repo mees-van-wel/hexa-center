@@ -1,16 +1,7 @@
-import fs from "fs/promises";
 import mjml2html from "mjml";
-import path from "path";
 import { Attachment, ServerClient } from "postmark";
-import { fileURLToPath } from "url";
 
-import { isProduction } from "./environment";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const basePath = isProduction
-  ? path.join(__dirname, "emails")
-  : path.join(__dirname, "..", "src", "emails");
+import { readFile } from "./fileSystem";
 
 const serverToken = process.env.POSTMARK_SERVER_TOKEN;
 if (!serverToken)
@@ -47,11 +38,11 @@ type SendMailProps<T extends keyof Mails> = {
   footer?: string;
   from?: {
     name?: string;
-    emailAddress?: string;
   };
+  replyToEmail?: string;
   to: {
     name: string;
-    emailAddress: string;
+    email: string;
   };
   template: T;
   variables: Mails[T];
@@ -61,12 +52,12 @@ type SendMailProps<T extends keyof Mails> = {
 export const sendMail = async <T extends keyof Mails>({
   title,
   logo = "https://cdn.mcauto-images-production.sendgrid.net/b2afceaeb16d6ede/8d7c73d8-b2dc-4ec3-b181-b719345cabd4/140x163.png",
-  company = "Hexa Center",
   footer,
   from = {
-    name: company,
-    emailAddress: "noreply@hexa.center",
+    name: "Hexa Center",
   },
+  replyToEmail,
+  company = from.name,
   to,
   template,
   variables,
@@ -74,18 +65,12 @@ export const sendMail = async <T extends keyof Mails>({
 }: SendMailProps<T>) => {
   variables = { ...variables, title, logo, company };
 
-  const templatePath = path.join(basePath, `${template}.mjml`);
-  const baseTemplatePath = path.join(basePath, `_base.mjml`);
-
   const readPromises = [
-    fs.readFile(templatePath, "utf8"),
-    fs.readFile(baseTemplatePath, "utf8"),
+    readFile("email", `${template}.mjml`),
+    readFile("email", "_base.mjml"),
   ];
 
-  if (footer) {
-    const footerPath = path.join(basePath, `_footer.mjml`);
-    readPromises.push(fs.readFile(footerPath, "utf8"));
-  }
+  if (footer) readPromises.push(readFile("email", "_footer.mjml"));
 
   let [templateContent, baseTemplateContent, footerContent] =
     await Promise.all(readPromises);
@@ -100,8 +85,9 @@ export const sendMail = async <T extends keyof Mails>({
   const { html } = mjml2html(baseTemplateContent.replace(/{{.*?}}/g, ""));
 
   return await postmarkClient.sendEmail({
-    From: `${from.name} <${from.emailAddress}>`,
-    To: `${to.name} <${to.emailAddress}>`,
+    From: `${from.name} <noreply@hexa.center>`,
+    ReplyTo: replyToEmail,
+    To: `${to.name} <${to.email}>`,
     Subject: title,
     HtmlBody: html,
     Attachments: attachments,

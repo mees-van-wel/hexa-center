@@ -3,7 +3,6 @@ import duration from "dayjs/plugin/duration.js";
 import { and, desc, eq } from "drizzle-orm";
 import { date, number, object } from "valibot";
 
-import db from "@/db/client";
 import {
   invoiceEvents,
   invoiceLines,
@@ -25,8 +24,8 @@ import { TRPCError } from "@trpc/server";
 dayjs.extend(duration);
 
 export const invoiceRouter = router({
-  list: procedure.query(() =>
-    db.query.invoices.findMany({
+  list: procedure.query(({ ctx }) =>
+    ctx.db.query.invoices.findMany({
       with: {
         customer: {
           columns: {
@@ -44,6 +43,7 @@ export const invoiceRouter = router({
         createdAt: true,
         date: true,
         grossAmount: true,
+        netAmount: true,
       },
       orderBy: desc(invoices.date),
     }),
@@ -61,7 +61,7 @@ export const invoiceRouter = router({
       ),
     )
     .mutation(({ input: { invoiceId, date }, ctx }) =>
-      issueInvoice(invoiceId, date, ctx.relation.id),
+      issueInvoice(invoiceId, date, ctx.user.id),
     ),
   generatePdf: procedure
     .input(wrap(number()))
@@ -69,10 +69,12 @@ export const invoiceRouter = router({
   mail: procedure.input(wrap(number())).mutation(async ({ input, ctx }) => {
     const { invoice, base64 } = await generateInvoicePdf(input);
 
-    const { invoiceEmailTitle, invoiceEmailContent } = await getSettings([
-      "invoiceEmailTitle",
-      "invoiceEmailContent",
-    ]);
+    const { companyLogoSrc, invoiceEmailTitle, invoiceEmailContent } =
+      await getSettings([
+        "companyLogoSrc",
+        "invoiceEmailTitle",
+        "invoiceEmailContent",
+      ]);
 
     if (!invoiceEmailTitle || !invoiceEmailContent)
       throw new TRPCError({
@@ -80,21 +82,37 @@ export const invoiceRouter = router({
         message: "Missing invoice email settings",
       });
 
-    const name = invoice.customerName || invoice.customer?.name;
-    const emailAddress =
-      invoice.customerEmailAddress || invoice.customer?.emailAddress;
-
-    if (!name || !emailAddress)
+    const customerName = invoice.customerName || invoice.customer?.name;
+    if (!customerName)
       throw new TRPCError({
         code: "BAD_REQUEST",
-        message: "Missing customer name or email address",
+        message: "Missing customer name",
+      });
+
+    const customerEmail = invoice.customerEmail || invoice.customer?.email;
+    if (!customerEmail)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Missing customer email",
+      });
+
+    const companyName = invoice.companyName || invoice.company?.name;
+    if (!customerEmail)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Missing company name",
       });
 
     await sendMail({
+      logo: companyLogoSrc || undefined,
       title: invoiceEmailTitle,
+      from: {
+        name: companyName,
+      },
+      replyToEmail: invoice.companyEmail || invoice.company?.email || undefined,
       to: {
-        name,
-        emailAddress,
+        name: customerName,
+        email: customerEmail,
       },
       attachments: [
         {
@@ -118,15 +136,14 @@ export const invoiceRouter = router({
       },
     });
 
-    await db.insert(invoiceEvents).values({
-      createdById: ctx.relation.id,
+    await ctx.db.insert(invoiceEvents).values({
+      createdById: ctx.user.id,
       invoiceId: input,
       type: "mailed",
     });
   }),
-  // TOOD Make credit invoice be issued right away
   credit: procedure.input(wrap(number())).mutation(async ({ input, ctx }) => {
-    const invoicesResult = await db
+    const invoicesResult = await ctx.db
       .select({
         refType: invoices.refType,
         refId: invoices.refId,
@@ -146,10 +163,10 @@ export const invoiceRouter = router({
 
     const [createCreditInvoiceResponse, invoiceLinesResult] = await Promise.all(
       [
-        db
+        ctx.db
           .insert(invoices)
           .values({
-            createdById: ctx.relation.id,
+            createdById: ctx.user.id,
             refType: invoice.refType,
             refId: invoice.refId,
             type: "credit",
@@ -157,14 +174,14 @@ export const invoiceRouter = router({
             netAmount: invertDecimalString(invoice.netAmount),
             vatAmount: invertDecimalString(invoice.vatAmount),
             grossAmount: invertDecimalString(invoice.grossAmount),
-            number: invoice.number + "-C",
             notes: invoice.notes,
             customerId: invoice.customerId,
             companyId: invoice.companyId,
           })
           .returning({ id: invoices.id }),
-        db
+        ctx.db
           .select({
+            revenueAccountId: invoiceLines.revenueAccountId,
             name: invoiceLines.name,
             unitAmount: invoiceLines.unitAmount,
             quantity: invoiceLines.quantity,
@@ -175,7 +192,7 @@ export const invoiceRouter = router({
           })
           .from(invoiceLines)
           .where(eq(invoiceLines.invoiceId, input)),
-        db
+        ctx.db
           .update(invoices)
           .set({
             status: "credited",
@@ -187,9 +204,10 @@ export const invoiceRouter = router({
     const creditInvoiceId = createCreditInvoiceResponse[0].id;
 
     await Promise.all([
-      db.insert(invoiceLines).values(
+      ctx.db.insert(invoiceLines).values(
         invoiceLinesResult.map((invoiceLine) => ({
           invoiceId: creditInvoiceId,
+          revenueAccountId: invoiceLine.revenueAccountId,
           name: invoiceLine.name,
           unitAmount: invertDecimalString(invoiceLine.unitAmount),
           quantity: invoiceLine.quantity,
@@ -199,17 +217,17 @@ export const invoiceRouter = router({
           grossAmount: invertDecimalString(invoiceLine.grossAmount),
         })),
       ),
-      db.insert(invoiceEvents).values({
+      ctx.db.insert(invoiceEvents).values({
         invoiceId: input,
         type: "credited",
-        createdById: ctx.relation.id,
+        createdById: ctx.user.id,
         refType: "invoice",
         refId: creditInvoiceId,
       }),
     ]);
 
     if (invoice.refType === "reservation") {
-      const reservationsToInvoicesResult = await db
+      const reservationsToInvoicesResult = await ctx.db
         .select()
         .from(reservationsToInvoices)
         .where(
@@ -221,19 +239,19 @@ export const invoiceRouter = router({
 
       const reservationsToInvoice = reservationsToInvoicesResult[0];
 
-      await db.insert(reservationsToInvoices).values({
+      await ctx.db.insert(reservationsToInvoices).values({
         ...reservationsToInvoice,
         invoiceId: creditInvoiceId,
       });
     }
 
-    await issueInvoice(creditInvoiceId, new Date(), ctx.relation.id);
+    await issueInvoice(creditInvoiceId, new Date(), ctx.user.id);
 
     return creditInvoiceId;
   }),
   delete: procedure
     .input(wrap(number()))
-    .mutation(async ({ input }) =>
-      db.delete(invoices).where(eq(invoices.id, input)),
+    .mutation(async ({ input, ctx }) =>
+      ctx.db.delete(invoices).where(eq(invoices.id, input)),
     ),
 });

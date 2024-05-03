@@ -1,13 +1,13 @@
 "use client";
 
-import { useId } from "react";
+import { useEffect, useId } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { Table } from "@/components/common/Table";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { useTranslation } from "@/hooks/useTranslation";
-import { RouterOutput } from "@/utils/trpc";
+import { type RouterOutput } from "@/utils/trpc";
 import { Button, Stack } from "@mantine/core";
 import { IconBed, IconPlus } from "@tabler/icons-react";
 
@@ -20,10 +20,14 @@ export const RoomsOverview = ({ rooms }: RoomsProps) => {
   const searchBarId = useId();
   const t = useTranslation();
 
+  useEffect(() => {
+    router.refresh();
+  }, []);
+
   return (
     <Stack>
       <DashboardHeader
-        title={[{ icon: <IconBed />, label: t("dashboardLayout.rooms") }]}
+        title={[{ icon: <IconBed />, label: t("entities.room.pluralName") }]}
       >
         <Button component={Link} href="/rooms/new" leftSection={<IconPlus />}>
           {t("common.create")}
@@ -38,11 +42,11 @@ export const RoomsOverview = ({ rooms }: RoomsProps) => {
         columns={[
           {
             selector: "name",
-            label: t("entities.room.keys.name"),
+            label: t("common.name"),
           },
           {
             selector: "price",
-            label: t("entities.room.keys.price"),
+            label: t("entities.room.price"),
             format: ({ price }) =>
               Intl.NumberFormat("nl-NL", {
                 style: "currency",

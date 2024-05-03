@@ -1,16 +1,17 @@
 import { eq, inArray } from "drizzle-orm";
 
-import db from "@/db/client";
+import { Settings } from "@/constants/settings";
 import { settings } from "@/db/schema";
-import { Settings } from "@front-end/constants/settings";
+import { getCtx } from "@/utils/context";
 
 // TODO Better error handling
-
 export const getSetting = async <
   T extends (typeof settings.name.enumValues)[number],
 >(
   name: T,
-): Promise<Settings[T]> => {
+) => {
+  const { db } = getCtx();
+
   const settingsResult = await db
     .select()
     .from(settings)
@@ -19,28 +20,26 @@ export const getSetting = async <
   const setting = settingsResult[0];
   if (!setting) throw new Error(`Setting '${name}' is missing`);
 
-  return setting.value as any;
+  return setting.value as Settings[T];
 };
 
 export const getSettings = async <
   T extends (typeof settings.name.enumValues)[number],
 >(
   names: T[],
-): Promise<Record<T, Settings[T]>> => {
+) => {
+  const { db } = getCtx();
+
   const settingsResult = await db
     .select()
     .from(settings)
     .where(inArray(settings.name, names));
 
-  const settingsMap: Record<T, any> = {} as Record<T, any>;
+  const settingsMap = {} as Record<T, Settings[T]>;
 
-  settingsResult.forEach((setting) => {
-    const key = setting.name as T;
-    if (key && names.includes(key)) settingsMap[key] = setting.value as any;
-  });
-
-  names.forEach((name) => {
-    if (!settingsMap[name]) throw new Error(`Setting '${name}' is missing`);
+  settingsResult.forEach((setting, index) => {
+    if (!setting) throw new Error(`Setting '${names[index]}' is missing`);
+    settingsMap[setting.name as T] = setting.value as Settings[T];
   });
 
   return settingsMap;

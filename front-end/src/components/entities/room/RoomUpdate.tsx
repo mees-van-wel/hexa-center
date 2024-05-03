@@ -15,7 +15,7 @@ import { useAutosave } from "@/hooks/useAutosave";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
 import { RoomInputUpdateSchema, RoomUpdateSchema } from "@/schemas/room";
-import { RouterOutput } from "@/utils/trpc";
+import { type RouterOutput } from "@/utils/trpc";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Badge, Button, Loader, Stack } from "@mantine/core";
 import { modals } from "@mantine/modals";
@@ -67,13 +67,14 @@ export const RoomUpdate = ({ room }: RoomProps) => {
           title={[
             {
               icon: <IconBed />,
-              label: t("dashboardLayout.rooms"),
+              label: t("entities.room.pluralName"),
               href: "/rooms",
             },
             { label: room.name },
           ]}
         >
           <Button
+            variant="light"
             color="red"
             onClick={deletehandler}
             leftSection={<IconTrash />}
@@ -133,7 +134,7 @@ const SaveBadge = () => {
 
       if (exception === "DB_UNIQUE_CONSTRAINT") {
         setError(data.column, {
-          message: `${t("entities.room.name.singular")} - ${getValues(
+          message: `${t("entities.room.singularName")} - ${getValues(
             data.column,
           )} - ${data.column}`,
         });

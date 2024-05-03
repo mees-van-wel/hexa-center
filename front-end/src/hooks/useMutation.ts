@@ -1,6 +1,7 @@
 import { useState } from "react";
 
-import { type RouterInput, type RouterOutput, trpc } from "@/utils/trpc";
+import { type RouterInput, type RouterOutput } from "@/utils/trpc";
+import { getTrpcClientOnClient } from "@/utils/trpcForClient";
 
 // TODO Error handling
 // TODO Caching
@@ -13,12 +14,17 @@ export const useMutation = <
 ) => {
   const [loading, setLoading] = useState(false);
 
-  const mutate = async (params: RouterInput[T][P]) => {
+  const mutate = async (
+    params: RouterInput[T][P],
+    options?: { signal?: AbortSignal },
+  ) => {
     setLoading(true);
+
+    const trpc = getTrpcClientOnClient();
 
     // @ts-ignore
     const result: RouterOutput[T][P] = await trpc[scope][procedure]
-      .mutate(params)
+      .mutate(params, { signal: options?.signal })
       .finally(() => {
         setLoading(false);
       });

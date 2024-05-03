@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
@@ -11,7 +11,7 @@ import { CountryKey } from "@/constants/countries";
 import { INVOICE_EVENT_TYPE_META } from "@/constants/invoiceEventTypes";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
-import { RouterOutput } from "@/utils/trpc";
+import { type RouterOutput } from "@/utils/trpc";
 import {
   Badge,
   Button,
@@ -41,6 +41,8 @@ import { IconDownload } from "@tabler/icons-react";
 
 import { IssueModal } from "./IssueModal";
 
+import styles from "./InvoiceDetail.module.scss";
+
 type InvoiceDetailProps = {
   invoice: RouterOutput["invoice"]["get"];
 };
@@ -59,6 +61,10 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
   const [printLoading, setPrintLoading] = useState(false);
   const router = useRouter();
 
+  useEffect(() => {
+    router.refresh();
+  }, []);
+
   const issueHandler = async () => {
     const onConfirm = async (issueDate: Date) => {
       try {
@@ -70,12 +76,12 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
         router.refresh();
 
         notifications.show({
-          message: "Issued successfully",
+          message: t("entities.invoice.issuedSucces"),
           color: "green",
         });
       } catch (error) {
         notifications.show({
-          title: "There was an error while issuing",
+          title: t("entities.invoice.issuedfailed"),
           // @ts-ignore
           message: error?.message || "...",
           color: "red",
@@ -128,49 +134,61 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
         printWindow.print();
         URL.revokeObjectURL(blobUrl);
       };
-    else alert("Please allow popups to print the document.");
+    else alert(t("entities.invoice.printDocumentAlert"));
 
     setPrintLoading(false);
   };
 
   const mailHandler = async () => {
-    try {
-      await mailInvoice.mutate(invoice.id);
+    modals.openConfirmModal({
+      title: t("common.areYouSure"),
+      labels: { confirm: t("common.yes"), cancel: t("common.no") },
+      onConfirm: async () => {
+        try {
+          await mailInvoice.mutate(invoice.id);
 
-      router.refresh();
+          router.refresh();
 
-      notifications.show({
-        message: "Mailed successfully",
-        color: "green",
-      });
-    } catch (error) {
-      notifications.show({
-        title: "There was an error while mailing",
-        // @ts-ignore
-        message: error?.message || "...",
-        color: "red",
-      });
-    }
+          notifications.show({
+            message: t("entities.invoice.mailedSucces"),
+            color: "green",
+          });
+        } catch (error) {
+          notifications.show({
+            title: t("entities.invoice.mailedFailed"),
+            // @ts-ignore
+            message: error?.message || "...",
+            color: "red",
+          });
+        }
+      },
+    });
   };
 
   const creditHandler = async () => {
-    try {
-      const creditInvoiceId = await creditInvoice.mutate(invoice.id);
+    modals.openConfirmModal({
+      title: t("common.areYouSure"),
+      labels: { confirm: t("common.yes"), cancel: t("common.no") },
+      onConfirm: async () => {
+        try {
+          const creditInvoiceId = await creditInvoice.mutate(invoice.id);
 
-      router.push(`/invoices/${creditInvoiceId}`);
+          router.push(`/invoices/${creditInvoiceId}`);
 
-      notifications.show({
-        message: "Credited successfully",
-        color: "green",
-      });
-    } catch (error) {
-      notifications.show({
-        title: "There was an error while crediting",
-        // @ts-ignore
-        message: error?.message || "...",
-        color: "red",
-      });
-    }
+          notifications.show({
+            message: "Credited successfully",
+            color: "green",
+          });
+        } catch (error) {
+          notifications.show({
+            title: t("entities.invoice.creditSucces"),
+            // @ts-ignore
+            message: error?.message || "...",
+            color: "red",
+          });
+        }
+      },
+    });
   };
 
   const deleteHandler = async () => {
@@ -180,10 +198,10 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
       onConfirm: async () => {
         await deleteInvoice.mutate(invoice.id);
 
-        router.replace("/invoices");
+        router.back();
 
         notifications.show({
-          message: "Invoice successfully deleted",
+          message: t("entities.invoice.deleted"),
           color: "green",
         });
       },
@@ -204,11 +222,13 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
     [invoice.events],
   );
 
-  const customerVatNumber =
-    invoice.customerVatNumber || invoice.customer?.vatNumber;
   const customerCocNumber =
     invoice.customerCocNumber || invoice.customer?.cocNumber;
-  const customerCountry = invoice.customerCountry || invoice.customer?.country;
+  const customerVatId = invoice.customerVatId || invoice.customer?.vatId;
+
+  const customerCountry =
+    invoice.customerBillingCountry || invoice.customer?.billingCountry;
+
   const companyCountry = invoice.companyCountry || invoice.company?.country;
 
   return (
@@ -231,7 +251,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
               leftSection={<IconFileArrowRight />}
               onClick={issueHandler}
             >
-              Issue
+              {t("entities.invoice.issue")}
             </Button>
             <Button
               color="red"
@@ -245,27 +265,29 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
           </>
         ) : (
           <>
-            <Button
-              variant={hasBeenMailed ? "light" : undefined}
-              leftSection={<IconMailFast />}
-              loading={mailInvoice.loading}
-              onClick={mailHandler}
-            >
-              {hasBeenMailed ? "Remail" : "Mail"}
-            </Button>
+            {(invoice.customerEmail || invoice.customer?.email) && (
+              <Button
+                variant={hasBeenMailed ? "light" : undefined}
+                leftSection={<IconMailFast />}
+                loading={mailInvoice.loading}
+                onClick={mailHandler}
+              >
+                {hasBeenMailed ? t("common.remail") : t("common.mail")}
+              </Button>
+            )}
             <Button
               loading={downloadLoading}
               leftSection={<IconDownload />}
               onClick={downloadHandler}
             >
-              Download PDF
+              {t("common.downloadPdf")}
             </Button>
             <Button
               loading={printLoading}
               leftSection={<IconPrinter />}
               onClick={printHandler}
             >
-              Print
+              {t("common.print")}
             </Button>
           </>
         )}
@@ -275,7 +297,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
             leftSection={<IconFileArrowLeft />}
             onClick={creditHandler}
           >
-            Credit
+            {t("entities.invoice.credit")}
           </Button>
         )}
         <Badge
@@ -287,12 +309,16 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
           {t("common.saved")}
         </Badge>
       </DashboardHeader>
-      <Group wrap="nowrap" align="stretch">
-        <Paper p="2rem">
+      <Group align="stretch">
+        <Paper p="2rem" style={{ flex: 1 }}>
           <Band
             title={
-              <>
-                <Title order={3}>Invoice</Title>
+              <Title order={3}>{t("entities.invoice.singularName")}</Title>
+            }
+            fh
+          >
+            <Group align="stretch" justify="space-between" gap="2rem">
+              <Stack align="flex-start">
                 <Button
                   component={Link}
                   size="compact-md"
@@ -300,24 +326,23 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   // @ts-ignore Router
                   href={`/${invoice.refType}s/${invoice.refId}`}
                   variant="light"
-                  rightSection={<IconExternalLink size="1rem" />}
+                  leftSection={<IconExternalLink size="1rem" />}
                 >
-                  {invoice.refType} {invoice.refId}
+                  {t(`entities.${invoice.refType}.singularName`)}{" "}
+                  {invoice.refId}
                 </Button>
-              </>
-            }
-            fh
-          >
-            <Group align="stretch" justify="space-between" gap="2rem">
-              <Stack align="flex-start">
                 <div>
                   <p>
-                    <strong>Type:</strong>{" "}
-                    <Badge variant="light">{invoice.type}</Badge>
+                    <strong>{t("entities.invoice.type.name")}:</strong>{" "}
+                    <Badge variant="light">
+                      {t(`entities.invoice.type.${invoice.type}`)}
+                    </Badge>
                   </p>
                   <p>
-                    <strong>Status:</strong>{" "}
-                    <Badge variant="light">{invoice.status}</Badge>
+                    <strong>{t("entities.invoice.status.name")}:</strong>{" "}
+                    <Badge variant="light">
+                      {t(`entities.invoice.status.${invoice.status}`)}
+                    </Badge>
                   </p>
                 </div>
                 <div>
@@ -349,87 +374,99 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                 </div>
                 {invoice.notes && (
                   <p>
-                    <strong>Notes:</strong> {invoice.notes}
+                    <strong>{t("entities.invoice.notes")}:</strong>{" "}
+                    {invoice.notes}
                   </p>
                 )}
               </Stack>
             </Group>
           </Band>
         </Paper>
-        <Paper p="2rem" style={{ flex: 1 }}>
+        <Paper p="2rem" className={styles.invoiceInfo}>
           <Band.Group>
             <Band
               title={
-                <>
-                  <Title order={3}>Customer</Title>
-                  <Title order={3}>-</Title>
-                  {invoice.customerId ? (
-                    <Button
-                      component={Link}
-                      size="compact-md"
-                      // @ts-ignore Router
-                      href={`/relations/${invoice.customerId}`}
-                      variant="light"
-                      rightSection={<IconExternalLink size="1rem" />}
-                    >
-                      {invoice.customerName || invoice.customer?.name}
-                    </Button>
-                  ) : (
-                    <p
-                      style={{
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {invoice.customerName}
-                    </p>
-                  )}
-                </>
+                <Title order={3}>{t("entities.invoice.customerName")}</Title>
               }
             >
-              <Stack>
+              <Stack align="flex-start">
+                {invoice.customerId ? (
+                  <Button
+                    component={Link}
+                    size="compact-md"
+                    // @ts-ignore Router
+                    href={`/customers/${invoice.customerId}`}
+                    variant="light"
+                    leftSection={<IconExternalLink size="1rem" />}
+                  >
+                    {invoice.customerName || invoice.customer?.name}
+                  </Button>
+                ) : (
+                  <p
+                    style={{
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {invoice.customerName}
+                  </p>
+                )}
                 <div>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    {invoice.customerStreet || invoice.customer?.street}{" "}
-                    {invoice.customerHouseNumber ||
-                      invoice.customer?.houseNumber}
+                    {invoice.customerBillingAddressLineOne ||
+                      invoice.customer?.billingAddressLineOne}
                   </p>
+                  {(invoice.customerBillingAddressLineTwo ||
+                    invoice.customer?.billingAddressLineTwo) && (
+                    <p style={{ whiteSpace: "nowrap" }}>
+                      {invoice.customerBillingAddressLineTwo ||
+                        invoice.customer?.billingAddressLineTwo}
+                    </p>
+                  )}
                   <p style={{ whiteSpace: "nowrap" }}>
-                    {invoice.customerPostalCode || invoice.customer?.postalCode}{" "}
-                    {invoice.customerCity || invoice.customer?.city}
+                    {invoice.customerBillingCity ||
+                      invoice.customer?.billingCity}{" "}
+                    {invoice.customerBillingRegion ||
+                      invoice.customer?.billingRegion}{" "}
+                    {invoice.customerBillingPostalCode ||
+                      invoice.customer?.billingPostalCode}
                   </p>
-                  <p style={{ whiteSpace: "nowrap" }}>
-                    {invoice.customerRegion || invoice.customer?.region}
-                    {customerCountry &&
-                      " - " +
-                        t(
-                          `constants.countries.${
-                            customerCountry as CountryKey
-                          }`,
-                        )}
-                  </p>
+                  {customerCountry && (
+                    <p style={{ whiteSpace: "nowrap" }}>
+                      {t(
+                        `constants.countries.${customerCountry as CountryKey}`,
+                      )}
+                    </p>
+                  )}
                 </div>
-                <div>
-                  <p style={{ whiteSpace: "nowrap" }}>
-                    Email address:{" "}
-                    {invoice.customerEmailAddress ||
-                      invoice.customer?.emailAddress}
-                  </p>
-                  <p style={{ whiteSpace: "nowrap" }}>
-                    Phone number:{" "}
-                    {invoice.customerPhoneNumber ||
-                      invoice.customer?.phoneNumber}
-                  </p>
-                </div>
-                {(customerVatNumber || customerCocNumber) && (
+                {(invoice.customerEmail ||
+                  invoice.customer?.email ||
+                  invoice.customerPhone ||
+                  invoice.customer?.phone) && (
                   <div>
-                    {customerVatNumber && (
+                    {(invoice.customerEmail || invoice.customer?.email) && (
                       <p style={{ whiteSpace: "nowrap" }}>
-                        VAT number: {customerVatNumber}
+                        {t("common.email")}:{" "}
+                        {invoice.customerEmail || invoice.customer?.email}
                       </p>
                     )}
+                    {(invoice.customerPhone || invoice.customer?.phone) && (
+                      <p style={{ whiteSpace: "nowrap" }}>
+                        {t("common.phone")}:{" "}
+                        {invoice.customerPhone || invoice.customer?.phone}
+                      </p>
+                    )}
+                  </div>
+                )}
+                {(customerVatId || customerCocNumber) && (
+                  <div>
                     {customerCocNumber && (
                       <p style={{ whiteSpace: "nowrap" }}>
-                        CoC number: {customerCocNumber}
+                        {t("entities.customer.cocNumber")}: {customerCocNumber}
+                      </p>
+                    )}
+                    {customerVatId && (
+                      <p style={{ whiteSpace: "nowrap" }}>
+                        {t("entities.customer.vatId")}: {customerVatId}
                       </p>
                     )}
                   </div>
@@ -437,79 +474,79 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
               </Stack>
             </Band>
             <Band
-              title={
-                <>
-                  <Title order={3}>Your details</Title>
-                  <Title order={3}>-</Title>
-                  {invoice.customerId ? (
-                    <Button
-                      component={Link}
-                      size="compact-md"
-                      // @ts-ignore Router
-                      href={`/properties/${invoice.companyId}`}
-                      variant="light"
-                      rightSection={<IconExternalLink size="1rem" />}
-                    >
-                      {invoice.companyName || invoice.company?.name}
-                    </Button>
-                  ) : (
-                    <p
-                      style={{
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {invoice.companyName}
+              title={<Title order={3}>{t("invoicePage.yourDetails")}</Title>}
+            >
+              <Stack align="flex-start">
+                {invoice.customerId ? (
+                  <Button
+                    component={Link}
+                    size="compact-md"
+                    // @ts-ignore Router
+                    href={`/businesses/${invoice.companyId}`}
+                    variant="light"
+                    leftSection={<IconExternalLink size="1rem" />}
+                  >
+                    {invoice.companyName || invoice.company?.name}
+                  </Button>
+                ) : (
+                  <p
+                    style={{
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {invoice.companyName}
+                  </p>
+                )}
+                <div>
+                  <p style={{ whiteSpace: "nowrap" }}>
+                    {invoice.companyAddressLineOne ||
+                      invoice.company?.addressLineOne}
+                  </p>
+                  {(invoice.companyAddressLineTwo ||
+                    invoice.company?.addressLineTwo) && (
+                    <p style={{ whiteSpace: "nowrap" }}>
+                      {invoice.companyAddressLineTwo ||
+                        invoice.company?.addressLineTwo}
                     </p>
                   )}
-                </>
-              }
-            >
-              <Stack>
+                  <p style={{ whiteSpace: "nowrap" }}>
+                    {invoice.companyCity || invoice.company?.city}{" "}
+                    {invoice.companyRegion || invoice.company?.region}{" "}
+                    {invoice.companyPostalCode || invoice.company?.postalCode}
+                  </p>
+                  {companyCountry && (
+                    <p style={{ whiteSpace: "nowrap" }}>
+                      {t(`constants.countries.${companyCountry as CountryKey}`)}
+                    </p>
+                  )}
+                </div>
                 <div>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    {invoice.companyStreet || invoice.company?.street}{" "}
-                    {invoice.companyHouseNumber || invoice.company?.houseNumber}
+                    {t("common.email")}:{" "}
+                    {invoice.companyEmail || invoice.company?.email}
                   </p>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    {invoice.companyPostalCode || invoice.company?.postalCode}{" "}
-                    {invoice.companyCity || invoice.company?.city}
-                  </p>
-                  <p style={{ whiteSpace: "nowrap" }}>
-                    {invoice.companyRegion || invoice.company?.region}
-                    {companyCountry &&
-                      " - " +
-                        t(
-                          `constants.countries.${companyCountry as CountryKey}`,
-                        )}
+                    {t("common.phone")}:{" "}
+                    {invoice.companyPhone || invoice.company?.phone}
                   </p>
                 </div>
                 <div>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    Email address:{" "}
-                    {invoice.companyEmailAddress ||
-                      invoice.company?.emailAddress}
+                    {t("entities.customer.vatId")}:{" "}
+                    {invoice.companyVatId || invoice.company?.vatId}
                   </p>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    Phone number:{" "}
-                    {invoice.companyPhoneNumber || invoice.company?.phoneNumber}
-                  </p>
-                </div>
-                <div>
-                  <p style={{ whiteSpace: "nowrap" }}>
-                    VAT number:{" "}
-                    {invoice.companyVatNumber || invoice.company?.vatNumber}
-                  </p>
-                  <p style={{ whiteSpace: "nowrap" }}>
-                    CoC number:{" "}
+                    {t("entities.customer.cocNumber")}:{" "}
                     {invoice.companyCocNumber || invoice.company?.cocNumber}
                   </p>
                 </div>
                 <div>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    IBAN: {invoice.companyIban || invoice.company?.iban}
+                    {t("entities.company.iban")}:{" "}
+                    {invoice.companyIban || invoice.company?.iban}
                   </p>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    BIC/SWIFT:{" "}
+                    {t("entities.company.swiftBic")}:{" "}
                     {invoice.companySwiftBic || invoice.company?.swiftBic}
                   </p>
                 </div>
@@ -517,9 +554,9 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
             </Band>
           </Band.Group>
         </Paper>
-        <Paper p="2rem">
-          <Band title={<Title order={3}>Timeline</Title>} fh>
-            <ScrollArea h={271} type="always" offsetScrollbars>
+        <Paper p="2rem" style={{ flex: 1 }}>
+          <Band title={<Title order={3}>{t("invoicePage.timeline")}</Title>} fh>
+            <ScrollArea h={300} type="always" offsetScrollbars>
               <Timeline
                 active={invoice.events.length}
                 bulletSize="2rem"
@@ -528,7 +565,15 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                 {invoice.events
                   .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
                   .map(
-                    ({ id, type, createdAt, createdById, refType, refId }) => {
+                    ({
+                      id,
+                      type,
+                      createdAt,
+                      createdById,
+                      createdBy,
+                      refType,
+                      refId,
+                    }) => {
                       const { IconComponent, title, message } =
                         INVOICE_EVENT_TYPE_META[type];
 
@@ -562,8 +607,8 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                             {createdById && (
                               <>
                                 {" by "}
-                                <Link href={`/relations/${createdById}`}>
-                                  Relation {createdById}
+                                <Link href={`/users/${createdById}`}>
+                                  {createdBy?.firstName} {createdBy?.lastName}
                                 </Link>
                               </>
                             )}
@@ -582,8 +627,9 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                     {invoice.createdById && (
                       <>
                         {" by "}
-                        <Link href={`/relations/${invoice.createdById}`}>
-                          Relation {invoice.createdById}
+                        <Link href={`/users/${invoice.createdById}`}>
+                          {invoice.createdBy?.firstName}{" "}
+                          {invoice.createdBy?.lastName}
                         </Link>
                       </>
                     )}
@@ -599,12 +645,12 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
           <Table>
             <Table.Thead>
               <Table.Tr>
-                <Table.Th>Name</Table.Th>
-                <Table.Th>Unit price</Table.Th>
-                <Table.Th>Quantity</Table.Th>
-                <Table.Th>Total net amount</Table.Th>
-                <Table.Th>VAT</Table.Th>
-                <Table.Th>Total gross amount</Table.Th>
+                <Table.Th>{t("common.name")}</Table.Th>
+                <Table.Th>{t("invoicePage.lines.unitPrice")}</Table.Th>
+                <Table.Th>{t("invoicePage.lines.quantity")}</Table.Th>
+                <Table.Th>{t("invoicePage.lines.totalNetAmount")}</Table.Th>
+                <Table.Th>{t("invoicePage.lines.vat")}</Table.Th>
+                <Table.Th>{t("invoicePage.lines.totalGrossAmount")}</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
@@ -635,11 +681,12 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                       }).format(parseFloat(netAmount))}
                     </Table.Td>
                     <Table.Td>
-                      {Intl.NumberFormat("nl-NL", {
-                        style: "currency",
-                        currency: "EUR",
-                      }).format(parseFloat(vatAmount))}{" "}
-                      ({vatRate}%)
+                      {vatRate?.toString()
+                        ? Intl.NumberFormat("nl-NL", {
+                            style: "currency",
+                            currency: "EUR",
+                          }).format(parseFloat(vatAmount)) + ` (${vatRate}%)`
+                        : "Not applicable"}
                     </Table.Td>
                     <Table.Td>
                       {Intl.NumberFormat("nl-NL", {
@@ -671,7 +718,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   }}
                 >
                   <Text size="1.25rem" fw={700}>
-                    Total
+                    {t("common.total")}
                   </Text>
                 </Table.Td>
                 <Table.Td

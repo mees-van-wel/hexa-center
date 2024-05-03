@@ -8,7 +8,7 @@ import {
   ReservationInputCreateSchema,
   ReservationInputUpdateSchema,
 } from "@/schemas/reservation";
-import { RouterOutput } from "@/utils/trpc";
+import { type RouterOutput } from "@/utils/trpc";
 import {
   Group,
   NumberInput,
@@ -24,10 +24,10 @@ import { IconCurrencyEuro } from "@tabler/icons-react";
 
 type ReservationForm = {
   rooms: RouterOutput["room"]["list"];
-  relations: RouterOutput["relation"]["list"];
+  customers: RouterOutput["customer"]["list"];
 };
 
-export const ReservationForm = ({ rooms, relations }: ReservationForm) => {
+export const ReservationForm = ({ rooms, customers }: ReservationForm) => {
   const t = useTranslation();
 
   const {
@@ -43,11 +43,11 @@ export const ReservationForm = ({ rooms, relations }: ReservationForm) => {
 
   const customerOptions = useMemo(
     () =>
-      relations.map((relation) => ({
-        label: relation.name,
-        value: relation.id.toString(),
+      customers.map((customer) => ({
+        label: customer.name,
+        value: customer.id.toString(),
       })),
-    [relations],
+    [customers],
   );
 
   const roomOptions = useMemo(
@@ -66,10 +66,10 @@ export const ReservationForm = ({ rooms, relations }: ReservationForm) => {
   useDidUpdate(() => {
     if (getFieldState("guestName").isTouched) return;
 
-    const customer = relations.find(({ id }) => id === customerId);
-    if (!customer) return;
+    const customer = customers.find(({ id }) => id === customerId);
+    if (!customer?.contactPersonName) return;
 
-    setValue("guestName", customer.businessContactName || customer.name);
+    setValue("guestName", customer.contactPersonName);
   }, [customerId]);
 
   return (
@@ -84,7 +84,7 @@ export const ReservationForm = ({ rooms, relations }: ReservationForm) => {
                 {...field}
                 value={field.value?.toString() || ""}
                 error={error?.message}
-                label={t("entities.reservation.keys.customerId")}
+                label={t("entities.reservation.customerId")}
                 data={customerOptions}
                 onChange={(value) => {
                   if (value) field.onChange(parseInt(value));
@@ -103,7 +103,7 @@ export const ReservationForm = ({ rooms, relations }: ReservationForm) => {
                 {...field}
                 value={field.value?.toString() || ""}
                 error={error?.message}
-                label={t("entities.reservation.keys.roomId")}
+                label={t("entities.reservation.roomId")}
                 data={roomOptions}
                 onChange={(value) => {
                   if (value) field.onChange(parseInt(value));
@@ -124,7 +124,7 @@ export const ReservationForm = ({ rooms, relations }: ReservationForm) => {
                 {...field}
                 required
                 error={error?.message}
-                label={t("entities.reservation.keys.startDate")}
+                label={t("entities.reservation.startDate")}
               />
             )}
           />
@@ -136,7 +136,7 @@ export const ReservationForm = ({ rooms, relations }: ReservationForm) => {
                 {...field}
                 required
                 error={error?.message}
-                label={t("entities.reservation.keys.endDate")}
+                label={t("entities.reservation.endDate")}
               />
             )}
           />
@@ -149,8 +149,7 @@ export const ReservationForm = ({ rooms, relations }: ReservationForm) => {
               <TextInput
                 {...field}
                 error={error?.message}
-                label={t("entities.reservation.keys.guestName")}
-                withAsterisk
+                label={t("entities.reservation.guestName")}
               />
             )}
           />
@@ -160,12 +159,12 @@ export const ReservationForm = ({ rooms, relations }: ReservationForm) => {
             render={({ field, fieldState: { error } }) => (
               <NumberInput
                 {...field}
-                value={field.value || undefined}
+                value={field.value || ""}
                 onChange={(value) => {
-                  field.onChange(value || null);
+                  field.onChange(value.toString() || null);
                 }}
                 error={error?.message}
-                label={t("entities.reservation.keys.priceOverride")}
+                label={t("entities.reservation.priceOverride")}
                 leftSection={<IconCurrencyEuro size="1rem" />}
                 decimalScale={2}
                 decimalSeparator=","
@@ -179,7 +178,7 @@ export const ReservationForm = ({ rooms, relations }: ReservationForm) => {
           <Textarea
             {...register("reservationNotes")}
             error={errors.reservationNotes?.message}
-            label={t("entities.reservation.keys.reservationNotes")}
+            label={t("entities.reservation.reservationNotes")}
             autosize
             minRows={2}
             maxRows={6}
@@ -187,7 +186,7 @@ export const ReservationForm = ({ rooms, relations }: ReservationForm) => {
           <Textarea
             {...register("invoiceNotes")}
             error={errors.invoiceNotes?.message}
-            label={t("entities.reservation.keys.invoiceNotes")}
+            label={t("entities.reservation.invoiceNotes")}
             autosize
             minRows={2}
             maxRows={6}

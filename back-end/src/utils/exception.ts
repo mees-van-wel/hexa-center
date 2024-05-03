@@ -1,4 +1,4 @@
-import type { Exception } from "@front-end/constants/exceptions";
+import type { Exception } from "@/constants/exceptions";
 import { TRPCError } from "@trpc/server";
 
 const PG_EXCEPTION_MAP: Record<string, Exception> = {
@@ -15,7 +15,7 @@ export const createPgException = (error: any) => {
 
   const exception = PG_EXCEPTION_MAP[error.code] as Exception | undefined;
 
-  console.log(error);
+  console.warn(error);
 
   if (exception === "DB_UNIQUE_CONSTRAINT")
     return new TRPCError({
@@ -32,7 +32,7 @@ export const createPgException = (error: any) => {
       message: JSON.stringify({
         exception,
         // TODO retrieve depend name from error
-        data: { depend: "Properties" },
+        data: { depend: "Business" },
       }),
     });
 

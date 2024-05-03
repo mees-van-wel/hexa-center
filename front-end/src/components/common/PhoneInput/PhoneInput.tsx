@@ -55,12 +55,12 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
     const id = useId();
     const t = useTranslation();
     const inputRef = useRef<HTMLInputElement>(null);
-    const parsedPhoneNumber = useMemo(
+    const parsedPhone = useMemo(
       () => (value ? parsePhoneNumber(value) : undefined),
       [value],
     );
 
-    const parsedDefaultPhoneNumber = useMemo(
+    const parsedDefaultPhone = useMemo(
       () => (defaultValue ? parsePhoneNumber(defaultValue) : undefined),
       [defaultValue],
     );
@@ -72,7 +72,7 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
       });
 
     const [countryCodeState, setRegionCodeState] = useState(
-      parsedPhoneNumber?.regionCode as CountryKey | undefined,
+      parsedPhone?.regionCode as CountryKey | undefined,
     );
 
     const countryCode = countryCodeState || storedCountryCode;
@@ -83,7 +83,10 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
           label: callingCode,
           value: countryCode,
           description: t(`constants.countries.${countryCode}`),
-        })),
+        })).sort(
+          (a, b) =>
+            parseInt(a.label.substring(1)) - parseInt(b.label.substring(1)),
+        ),
       [t],
     );
 
@@ -125,7 +128,7 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
               }
             }}
             value={countryCode}
-            defaultValue={parsedDefaultPhoneNumber?.regionCode}
+            defaultValue={parsedDefaultPhone?.regionCode}
             data={options}
             disabled={disabled}
           />
@@ -139,14 +142,14 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
             autoFocus={autoFocus}
             value={
               value
-                ? parsedPhoneNumber?.number?.national ||
-                  parsedPhoneNumber?.number?.input ||
+                ? parsedPhone?.number?.national ||
+                  parsedPhone?.number?.input ||
                   ""
                 : undefined
             }
             defaultValue={
-              parsedDefaultPhoneNumber?.number?.national ||
-              parsedDefaultPhoneNumber?.number?.input
+              parsedDefaultPhone?.number?.national ||
+              parsedDefaultPhone?.number?.input
             }
             styles={{
               input: {
@@ -156,18 +159,16 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
             }}
             className={styles.numberInput}
             onChange={(e) => {
-              const parsedPhoneNumber = parsePhoneNumber(e.target.value, {
+              const parsedPhone = parsePhoneNumber(e.target.value, {
                 regionCode: countryCode,
               });
 
               if (onChange)
                 onChange(
-                  parsedPhoneNumber.number?.e164 ||
-                    parsedPhoneNumber.number?.input ||
-                    "",
+                  parsedPhone.number?.e164 || parsedPhone.number?.input || "",
                 );
-              else if (parsedPhoneNumber.number?.national)
-                e.target.value = parsedPhoneNumber.number.national;
+              else if (parsedPhone.number?.national)
+                e.target.value = parsedPhone.number.national;
             }}
           />
         </Group>

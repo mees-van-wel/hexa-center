@@ -35,7 +35,7 @@ export const PhoneOtpInput = () => {
 
   const sendAgainHandler = async () => {
     const phoneToken = await sendPhoneOtp.mutate({
-      phoneNumber: loginState.phoneNumber,
+      phone: loginState.phone,
     });
     setLoginState({ phoneToken });
     reset();
@@ -45,7 +45,7 @@ export const PhoneOtpInput = () => {
     <Stack>
       <Input.Wrapper
         label={t("loginPage.otp")}
-        description={`${t("loginPage.phoneOtpSent")} ${loginState.phoneNumber}`}
+        description={`${t("loginPage.phoneOtpSent")} ${loginState.phone}`}
         error={error}
         withAsterisk
       >

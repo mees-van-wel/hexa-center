@@ -18,16 +18,12 @@
   filter: blur(8px);
   object-fit: cover;
   scale: -1 1;
-}
-
-.mobileNav {
-  height: calc(100% - 113px);
+  position: fixed !important;
 }
 
 .main {
   flex: 1;
   align-items: stretch;
-  overflow-x: hidden;
 }
 
 .layoutContainer {

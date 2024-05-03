@@ -1,7 +1,5 @@
-import { cookies } from "next/headers";
-
 import { ReservationDetail } from "@/components/entities/reservation/reservationDetail";
-import { setTRPCRefreshToken, trpc } from "@/utils/trpc";
+import { getTrpcClientOnServer } from "@/utils/trpcForServer";
 
 type ReservationPageParams = {
   params: {
@@ -10,25 +8,34 @@ type ReservationPageParams = {
 };
 
 export default async function Page({ params }: ReservationPageParams) {
-  const refreshToken = cookies().get("refreshToken")?.value;
-  if (refreshToken) setTRPCRefreshToken(refreshToken);
+  const trpc = getTrpcClientOnServer();
 
   const reservationId = parseInt(params.id);
 
-  const [reservation, relations, rooms, invoiceExtraTemplates] =
-    await Promise.all([
-      trpc.reservation.get.query(reservationId),
-      trpc.relation.list.query(),
-      trpc.room.list.query(),
-      trpc.invoiceExtra.list.query(),
-    ]);
+  const [
+    reservation,
+    customers,
+    rooms,
+    reservations,
+    productTemplates,
+    ledgerAccounts,
+  ] = await Promise.all([
+    trpc.reservation.get.query(reservationId),
+    trpc.customer.list.query(),
+    trpc.room.list.query(),
+    trpc.reservation.list.query(),
+    trpc.product.list.query(),
+    trpc.ledgerAccount.list.query(),
+  ]);
 
   return (
     <ReservationDetail
       reservation={reservation}
       rooms={rooms}
-      relations={relations}
-      invoiceExtraTemplates={invoiceExtraTemplates}
+      customers={customers}
+      reservations={reservations}
+      productTemplates={productTemplates}
+      ledgerAccounts={ledgerAccounts}
     />
   );
 }

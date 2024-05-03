@@ -1,13 +1,12 @@
-import { cookies } from "next/headers";
-
 import { RoomsOverview } from "@/components/entities/room/RoomsOverview";
-import { setTRPCRefreshToken, trpc } from "@/utils/trpc";
+import { getTrpcClientOnServer } from "@/utils/trpcForServer";
 
 export default async function Page() {
-  const refreshToken = cookies().get("refreshToken")?.value;
-  if (refreshToken) setTRPCRefreshToken(refreshToken);
+  const trpc = getTrpcClientOnServer();
 
   const rooms = await trpc.room.list.query();
 
-  return <RoomsOverview rooms={rooms} />;
+  return (
+    <RoomsOverview rooms={rooms.sort((a, b) => a.name.localeCompare(b.name))} />
+  );
 }

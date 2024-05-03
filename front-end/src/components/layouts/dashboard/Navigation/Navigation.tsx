@@ -11,6 +11,8 @@ import {
   IconFileEuro,
   IconHome,
   IconHotelService,
+  IconPlugConnected,
+  IconUserDollar,
   IconUsers,
 } from "@tabler/icons-react";
 
@@ -22,7 +24,7 @@ export const Navigation = () => {
   const pathname = useMemo(() => `/${url.split("/")[1]}`, [url]);
 
   return (
-    <Stack pos="relative" h="100%">
+    <Stack className={styles.navigationContainer}>
       <nav>
         <Stack>
           <Button
@@ -33,22 +35,22 @@ export const Navigation = () => {
             fullWidth
             justify="left"
           >
-            {t("dashboardLayout.home")}
+            {t("homePage.name")}
           </Button>
           <Stack gap="xs">
             <Title order={4}>{t("modules.essentials")}</Title>
             <Stack gap={0}>
               <Button
                 component={Link}
-                href="/properties"
-                variant={pathname === "/properties" ? "filled" : "subtle"}
-                leftSection={<IconBuilding />}
+                href="/users"
+                variant={pathname === "/users" ? "filled" : "subtle"}
+                leftSection={<IconUsers />}
                 fullWidth
                 justify="left"
               >
-                {t("dashboardLayout.properties")}
+                {t("entities.user.pluralName")}
               </Button>
-              {/* <Button
+              {/* <Button 
                 component={Link}
                 href="/roles"
                 variant={pathname === "/roles" ? "filled" : "subtle"}
@@ -56,17 +58,17 @@ export const Navigation = () => {
                 fullWidth
                 justify="left"
               >
-                {t("dashboardLayout.roles")}
+                {t("entities.roles.pluralName")}
               </Button> */}
               <Button
                 component={Link}
-                href="/relations"
-                variant={pathname === "/relations" ? "filled" : "subtle"}
-                leftSection={<IconUsers />}
+                href="/businesses"
+                variant={pathname === "/businesses" ? "filled" : "subtle"}
+                leftSection={<IconBuilding />}
                 fullWidth
                 justify="left"
               >
-                {t("entities.relation.name.plural")}
+                {t("entities.company.pluralName")}
               </Button>
               <Button
                 component={Link}
@@ -91,7 +93,7 @@ export const Navigation = () => {
                 fullWidth
                 justify="left"
               >
-                {t("dashboardLayout.reservations")}
+                {t("entities.reservation.pluralName")}
               </Button>
               <Button
                 component={Link}
@@ -101,13 +103,23 @@ export const Navigation = () => {
                 fullWidth
                 justify="left"
               >
-                {t("dashboardLayout.rooms")}
+                {t("entities.room.pluralName")}
               </Button>
             </Stack>
           </Stack>
           <Stack gap="xs">
             <Title order={4}>{t("modules.sales")}</Title>
             <Stack gap={0}>
+              <Button
+                component={Link}
+                href="/customers"
+                variant={pathname === "/customers" ? "filled" : "subtle"}
+                leftSection={<IconUserDollar />}
+                fullWidth
+                justify="left"
+              >
+                {t("entities.customer.pluralName")}
+              </Button>
               <Button
                 component={Link}
                 href="/invoices"
@@ -117,6 +129,21 @@ export const Navigation = () => {
                 justify="left"
               >
                 {t("entities.invoice.pluralName")}
+              </Button>
+            </Stack>
+          </Stack>
+          <Stack gap="xs">
+            <Title order={4}>{t("modules.system")}</Title>
+            <Stack gap={0}>
+              <Button
+                component={Link}
+                href="/integrations"
+                variant={pathname === "/integrations" ? "filled" : "subtle"}
+                leftSection={<IconPlugConnected />}
+                fullWidth
+                justify="left"
+              >
+                {t("screens.integrationsPage.pluralName")}
               </Button>
             </Stack>
           </Stack>

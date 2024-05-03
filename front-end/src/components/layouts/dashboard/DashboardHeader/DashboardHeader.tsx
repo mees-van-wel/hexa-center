@@ -4,12 +4,13 @@ import { Fragment } from "react";
 import type { Route } from "next";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import clsx from "clsx";
 import { useRecoilValue } from "recoil";
 
-import { useAuthRelation } from "@/contexts/AuthContext";
+import { useAuthUser } from "@/contexts/AuthContext";
 import { useTranslation } from "@/hooks/useTranslation";
 import { routeHistoryState } from "@/states/routeHistoryState";
-import { trpc } from "@/utils/trpc";
+import { getTrpcClientOnClient } from "@/utils/trpcForClient";
 import {
   Avatar,
   Button,
@@ -48,21 +49,27 @@ export const DashboardHeader = ({
   const t = useTranslation();
   const router = useRouter();
   const pathName = usePathname();
-  const authRelation = useAuthRelation();
+  const authUser = useAuthUser();
   const routeHistory = useRecoilValue(routeHistoryState);
   const previousRoute = routeHistory.at(-2);
   const showBackButton =
     !!(previousRoute !== pathName && previousRoute) || !!backRouteFallback;
 
   const logoutHandler = async () => {
+    const trpc = getTrpcClientOnClient();
     await trpc.auth.logout.mutate();
     router.replace("/login");
   };
 
   return (
-    <Group w="100%" align="stretch" wrap="nowrap">
+    <Group w="100%" align="stretch">
       {(children || showBackButton) && (
-        <Paper component={Group} p="md" wrap="nowrap">
+        <Paper
+          component={Group}
+          p="md"
+          wrap="nowrap"
+          className={styles.changeOrderExtra}
+        >
           {showBackButton && (
             <Button
               variant="light"
@@ -80,7 +87,7 @@ export const DashboardHeader = ({
         </Paper>
       )}
       <Paper
-        className={styles.titleContainer}
+        className={clsx([styles.titleContainer, styles.changeOrderTitle])}
         component={Group}
         wrap="nowrap"
         justify="center"
@@ -119,7 +126,13 @@ export const DashboardHeader = ({
           );
         })}
       </Paper>
-      <Paper component={Menu} trigger="hover" position="bottom-end" p="md">
+      <Paper
+        component={Menu}
+        trigger="hover"
+        position="bottom-end"
+        p="md"
+        className={styles.changeOrderAccount}
+      >
         <Menu.Target>
           <Group wrap="nowrap">
             <Stack ta="right" visibleFrom="md" gap={0}>
@@ -130,7 +143,7 @@ export const DashboardHeader = ({
                   whiteSpace: "nowrap",
                 }}
               >
-                {authRelation.name}
+                {authUser.firstName} {authUser.lastName}
               </Text>
               <Text
                 size="xs"
@@ -138,7 +151,7 @@ export const DashboardHeader = ({
                   whiteSpace: "nowrap",
                 }}
               >
-                {authRelation.emailAddress}
+                {authUser.email}
               </Text>
             </Stack>
             <Avatar />

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { type RouterInput, type RouterOutput, trpc } from "@/utils/trpc";
+import { type RouterInput, type RouterOutput } from "@/utils/trpc";
+import { getTrpcClientOnClient } from "@/utils/trpcForClient";
 
 // TODO Error handling
 // TODO Caching
@@ -21,6 +22,8 @@ export const useQuery = <
   const query = useCallback(
     async (params?: RouterInput[T][P]) => {
       setLoading(true);
+
+      const trpc = getTrpcClientOnClient();
 
       // @ts-ignore
       const result: RouterOutput[T][P] = await trpc[scope][procedure]

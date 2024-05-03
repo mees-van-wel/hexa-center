@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 
-import Icon from "@/assets/images/icon-white.svg";
+import Icon from "@/assets/images/icon-black.svg";
 import { useCompanyName } from "@/hooks/useCompanyName";
 import { Group, Stack, Title } from "@mantine/core";
 
