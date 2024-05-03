@@ -1,7 +1,5 @@
-import { cookies } from "next/headers";
-
 import { AppointmentTypeDetail } from "@/components/entities/appointmentType/appointmentTypeDetail";
-import { setTRPCRefreshToken, trpc } from "@/utils/trpc";
+import { getTrpcClientOnServer } from "@/utils/trpcForServer";
 
 type AppointmentTypePageParams = {
   params: {
@@ -10,8 +8,7 @@ type AppointmentTypePageParams = {
 };
 
 export default async function Page({ params }: AppointmentTypePageParams) {
-  const refreshToken = cookies().get("refreshToken")?.value;
-  if (refreshToken) setTRPCRefreshToken(refreshToken);
+  const trpc = getTrpcClientOnServer();
 
   const appointmentType = await trpc.appointmentType.get.query(
     parseInt(params.id),

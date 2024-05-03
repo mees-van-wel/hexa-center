@@ -38,7 +38,7 @@ export default function Page() {
       message: t("entities.appointmentType.createdNotification"),
       color: "green",
     });
-    router.push(`/appointmentType/${response.id}`);
+    router.push(`/appointmentTypes/${response.id}`);
   };
 
   return (
@@ -46,12 +46,12 @@ export default function Page() {
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack>
           <DashboardHeader
-            backRouteFallback="/appointmentType"
+            backRouteFallback="/appointmentTypes"
             title={[
               {
                 icon: <IconCalendarStats />,
-                label: t("dashboardLayout.appointmentTypes"),
-                href: "/appointmentType",
+                label: t("entities.appointmentType.name.plural"),
+                href: "/appointmentTypes",
               },
               { label: t("common.new") },
             ]}

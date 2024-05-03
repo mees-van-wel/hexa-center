@@ -28,14 +28,14 @@ export const AppointmentTypesOverview = ({
         title={[
           {
             icon: <IconCalendarStats />,
-            label: t("dashboardLayout.appointmentTypes"),
+            label: t("entities.appointmentType.name.plural"),
           },
         ]}
       >
         <Button
           leftSection={<IconPlus />}
           component={Link}
-          href="/appointmentType/new"
+          href="/appointmentTypes/new"
         >
           {t("common.new")}
         </Button>

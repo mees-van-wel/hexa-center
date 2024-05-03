@@ -266,12 +266,6 @@ export type Translation = {
       preferences: string;
       logout: string;
     };
-    home: string;
-    properties: string;
-    appointmentTypes: string;
-    roles: string;
-    reservations: string;
-    rooms: string;
   };
   loginPage: {
     login: string;

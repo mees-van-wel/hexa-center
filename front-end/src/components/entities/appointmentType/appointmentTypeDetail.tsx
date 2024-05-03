@@ -73,7 +73,7 @@ export const AppointmentTypeDetail = ({
           title={[
             {
               icon: <IconCalendarStats />,
-              label: t("dashboardLayout.appointmentTypes"),
+              label: t("entities.appointmentType.name.plural"),
               href: "/appointmentTypes",
             },
             { label: appointmentType.name },

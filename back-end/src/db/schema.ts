@@ -71,12 +71,16 @@ export const appointmentTypes = pgTable("appointmentTypes", {
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
   createdById: integer("created_by_id").references(
-    (): AnyPgColumn => relations.id,
-    { onDelete: "set null" },
+    (): AnyPgColumn => users.id,
+    {
+      onDelete: "set null",
+    },
   ),
   updatedById: integer("updated_by_id").references(
-    (): AnyPgColumn => relations.id,
-    { onDelete: "set null" },
+    (): AnyPgColumn => users.id,
+    {
+      onDelete: "set null",
+    },
   ),
   name: text("name").unique().notNull(),
   color: text("color").notNull(),
@@ -84,16 +88,16 @@ export const appointmentTypes = pgTable("appointmentTypes", {
   appointmentDuration: interval("appointmentDuration"),
 });
 
-export const appointmentTypesRelations = relationBuilder(
+export const appointmentTypesRelations = relations(
   appointmentTypes,
   ({ one }) => ({
-    createdBy: one(relations, {
+    createdBy: one(users, {
       fields: [appointmentTypes.createdById],
-      references: [relations.id],
+      references: [users.id],
     }),
-    updatedBy: one(relations, {
+    updatedBy: one(users, {
       fields: [appointmentTypes.updatedById],
-      references: [relations.id],
+      references: [users.id],
     }),
   }),
 );

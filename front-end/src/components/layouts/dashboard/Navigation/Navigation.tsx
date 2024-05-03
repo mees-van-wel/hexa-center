@@ -78,7 +78,7 @@ export const Navigation = () => {
                 fullWidth
                 justify="left"
               >
-                {t("dashboardLayout.appointmentTypes")}
+                {t("entities.appointmentType.name.plural")}
               </Button>
             </Stack>
           </Stack>
