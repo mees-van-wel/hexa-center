@@ -1,1 +1,0 @@
-ALTER TABLE "appointmentTypes" ALTER COLUMN "color" SET NOT NULL;
