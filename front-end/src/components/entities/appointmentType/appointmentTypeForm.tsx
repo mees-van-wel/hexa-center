@@ -22,7 +22,7 @@ export const AppointmentTypeForm = ({ disabled }: AppointmentTypeFormProps) => {
   >();
   var duration = require("dayjs/plugin/duration");
   dayjs.extend(duration);
-
+  console.log(formState.defaultValues);
   return (
     <Paper p="md">
       <Stack>
@@ -54,19 +54,9 @@ export const AppointmentTypeForm = ({ disabled }: AppointmentTypeFormProps) => {
           render={({ field, fieldState: { error } }) => (
             <TimeInput
               {...field}
-              value={
-                field.value ? dayjs.duration(field.value).format("HH:mm") : ""
-              }
+              value={field.value ? field.value : ""}
               onChange={(event) => {
-                const time = event.target.value;
-                const isoValue = time
-                  ? dayjs
-                      .duration(
-                        `PT${time.split(":")[0]}H${time.split(":")[1]}M`,
-                      )
-                      .toISOString()
-                  : null;
-                field.onChange(isoValue);
+                field.onChange(event.target.value);
               }}
               label={t("entities.appointmentType.duration")}
               error={error?.message}
