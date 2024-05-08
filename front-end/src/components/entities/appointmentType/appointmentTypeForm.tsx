@@ -22,7 +22,7 @@ export const AppointmentTypeForm = ({ disabled }: AppointmentTypeFormProps) => {
   >();
   var duration = require("dayjs/plugin/duration");
   dayjs.extend(duration);
-  console.log(formState.defaultValues);
+
   return (
     <Paper p="md">
       <Stack>
