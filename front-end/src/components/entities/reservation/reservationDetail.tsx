@@ -461,6 +461,7 @@ export const ReservationDetail = ({
 
                       const isFinalInvoice = dayjs(reservation.endDate).isSame(
                         periodEndDate,
+                        "day",
                       );
 
                       const color =

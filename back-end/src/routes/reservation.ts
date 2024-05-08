@@ -229,9 +229,10 @@ export const reservationRouter = router({
         vatRate: string | null;
       }[] = [];
 
-      const isFinalInvoice = dayjs(reservation.endDate).isSame(
-        input.periodEndDate,
-      );
+      const isFinalInvoice = dayjs(reservation.endDate)
+        // TODO Patch, should be fixed by changing the reservation timestamps to dates
+        .add(2, "hour")
+        .isSame(input.periodEndDate);
 
       const periodNights = dayjs(input.periodEndDate).diff(
         input.periodStartDate,
