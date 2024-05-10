@@ -53,7 +53,7 @@ export default function Page() {
           title={[
             {
               icon: <IconBuilding />,
-              label: t("entities.business.pluralName"),
+              label: t("entities.company.pluralName"),
               href: "/businesses",
             },
             { label: t("common.new") },
@@ -96,7 +96,7 @@ const SaveButton = () => {
     ]);
 
     notifications.show({
-      message: t("entities.business.createdNotification"),
+      message: t("entities.company.createdNotification"),
       color: "green",
     });
 

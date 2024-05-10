@@ -76,12 +76,12 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
         router.refresh();
 
         notifications.show({
-          message: "Issued successfully",
+          message: t("entities.invoice.issuedSucces"),
           color: "green",
         });
       } catch (error) {
         notifications.show({
-          title: "There was an error while issuing",
+          title: t("entities.invoice.issuedfailed"),
           // @ts-ignore
           message: error?.message || "...",
           color: "red",
@@ -134,7 +134,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
         printWindow.print();
         URL.revokeObjectURL(blobUrl);
       };
-    else alert("Please allow popups to print the document.");
+    else alert(t("entities.invoice.printDocumentAlert"));
 
     setPrintLoading(false);
   };
@@ -150,12 +150,12 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
           router.refresh();
 
           notifications.show({
-            message: "Mailed successfully",
+            message: t("entities.invoice.mailedSucces"),
             color: "green",
           });
         } catch (error) {
           notifications.show({
-            title: "There was an error while mailing",
+            title: t("entities.invoice.mailedFailed"),
             // @ts-ignore
             message: error?.message || "...",
             color: "red",
@@ -181,7 +181,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
           });
         } catch (error) {
           notifications.show({
-            title: "There was an error while crediting",
+            title: t("entities.invoice.creditSucces"),
             // @ts-ignore
             message: error?.message || "...",
             color: "red",
@@ -201,7 +201,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
         router.back();
 
         notifications.show({
-          message: "Invoice successfully deleted",
+          message: t("entities.invoice.deleted"),
           color: "green",
         });
       },
@@ -251,7 +251,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
               leftSection={<IconFileArrowRight />}
               onClick={issueHandler}
             >
-              Issue
+              {t("entities.invoice.issue")}
             </Button>
             <Button
               color="red"
@@ -272,7 +272,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                 loading={mailInvoice.loading}
                 onClick={mailHandler}
               >
-                {hasBeenMailed ? "Remail" : "Mail"}
+                {hasBeenMailed ? t("common.remail") : t("common.mail")}
               </Button>
             )}
             <Button
@@ -280,14 +280,14 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
               leftSection={<IconDownload />}
               onClick={downloadHandler}
             >
-              Download PDF
+              {t("common.downloadPdf")}
             </Button>
             <Button
               loading={printLoading}
               leftSection={<IconPrinter />}
               onClick={printHandler}
             >
-              Print
+              {t("common.print")}
             </Button>
           </>
         )}
@@ -297,7 +297,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
             leftSection={<IconFileArrowLeft />}
             onClick={creditHandler}
           >
-            Credit
+            {t("entities.invoice.credit")}
           </Button>
         )}
         <Badge
@@ -311,7 +311,12 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
       </DashboardHeader>
       <Group align="stretch">
         <Paper p="2rem" style={{ flex: 1 }}>
-          <Band title={<Title order={3}>Invoice</Title>} fh>
+          <Band
+            title={
+              <Title order={3}>{t("entities.invoice.singularName")}</Title>
+            }
+            fh
+          >
             <Group align="stretch" justify="space-between" gap="2rem">
               <Stack align="flex-start">
                 <Button
@@ -323,16 +328,21 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   variant="light"
                   leftSection={<IconExternalLink size="1rem" />}
                 >
-                  {invoice.refType} {invoice.refId}
+                  {t(`entities.${invoice.refType}.singularName`)}{" "}
+                  {invoice.refId}
                 </Button>
                 <div>
                   <p>
-                    <strong>{t("entities.invoice.type")}:</strong>{" "}
-                    <Badge variant="light">{invoice.type}</Badge>
+                    <strong>{t("entities.invoice.type.name")}:</strong>{" "}
+                    <Badge variant="light">
+                      {t(`entities.invoice.type.${invoice.type}`)}
+                    </Badge>
                   </p>
                   <p>
-                    <strong>{t("entities.invoice.status")}:</strong>{" "}
-                    <Badge variant="light">{invoice.status}</Badge>
+                    <strong>{t("entities.invoice.status.name")}:</strong>{" "}
+                    <Badge variant="light">
+                      {t(`entities.invoice.status.${invoice.status}`)}
+                    </Badge>
                   </p>
                 </div>
                 <div>
@@ -364,7 +374,8 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                 </div>
                 {invoice.notes && (
                   <p>
-                    <strong>Notes:</strong> {invoice.notes}
+                    <strong>{t("entities.invoice.notes")}:</strong>{" "}
+                    {invoice.notes}
                   </p>
                 )}
               </Stack>
@@ -433,13 +444,13 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   <div>
                     {(invoice.customerEmail || invoice.customer?.email) && (
                       <p style={{ whiteSpace: "nowrap" }}>
-                        Email address:{" "}
+                        {t("common.email")}:{" "}
                         {invoice.customerEmail || invoice.customer?.email}
                       </p>
                     )}
                     {(invoice.customerPhone || invoice.customer?.phone) && (
                       <p style={{ whiteSpace: "nowrap" }}>
-                        Phone number:{" "}
+                        {t("common.phone")}:{" "}
                         {invoice.customerPhone || invoice.customer?.phone}
                       </p>
                     )}
@@ -449,19 +460,21 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   <div>
                     {customerCocNumber && (
                       <p style={{ whiteSpace: "nowrap" }}>
-                        Coc-number: {customerCocNumber}
+                        {t("entities.customer.cocNumber")}: {customerCocNumber}
                       </p>
                     )}
                     {customerVatId && (
                       <p style={{ whiteSpace: "nowrap" }}>
-                        VAT ID: {customerVatId}
+                        {t("entities.customer.vatId")}: {customerVatId}
                       </p>
                     )}
                   </div>
                 )}
               </Stack>
             </Band>
-            <Band title={<Title order={3}>Your details</Title>}>
+            <Band
+              title={<Title order={3}>{t("invoicePage.yourDetails")}</Title>}
+            >
               <Stack align="flex-start">
                 {invoice.customerId ? (
                   <Button
@@ -508,29 +521,31 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                 </div>
                 <div>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    Email address:{" "}
+                    {t("common.email")}:{" "}
                     {invoice.companyEmail || invoice.company?.email}
                   </p>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    Phone number:{" "}
+                    {t("common.phone")}:{" "}
                     {invoice.companyPhone || invoice.company?.phone}
                   </p>
                 </div>
                 <div>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    VAT ID: {invoice.companyVatId || invoice.company?.vatId}
+                    {t("entities.customer.vatId")}:{" "}
+                    {invoice.companyVatId || invoice.company?.vatId}
                   </p>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    CoC-number:{" "}
+                    {t("entities.customer.cocNumber")}:{" "}
                     {invoice.companyCocNumber || invoice.company?.cocNumber}
                   </p>
                 </div>
                 <div>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    IBAN: {invoice.companyIban || invoice.company?.iban}
+                    {t("entities.company.iban")}:{" "}
+                    {invoice.companyIban || invoice.company?.iban}
                   </p>
                   <p style={{ whiteSpace: "nowrap" }}>
-                    BIC/SWIFT:{" "}
+                    {t("entities.company.swiftBic")}:{" "}
                     {invoice.companySwiftBic || invoice.company?.swiftBic}
                   </p>
                 </div>
@@ -539,7 +554,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
           </Band.Group>
         </Paper>
         <Paper p="2rem" style={{ flex: 1 }}>
-          <Band title={<Title order={3}>Timeline</Title>} fh>
+          <Band title={<Title order={3}>{t("invoicePage.timeline")}</Title>} fh>
             <ScrollArea h={300} type="always" offsetScrollbars>
               <Timeline
                 active={invoice.events.length}
@@ -629,12 +644,12 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
           <Table>
             <Table.Thead>
               <Table.Tr>
-                <Table.Th>Name</Table.Th>
-                <Table.Th>Unit price</Table.Th>
-                <Table.Th>Quantity</Table.Th>
-                <Table.Th>Total net amount</Table.Th>
-                <Table.Th>VAT</Table.Th>
-                <Table.Th>Total gross amount</Table.Th>
+                <Table.Th>{t("common.name")}</Table.Th>
+                <Table.Th>{t("invoicePage.lines.unitPrice")}</Table.Th>
+                <Table.Th>{t("invoicePage.lines.quantity")}</Table.Th>
+                <Table.Th>{t("invoicePage.lines.totalNetAmount")}</Table.Th>
+                <Table.Th>{t("invoicePage.lines.vat")}</Table.Th>
+                <Table.Th>{t("invoicePage.lines.totalGrossAmount")}</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
@@ -702,7 +717,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   }}
                 >
                   <Text size="1.25rem" fw={700}>
-                    Total
+                    {t("common.total")}
                   </Text>
                 </Table.Td>
                 <Table.Td

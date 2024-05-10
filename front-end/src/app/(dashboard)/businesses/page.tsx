@@ -22,7 +22,7 @@ export default function Page() {
     <Stack>
       <DashboardHeader
         title={[
-          { icon: <IconBuilding />, label: t("entities.business.pluralName") },
+          { icon: <IconBuilding />, label: t("entities.company.pluralName") },
         ]}
       >
         <Button

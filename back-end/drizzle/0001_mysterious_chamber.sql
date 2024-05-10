@@ -1,0 +1,2 @@
+ALTER TABLE "reservations_to_invoices" ALTER COLUMN "period_start_date" SET DATA TYPE timestamp WITHOUT TIME ZONE USING "period_start_date" AT TIME ZONE 'Europe/Amsterdam';--> statement-breakpoint
+ALTER TABLE "reservations_to_invoices" ALTER COLUMN "period_end_date" SET DATA TYPE timestamp WITHOUT TIME ZONE USING "period_end_date" AT TIME ZONE 'Europe/Amsterdam';

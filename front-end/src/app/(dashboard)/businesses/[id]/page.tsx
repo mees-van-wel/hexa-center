@@ -83,7 +83,7 @@ const Detail = ({ business }: DetailProps) => {
         memory.evict(business);
 
         notifications.show({
-          message: t("entities.business.deletedNotification"),
+          message: t("entities.company.deletedNotification"),
           color: "green",
         });
 
@@ -100,7 +100,7 @@ const Detail = ({ business }: DetailProps) => {
           title={[
             {
               icon: <IconBuilding />,
-              label: t("entities.business.pluralName"),
+              label: t("entities.company.pluralName"),
               href: "/businesses",
             },
             { label: business.name },

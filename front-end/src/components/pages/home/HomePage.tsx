@@ -34,7 +34,9 @@ export default function HomePage({ newsItems }: { newsItems: NewsItem[] }) {
 
   return (
     <>
-      <DashboardHeader title={[{ label: "Home", icon: <IconHome /> }]} />
+      <DashboardHeader
+        title={[{ label: t("homePage.name"), icon: <IconHome /> }]}
+      />
       <Group justify="space-between" align="flex-start" p="md">
         <Sheet title={t("homePage.welcome")} glass>
           <Title>
