@@ -1,12 +1,9 @@
-import { useFormContext } from "react-hook-form";
-
 import { notifications } from "@mantine/notifications";
 
 import { useTranslation } from "./useTranslation";
 
 export function useException() {
   const t = useTranslation();
-  const { reset, setError } = useFormContext();
 
   function isJson(str: string) {
     if (!str) return { success: false, json: undefined };
@@ -18,12 +15,7 @@ export function useException() {
     }
   }
 
-  function handleJsonResult(
-    error: any,
-    entity: string,
-    // value: string,
-    // column: string,
-  ) {
+  function handleJsonResult(error: any, entity: string) {
     const { success, json } = isJson((error as any).message);
 
     if (!success) {
@@ -32,31 +24,24 @@ export function useException() {
         color: "red",
       });
 
-      reset();
-
-      return { success: false, exception: undefined, data: undefined };
+      return { success: false };
     }
 
     const { exception, data } = json;
 
     if (exception === "DB_UNIQUE_CONSTRAINT") {
-      setError(data.column, {
-        message: `${
-          data.column.charAt(0).toUpperCase() + data.column.slice(1)
-        } ${t("exceptions.DB_UNIQUE")} ${entity.toLowerCase()}`,
-      });
+      return {
+        column: data.column,
+        exception: "DB_UNIQUE_CONSTRAINT",
+        error: t("exceptions.DB_UNIQUE", entity, data.value, data.column),
+      };
     }
 
-    // if (exception === "DB_KEY_CONSTRAINT")
-    //   notifications.show({
-    //     message: t("exceptions.DB_KEY_CONSTRAINT", {
-    //       depend: data.depend,
-    //       entity: t("entities.user.singularName"),
-    //     }),
-    //     color: "red",
-    //   });
-
-    // return { success: true, exception, data };
+    if (exception === "DB_KEY_CONSTRAINT")
+      notifications.show({
+        message: t("exceptions.DB_STRICT", data.depend, entity),
+        color: "red",
+      });
   }
 
   return { isJson, handleJsonResult };

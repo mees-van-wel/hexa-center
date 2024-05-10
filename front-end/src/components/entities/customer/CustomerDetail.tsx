@@ -12,6 +12,7 @@ import {
 import { Metadata } from "@/components/common/Metadata";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { useAutosave } from "@/hooks/useAutosave";
+import { useException } from "@/hooks/useException";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
 import {
@@ -40,6 +41,7 @@ export const CustomerDetail = ({ customer }: CustomerDetailProps) => {
   const deleteCustomer = useMutation("customer", "delete");
   const router = useRouter();
   const t = useTranslation();
+  const { handleJsonResult } = useException();
 
   const formMethods = useForm({
     defaultValues: customer,
@@ -51,14 +53,18 @@ export const CustomerDetail = ({ customer }: CustomerDetailProps) => {
       title: t("common.areYouSure"),
       labels: { confirm: t("common.yes"), cancel: t("common.no") },
       onConfirm: async () => {
-        await deleteCustomer.mutate(customer.id);
+        try {
+          await deleteCustomer.mutate(customer.id);
 
-        notifications.show({
-          message: t("entities.customer.deletedNotification"),
-          color: "green",
-        });
+          notifications.show({
+            message: t("entities.customer.deletedNotification"),
+            color: "green",
+          });
 
-        router.push("/customers");
+          router.push("/customers");
+        } catch (error) {
+          handleJsonResult(error, t("entities.customer.singularName"));
+        }
       },
     });
   };
@@ -98,6 +104,7 @@ export const CustomerDetail = ({ customer }: CustomerDetailProps) => {
 const SaveBadge = () => {
   const updateCustomer = useMutation("customer", "update");
   const t = useTranslation();
+  const { handleJsonResult } = useException();
 
   const { control, getValues, reset, setError } =
     useFormContext<CustomerUpdateInputSchema>();
@@ -105,16 +112,6 @@ const SaveBadge = () => {
   const isError = useMemo(() => !!Object.keys(errors).length, [errors]);
 
   useAutosave(control, async (values) => {
-    function isJson(str: string) {
-      if (!str) return { success: false, json: undefined };
-
-      try {
-        return { success: true, json: JSON.parse(str) };
-      } catch (e) {
-        return { success: false, json: undefined };
-      }
-    }
-
     try {
       const updatedCustomer = await updateCustomer.mutate({
         ...values,
@@ -123,28 +120,14 @@ const SaveBadge = () => {
 
       reset(updatedCustomer);
     } catch (error) {
-      // TODO Fix typings
-      const { success, json } = isJson((error as any).message);
-      if (!success) {
-        notifications.show({
-          message: t("common.oops"),
-          color: "red",
-        });
+      const errorResult = handleJsonResult(
+        error,
+        t("entities.customer.singularName"),
+      );
 
-        reset();
-
-        return;
-      }
-
-      const { exception, data } = json;
-
-      if (exception === "DB_UNIQUE_CONSTRAINT") {
-        setError(data.column, {
-          message: `${t("entities.customer.singularName")} - ${getValues(
-            data.column,
-          )} - ${data.column}`,
-        });
-      }
+      if (errorResult?.error)
+        setError(errorResult?.column, { message: errorResult.error });
+      else if (!errorResult?.success) reset();
     }
   });
 

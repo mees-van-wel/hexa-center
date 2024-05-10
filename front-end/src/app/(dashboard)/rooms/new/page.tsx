@@ -11,6 +11,7 @@ import {
 
 import { RoomForm } from "@/components/entities/room/RoomForm";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
+import { useException } from "@/hooks/useException";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
 import { RoomCreateSchema, RoomInputCreateSchema } from "@/schemas/room";
@@ -51,6 +52,7 @@ const SaveButton = () => {
   const createRoom = useMutation("room", "create");
   const router = useRouter();
   const t = useTranslation();
+  const { handleJsonResult } = useException();
 
   const { control, handleSubmit } = useFormContext<RoomInputCreateSchema>();
   const { isDirty } = useFormState({ control });
@@ -58,14 +60,18 @@ const SaveButton = () => {
   const submitHandler: SubmitHandler<RoomInputCreateSchema> = async (
     values,
   ) => {
-    const response = await createRoom.mutate(values);
+    try {
+      const response = await createRoom.mutate(values);
 
-    notifications.show({
-      message: t("entities.room.createdNotification"),
-      color: "green",
-    });
+      notifications.show({
+        message: t("entities.room.createdNotification"),
+        color: "green",
+      });
 
-    router.push(`/rooms/${response.id}`);
+      router.push(`/rooms/${response.id}`);
+    } catch (error) {
+      handleJsonResult(error, t("entities.room.singularName"));
+    }
   };
 
   return (

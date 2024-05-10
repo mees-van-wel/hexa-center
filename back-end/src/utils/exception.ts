@@ -17,22 +17,24 @@ export const createPgException = (error: any) => {
 
   console.warn(error);
 
-  if (exception === "DB_UNIQUE_CONSTRAINT")
+  if (exception === "DB_UNIQUE_CONSTRAINT") {
+    const match = error.detail.match(/\(name\)=\((.*?)\)/);
+
     return new TRPCError({
       code: "BAD_REQUEST",
       message: JSON.stringify({
         exception,
-        data: { column: error.constraint_name.split("_")[1] },
+        data: { column: error.constraint_name.split("_")[1], value: match[1] },
       }),
     });
+  }
 
   if (exception === "DB_KEY_CONSTRAINT")
     return new TRPCError({
       code: "BAD_REQUEST",
       message: JSON.stringify({
         exception,
-        // TODO retrieve depend name from error
-        data: { depend: "Business" },
+        data: { depend: error.table_name },
       }),
     });
 

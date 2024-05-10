@@ -10,7 +10,7 @@ type BusinessPageParams = {
 export default async function Page({ params }: BusinessPageParams) {
   const trpc = getTrpcClientOnServer();
 
-  const business = await trpc.business.get.query(parseInt(params.id));
+  const business = await trpc.business.list.query();
 
   return <BusinessDetail business={business} />;
 }

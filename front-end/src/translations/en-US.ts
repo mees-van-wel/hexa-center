@@ -1,3 +1,5 @@
+"use client";
+
 import { Translation } from "@/types/translation";
 
 export default {
@@ -39,8 +41,12 @@ export default {
     total: "Total",
   },
   exceptions: {
-    DB_UNIQUE: "already exists inside another",
-    DB_STRICT: "",
+    DB_UNIQUE: (entity, value, column) =>
+      `A ${entity} with a ${column} of ${value} already exists.`,
+    DB_STRICT: (depend, entity) =>
+      `There are one or more ${depend} using this ${entity}, please delete them first.`,
+    DB_STRICT_second: "using this",
+    DB_STRICT_last: ", please delete them first.",
   },
   modules: {
     essentials: "Essentials",

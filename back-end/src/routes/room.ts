@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { number } from "valibot";
 
 import { RoomCreateSchema, RoomUpdateSchema } from "@/schemas/room";
+import { createPgException } from "@/utils/exception";
 import { wrap } from "@decs/typeschema";
 import { TRPCError } from "@trpc/server";
 
@@ -12,29 +13,33 @@ export const roomRouter = router({
   create: procedure
     .input(wrap(RoomCreateSchema))
     .mutation(async ({ input, ctx }) => {
-      const result = await ctx.db
-        .insert(rooms)
-        .values({
-          ...input,
-          createdById: ctx.user.id,
-          updatedById: ctx.user.id,
-          businessId: 1,
-        })
-        .returning({
-          $kind: rooms.$kind,
-          id: rooms.id,
-          createdAt: rooms.createdAt,
-          createdById: rooms.createdById,
-          updatedAt: rooms.updatedAt,
-          updatedById: rooms.updatedById,
-          name: rooms.name,
-          price: rooms.price,
-        });
+      try {
+        const result = await ctx.db
+          .insert(rooms)
+          .values({
+            ...input,
+            createdById: ctx.user.id,
+            updatedById: ctx.user.id,
+            businessId: 1,
+          })
+          .returning({
+            $kind: rooms.$kind,
+            id: rooms.id,
+            createdAt: rooms.createdAt,
+            createdById: rooms.createdById,
+            updatedAt: rooms.updatedAt,
+            updatedById: rooms.updatedById,
+            name: rooms.name,
+            price: rooms.price,
+          });
 
-      const room = result[0];
-      if (!room) throw new TRPCError({ code: "NOT_FOUND" });
+        const room = result[0];
+        if (!room) throw new TRPCError({ code: "NOT_FOUND" });
 
-      return room;
+        return room;
+      } catch (error) {
+        throw createPgException(error);
+      }
     }),
   list: procedure.query(({ ctx }) =>
     ctx.db
@@ -67,29 +72,32 @@ export const roomRouter = router({
   update: procedure
     .input(wrap(RoomUpdateSchema))
     .mutation(async ({ input, ctx }) => {
-      const result = await ctx.db
-        .update(rooms)
-        .set({
-          ...input,
-          updatedAt: new Date(),
-          updatedById: ctx.user.id,
-        })
-        .where(eq(rooms.id, input.id))
-        .returning({
-          $kind: rooms.$kind,
-          id: rooms.id,
-          createdAt: rooms.createdAt,
-          createdById: rooms.createdById,
-          updatedAt: rooms.updatedAt,
-          updatedById: rooms.updatedById,
-          name: rooms.name,
-          price: rooms.price,
-        });
+      try {
+        const result = await ctx.db
+          .update(rooms)
+          .set({
+            ...input,
+            updatedAt: new Date(),
+            updatedById: ctx.user.id,
+          })
+          .where(eq(rooms.id, input.id))
+          .returning({
+            $kind: rooms.$kind,
+            id: rooms.id,
+            createdAt: rooms.createdAt,
+            createdById: rooms.createdById,
+            updatedAt: rooms.updatedAt,
+            updatedById: rooms.updatedById,
+            name: rooms.name,
+            price: rooms.price,
+          });
 
-      const room = result[0];
-      if (!room) throw new TRPCError({ code: "NOT_FOUND" });
+        const room = result[0];
 
-      return room;
+        return room;
+      } catch (error) {
+        throw createPgException(error);
+      }
     }),
   delete: procedure
     .input(wrap(number()))

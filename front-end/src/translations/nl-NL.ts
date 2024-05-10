@@ -1,3 +1,5 @@
+"use client";
+
 import { Translation } from "@/types/translation";
 
 export default {
@@ -39,8 +41,12 @@ export default {
     total: "Totaal",
   },
   exceptions: {
-    DB_UNIQUE: "already exists.",
-    DB_STRICT: "",
+    DB_UNIQUE: (entity, value, column) =>
+      `Er bestaat al een ${entity} met ${value} als ${column}.`,
+    DB_STRICT: (depend, entity) =>
+      `Er zijn een of meerdere ${depend} die deze ${entity} gebruiken, verwijder ze eerst.`,
+    DB_STRICT_second: "die dit gebruiken",
+    DB_STRICT_last: ", verwijder deze eerst.",
   },
   modules: {
     essentials: "Essentieel",

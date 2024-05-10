@@ -47,8 +47,10 @@ export type Translation = {
     total: string;
   };
   exceptions: {
-    DB_UNIQUE: string;
-    DB_STRICT: string;
+    DB_UNIQUE: (entity: string, value: string, column: string) => string;
+    DB_STRICT: (depend: string, entity: string) => string;
+    DB_STRICT_second: string;
+    DB_STRICT_last: string;
   };
   modules: {
     essentials: string;

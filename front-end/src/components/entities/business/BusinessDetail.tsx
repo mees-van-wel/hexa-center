@@ -12,6 +12,7 @@ import {
 import { Metadata } from "@/components/common/Metadata";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { useAutosave } from "@/hooks/useAutosave";
+import { useException } from "@/hooks/useException";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
 import {
@@ -97,23 +98,14 @@ export const BusinessDetail = ({ business }: BusinessPageProps) => {
 const SaveBadge = () => {
   const updateBusiness = useMutation("business", "update");
   const t = useTranslation();
+  const { handleJsonResult } = useException();
 
-  const { control, getValues, reset, setError } =
+  const { control, getValues, reset } =
     useFormContext<BusinessUpdateInputSchema>();
   const { isDirty, errors } = useFormState({ control });
   const isError = useMemo(() => !!Object.keys(errors).length, [errors]);
 
   useAutosave(control, async (values) => {
-    function isJson(str: string) {
-      if (!str) return { success: false, json: undefined };
-
-      try {
-        return { success: true, json: JSON.parse(str) };
-      } catch (e) {
-        return { success: false, json: undefined };
-      }
-    }
-
     try {
       const updatedBusiness = await updateBusiness.mutate({
         ...values,
@@ -122,27 +114,8 @@ const SaveBadge = () => {
 
       reset(updatedBusiness);
     } catch (error) {
-      const { success, json } = isJson((error as any).message);
-      if (!success) {
-        notifications.show({
-          message: t("common.oops"),
-          color: "red",
-        });
-
-        reset();
-
-        return;
-      }
-
-      const { exception, data } = json;
-
-      if (exception === "DB_UNIQUE_CONSTRAINT") {
-        setError(data.column, {
-          message: `${t("entities.company.singularName")} - ${getValues(
-            data.column,
-          )} - ${data.column}`,
-        });
-      }
+      console.log(error);
+      handleJsonResult(error, t("entities.company.singularName"));
     }
   });
 

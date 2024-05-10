@@ -128,9 +128,11 @@ export const userRouter = router({
         throw createPgException(error);
       }
     }),
-  delete: procedure
-    .input(wrap(number()))
-    .mutation(({ input, ctx }) =>
-      ctx.db.delete(users).where(eq(users.id, input)),
-    ),
+  delete: procedure.input(wrap(number())).mutation(({ input, ctx }) => {
+    try {
+      return ctx.db.delete(users).where(eq(users.id, input));
+    } catch (error) {
+      throw createPgException(error);
+    }
+  }),
 });

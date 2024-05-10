@@ -12,6 +12,7 @@ import {
 import { Metadata } from "@/components/common/Metadata";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { useAutosave } from "@/hooks/useAutosave";
+import { useException } from "@/hooks/useException";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
 import { RoomInputUpdateSchema, RoomUpdateSchema } from "@/schemas/room";
@@ -93,23 +94,13 @@ export const RoomUpdate = ({ room }: RoomProps) => {
 const SaveBadge = () => {
   const updateRoom = useMutation("room", "update");
   const t = useTranslation();
+  const { handleJsonResult } = useException();
 
-  const { control, getValues, reset, setError } =
-    useFormContext<RoomInputUpdateSchema>();
+  const { control, getValues, reset } = useFormContext<RoomInputUpdateSchema>();
   const { isDirty, errors } = useFormState({ control });
   const isError = useMemo(() => !!Object.keys(errors).length, [errors]);
 
   useAutosave(control, async (values) => {
-    function isJson(str: string) {
-      if (!str) return { success: false, json: undefined };
-
-      try {
-        return { success: true, json: JSON.parse(str) };
-      } catch (e) {
-        return { success: false, json: undefined };
-      }
-    }
-
     try {
       const updatedRoom = await updateRoom.mutate({
         ...values,
@@ -118,27 +109,7 @@ const SaveBadge = () => {
 
       reset(updatedRoom);
     } catch (error) {
-      const { success, json } = isJson((error as any).message);
-      if (!success) {
-        notifications.show({
-          message: t("common.oops"),
-          color: "red",
-        });
-
-        reset();
-
-        return;
-      }
-
-      const { exception, data } = json;
-
-      if (exception === "DB_UNIQUE_CONSTRAINT") {
-        setError(data.column, {
-          message: `${t("entities.room.singularName")} - ${getValues(
-            data.column,
-          )} - ${data.column}`,
-        });
-      }
+      handleJsonResult(error, t("entities.room.singularName"));
     }
   });
 

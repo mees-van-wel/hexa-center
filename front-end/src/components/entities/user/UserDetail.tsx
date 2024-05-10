@@ -40,6 +40,7 @@ export const UserDetail = ({ user }: UserDetailProps) => {
   const authUser = useAuthUser();
   const router = useRouter();
   const t = useTranslation();
+  const { handleJsonResult } = useException();
 
   const formMethods = useForm({
     defaultValues: user,
@@ -53,14 +54,18 @@ export const UserDetail = ({ user }: UserDetailProps) => {
       title: t("common.areYouSure"),
       labels: { confirm: t("common.yes"), cancel: t("common.no") },
       onConfirm: async () => {
-        await deleteUser.mutate(user.id);
+        try {
+          await deleteUser.mutate(user.id);
 
-        notifications.show({
-          message: t("entities.user.deletedNotification"),
-          color: "green",
-        });
+          notifications.show({
+            message: t("entities.user.deletedNotification"),
+            color: "green",
+          });
 
-        router.push("/users");
+          router.push("/users");
+        } catch (error) {
+          handleJsonResult(error, t("entities.user.singularName"));
+        }
       },
     });
   };
