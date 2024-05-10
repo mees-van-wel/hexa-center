@@ -1,9 +1,10 @@
 import { eq } from "drizzle-orm";
 import { number } from "valibot";
 
-import { productInstances, productTemplates } from "@/db/schema";
-import { procedure, router } from "@/trpc";
-import { wrap } from "@decs/typeschema";
+import { wrap } from "@typeschema/valibot";
+
+import { productInstances, productTemplates } from "~/db/schema";
+import { procedure, router } from "~/trpc";
 
 export const productRouter = router({
   list: procedure.query(({ ctx }) =>

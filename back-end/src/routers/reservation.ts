@@ -12,21 +12,22 @@ import {
   string,
 } from "valibot";
 
+import { TRPCError } from "@trpc/server";
+import { wrap } from "@typeschema/valibot";
+
 import {
   productInstances,
   reservations,
   reservationsToInvoices,
   reservationsToProductInstances,
-} from "@/db/schema";
+} from "~/db/schema";
 import {
   ReservationCreateSchema,
   ReservationUpdateSchema,
-} from "@/schemas/reservation";
-import { createInvoice } from "@/services/invoice";
-import { getSetting } from "@/services/setting";
-import { procedure, router } from "@/trpc";
-import { wrap } from "@decs/typeschema";
-import { TRPCError } from "@trpc/server";
+} from "~/schemas/reservation";
+import { createInvoice } from "~/services/invoice";
+import { getSetting } from "~/services/setting";
+import { procedure, router } from "~/trpc";
 
 export const reservationRouter = router({
   create: procedure

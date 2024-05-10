@@ -1,6 +1,6 @@
 import * as jose from "jose";
 
-import { Stringified } from "@/types";
+import { Stringified } from "~/types";
 
 export type JWT<T> = Stringified<T>;
 

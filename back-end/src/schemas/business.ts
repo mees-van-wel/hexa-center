@@ -10,7 +10,7 @@ import {
   string,
 } from "valibot";
 
-import { toNull } from "@/valibotPipes/toNull";
+import { toNull } from "~/valibotPipes/toNull";
 
 export const BusinessCreateSchema = object({
   name: string([minLength(2)]),

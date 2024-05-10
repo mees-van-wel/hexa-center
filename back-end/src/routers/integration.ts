@@ -1,13 +1,14 @@
 import { eq } from "drizzle-orm";
 import { picklist, string } from "valibot";
 
-import { integrationConnections } from "@/db/schema";
+import { wrap } from "@typeschema/valibot";
+
+import { integrationConnections } from "~/db/schema";
 import {
   connectTwinfield,
   TwinfieldIntegrationData,
-} from "@/services/integration";
-import { procedure, router } from "@/trpc";
-import { wrap } from "@decs/typeschema";
+} from "~/services/integration";
+import { procedure, router } from "~/trpc";
 
 export const integrationRouter = router({
   list: procedure.query(({ ctx }) =>

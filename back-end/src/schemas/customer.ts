@@ -9,8 +9,8 @@ import {
   string,
 } from "valibot";
 
-import { nullableEmail } from "@/valibotPipes/nullableEmail";
-import { toNull } from "@/valibotPipes/toNull";
+import { nullableEmail } from "~/valibotPipes/nullableEmail";
+import { toNull } from "~/valibotPipes/toNull";
 
 // TODO picklist options from constant
 // TODO Phone number validation pipe

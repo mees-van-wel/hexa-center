@@ -1,7 +1,7 @@
 import ejs from "ejs";
 import puppeteer from "puppeteer";
 
-import { PDFTemplate, PDFTemplateVariables } from "@/constants/pdfTemplates";
+import { PDFTemplate, PDFTemplateVariables } from "~/constants/pdfTemplates";
 
 import { isProduction } from "./environment";
 import { readFile } from "./fileSystem";

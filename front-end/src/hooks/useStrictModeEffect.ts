@@ -5,7 +5,7 @@ import {
   useRef,
 } from "react";
 
-import { isProduction } from "@back-end/utils/environment";
+import { isProduction } from "@/utils/environment";
 
 export const useStrictModeEffect = (
   effect: EffectCallback,

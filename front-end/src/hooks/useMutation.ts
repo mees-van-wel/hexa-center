@@ -22,6 +22,8 @@ export const useMutation = <
 
     const trpc = getTrpcClientOnClient();
 
+    const lol = await trpc.user.list.query();
+
     // @ts-ignore
     const result: RouterOutput[T][P] = await trpc[scope][procedure]
       .mutate(params, { signal: options?.signal })

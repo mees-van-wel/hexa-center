@@ -1,9 +1,7 @@
-import type {
-  AppRouter as AR,
-  RouterInput as RI,
-  RouterOutput as RO,
-} from "@back-end/routes/_app";
+import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
+
+import type { AppRouter as AR } from "~/routers/_app";
 
 export type AppRouter = AR;
-export type RouterInput = RI;
-export type RouterOutput = RO;
+export type RouterInput = inferRouterInputs<AR>;
+export type RouterOutput = inferRouterOutputs<AR>;

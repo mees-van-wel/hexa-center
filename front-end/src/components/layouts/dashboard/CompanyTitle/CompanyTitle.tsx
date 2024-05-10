@@ -5,7 +5,7 @@ import Image from "next/image";
 import iconBlack from "@/assets/images/icon-black.svg";
 import iconWhite from "@/assets/images/icon-white.svg";
 import { useCompanyName } from "@/hooks/useCompanyName";
-import { isProduction } from "@back-end/utils/environment";
+import { isProduction } from "@/utils/environment";
 import { Group, Stack, Title } from "@mantine/core";
 
 export const CompanyTitle = () => {

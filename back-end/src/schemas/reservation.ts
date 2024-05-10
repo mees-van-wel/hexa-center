@@ -9,7 +9,7 @@ import {
   string,
 } from "valibot";
 
-import { toNull } from "@/valibotPipes/toNull";
+import { toNull } from "~/valibotPipes/toNull";
 
 export const ReservationCreateSchema = object({
   roomId: number(),

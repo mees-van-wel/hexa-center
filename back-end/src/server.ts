@@ -7,7 +7,7 @@ import { createServer } from "http";
 
 import * as trpcExpress from "@trpc/server/adapters/express";
 
-import { appRouter } from "./routes/_app";
+import { appRouter } from "./routers/_app";
 import { ctx } from "./utils/context";
 import { getDatabaseClient } from "./utils/database";
 import { isProduction } from "./utils/environment";
