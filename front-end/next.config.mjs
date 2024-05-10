@@ -8,6 +8,7 @@
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: "standalone",
   images: {
     remotePatterns: [
       {
@@ -17,18 +18,17 @@ const nextConfig = {
     ],
   },
   poweredByHeader: false,
-  output: "standalone",
   experimental: {
     typedRoutes: true,
     optimizePackageImports: ["@mantine/core", "@mantine/hooks"],
   },
-  typescript: {
-    // !! WARN !!
-    // Dangerously allow production builds to successfully complete even if
-    // your project has type errors.
-    // !! WARN !!
-    ignoreBuildErrors: true,
-  },
+  // typescript: {
+  //   // !! WARN !!
+  //   // Dangerously allow production builds to successfully complete even if
+  //   // your project has type errors.
+  //   // !! WARN !!
+  //   ignoreBuildErrors: true,
+  // },
   async headers() {
     return [
       {

@@ -1,25 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
-import { useRouter } from "next/navigation";
-import {
-  FormProvider,
-  useForm,
-  useFormContext,
-  useFormState,
-} from "react-hook-form";
-
-import { Metadata } from "@/components/common/Metadata";
-import { UserForm } from "@/components/entities/user/UserForm";
-import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
-import { useAuthUser } from "@/contexts/AuthContext";
-import { useAutosave } from "@/hooks/useAutosave";
-import { useMemory } from "@/hooks/useMemory";
-import { useMutation } from "@/hooks/useMutation";
-import { useQuery } from "@/hooks/useQuery";
-import { useTranslation } from "@/hooks/useTranslation";
-import { UserUpdateInputSchema, UserUpdateSchema } from "@/schemas/user";
-import { RouterOutput } from "@/utils/trpc";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import {
   Alert,
@@ -38,6 +18,26 @@ import {
   IconTrash,
   IconUsers,
 } from "@tabler/icons-react";
+import { useRouter } from "next/navigation";
+import { useMemo } from "react";
+import {
+  FormProvider,
+  useForm,
+  useFormContext,
+  useFormState,
+} from "react-hook-form";
+
+import { Metadata } from "@/components/common/Metadata";
+import { UserForm } from "@/components/entities/user/UserForm";
+import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
+import { useAuthUser } from "@/contexts/AuthContext";
+import { useAutosave } from "@/hooks/useAutosave";
+import { useMemory } from "@/hooks/useMemory";
+import { useMutation } from "@/hooks/useMutation";
+import { useQuery } from "@/hooks/useQuery";
+import { useTranslation } from "@/hooks/useTranslation";
+import { UserUpdateInputSchema, UserUpdateSchema } from "@/schemas/user";
+import { RouterOutput } from "@/utils/trpc";
 
 type PageParams = { params: { id: string } };
 
@@ -174,6 +174,7 @@ const SaveBadge = () => {
     }
 
     try {
+      // @ts-ignore Fix this
       const updatedUser = await updateUser.mutate({
         ...values,
         id: getValues("id"),

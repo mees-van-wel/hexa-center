@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useId } from "react";
+import { Button, Stack } from "@mantine/core";
+import { IconPlus, IconUserDollar } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect, useId } from "react";
 
 import { useTranslation } from "@/hooks/useTranslation";
 import type { RouterOutput } from "@/utils/trpc";
-import { Button, Stack } from "@mantine/core";
-import { IconPlus, IconUserDollar } from "@tabler/icons-react";
 
 import { Table } from "../../common/Table";
 import { DashboardHeader } from "../../layouts/dashboard/DashboardHeader";

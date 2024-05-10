@@ -1,8 +1,7 @@
 import clsx from "clsx";
 
-import { BandGroup } from "./BandGroup";
-
 import styles from "./Band.module.scss";
+import { BandGroup } from "./BandGroup";
 
 type BandProps = {
   children: React.ReactNode;

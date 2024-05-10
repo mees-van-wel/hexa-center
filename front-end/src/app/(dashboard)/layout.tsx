@@ -1,16 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Drawer, Group, Paper, Stack } from "@mantine/core";
+import { IconDotsVertical } from "@tabler/icons-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
 
 import background from "@/assets/images/bg.jpeg";
 import { CompanyTitle } from "@/components/layouts/dashboard/CompanyTitle";
 import { Navigation } from "@/components/layouts/dashboard/Navigation";
 import { routeHistoryState } from "@/states/routeHistoryState";
-import { Drawer, Group, Paper, Stack } from "@mantine/core";
-import { IconDotsVertical } from "@tabler/icons-react";
 
 import styles from "./layout.module.scss";
 

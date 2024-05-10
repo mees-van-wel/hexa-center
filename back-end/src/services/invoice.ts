@@ -1,9 +1,8 @@
+import { TRPCError } from "@trpc/server";
 import dayjs from "dayjs";
 import Decimal from "decimal.js";
 import { and, desc, eq, or, sql } from "drizzle-orm";
 import ejs from "ejs";
-
-import { TRPCError } from "@trpc/server";
 
 import { Settings } from "~/constants/settings";
 import {
@@ -15,7 +14,7 @@ import {
   invoiceLines,
   invoices,
   logs,
-  reservations,
+  reservationsToInvoices,
 } from "~/db/schema";
 import { getCtx } from "~/utils/context";
 import { readFile } from "~/utils/fileSystem";
@@ -880,20 +879,32 @@ export const issueInvoice = async (
       });
 
       if (invoice.refType === "reservation") {
-        const reservationResult = await db
+        const reservationsToInvoicesResult = await db
           .select({
-            startDate: reservations.startDate,
-            endDate: reservations.endDate,
+            periodStartDate: reservationsToInvoices.periodStartDate,
+            periodEndDate: reservationsToInvoices.periodEndDate,
           })
-          .from(reservations)
-          .where(eq(reservations.id, invoice.refId));
+          .from(reservationsToInvoices)
+          .where(
+            and(
+              eq(reservationsToInvoices.reservationId, invoice.refId),
+              eq(reservationsToInvoices.invoiceId, invoice.id),
+            ),
+          );
 
-        const reservation = reservationResult[0];
+        const reservationToInvoice = reservationsToInvoicesResult[0];
 
-        if (!reservation) {
-          console.warn(`Reservation not found: ${invoice.refId}`);
+        if (!reservationToInvoice) {
+          console.warn(
+            `Reservation To Invoice junction not found: ${invoice.refId} - ${invoice.id}`,
+          );
           return;
         }
+
+        const periodStartDate = dayjs(reservationToInvoice.periodStartDate);
+        const periodEndDate = dayjs(reservationToInvoice.periodEndDate);
+
+        if (periodStartDate.month() === periodEndDate.month()) return;
 
         const balanceAccountMappingResult = await db
           .select()
@@ -957,8 +968,8 @@ export const issueInvoice = async (
             transactionTypeCode: externalTransactionTypeCode,
             transactionNumber,
             balanceAccountCode: externalBalanceAccountCode,
-            startPeriod: dayjs(reservation.startDate).format("YYYY/MM"),
-            endPeriod: dayjs(reservation.endDate).format("YYYY/MM"),
+            startPeriod: periodStartDate.format("YYYY/MM"),
+            endPeriod: periodEndDate.format("YYYY/MM"),
           },
           { async: true },
         );

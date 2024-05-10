@@ -1,7 +1,10 @@
 import { useState } from "react";
 
-import { type RouterInput, type RouterOutput } from "@/utils/trpc";
-import { getTrpcClientOnClient } from "@/utils/trpcForClient";
+import {
+  getTrpcClient,
+  type RouterInput,
+  type RouterOutput,
+} from "@/utils/trpc";
 
 // TODO Error handling
 // TODO Caching
@@ -20,7 +23,7 @@ export const useMutation = <
   ) => {
     setLoading(true);
 
-    const trpc = getTrpcClientOnClient();
+    const trpc = getTrpcClient();
 
     const lol = await trpc.user.list.query();
 

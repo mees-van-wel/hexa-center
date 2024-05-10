@@ -1,5 +1,9 @@
 "use client";
 
+import { valibotResolver } from "@hookform/resolvers/valibot";
+import { Button, Stack } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import { IconDeviceFloppy, IconUserDollar } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import {
   FormProvider,
@@ -17,10 +21,6 @@ import {
   CustomerCreateInputSchema,
   CustomerCreateSchema,
 } from "@/schemas/customer";
-import { valibotResolver } from "@hookform/resolvers/valibot";
-import { Button, Stack } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
-import { IconDeviceFloppy, IconUserDollar } from "@tabler/icons-react";
 
 export default function Page() {
   const t = useTranslation();
@@ -36,6 +36,7 @@ export default function Page() {
       billingPostalCode: "",
       billingCity: "",
       billingRegion: "",
+      // @ts-ignore Fix this
       billingCountry: null,
       cocNumber: "",
       vatId: "",

@@ -1,3 +1,6 @@
+import { valibotResolver } from "@hookform/resolvers/valibot";
+import { Button, Stack } from "@mantine/core";
+import { IconDeviceMobileMessage } from "@tabler/icons-react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { Input } from "valibot";
 
@@ -5,9 +8,6 @@ import { PhoneInput as PhoneInputComponent } from "@/components/common/PhoneInpu
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
 import { SendPhoneOtpSchema } from "@/schemas/auth";
-import { valibotResolver } from "@hookform/resolvers/valibot";
-import { Button, Stack } from "@mantine/core";
-import { IconDeviceMobileMessage } from "@tabler/icons-react";
 
 import { useLoginContext } from "./LoginContext";
 
@@ -19,12 +19,12 @@ export const PhoneInput = () => {
   const t = useTranslation();
 
   const { control, handleSubmit } = useForm<SendPhoneOtpSchema>({
+    defaultValues: { phone: loginState.phone },
     resolver: valibotResolver(SendPhoneOtpSchema),
   });
 
   const onSubmit: SubmitHandler<SendPhoneOtpSchema> = async ({ phone }) => {
     const phoneToken = await sendPhoneOtp.mutate({ phone });
-
     setLoginState({
       step: "PHONE_OTP",
       phone,
@@ -41,8 +41,7 @@ export const PhoneInput = () => {
           render={({ field, fieldState: { error } }) => (
             <PhoneInputComponent
               {...field}
-              value={field.value}
-              defaultValue={loginState.phone}
+              value={control._defaultValues.phone}
               error={error?.message}
               label={t("loginPage.phone")}
               autoComplete

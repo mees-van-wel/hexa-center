@@ -1,10 +1,18 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import Link from "next/link";
+import { Button, Flex, Group, Loader, Paper, Stack } from "@mantine/core";
+import { useSessionStorage } from "@mantine/hooks";
+import {
+  IconArrowBarLeft,
+  IconArrowBarRight,
+  IconHotelService,
+  IconPlus,
+} from "@tabler/icons-react";
 import clsx from "clsx";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import Link from "next/link";
+import { useMemo, useState } from "react";
 
 import { CalendarSidebar } from "@/components/common/CalendarSidebar";
 import { ReservationCalendar } from "@/components/entities/reservation/ReservationCalendar";
@@ -14,14 +22,6 @@ import { MONTH_VALUES } from "@/constants/months";
 import { WEEKDAY_VALUES } from "@/constants/weekdays";
 import { useQuery } from "@/hooks/useQuery";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Button, Flex, Group, Loader, Paper, Stack } from "@mantine/core";
-import { useSessionStorage } from "@mantine/hooks";
-import {
-  IconArrowBarLeft,
-  IconArrowBarRight,
-  IconHotelService,
-  IconPlus,
-} from "@tabler/icons-react";
 
 import styles from "./page.module.scss";
 
@@ -176,7 +176,9 @@ export default function Page() {
                 <Stack gap={0} w="100%">
                   <ReservationCalendar
                     currentWeek={currentWeek}
+                    // @ts-ignore Fix this
                     currentRooms={listRooms.data}
+                    // @ts-ignore Fix this
                     reservations={listReservations.data}
                   />
                 </Stack>

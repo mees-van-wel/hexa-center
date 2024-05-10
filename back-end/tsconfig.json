@@ -13,7 +13,6 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "allowSyntheticDefaultImports": true,
     // TODO Depend on environment (production false, dev true)
     "sourceMap": true,
     "paths": {

@@ -1,1 +1,1 @@
-export * from "./workinghours";
+export * from "./WorkingHours";

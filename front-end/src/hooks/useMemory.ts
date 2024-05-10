@@ -1,6 +1,6 @@
-import { useCallback } from "react";
 import merge from "deepmerge";
 import isEqual from "fast-deep-equal";
+import { useCallback } from "react";
 import { useRecoilState } from "recoil";
 
 import { memoryState } from "@/states/memoryState";

@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { Button, Group, Radio, Stack } from "@mantine/core";
+import { IconLogin } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import {
   DEFAULT_SESSION_DURATION,
@@ -8,8 +10,6 @@ import {
 import { useAuthContext } from "@/contexts/AuthContext";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Button, Group, Radio, Stack } from "@mantine/core";
-import { IconLogin } from "@tabler/icons-react";
 
 import { useLoginContext } from "./LoginContext";
 

@@ -1,14 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
-import { Controller, useFormContext } from "react-hook-form";
-
-import { useTranslation } from "@/hooks/useTranslation";
-import {
-  ReservationInputCreateSchema,
-  ReservationInputUpdateSchema,
-} from "@/schemas/reservation";
-import { type RouterOutput } from "@/utils/trpc";
 import {
   Group,
   NumberInput,
@@ -21,6 +12,15 @@ import {
 import { DateInput } from "@mantine/dates";
 import { useDidUpdate } from "@mantine/hooks";
 import { IconCurrencyEuro } from "@tabler/icons-react";
+import { useMemo } from "react";
+import { Controller, useFormContext } from "react-hook-form";
+
+import { useTranslation } from "@/hooks/useTranslation";
+import {
+  ReservationInputCreateSchema,
+  ReservationInputUpdateSchema,
+} from "@/schemas/reservation";
+import { type RouterOutput } from "@/utils/trpc";
 
 type ReservationForm = {
   rooms: RouterOutput["room"]["list"];
@@ -146,6 +146,7 @@ export const ReservationForm = ({ rooms, customers }: ReservationForm) => {
             name="guestName"
             control={control}
             render={({ field, fieldState: { error } }) => (
+              // @ts-ignore Fix this
               <TextInput
                 {...field}
                 error={error?.message}

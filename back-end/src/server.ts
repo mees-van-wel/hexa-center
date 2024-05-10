@@ -1,3 +1,4 @@
+import * as trpcExpress from "@trpc/server/adapters/express";
 import compression from "compression";
 import cookieParser from "cookie-parser";
 import cors, { type CorsOptions } from "cors";
@@ -5,18 +6,11 @@ import express from "express";
 import helmet from "helmet";
 import { createServer } from "http";
 
-import * as trpcExpress from "@trpc/server/adapters/express";
-
+import { getDatabaseClient } from "./database";
 import { appRouter } from "./routers/_app";
-import { ctx } from "./utils/context";
-import { getDatabaseClient } from "./utils/database";
-import { isProduction } from "./utils/environment";
 import { createContext } from "./trpc";
-
-// import { Server } from "socket.io";
-// import { createAdapter } from "@socket.io/redis-adapter";
-// import { Emitter } from "@socket.io/redis-emitter";
-// import { createClient } from "redis";
+import { ctx } from "./utils/context";
+import { isProduction } from "./utils/environment";
 
 process.on("uncaughtException", (error) => {
   console.error("Uncaught Exception:", error);
@@ -95,36 +89,8 @@ app.use(
   }),
 );
 
-// const pubClient = createClient({ url: process.env.REDIS_URL });
-// const subClient = pubClient.duplicate();
-// const emitClient = pubClient.duplicate();
-
-// await Promise.all([
-//   pubClient.connect(),
-//   subClient.connect(),
-//   emitClient.connect(),
-// ]);
-
 const httpServer = createServer(app);
 
-// TODO Save multiple socket id's to redis per user id
-// const io = new Server(httpServer, {
-//   transports: ["websocket"],
-//   serveClient: false,
-//   cors: corsOptions,
-// });
-
-// io.adapter(createAdapter(pubClient, subClient));
-// const emitter = new Emitter(emitClient);
-
-// io.on("connection", (socket) => {
-//   console.log("Connected");
-
-//   socket.on("disconnect", () => {
-//     console.log("Disconnected");
-//   });
-// });
-
-httpServer.listen(3001, async () => {
+httpServer.listen(4000, async () => {
   console.log("back-end started");
 });

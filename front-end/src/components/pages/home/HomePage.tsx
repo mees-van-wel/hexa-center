@@ -1,14 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
-import Image from "next/image";
-import parse from "html-react-parser";
-
-import { NewsItem } from "@/app/(dashboard)/page";
-import { Sheet } from "@/components/common/Sheet";
-import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
-import { useAuthUser } from "@/contexts/AuthContext";
-import { useTranslation } from "@/hooks/useTranslation";
 import {
   Badge,
   Button,
@@ -19,6 +10,15 @@ import {
   Title,
 } from "@mantine/core";
 import { IconHome } from "@tabler/icons-react";
+import parse from "html-react-parser";
+import Image from "next/image";
+import { useMemo } from "react";
+
+import { NewsItem } from "@/app/(dashboard)/page";
+import { Sheet } from "@/components/common/Sheet";
+import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
+import { useAuthUser } from "@/contexts/AuthContext";
+import { useTranslation } from "@/hooks/useTranslation";
 
 import styles from "./HomePage.module.scss";
 
@@ -34,7 +34,9 @@ export default function HomePage({ newsItems }: { newsItems: NewsItem[] }) {
 
   return (
     <>
-      <DashboardHeader title={[{ label: "Home", icon: <IconHome /> }]} />
+      <DashboardHeader
+        title={[{ label: t("homePage.name"), icon: <IconHome /> }]}
+      />
       <Group justify="space-between" align="flex-start" p="md">
         <Sheet title={t("homePage.welcome")} glass>
           <Title>

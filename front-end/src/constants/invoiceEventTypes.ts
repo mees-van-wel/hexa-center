@@ -1,10 +1,10 @@
-import { TranslationPaths } from "@/types/translation";
 import {
   IconFileArrowLeft,
   IconFileArrowRight,
   IconMailFast,
-  TablerIconsProps,
 } from "@tabler/icons-react";
+
+import { TranslationPaths } from "@/types/translation";
 
 export const INVOICE_EVENT_TYPES = {
   ISSUED: "issued",
@@ -27,24 +27,28 @@ export const INVOICE_EVENT_TYPE_VALUES = Object.values(
 export const INVOICE_EVENT_TYPE_META: Record<
   InvoiceEventType,
   {
-    IconComponent: (props: TablerIconsProps) => JSX.Element;
+    // @ts-ignore Fix this
+    IconComponent: (props: any) => JSX.Element;
     title: keyof TranslationPaths;
     message: keyof TranslationPaths;
   }
 > = {
   [INVOICE_EVENT_TYPES.ISSUED]: {
+    // @ts-ignore Fix this
     IconComponent: IconFileArrowRight,
-    title: "entities.invoice.issued",
+    title: "entities.invoice.status.issued",
     message: "entities.invoice.issuedMessage",
   },
   [INVOICE_EVENT_TYPES.MAILED]: {
+    // @ts-ignore Fix this
     IconComponent: IconMailFast,
     title: "entities.invoice.mailed",
     message: "entities.invoice.mailedMessage",
   },
   [INVOICE_EVENT_TYPES.CREDITED]: {
+    // @ts-ignore Fix this
     IconComponent: IconFileArrowLeft,
-    title: "entities.invoice.credited",
+    title: "entities.invoice.status.credited",
     message: "entities.invoice.creditedMessage",
   },
 };

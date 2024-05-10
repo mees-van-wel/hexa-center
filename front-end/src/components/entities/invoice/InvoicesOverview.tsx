@@ -1,17 +1,17 @@
 "use client";
 
-import { useEffect, useId, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { AreaChart } from "@mantine/charts";
+import { Badge, Paper, Stack, Title } from "@mantine/core";
+import { IconFileEuro } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import Decimal from "decimal.js";
+import { useRouter } from "next/navigation";
+import { useEffect, useId, useMemo } from "react";
 
 import { Table } from "@/components/common/Table";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { useTranslation } from "@/hooks/useTranslation";
 import { type RouterOutput } from "@/utils/trpc";
-import { AreaChart } from "@mantine/charts";
-import { Badge, Paper, Stack, Title } from "@mantine/core";
-import { IconFileEuro } from "@tabler/icons-react";
 
 type InvoicesOverviewProps = {
   invoices: RouterOutput["invoice"]["list"];
@@ -172,9 +172,11 @@ export const InvoicesOverview = ({ invoices }: InvoicesOverviewProps) => {
         <Table.SearchBar id={searchBarId} />
       </DashboardHeader>
       <Paper p="md">
-        <Title order={3}>Total revenue this year: {totalRevenueThisYear}</Title>
+        <Title order={3}>
+          {t("invoicePage.totalRevenueThisYear")}: {totalRevenueThisYear}
+        </Title>
         <Title order={4} mb="md" c="dimmed">
-          Total revenue last year: {totalRevenuePreviousYear}
+          {t("invoicePage.totalRevenueLastYear")}: {totalRevenuePreviousYear}
         </Title>
         <AreaChart
           h={200}
@@ -184,12 +186,12 @@ export const InvoicesOverview = ({ invoices }: InvoicesOverviewProps) => {
           series={[
             {
               name: "revenueThisYear",
-              label: "Revenue this year",
+              label: t("invoicePage.revenueThisYear"),
               color: "blue.6",
             },
             {
               name: "revenuePreviousYear",
-              label: "Revenue previous year",
+              label: t("invoicePage.revenueLastYear"),
               color: "gray.6",
             },
           ]}
@@ -205,16 +207,20 @@ export const InvoicesOverview = ({ invoices }: InvoicesOverviewProps) => {
         columns={[
           {
             selector: "type",
-            label: t("entities.invoice.type"),
+            label: t("entities.invoice.type.name"),
             format: ({ type }) => (
-              <Badge variant="light">{t(`entities.invoice.${type}`)}</Badge>
+              <Badge variant="light">
+                {t(`entities.invoice.type.${type}`)}
+              </Badge>
             ),
           },
           {
             selector: "status",
-            label: t("entities.invoice.status"),
+            label: t("entities.invoice.status.name"),
             format: ({ status }) => (
-              <Badge variant="light">{t(`entities.invoice.${status}`)}</Badge>
+              <Badge variant="light">
+                {t(`entities.invoice.status.${status}`)}
+              </Badge>
             ),
           },
           {

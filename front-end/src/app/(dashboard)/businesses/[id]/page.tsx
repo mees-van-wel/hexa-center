@@ -1,7 +1,17 @@
 "use client";
 
-import { useMemo } from "react";
+import { valibotResolver } from "@hookform/resolvers/valibot";
+import { Badge, Button, Flex, Loader, Paper, Stack } from "@mantine/core";
+import { modals } from "@mantine/modals";
+import { notifications } from "@mantine/notifications";
+import {
+  IconAlertTriangle,
+  IconBuilding,
+  IconCheck,
+  IconTrash,
+} from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 import {
   FormProvider,
   useForm,
@@ -22,16 +32,6 @@ import {
   BusinessUpdateSchema,
 } from "@/schemas/business";
 import { RouterOutput } from "@/utils/trpc";
-import { valibotResolver } from "@hookform/resolvers/valibot";
-import { Badge, Button, Flex, Loader, Paper, Stack } from "@mantine/core";
-import { modals } from "@mantine/modals";
-import { notifications } from "@mantine/notifications";
-import {
-  IconAlertTriangle,
-  IconBuilding,
-  IconCheck,
-  IconTrash,
-} from "@tabler/icons-react";
 
 type PageParams = { params: { id: string } };
 
@@ -83,7 +83,7 @@ const Detail = ({ business }: DetailProps) => {
         memory.evict(business);
 
         notifications.show({
-          message: t("entities.business.deletedNotification"),
+          message: t("entities.company.deletedNotification"),
           color: "green",
         });
 
@@ -100,7 +100,7 @@ const Detail = ({ business }: DetailProps) => {
           title={[
             {
               icon: <IconBuilding />,
-              label: t("entities.business.pluralName"),
+              label: t("entities.company.pluralName"),
               href: "/businesses",
             },
             { label: business.name },
@@ -136,6 +136,7 @@ const SaveBadge = () => {
 
   useAutosave(control, async (values) => {
     try {
+      // @ts-ignore Fix this
       const updatedBusiness = await updateBusiness.mutate({
         ...values,
         id: getValues("id"),

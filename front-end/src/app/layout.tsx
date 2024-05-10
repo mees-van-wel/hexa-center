@@ -1,5 +1,16 @@
 // export const runtime = "edge";
 
+import "modern-normalize/modern-normalize.css";
+import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
+import "@mantine/dates/styles.css";
+import "@mantine/charts/styles.css";
+import "./globals.scss";
+
+import { ColorSchemeScript, MantineProvider } from "@mantine/core";
+import { ModalsProvider } from "@mantine/modals";
+import { Notifications } from "@mantine/notifications";
+import { TRPCClientError } from "@trpc/client";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { headers } from "next/headers";
@@ -10,19 +21,8 @@ import { TranslationInitializer } from "@/initializers/TranslationInitializer";
 import { isProduction } from "@/utils/environment";
 import { AppRouter, type RouterOutput } from "@/utils/trpc";
 import { getTrpcClientOnServer } from "@/utils/trpcForServer";
-import { ColorSchemeScript, MantineProvider } from "@mantine/core";
-import { ModalsProvider } from "@mantine/modals";
-import { Notifications } from "@mantine/notifications";
-import { TRPCClientError } from "@trpc/client";
 
 import Providers from "./providers";
-
-import "modern-normalize/modern-normalize.css";
-import "@mantine/core/styles.css";
-import "@mantine/notifications/styles.css";
-import "@mantine/dates/styles.css";
-import "@mantine/charts/styles.css";
-import "./globals.scss";
 
 const eurostile = localFont({
   src: "../assets/fonts/eurostile.woff2",
@@ -51,6 +51,7 @@ export default async function RootLayout({
     user = await trpc.auth.currentUser.query();
   } catch (e) {
     const error = e as TRPCClientError<AppRouter>;
+    // @ts-ignore Fix this
     const code = error.meta?.response?.status as number | undefined;
     if (code === 418)
       redirect("https://www.hexa.center/", RedirectType.replace);

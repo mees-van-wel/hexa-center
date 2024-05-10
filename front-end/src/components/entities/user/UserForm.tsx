@@ -1,5 +1,7 @@
 "use client";
 
+import { Avatar, Group, Paper, Stack, TextInput } from "@mantine/core";
+import { DateInput } from "@mantine/dates";
 import { Controller, useFormContext } from "react-hook-form";
 
 import { Address } from "@/components/common/Address";
@@ -8,8 +10,6 @@ import { PhoneInput } from "@/components/common/PhoneInput";
 import { SEX_VALUES } from "@/constants/sexes";
 import { useTranslation } from "@/hooks/useTranslation";
 import { UserCreateInputSchema, UserUpdateInputSchema } from "@/schemas/user";
-import { Avatar, Group, Paper, Stack, TextInput } from "@mantine/core";
-import { DateInput } from "@mantine/dates";
 
 type UserFormProps = {
   disabled?: boolean;

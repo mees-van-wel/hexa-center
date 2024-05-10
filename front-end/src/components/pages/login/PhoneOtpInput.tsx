@@ -1,10 +1,10 @@
+import { Button, Group, Input, Loader, PinInput, Stack } from "@mantine/core";
+import { IconArrowLeft, IconRefresh } from "@tabler/icons-react";
 import { useState } from "react";
 
 import { useCountdown } from "@/hooks/useCountdown";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Button, Group, Input, Loader, PinInput, Stack } from "@mantine/core";
-import { IconArrowLeft, IconRefresh } from "@tabler/icons-react";
 
 import { useLoginContext } from "./LoginContext";
 

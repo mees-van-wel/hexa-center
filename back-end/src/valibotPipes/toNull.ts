@@ -2,6 +2,7 @@ import { toCustom } from "valibot";
 
 // TODO support numbers
 export const toNull = () =>
+  // @ts-ignore Fix this
   toCustom<string>((input) => {
     if (typeof input !== "string") {
       throw new Error(

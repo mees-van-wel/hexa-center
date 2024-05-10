@@ -1,7 +1,17 @@
 "use client";
 
-import { useMemo } from "react";
+import { valibotResolver } from "@hookform/resolvers/valibot";
+import { Badge, Button, Loader, Stack } from "@mantine/core";
+import { modals } from "@mantine/modals";
+import { notifications } from "@mantine/notifications";
+import {
+  IconAlertTriangle,
+  IconCheck,
+  IconTrash,
+  IconUserDollar,
+} from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 import {
   FormProvider,
   useForm,
@@ -19,16 +29,6 @@ import {
   CustomerUpdateInputSchema,
 } from "@/schemas/customer";
 import { type RouterOutput } from "@/utils/trpc";
-import { valibotResolver } from "@hookform/resolvers/valibot";
-import { Badge, Button, Loader, Stack } from "@mantine/core";
-import { modals } from "@mantine/modals";
-import { notifications } from "@mantine/notifications";
-import {
-  IconAlertTriangle,
-  IconCheck,
-  IconTrash,
-  IconUserDollar,
-} from "@tabler/icons-react";
 
 import { CustomerForm } from "./CustomerForm";
 
@@ -116,6 +116,7 @@ const SaveBadge = () => {
     }
 
     try {
+      // @ts-ignore Fix this
       const updatedCustomer = await updateCustomer.mutate({
         ...values,
         id: getValues("id"),

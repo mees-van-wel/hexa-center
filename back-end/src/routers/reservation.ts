@@ -1,3 +1,5 @@
+import { TRPCError } from "@trpc/server";
+import { wrap } from "@typeschema/valibot";
 import dayjs from "dayjs";
 import Decimal from "decimal.js";
 import { and, eq } from "drizzle-orm";
@@ -11,9 +13,6 @@ import {
   picklist,
   string,
 } from "valibot";
-
-import { TRPCError } from "@trpc/server";
-import { wrap } from "@typeschema/valibot";
 
 import {
   productInstances,
@@ -228,9 +227,10 @@ export const reservationRouter = router({
         vatRate: string | null;
       }[] = [];
 
-      const isFinalInvoice = dayjs(reservation.endDate).isSame(
-        input.periodEndDate,
-      );
+      const isFinalInvoice = dayjs(reservation.endDate)
+        // TODO Patch, should be fixed by changing the reservation timestamps to dates
+        .add(2, "hour")
+        .isSame(input.periodEndDate);
 
       const periodNights = dayjs(input.periodEndDate).diff(
         input.periodStartDate,
@@ -305,7 +305,9 @@ export const reservationRouter = router({
         lines: [
           {
             revenueAccountId: reservationRevenueAccountId,
-            name: "Overnight Stays",
+            name: `Nights (${dayjs(input.periodStartDate).format(
+              "DD-MM-YYYY",
+            )} - ${dayjs(input.periodEndDate).format("DD-MM-YYYY")})`,
             unitAmount: reservation.priceOverride || reservation.room.price,
             quantity: periodNights.toString(),
             vatRate: "9",

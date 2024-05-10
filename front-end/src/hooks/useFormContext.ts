@@ -10,5 +10,6 @@ export const useFormContext = <T extends FieldValues>(): FormMethods<T> => {
   if (!formContext)
     throw new Error("useFormContext must be used within FormContextProvider");
 
+  // @ts-ignore Fix this
   return formContext;
 };

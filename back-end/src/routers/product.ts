@@ -1,7 +1,6 @@
+import { wrap } from "@typeschema/valibot";
 import { eq } from "drizzle-orm";
 import { number } from "valibot";
-
-import { wrap } from "@typeschema/valibot";
 
 import { productInstances, productTemplates } from "~/db/schema";
 import { procedure, router } from "~/trpc";

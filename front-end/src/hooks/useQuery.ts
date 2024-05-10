@@ -1,10 +1,13 @@
+import { useDidUpdate } from "@mantine/hooks";
 import { useCallback, useMemo, useState } from "react";
 import { useRecoilState } from "recoil";
 
 import { memoryState } from "@/states/memoryState";
-import { type RouterInput, type RouterOutput } from "@/utils/trpc";
-import { getTrpcClientOnClient } from "@/utils/trpcForClient";
-import { useDidUpdate } from "@mantine/hooks";
+import {
+  getTrpcClient,
+  type RouterInput,
+  type RouterOutput,
+} from "@/utils/trpc";
 
 import { flatten, getCacheKey, unflatten } from "./useMemory";
 import { useStrictModeEffect } from "./useStrictModeEffect";
@@ -52,7 +55,7 @@ export const useQuery = <
     async (params?: RouterInput[T][P], abortController?: AbortController) => {
       setLoading(true);
 
-      const trpc = getTrpcClientOnClient();
+      const trpc = getTrpcClient();
 
       // @ts-ignore
       const response: RouterOutput[T][P] = await trpc[scope][procedure]

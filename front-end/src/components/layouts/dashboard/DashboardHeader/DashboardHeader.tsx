@@ -1,16 +1,5 @@
 "use client";
 
-import { Fragment } from "react";
-import type { Route } from "next";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import clsx from "clsx";
-import { useRecoilValue } from "recoil";
-
-import { useAuthUser } from "@/contexts/AuthContext";
-import { useTranslation } from "@/hooks/useTranslation";
-import { routeHistoryState } from "@/states/routeHistoryState";
-import { getTrpcClientOnClient } from "@/utils/trpcForClient";
 import {
   Avatar,
   Button,
@@ -28,6 +17,17 @@ import {
   IconPalette,
   IconUser,
 } from "@tabler/icons-react";
+import clsx from "clsx";
+import type { Route } from "next";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { Fragment } from "react";
+import { useRecoilValue } from "recoil";
+
+import { useAuthUser } from "@/contexts/AuthContext";
+import { useTranslation } from "@/hooks/useTranslation";
+import { routeHistoryState } from "@/states/routeHistoryState";
+import { getTrpcClient } from "@/utils/trpc";
 
 import styles from "./DashboardHeader.module.scss";
 
@@ -56,7 +56,7 @@ export const DashboardHeader = ({
     !!(previousRoute !== pathName && previousRoute) || !!backRouteFallback;
 
   const logoutHandler = async () => {
-    const trpc = getTrpcClientOnClient();
+    const trpc = getTrpcClient();
     await trpc.auth.logout.mutate();
     router.replace("/login");
   };

@@ -1,7 +1,9 @@
 "use client";
 
-import { useMemo } from "react";
+import { Group, Select, Stack } from "@mantine/core";
+import { IconSettings } from "@tabler/icons-react";
 import dayjs from "dayjs";
+import { useMemo } from "react";
 
 import { Sheet } from "@/components/common/Sheet/Sheet";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
@@ -30,8 +32,6 @@ import {
 import { TIMEZONES } from "@/constants/timezones";
 import { useAuthUser } from "@/contexts/AuthContext";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Group, Select, Stack } from "@mantine/core";
-import { IconSettings } from "@tabler/icons-react";
 
 export default function Preferences() {
   const t = useTranslation();

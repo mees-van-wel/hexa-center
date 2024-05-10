@@ -1,6 +1,3 @@
-import { useState } from "react";
-
-import { type RouterOutput } from "@/utils/trpc";
 import {
   Button,
   ButtonGroup,
@@ -11,6 +8,10 @@ import {
   TextInput,
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
+import { useState } from "react";
+
+import { useTranslation } from "@/hooks/useTranslation";
+import { type RouterOutput } from "@/utils/trpc";
 
 import { Cycle, ReservationProductValues } from "./AddProductModal";
 
@@ -25,6 +26,7 @@ export const EditProductModal = ({
   currentValues,
   onConfirm,
 }: EditProductModalProps) => {
+  const t = useTranslation();
   const [values, setValues] = useState({
     name: currentValues.name,
     price: currentValues.price,
@@ -47,7 +49,7 @@ export const EditProductModal = ({
     <Stack>
       <SimpleGrid cols={2} verticalSpacing="xs">
         <TextInput
-          label="Name"
+          label={t("common.name")}
           value={values.name}
           onChange={(event) => {
             changeHandler({ name: event.target.value });
@@ -55,7 +57,7 @@ export const EditProductModal = ({
           withAsterisk
         />
         <NumberInput
-          label="Price"
+          label={t("entities.product.price")}
           value={values.price}
           onChange={(price) => {
             changeHandler({ price: price.toString() });
@@ -68,7 +70,7 @@ export const EditProductModal = ({
           withAsterisk
         />
         <NumberInput
-          label="VAT Rate"
+          label={t("entities.product.vatRate")}
           value={!values.vatRate ? "" : values.vatRate}
           onChange={(vatRate) => {
             changeHandler({
@@ -82,7 +84,7 @@ export const EditProductModal = ({
           rightSection="%"
         />
         <NumberInput
-          label="Quantity"
+          label={t("entities.product.quantity")}
           value={values.quantity}
           onChange={(quantity) => {
             changeHandler({ quantity: quantity.toString() });
@@ -94,7 +96,7 @@ export const EditProductModal = ({
           withAsterisk
         />
         <Select
-          label="Revenue account"
+          label={t("entities.product.revenueAccount")}
           data={ledgerAccounts.map(({ id, name }) => ({
             label: name,
             value: id.toString(),
@@ -108,23 +110,23 @@ export const EditProductModal = ({
           withAsterisk
         />
         <Select
-          label="Cycle"
+          label={t("entities.product.cycle.name")}
           data={[
             {
               value: "oneTimeOnNext",
-              label: "One-Time - On Next Invoice",
+              label: t("entities.product.cycle.oneTimeOnNext"),
             },
             {
               value: "oneTimeOnEnd",
-              label: "One-Time - On Final Invoice",
+              label: t("entities.product.cycle.oneTimeOnEnd"),
             },
             {
               value: "perNightThroughout",
-              label: "Per Night - On Every Invoice",
+              label: t("entities.product.cycle.perNightThroughout"),
             },
             {
               value: "perNightOnEnd",
-              label: "Per Night - On Final Invoice",
+              label: t("entities.product.cycle.perNightOnEnd"),
             },
           ]}
           value={values.cycle}
@@ -144,10 +146,10 @@ export const EditProductModal = ({
           }}
           fullWidth
         >
-          Back
+          {t("common.back")}
         </Button>
         <Button onClick={confirmHandler} fullWidth>
-          Save
+          {t("common.save")}
         </Button>
       </ButtonGroup>
     </Stack>

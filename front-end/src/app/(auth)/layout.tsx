@@ -1,5 +1,7 @@
 "use client";
 
+import { Button, Group, Stack, Title } from "@mantine/core";
+import { IconQuestionMark } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -9,8 +11,6 @@ import iconWhite from "@/assets/images/icon-white.svg";
 import { useCompanyName } from "@/hooks/useCompanyName";
 import { useTranslation } from "@/hooks/useTranslation";
 import { isProduction } from "@/utils/environment";
-import { Button, Group, Stack, Title } from "@mantine/core";
-import { IconQuestionMark } from "@tabler/icons-react";
 
 import styles from "./layout.module.scss";
 

@@ -1,9 +1,8 @@
+import { TRPCError } from "@trpc/server";
+import { wrap } from "@typeschema/valibot";
 import { and, eq, sql } from "drizzle-orm";
 import ejs from "ejs";
 import { number } from "valibot";
-
-import { TRPCError } from "@trpc/server";
-import { wrap } from "@typeschema/valibot";
 
 import {
   customers,
@@ -230,7 +229,9 @@ export const customerRouter = router({
               ),
             );
 
-          const externalCode = result[0]?.data?.code as string | undefined;
+          const externalCode = (result[0]?.data as any)?.code as
+            | string
+            | undefined;
           if (!externalCode)
             throw new Error(
               `Missing twinfield customer code mapping for customer: ${input}`,
@@ -312,7 +313,7 @@ export const customerRouter = router({
           ),
         );
 
-      const externalCode = result[0]?.data?.code as string | undefined;
+      const externalCode = (result[0]?.data as any)?.code as string | undefined;
       if (!externalCode)
         throw new Error(
           `Missing twinfield customer code mapping for customer: ${input}`,

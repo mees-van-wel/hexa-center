@@ -43,9 +43,9 @@ COPY --from=builder /app/src/pdfs ./pdfs
 COPY --from=builder /app/src/soapEnvelopes ./soapEnvelopes
 COPY --from=builder /app/drizzle ./drizzle
 
-EXPOSE 3001
+EXPOSE 4000
 
-ENV PORT 3001 \
+ENV PORT 4000 \
     HOSTNAME "0.0.0.0"
 
 CMD ["node", "server.js"]

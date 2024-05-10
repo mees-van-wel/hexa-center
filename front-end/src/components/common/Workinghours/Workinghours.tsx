@@ -1,25 +1,24 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Button, Group, SegmentedControl, Stack } from "@mantine/core";
+import { TimeInput } from "@mantine/dates";
+import { IconMinus, IconPlus } from "@tabler/icons-react";
 import dayjs from "dayjs";
+import { useMemo, useState } from "react";
 
 import { FIRST_DAYS_OF_THE_WEEK } from "@/constants/firstDayOfTheWeek";
 import { Weekday, WEEKDAY_VALUES, WEEKDAYS } from "@/constants/weekdays";
 import { useTranslation } from "@/hooks/useTranslation";
 import { RouterOutput } from "@/utils/trpc";
-import { Button, Group, SegmentedControl, Stack } from "@mantine/core";
-import { TimeInput } from "@mantine/dates";
-import { IconMinus, IconPlus } from "@tabler/icons-react";
 
 import { Sheet } from "../Sheet";
-
 import styles from "./WorkingHours.module.scss";
 
-type workinghoursProps = {
+type workingHoursProps = {
   accountDetails: RouterOutput["auth"]["currentUser"]["accountDetails"];
 };
 
-export const Workinghours = ({ accountDetails }: workinghoursProps) => {
+export const WorkingHours = ({ accountDetails }: workingHoursProps) => {
   const t = useTranslation();
 
   const [currentWeekday, setCurrentWeekday] = useState<Weekday>(

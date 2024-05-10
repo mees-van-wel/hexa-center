@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import clsx from "clsx";
-
-import { useTranslation } from "@/hooks/useTranslation";
 import { Button, Group, Paper, Stack, Title } from "@mantine/core";
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
+import clsx from "clsx";
+import { useState } from "react";
+
+import { useTranslation } from "@/hooks/useTranslation";
 
 import styles from "./Sheet.module.scss";
 

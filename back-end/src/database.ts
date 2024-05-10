@@ -3,9 +3,9 @@ import { migrate } from "drizzle-orm/postgres-js/migrator";
 import NodeCache from "node-cache";
 import postgres from "postgres";
 
-import * as schema from "../db/schema";
+import * as schema from "~/db/schema";
 
-import { isProduction } from "./environment";
+import { isProduction } from "./utils/environment";
 
 const drizzleClientCache = new NodeCache({
   stdTTL: 3600,

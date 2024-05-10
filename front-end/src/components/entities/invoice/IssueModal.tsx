@@ -1,8 +1,9 @@
-import { useState } from "react";
-
 import { Button, Group, Stack } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { modals } from "@mantine/modals";
+import { useState } from "react";
+
+import { useTranslation } from "@/hooks/useTranslation";
 
 type IssueModalProps = {
   onCancel?: () => void;
@@ -11,6 +12,7 @@ type IssueModalProps = {
 
 export const IssueModal = ({ onCancel, onConfirm }: IssueModalProps) => {
   const [issueDate, setIssueDate] = useState(new Date());
+  const t = useTranslation();
 
   const cancelHandler = () => {
     if (onCancel) onCancel();
@@ -34,7 +36,7 @@ export const IssueModal = ({ onCancel, onConfirm }: IssueModalProps) => {
       />
       <Group>
         <Button variant="light" onClick={cancelHandler}>
-          No
+          {t("common.no")}
         </Button>
         <Button onClick={confirmHandler}>Yes</Button>
       </Group>

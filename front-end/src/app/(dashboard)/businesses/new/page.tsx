@@ -1,5 +1,9 @@
 "use client";
 
+import { valibotResolver } from "@hookform/resolvers/valibot";
+import { Button, Stack } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import { IconBuilding, IconDeviceFloppy } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import {
   FormProvider,
@@ -18,10 +22,6 @@ import {
   BusinessCreateInputSchema,
   BusinessCreateSchema,
 } from "@/schemas/business";
-import { valibotResolver } from "@hookform/resolvers/valibot";
-import { Button, Stack } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
-import { IconBuilding, IconDeviceFloppy } from "@tabler/icons-react";
 
 export default function Page() {
   const t = useTranslation();
@@ -37,6 +37,7 @@ export default function Page() {
       postalCode: "",
       city: "",
       region: "",
+      // @ts-ignore Fix this
       country: null,
       cocNumber: "",
       vatId: "",
@@ -53,7 +54,7 @@ export default function Page() {
           title={[
             {
               icon: <IconBuilding />,
-              label: t("entities.business.pluralName"),
+              label: t("entities.company.pluralName"),
               href: "/businesses",
             },
             { label: t("common.new") },
@@ -96,7 +97,7 @@ const SaveButton = () => {
     ]);
 
     notifications.show({
-      message: t("entities.business.createdNotification"),
+      message: t("entities.company.createdNotification"),
       color: "green",
     });
 

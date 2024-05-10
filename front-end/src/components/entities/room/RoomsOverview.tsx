@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect, useId } from "react";
+import { Button, Stack } from "@mantine/core";
+import { IconBed, IconPlus } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect, useId } from "react";
 
 import { Table } from "@/components/common/Table";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { useTranslation } from "@/hooks/useTranslation";
 import { type RouterOutput } from "@/utils/trpc";
-import { Button, Stack } from "@mantine/core";
-import { IconBed, IconPlus } from "@tabler/icons-react";
 
 type RoomsProps = {
   rooms: RouterOutput["room"]["list"];

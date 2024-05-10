@@ -1,15 +1,15 @@
 "use client";
 
-import { useId } from "react";
+import { Button, Flex, Loader, Paper, Stack } from "@mantine/core";
+import { IconBuilding, IconPlus } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useId } from "react";
 
 import { Table } from "@/components/common/Table";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { useQuery } from "@/hooks/useQuery";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Button, Flex, Loader, Paper, Stack } from "@mantine/core";
-import { IconBuilding, IconPlus } from "@tabler/icons-react";
 
 export default function Page() {
   const router = useRouter();
@@ -22,7 +22,7 @@ export default function Page() {
     <Stack>
       <DashboardHeader
         title={[
-          { icon: <IconBuilding />, label: t("entities.business.pluralName") },
+          { icon: <IconBuilding />, label: t("entities.company.pluralName") },
         ]}
       >
         <Button

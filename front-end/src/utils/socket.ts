@@ -1,3 +1,4 @@
+// @ts-ignore Fix this
 import { io } from "socket.io-client";
 
 const socketServer = process.env.NEXT_PUBLIC_API_URL;

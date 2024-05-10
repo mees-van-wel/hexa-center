@@ -1,8 +1,3 @@
-import { useMemo } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-
-import { useTranslation } from "@/hooks/useTranslation";
 import { Button, Stack, Title } from "@mantine/core";
 import {
   IconBed,
@@ -14,6 +9,11 @@ import {
   IconUserDollar,
   IconUsers,
 } from "@tabler/icons-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useMemo } from "react";
+
+import { useTranslation } from "@/hooks/useTranslation";
 
 import styles from "./Navigation.module.scss";
 
@@ -34,7 +34,7 @@ export const Navigation = () => {
             fullWidth
             justify="left"
           >
-            {t("dashboardLayout.home")}
+            {t("homePage.name")}
           </Button>
           <Stack gap="xs">
             <Title order={4}>{t("modules.essentials")}</Title>
@@ -67,7 +67,7 @@ export const Navigation = () => {
                 fullWidth
                 justify="left"
               >
-                {t("entities.business.pluralName")}
+                {t("entities.company.pluralName")}
               </Button>
             </Stack>
           </Stack>

@@ -32,5 +32,6 @@ export const FormProvider = <T extends FieldValues>({
 }: {
   children: React.ReactNode;
 } & FormMethods<T>) => (
+  // @ts-ignore Fix this
   <FormContext.Provider value={formMethods}>{children}</FormContext.Provider>
 );

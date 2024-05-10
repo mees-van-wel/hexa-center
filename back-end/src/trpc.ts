@@ -1,12 +1,10 @@
-import { and, eq, gt, isNull, or } from "drizzle-orm";
-
 import { initTRPC, TRPCError } from "@trpc/server";
 import * as trpcExpress from "@trpc/server/adapters/express";
-
-import { isProduction } from "~/utils/environment";
-import { trpcTransformer } from "~/utils/trpcTransformer";
+import { and, eq, gt, isNull, or } from "drizzle-orm";
+import superjson from "superjson";
 
 import { users, userSessions } from "./db/schema";
+import { isProduction } from "./utils/environment";
 
 export const createContext = async ({
   req,
@@ -14,6 +12,7 @@ export const createContext = async ({
 }: trpcExpress.CreateExpressContextOptions) => {
   let refreshToken = req.cookies[`refreshToken_${req.tenant}`];
   const authHeader = req.headers.authorization;
+
   const db = req.db;
 
   if (authHeader && authHeader.startsWith("Bearer "))
@@ -131,7 +130,7 @@ type Meta = {
 };
 
 const t = initTRPC.context<Context>().meta<Meta>().create({
-  transformer: trpcTransformer,
+  transformer: superjson,
 });
 
 const authMiddleware = t.middleware(({ meta, next, ctx }) => {
@@ -143,6 +142,5 @@ const authMiddleware = t.middleware(({ meta, next, ctx }) => {
   });
 });
 
-export const middleware = t.middleware;
 export const router = t.router;
 export const procedure = t.procedure.use(authMiddleware);
