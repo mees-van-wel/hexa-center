@@ -25,6 +25,7 @@ export const createDynamicConnection = async (databaseName: string) => {
   dbUrl = parts.join("/");
 
   // TODO put as deployment step
+  console.log("Running migrations");
   await migrate(
     drizzle(postgres(dbUrl, { ssl: isProduction ? "require" : false, max: 1 })),
     {
