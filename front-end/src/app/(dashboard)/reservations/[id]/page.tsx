@@ -79,7 +79,7 @@ export default function Page({ params }: ReservationPageParams) {
     initialParams: parseInt(params.id),
   });
 
-  const loading =
+  if (
     listCustomers.loading ||
     listRooms.loading ||
     listReservations.loading ||
@@ -91,9 +91,8 @@ export default function Page({ params }: ReservationPageParams) {
     !listReservations.data ||
     !listProductTemplates.data ||
     !listLedgerAccounts.data ||
-    !getReservation.data;
-
-  if (loading)
+    !getReservation.data
+  )
     return (
       <Flex
         gap="md"
@@ -107,17 +106,6 @@ export default function Page({ params }: ReservationPageParams) {
         <Loader />
       </Flex>
     );
-
-  // Fix this
-  if (
-    !listCustomers.data ||
-    !listRooms.data ||
-    !listReservations.data ||
-    !listProductTemplates.data ||
-    !listLedgerAccounts.data ||
-    !getReservation.data
-  )
-    return null;
 
   return (
     <Detail
@@ -284,8 +272,7 @@ const Detail = ({
           currentValues={{
             name: productInstanceJunction.productInstance.name,
             price: productInstanceJunction.productInstance.price,
-            // @ts-ignore Fix this
-            vatRate: productInstanceJunction.productInstance.vatRate,
+            vatRate: productInstanceJunction.productInstance.vatRate || null,
             quantity: productInstanceJunction.quantity,
             cycle: productInstanceJunction.cycle,
             revenueAccountId:
@@ -375,8 +362,7 @@ const Detail = ({
               href: "/reservations",
             },
             {
-              // @ts-ignore Fix this
-              label: customer.name,
+              label: customer?.name || "",
             },
           ]}
         >
@@ -426,10 +412,8 @@ const Detail = ({
                     <Table.Th>{t("entities.product.price")}</Table.Th>
                     <Table.Th>{t("entities.product.vatRate")}</Table.Th>
                     <Table.Th>{t("entities.product.quantity")}</Table.Th>
-                    {/* @ts-ignore Fix this */}
-                    <Table.Th>{t("entities.product.cycle")}</Table.Th>
-                    {/* @ts-ignore Fix this */}
-                    <Table.Th>{t("entities.product.status")}</Table.Th>
+                    <Table.Th>{t("entities.product.cycle.name")}</Table.Th>
+                    <Table.Th>{t("entities.product.status.name")}</Table.Th>
                     <Table.Th>{t("entities.product.actions")}</Table.Th>
                   </Table.Tr>
                 </Table.Thead>
@@ -520,7 +504,12 @@ const Detail = ({
               <ScrollArea maw="77.5vw">
                 <Group gap="2rem" p="md" wrap="nowrap">
                   {invoices.map(
-                    ({ invoice, periodStartDate, periodEndDate }) => {
+                    ({
+                      invoiceId,
+                      invoice,
+                      periodStartDate,
+                      periodEndDate,
+                    }) => {
                       const Icon =
                         invoice.type === "credit"
                           ? IconFileArrowLeft
@@ -541,8 +530,7 @@ const Detail = ({
 
                       return (
                         <Card
-                          // @ts-ignore Fix this
-                          key={invoice.invoiceId}
+                          key={invoiceId}
                           shadow="sm"
                           padding={0}
                           radius="md"
@@ -753,7 +741,6 @@ const SaveBadge = ({ reservation, reservations }: SaveButtonProps) => {
           closeOnClickOutside: false,
           withCloseButton: false,
           onConfirm: () => {
-            // @ts-ignore Fix this
             updateHandler(values);
           },
           onCancel: () => {
@@ -763,7 +750,6 @@ const SaveBadge = ({ reservation, reservations }: SaveButtonProps) => {
 
         return;
       } else {
-        // @ts-ignore Fix this
         updateHandler(values);
         return;
       }
@@ -798,8 +784,6 @@ const SaveBadge = ({ reservation, reservations }: SaveButtonProps) => {
       ...values,
       id: getValues("id"),
     });
-
-    console.log(updatedReservation);
 
     memory.update(updatedReservation);
     reset(updatedReservation);

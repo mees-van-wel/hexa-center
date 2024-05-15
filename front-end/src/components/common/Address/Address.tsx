@@ -168,7 +168,7 @@ export const Address = ({ disabled, required, keyOverrides }: AddressProps) => {
         setValue(key, value || "", { shouldDirty: true, shouldTouch: true });
       });
     },
-    [setValue],
+    [addressLineOneKey, countryKey, keyOverrides, setValue],
   );
 
   const countryOptions = useMemo(

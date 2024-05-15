@@ -8,7 +8,6 @@ import isBetween from "dayjs/plugin/isBetween";
 import Link from "next/link";
 
 import { useTranslation } from "@/hooks/useTranslation";
-import { Position } from "@/types/Position";
 import { type RouterOutput } from "@/utils/trpc";
 
 import styles from "./ReservationCalendar.module.scss";
@@ -18,6 +17,8 @@ dayjs.extend(isBetween);
 export const compareDates = (firstDate: Dayjs, secondDate: Dayjs) => {
   return firstDate.startOf("day").isSame(secondDate.startOf("day"), "day");
 };
+
+type Position = { id: number; end: Date; top: number };
 
 type ReservationCalendarProps = {
   currentWeek: Dayjs[];

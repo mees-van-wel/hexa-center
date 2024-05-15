@@ -10,7 +10,6 @@ import "./globals.scss";
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
 import { Notifications } from "@mantine/notifications";
-import { TRPCClientError } from "@trpc/client";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { headers } from "next/headers";
@@ -18,8 +17,9 @@ import { redirect, RedirectType } from "next/navigation";
 
 import { AuthContextProvider } from "@/contexts/AuthContext";
 import { TranslationInitializer } from "@/initializers/TranslationInitializer";
+import { tRPCError } from "@/types/tRPCError";
 import { isProduction } from "@/utils/environment";
-import { AppRouter, type RouterOutput } from "@/utils/trpc";
+import { type RouterOutput } from "@/utils/trpc";
 import { getTrpcClientOnServer } from "@/utils/trpcForServer";
 
 import Providers from "./providers";
@@ -50,8 +50,7 @@ export default async function RootLayout({
     const trpc = getTrpcClientOnServer();
     user = await trpc.auth.currentUser.query();
   } catch (e) {
-    const error = e as TRPCClientError<AppRouter>;
-    // @ts-ignore Fix this
+    const error = e as tRPCError;
     const code = error.meta?.response?.status as number | undefined;
     if (code === 418)
       redirect("https://www.hexa.center/", RedirectType.replace);

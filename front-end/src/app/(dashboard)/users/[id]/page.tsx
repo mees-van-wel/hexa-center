@@ -174,7 +174,6 @@ const SaveBadge = () => {
     }
 
     try {
-      // @ts-ignore Fix this
       const updatedUser = await updateUser.mutate({
         ...values,
         id: getValues("id"),

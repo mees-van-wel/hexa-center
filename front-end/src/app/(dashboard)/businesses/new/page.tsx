@@ -21,12 +21,13 @@ import { useTranslation } from "@/hooks/useTranslation";
 import {
   BusinessCreateInputSchema,
   BusinessCreateSchema,
+  BusinessDefaultsSchema,
 } from "@/schemas/business";
 
 export default function Page() {
   const t = useTranslation();
 
-  const formMethods = useForm<BusinessCreateInputSchema>({
+  const formMethods = useForm<BusinessDefaultsSchema>({
     resolver: valibotResolver(BusinessCreateSchema),
     defaultValues: {
       name: "",
@@ -37,7 +38,6 @@ export default function Page() {
       postalCode: "",
       city: "",
       region: "",
-      // @ts-ignore Fix this
       country: null,
       cocNumber: "",
       vatId: "",

@@ -30,6 +30,15 @@ export type ReservationProductValues = {
   revenueAccountId: number;
 };
 
+export type ReservationProductDefaultValues = {
+  name: string;
+  price: string;
+  vatRate: string | null;
+  quantity: string;
+  cycle: Cycle | null;
+  revenueAccountId: number | null;
+};
+
 type AddProductModalProps = {
   templates: RouterOutput["product"]["list"];
   ledgerAccounts: RouterOutput["ledgerAccount"]["list"];
@@ -53,14 +62,14 @@ export const AddProductModal = ({
     [templateId, templates],
   );
 
-  const [values, setValues] = useState<ReservationProductValues>({
+  const [values, setValues] = useState<
+    ReservationProductValues | ReservationProductDefaultValues
+  >({
     name: "",
     price: "",
     vatRate: "21",
     quantity: "1",
-    // @ts-ignore Fix this
     revenueAccountId: null,
-    // @ts-ignore Fix this
     cycle: null,
   });
 
@@ -81,7 +90,8 @@ export const AddProductModal = ({
   };
 
   const confirmHandler = () => {
-    onConfirm(templateId, values);
+    if (!values.revenueAccountId || !values.cycle) return;
+    onConfirm(templateId, values as ReservationProductValues);
     modals.closeAll();
   };
 

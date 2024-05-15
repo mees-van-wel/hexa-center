@@ -99,12 +99,6 @@ export default function Page() {
   //   [listRooms.data],
   // );
 
-  const loading =
-    listRooms.loading ||
-    listReservations.loading ||
-    !listRooms.data ||
-    !listReservations.data;
-
   return (
     <Stack mih="100%">
       <DashboardHeader
@@ -123,7 +117,10 @@ export default function Page() {
           {t("common.new")}
         </Button>
       </DashboardHeader>
-      {loading ? (
+      {listRooms.loading ||
+      listReservations.loading ||
+      !listRooms.data ||
+      !listReservations.data ? (
         <Flex
           gap="md"
           justify="center"
@@ -176,9 +173,7 @@ export default function Page() {
                 <Stack gap={0} w="100%">
                   <ReservationCalendar
                     currentWeek={currentWeek}
-                    // @ts-ignore Fix this
                     currentRooms={listRooms.data}
-                    // @ts-ignore Fix this
                     reservations={listReservations.data}
                   />
                 </Stack>

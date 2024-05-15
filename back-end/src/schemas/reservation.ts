@@ -28,10 +28,10 @@ export const ReservationUpdateSchema = object({
   customerId: optional(number()),
   startDate: optional(date()),
   endDate: optional(date()),
-  priceOverride: nullish(string()),
-  guestName: nullish(string([toNull()])),
-  reservationNotes: nullish(string([toNull()])),
-  invoiceNotes: nullish(string([toNull()])),
+  priceOverride: optional(nullish(string())),
+  guestName: optional(nullish(string([toNull()]))),
+  reservationNotes: optional(nullish(string([toNull()]))),
+  invoiceNotes: optional(nullish(string([toNull()]))),
 });
 
 export type ReservationInputCreateSchema = Input<

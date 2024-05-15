@@ -136,7 +136,6 @@ const SaveBadge = () => {
 
   useAutosave(control, async (values) => {
     try {
-      // @ts-ignore Fix this
       const updatedBusiness = await updateBusiness.mutate({
         ...values,
         id: getValues("id"),

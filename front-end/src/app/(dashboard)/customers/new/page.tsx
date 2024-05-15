@@ -36,7 +36,6 @@ export default function Page() {
       billingPostalCode: "",
       billingCity: "",
       billingRegion: "",
-      // @ts-ignore Fix this
       billingCountry: null,
       cocNumber: "",
       vatId: "",

@@ -1,12 +1,14 @@
 import {
   email,
   Input,
+  merge,
   minLength,
   nullable,
   nullish,
   number,
   object,
   optional,
+  partial,
   string,
 } from "valibot";
 
@@ -28,22 +30,46 @@ export const BusinessCreateSchema = object({
   swiftBic: string([minLength(2)]),
 });
 
-export const BusinessUpdateSchema = object({
-  id: number(),
-  name: optional(string([minLength(2)])),
-  email: optional(string([email()])),
-  phone: optional(string([minLength(2)])),
-  addressLineOne: optional(string([minLength(2)])),
-  addressLineTwo: nullish(string([toNull()])),
-  city: optional(string([minLength(2)])),
-  region: nullish(string([toNull()])),
-  postalCode: nullish(string([toNull()])),
-  country: optional(string([minLength(2)])),
-  cocNumber: optional(string([minLength(2)])),
-  vatId: optional(string([minLength(2)])),
-  iban: optional(string([minLength(2)])),
-  swiftBic: optional(string([minLength(2)])),
-});
+export const BusinessUpdateSchema = merge([
+  object({ id: number() }),
+  partial(
+    object({
+      name: optional(string([minLength(2)])),
+      email: optional(string([email()])),
+      phone: optional(string([minLength(2)])),
+      addressLineOne: optional(string([minLength(2)])),
+      addressLineTwo: nullish(string([toNull()])),
+      city: optional(string([minLength(2)])),
+      region: nullish(string([toNull()])),
+      postalCode: nullish(string([toNull()])),
+      country: optional(string([minLength(2)])),
+      cocNumber: optional(string([minLength(2)])),
+      vatId: optional(string([minLength(2)])),
+      iban: optional(string([minLength(2)])),
+      swiftBic: optional(string([minLength(2)])),
+    }),
+  ),
+]);
+
+export type BusinessDefaultsSchema = {
+  name: "";
+  email: "";
+  phone: "";
+  addressLineOne: "";
+  addressLineTwo: "";
+  city: "";
+  region: "";
+  postalCode: "";
+  country: null;
+  cocNumber: "";
+  vatId: "";
+  iban: "";
+  swiftBic: "";
+};
 
 export type BusinessCreateInputSchema = Input<typeof BusinessCreateSchema>;
 export type BusinessUpdateInputSchema = Input<typeof BusinessUpdateSchema>;
+export type BusinessFormSchema =
+  | BusinessDefaultsSchema
+  | BusinessCreateInputSchema
+  | BusinessUpdateInputSchema;

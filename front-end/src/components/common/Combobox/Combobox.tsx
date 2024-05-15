@@ -103,7 +103,7 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
 
     useEffect(() => {
       if (typeof value === "string" && selectedOption) {
-        // TODO Fix this, sometimes it overwrites search input
+        // TODO Sometimes it overwrites search input
         setSearch(selectedOption.label);
       }
     }, [value, selectedOption, setSearch]);
