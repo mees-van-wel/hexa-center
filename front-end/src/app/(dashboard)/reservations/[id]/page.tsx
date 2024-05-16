@@ -32,6 +32,7 @@ import {
 } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
+import type { Route } from "next";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
@@ -630,8 +631,7 @@ const Detail = ({
                           <Button
                             fullWidth
                             component={Link}
-                            // @ts-ignore Router
-                            href={`/invoices/${invoice.id}`}
+                            href={`/invoices/${invoice.id}` as Route}
                             radius={0}
                           >
                             View Details

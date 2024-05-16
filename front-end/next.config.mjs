@@ -20,7 +20,13 @@ const nextConfig = {
   poweredByHeader: false,
   experimental: {
     typedRoutes: true,
-    optimizePackageImports: ["@mantine/core", "@mantine/hooks"],
+    optimizePackageImports: [
+      "@mantine/core",
+      "@mantine/hooks",
+      "dayjs",
+      "decimal.js",
+      "valibot",
+    ],
   },
   // typescript: {
   //   // !! WARN !!

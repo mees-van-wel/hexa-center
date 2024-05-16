@@ -155,9 +155,8 @@ export const Address = ({ disabled, required, keyOverrides }: AddressProps) => {
 
       const selectedAddress = JSON.parse(option);
 
-      Object.values(AddressKeys).forEach((key) => {
-        // @ts-ignore
-        key = keyOverrides?.[key] || key;
+      Object.values(AddressKeys).forEach((baseKey) => {
+        const key = keyOverrides?.[baseKey] || baseKey;
         let value = selectedAddress[key];
 
         if (key === countryKey)

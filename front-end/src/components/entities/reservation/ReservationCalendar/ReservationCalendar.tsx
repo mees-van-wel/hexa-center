@@ -5,6 +5,7 @@ import { IconArrowMoveLeft, IconArrowMoveRight } from "@tabler/icons-react";
 import clsx from "clsx";
 import dayjs, { Dayjs } from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
+import type { Route } from "next";
 import Link from "next/link";
 
 import { useTranslation } from "@/hooks/useTranslation";
@@ -221,8 +222,7 @@ export const ReservationCalendar = ({
                     <Button
                       key={`${reservation.room.name}-${reservationIndex}`}
                       component={Link}
-                      // @ts-ignore Router
-                      href={`/reservations/${reservation.id}`}
+                      href={`/reservations/${reservation.id}` as Route}
                       title={title}
                       size="xs"
                       classNames={{

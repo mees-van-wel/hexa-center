@@ -57,7 +57,7 @@ export const useQuery = <
 
       const trpc = getTrpcClient();
 
-      // @ts-ignore
+      // @ts-ignore Too complex typings
       const response: RouterOutput[T][P] = await trpc[scope][procedure]
         .query(
           params,

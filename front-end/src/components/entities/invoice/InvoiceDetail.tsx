@@ -27,6 +27,7 @@ import {
 } from "@tabler/icons-react";
 import { IconDownload } from "@tabler/icons-react";
 import dayjs from "dayjs";
+import type { Route } from "next";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -78,10 +79,10 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
           message: t("entities.invoice.issuedSucces"),
           color: "green",
         });
-      } catch (error) {
+      } catch (e) {
+        const error = e as Error | undefined;
         notifications.show({
           title: t("entities.invoice.issuedfailed"),
-          // @ts-ignore
           message: error?.message || "...",
           color: "red",
         });
@@ -152,10 +153,10 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
             message: t("entities.invoice.mailedSucces"),
             color: "green",
           });
-        } catch (error) {
+        } catch (e) {
+          const error = e as Error | undefined;
           notifications.show({
             title: t("entities.invoice.mailedFailed"),
-            // @ts-ignore
             message: error?.message || "...",
             color: "red",
           });
@@ -178,10 +179,10 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
             message: "Credited successfully",
             color: "green",
           });
-        } catch (error) {
+        } catch (e) {
+          const error = e as Error | undefined;
           notifications.show({
             title: t("entities.invoice.creditSucces"),
-            // @ts-ignore
             message: error?.message || "...",
             color: "red",
           });
@@ -322,8 +323,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   component={Link}
                   size="compact-md"
                   // TODO remove hardcoded s
-                  // @ts-ignore Router
-                  href={`/${invoice.refType}s/${invoice.refId}`}
+                  href={`/${invoice.refType}s/${invoice.refId}` as Route}
                   variant="light"
                   leftSection={<IconExternalLink size="1rem" />}
                 >
@@ -393,8 +393,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   <Button
                     component={Link}
                     size="compact-md"
-                    // @ts-ignore Router
-                    href={`/customers/${invoice.customerId}`}
+                    href={`/customers/${invoice.customerId}` as Route}
                     variant="light"
                     leftSection={<IconExternalLink size="1rem" />}
                   >
@@ -479,8 +478,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                   <Button
                     component={Link}
                     size="compact-md"
-                    // @ts-ignore Router
-                    href={`/businesses/${invoice.companyId}`}
+                    href={`/businesses/${invoice.companyId}` as Route}
                     variant="light"
                     leftSection={<IconExternalLink size="1rem" />}
                   >
@@ -585,8 +583,7 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
                                 <Button
                                   size="compact-sm"
                                   component={Link}
-                                  // @ts-ignore Router
-                                  href={`/invoices/${refId}`}
+                                  href={`/invoices/${refId}` as Router}
                                   variant="light"
                                 >
                                   <IconExternalLink size="1rem" />

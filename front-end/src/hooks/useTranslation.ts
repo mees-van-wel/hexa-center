@@ -26,7 +26,7 @@ export const useTranslation = () => {
       return value
         ? typeof value === "string"
           ? value
-          : // @ts-ignore
+          : // @ts-ignore TODO Fix typings
             value(params)
         : key;
     },
