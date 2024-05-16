@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   FormProvider,
@@ -100,10 +100,13 @@ const SaveBadge = () => {
   const t = useTranslation();
   const { handleJsonResult } = useException();
 
-  const { control, getValues, reset } =
+  const { control, getValues, reset, setError } =
     useFormContext<BusinessUpdateInputSchema>();
   const { isDirty, errors } = useFormState({ control });
   const isError = useMemo(() => !!Object.keys(errors).length, [errors]);
+  const [badgeError, setBadgeError] = useState(false);
+
+  useMemo(() => setBadgeError(false), [isDirty]);
 
   useAutosave(control, async (values) => {
     try {
@@ -114,8 +117,17 @@ const SaveBadge = () => {
 
       reset(updatedBusiness);
     } catch (error) {
-      console.log(error);
-      handleJsonResult(error, t("entities.company.singularName"));
+      const errorResult = handleJsonResult(
+        error,
+        t("entities.company.singularName"),
+      );
+
+      if (errorResult?.error) {
+        setBadgeError(true);
+        setError(errorResult?.column, { message: errorResult.error });
+      } else if (!errorResult?.success) {
+        reset();
+      }
     }
   });
 
@@ -123,10 +135,14 @@ const SaveBadge = () => {
     <Badge
       size="lg"
       color={
-        isError ? "red" : isDirty || updateBusiness.loading ? "orange" : "green"
+        isError || (badgeError && isDirty)
+          ? "red"
+          : isDirty || updateBusiness.loading
+            ? "orange"
+            : "green"
       }
       leftSection={
-        isError ? (
+        isError || (badgeError && isDirty) ? (
           <IconAlertTriangle size="1rem" />
         ) : isDirty || updateBusiness.loading ? (
           <Loader color="orange" variant="oval" size="1rem" />
@@ -136,7 +152,7 @@ const SaveBadge = () => {
       }
       variant="light"
     >
-      {isError
+      {isError || (badgeError && isDirty)
         ? t("common.error")
         : isDirty || updateBusiness.loading
           ? t("common.saving")
