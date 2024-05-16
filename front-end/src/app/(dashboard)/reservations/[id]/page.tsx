@@ -56,7 +56,7 @@ import { useMutation } from "@/hooks/useMutation";
 import { useQuery } from "@/hooks/useQuery";
 import { useTranslation } from "@/hooks/useTranslation";
 import {
-  ReservationInputUpdateSchema,
+  ReservationUpdateInputSchema,
   ReservationUpdateSchema,
 } from "@/schemas/reservation";
 import { RouterOutput } from "@/utils/trpc";
@@ -147,7 +147,7 @@ const Detail = ({
   const resetProduct = useMutation("reservation", "resetProduct");
   const deleteProductInstance = useMutation("product", "deleteInstance");
 
-  const formMethods = useForm<ReservationInputUpdateSchema>({
+  const formMethods = useForm<ReservationUpdateInputSchema>({
     defaultValues: reservation,
     resolver: valibotResolver(ReservationUpdateSchema),
   });
@@ -690,7 +690,7 @@ const SaveBadge = ({ reservation, reservations }: SaveButtonProps) => {
   const t = useTranslation();
 
   const { control, getValues, reset, setError } =
-    useFormContext<ReservationInputUpdateSchema>();
+    useFormContext<ReservationUpdateInputSchema>();
   const { isDirty, errors, dirtyFields } = useFormState({ control });
   const isError = useMemo(() => !!Object.keys(errors).length, [errors]);
 
@@ -778,7 +778,7 @@ const SaveBadge = ({ reservation, reservations }: SaveButtonProps) => {
   });
 
   const updateHandler = async (
-    values: Omit<ReservationInputUpdateSchema, "id">,
+    values: Omit<ReservationUpdateInputSchema, "id">,
   ) => {
     const updatedReservation = await updateReservation.mutate({
       ...values,

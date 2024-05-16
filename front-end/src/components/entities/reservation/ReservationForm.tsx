@@ -16,10 +16,7 @@ import { useMemo } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 
 import { useTranslation } from "@/hooks/useTranslation";
-import {
-  ReservationInputCreateSchema,
-  ReservationInputUpdateSchema,
-} from "@/schemas/reservation";
+import { ReservationFormSchema } from "@/schemas/reservation";
 import { type RouterOutput } from "@/utils/trpc";
 
 type ReservationForm = {
@@ -37,9 +34,7 @@ export const ReservationForm = ({ rooms, customers }: ReservationForm) => {
     watch,
     getFieldState,
     setValue,
-  } = useFormContext<
-    ReservationInputCreateSchema | ReservationInputUpdateSchema
-  >();
+  } = useFormContext<ReservationFormSchema>();
 
   const customerOptions = useMemo(
     () =>
@@ -142,17 +137,10 @@ export const ReservationForm = ({ rooms, customers }: ReservationForm) => {
           />
         </Group>
         <Group>
-          <Controller
-            name="guestName"
-            control={control}
-            render={({ field, fieldState: { error } }) => (
-              // @ts-ignore Fix this
-              <TextInput
-                {...field}
-                error={error?.message}
-                label={t("entities.reservation.guestName")}
-              />
-            )}
+          <TextInput
+            {...register("guestName")}
+            label={t("entities.reservation.guestName")}
+            error={errors.guestName?.message}
           />
           <Controller
             name="priceOverride"

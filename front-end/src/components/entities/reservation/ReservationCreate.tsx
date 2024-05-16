@@ -22,8 +22,9 @@ import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader"
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
 import {
+  ReservationCreateInputSchema,
   ReservationCreateSchema,
-  ReservationInputCreateSchema,
+  ReservationDefaultsSchema,
 } from "@/schemas/reservation";
 import { type RouterOutput } from "@/utils/trpc";
 
@@ -58,7 +59,7 @@ export const ReservationCreate = ({
 }: ReservationCreateProps) => {
   const t = useTranslation();
 
-  const formMethods = useForm<ReservationInputCreateSchema>({
+  const formMethods = useForm<ReservationDefaultsSchema>({
     resolver: valibotResolver(ReservationCreateSchema),
     defaultValues: {
       roomId: undefined,
@@ -104,10 +105,10 @@ const SaveButton = ({ reservations }: SaveButtonProps) => {
   const t = useTranslation();
 
   const { control, handleSubmit } =
-    useFormContext<ReservationInputCreateSchema>();
+    useFormContext<ReservationCreateInputSchema>();
   const { isDirty } = useFormState({ control });
 
-  const submitHandler: SubmitHandler<ReservationInputCreateSchema> = async (
+  const submitHandler: SubmitHandler<ReservationCreateInputSchema> = async (
     values,
   ) => {
     const overlaps = reservations.some((reservation) => {
@@ -144,7 +145,7 @@ const SaveButton = ({ reservations }: SaveButtonProps) => {
     createHandler(values);
   };
 
-  const createHandler = async (values: ReservationInputCreateSchema) => {
+  const createHandler = async (values: ReservationCreateInputSchema) => {
     const response = await createReservation.mutate(values);
 
     notifications.show({
