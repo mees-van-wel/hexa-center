@@ -1,19 +1,20 @@
 import { useDidUpdate } from "@mantine/hooks";
 import { useRef } from "react";
-import { useFormContext, useFormState, useWatch } from "react-hook-form";
+import {
+  type Control,
+  useFormContext,
+  useFormState,
+  useWatch,
+} from "react-hook-form";
 
-// TODO Fix typings
 // TODO Fix dirty fields only
-export const useAutosave = <T>(
+export const useAutosave = <T extends Control<any>>(
   control: T,
-  // @ts-ignore Fix this
   callback: (values: T["_defaultValues"]) => any,
   delay = 700,
 ) => {
   const timeoutRef = useRef<NodeJS.Timeout>();
-  // @ts-ignore Fix this
   const values = useWatch({ control });
-  // @ts-ignore Fix this
   const { dirtyFields } = useFormState({ control });
   const { handleSubmit } = useFormContext();
 
@@ -25,7 +26,6 @@ export const useAutosave = <T>(
 
       handleSubmit((values) => {
         callback(
-          // @ts-ignore Fix this
           dirtyFieldKeys.reduce((acc, key) => {
             return { ...acc, [key]: values[key] };
           }, {}),
