@@ -11,6 +11,7 @@ import {
 
 import { CustomerForm } from "@/components/entities/customer/CustomerForm";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
+import { useException } from "@/hooks/useException";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
 import {
@@ -71,21 +72,34 @@ const SaveButton = () => {
   const createCustomer = useMutation("customer", "create");
   const router = useRouter();
   const t = useTranslation();
+  const { handleJsonResult } = useException();
 
-  const { control, handleSubmit } = useFormContext<CustomerCreateInputSchema>();
+  const { control, handleSubmit, setError, reset } =
+    useFormContext<CustomerCreateInputSchema>();
   const { isDirty } = useFormState({ control });
 
   const submitHandler: SubmitHandler<CustomerCreateInputSchema> = async (
     values,
   ) => {
-    const response = await createCustomer.mutate(values);
+    try {
+      const response = await createCustomer.mutate(values);
 
-    notifications.show({
-      message: t("entities.customer.createdNotification"),
-      color: "green",
-    });
+      notifications.show({
+        message: t("entities.customer.createdNotification"),
+        color: "green",
+      });
 
-    router.push(`/customers/${response.id}`);
+      router.push(`/customers/${response.id}`);
+    } catch (error) {
+      const errorResult = handleJsonResult(
+        error,
+        t("entities.room.singularName"),
+      );
+
+      if (errorResult?.error)
+        setError(errorResult?.column, { message: errorResult.error });
+      else if (!errorResult?.success) reset();
+    }
   };
 
   return (

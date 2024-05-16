@@ -54,7 +54,8 @@ const SaveButton = () => {
   const t = useTranslation();
   const { handleJsonResult } = useException();
 
-  const { control, handleSubmit } = useFormContext<RoomInputCreateSchema>();
+  const { control, handleSubmit, setError, reset } =
+    useFormContext<RoomInputCreateSchema>();
   const { isDirty } = useFormState({ control });
 
   const submitHandler: SubmitHandler<RoomInputCreateSchema> = async (
@@ -70,7 +71,14 @@ const SaveButton = () => {
 
       router.push(`/rooms/${response.id}`);
     } catch (error) {
-      handleJsonResult(error, t("entities.room.singularName"));
+      const errorResult = handleJsonResult(
+        error,
+        t("entities.room.singularName"),
+      );
+
+      if (errorResult?.error)
+        setError(errorResult?.column, { message: errorResult.error });
+      else if (!errorResult?.success) reset();
     }
   };
 
