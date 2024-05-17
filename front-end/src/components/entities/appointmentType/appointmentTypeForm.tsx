@@ -1,6 +1,7 @@
 "use client";
 
 import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
 import { Controller, useFormContext } from "react-hook-form";
 
 import { useTranslation } from "@/hooks/useTranslation";
@@ -11,17 +12,13 @@ import {
 import { ColorInput, Group, Paper, Stack, TextInput } from "@mantine/core";
 import { TimeInput } from "@mantine/dates";
 
-type AppointmentTypeFormProps = {
-  disabled?: boolean;
-};
+dayjs.extend(duration);
 
-export const AppointmentTypeForm = ({ disabled }: AppointmentTypeFormProps) => {
+export const AppointmentTypeForm = () => {
   const t = useTranslation();
   const { register, control, formState } = useFormContext<
     AppointmentTypeCreateInputSchema | AppointmentTypeUpdateInputSchema
   >();
-  var duration = require("dayjs/plugin/duration");
-  dayjs.extend(duration);
 
   return (
     <Paper p="md">
@@ -31,7 +28,6 @@ export const AppointmentTypeForm = ({ disabled }: AppointmentTypeFormProps) => {
             {...register("name")}
             label={t("entities.appointmentType.keys.name")}
             error={formState.errors.name?.message}
-            disabled={disabled}
             required
           />
           <Controller
@@ -41,31 +37,21 @@ export const AppointmentTypeForm = ({ disabled }: AppointmentTypeFormProps) => {
               <ColorInput
                 {...field}
                 error={error?.message}
-                disabled={disabled}
                 label={t("entities.appointmentType.keys.color")}
                 required
               />
             )}
           />
         </Group>
-        <Controller
-          name="appointmentDuration"
-          control={control}
-          render={({ field, fieldState: { error } }) => (
-            <TimeInput
-              {...field}
-              value={field.value ? field.value : ""}
-              onChange={(event) => {
-                field.onChange(event.target.value);
-              }}
-              label={t("entities.appointmentType.duration")}
-              error={error?.message}
-            />
-          )}
+        <TimeInput
+          {...register("appointmentDuration")}
+          label={t("entities.appointmentType.duration")}
+          error={formState.errors.appointmentDuration?.message}
         />
         <TextInput
           {...register("appointmentDescription")}
           label={t("entities.appointmentType.appointmentDescription")}
+          error={formState.errors.appointmentDescription?.message}
         />
       </Stack>
     </Paper>
