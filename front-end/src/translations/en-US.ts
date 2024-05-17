@@ -68,6 +68,25 @@ export default {
       createdNotification: "Business successfully created",
       deletedNotification: "Business successfully deleted",
     },
+    appointmentType: {
+      name: {
+        singular: "Appointment type",
+        plural: "Appointment types",
+      },
+      keys: {
+        name: "Name",
+        start: "Start",
+        end: "End",
+        color: "Color",
+        number: "Number",
+      },
+      duration: "Duration",
+      hours: "Hours",
+      minutes: "Minutes",
+      appointmentDescription: "Appointment description",
+      createdNotification: "Appointment type successfully created",
+      deletedNotification: "Appointment type successfully deleted",
+    },
     room: {
       singularName: "Room",
       pluralName: "Rooms",

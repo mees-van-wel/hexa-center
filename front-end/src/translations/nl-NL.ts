@@ -69,6 +69,25 @@ export default {
       createdNotification: "Bedrijf succesvol aangemaakt",
       deletedNotification: "Bedrijf succesvol verwijderd",
     },
+    appointmentType: {
+      name: {
+        singular: "Afspraaktype",
+        plural: "Afspraaktypes",
+      },
+      keys: {
+        name: "Naam",
+        start: "Start",
+        end: "Einde",
+        color: "Kleur",
+        number: "Nummer",
+      },
+      duration: "Tijdsduur",
+      hours: "Uren",
+      minutes: "Minuten",
+      appointmentDescription: "Afspraakbeschrijving",
+      createdNotification: "Afspraaktype succesvol aangemaakt",
+      deletedNotification: "Afsrpaaktype succesvol verwijderd",
+    },
     room: {
       singularName: "Kamer",
       pluralName: "Kamers",

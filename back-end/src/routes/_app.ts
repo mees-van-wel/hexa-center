@@ -2,6 +2,7 @@ import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 
 import { router } from "../trpc";
 
+import { appointmentTypeRouter } from "./appointmentType";
 import { authRouter } from "./auth";
 import { businessRouter } from "./business";
 import { customerRouter } from "./customer";
@@ -16,6 +17,7 @@ import { userRouter } from "./user";
 export const appRouter = router({
   auth: authRouter,
   business: businessRouter,
+  appointmentType: appointmentTypeRouter,
   user: userRouter,
   room: roomRouter,
   reservation: reservationRouter,
