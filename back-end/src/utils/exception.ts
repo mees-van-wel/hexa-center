@@ -18,7 +18,7 @@ export const createPgException = (error: any) => {
   console.warn(error);
 
   if (exception === "DB_UNIQUE_CONSTRAINT") {
-    const match = error.detail.match(/\(name\)=\((.*?)\)/);
+    const match = error.detail.match(/=\((.*?)\)/);
 
     return new TRPCError({
       code: "BAD_REQUEST",

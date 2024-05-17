@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   FormProvider,
@@ -36,6 +36,7 @@ type RoomProps = {
 
 export const RoomUpdate = ({ room }: RoomProps) => {
   const t = useTranslation();
+  const { handleJsonResult } = useException();
   const router = useRouter();
   const deleteRoom = useMutation("room", "delete");
 
@@ -49,13 +50,18 @@ export const RoomUpdate = ({ room }: RoomProps) => {
       title: t("common.areYouSure"),
       labels: { confirm: t("common.yes"), cancel: t("common.no") },
       onConfirm: async () => {
-        await deleteRoom.mutate(room.id);
+        try {
+          await deleteRoom.mutate(room.id);
 
-        notifications.show({
-          message: t("entities.room.deletedNotification"),
-          color: "green",
-        });
-        router.push("/rooms");
+          notifications.show({
+            message: t("entities.room.deletedNotification"),
+            color: "green",
+          });
+
+          router.push("/rooms");
+        } catch (error) {
+          handleJsonResult(error, t("entities.room.singularName"));
+        }
       },
     });
   };
@@ -96,9 +102,13 @@ const SaveBadge = () => {
   const t = useTranslation();
   const { handleJsonResult } = useException();
 
-  const { control, getValues, reset } = useFormContext<RoomInputUpdateSchema>();
+  const { control, getValues, reset, setError } =
+    useFormContext<RoomInputUpdateSchema>();
   const { isDirty, errors } = useFormState({ control });
   const isError = useMemo(() => !!Object.keys(errors).length, [errors]);
+  const [exceptionError, setExceptionError] = useState(false);
+
+  useMemo(() => setExceptionError(false), [isDirty]);
 
   useAutosave(control, async (values) => {
     try {
@@ -109,7 +119,17 @@ const SaveBadge = () => {
 
       reset(updatedRoom);
     } catch (error) {
-      handleJsonResult(error, t("entities.room.singularName"));
+      const errorResult = handleJsonResult(
+        error,
+        t("entities.room.singularName"),
+      );
+
+      if (errorResult?.error) {
+        setExceptionError(true);
+        setError(errorResult?.column, { message: errorResult.error });
+      } else if (!errorResult?.success) {
+        reset();
+      }
     }
   });
 
@@ -117,10 +137,14 @@ const SaveBadge = () => {
     <Badge
       size="lg"
       color={
-        isError ? "red" : isDirty || updateRoom.loading ? "orange" : "green"
+        isError || (exceptionError && isDirty)
+          ? "red"
+          : isDirty || updateRoom.loading
+            ? "orange"
+            : "green"
       }
       leftSection={
-        isError ? (
+        isError || (exceptionError && isDirty) ? (
           <IconAlertTriangle size="1rem" />
         ) : isDirty || updateRoom.loading ? (
           <Loader color="orange" variant="oval" size="1rem" />
@@ -130,7 +154,7 @@ const SaveBadge = () => {
       }
       variant="light"
     >
-      {isError
+      {isError || (exceptionError && isDirty)
         ? t("common.error")
         : isDirty || updateRoom.loading
           ? t("common.saving")

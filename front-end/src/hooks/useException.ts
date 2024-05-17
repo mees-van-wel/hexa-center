@@ -29,19 +29,19 @@ export function useException() {
 
     const { exception, data } = json;
 
-    if (exception === "DB_UNIQUE_CONSTRAINT") {
+    if (exception === "DB_UNIQUE_CONSTRAINT")
       return {
         column: data.column,
         exception: "DB_UNIQUE_CONSTRAINT",
         error: t("exceptions.DB_UNIQUE", entity, data.value, data.column),
       };
-    }
 
-    if (exception === "DB_KEY_CONSTRAINT")
+    if (exception === "DB_KEY_CONSTRAINT") {
       notifications.show({
         message: t("exceptions.DB_STRICT", data.depend, entity),
         color: "red",
       });
+    }
   }
 
   return { isJson, handleJsonResult };

@@ -78,7 +78,6 @@ const SaveButton = () => {
 
       if (errorResult?.error)
         setError(errorResult?.column, { message: errorResult.error });
-      else if (!errorResult?.success) reset();
     }
   };
 

@@ -42,7 +42,7 @@ export default function Page() {
     },
   });
 
-  const { handleSubmit, formState, setError, reset } = formMethods;
+  const { handleSubmit, formState, setError } = formMethods;
 
   const onSubmit = async (values: BusinessCreateInputSchema) => {
     try {
@@ -62,7 +62,6 @@ export default function Page() {
 
       if (errorResult?.error)
         setError(errorResult?.column, { message: errorResult.error });
-      else if (!errorResult?.success) reset();
     }
   };
 

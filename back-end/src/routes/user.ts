@@ -12,39 +12,43 @@ export const userRouter = router({
   create: procedure
     .input(wrap(UserCreateSchema))
     .mutation(async ({ input, ctx }) => {
-      const result = await ctx.db
-        .insert(users)
-        .values({
-          ...input,
-          createdById: ctx.user.id,
-          updatedById: ctx.user.id,
-          businessId: 1,
-          roleId: 1,
-        })
-        .returning({
-          $kind: users.$kind,
-          id: users.id,
-          createdAt: users.createdAt,
-          createdById: users.createdById,
-          updatedAt: users.updatedAt,
-          updatedById: users.updatedById,
-          firstName: users.firstName,
-          lastName: users.lastName,
-          email: users.email,
-          phone: users.phone,
-          addressLineOne: users.addressLineOne,
-          addressLineTwo: users.addressLineTwo,
-          city: users.city,
-          region: users.region,
-          postalCode: users.postalCode,
-          country: users.country,
-          sex: users.sex,
-          birthDate: users.birthDate,
-        });
+      try {
+        const result = await ctx.db
+          .insert(users)
+          .values({
+            ...input,
+            createdById: ctx.user.id,
+            updatedById: ctx.user.id,
+            businessId: 1,
+            roleId: 1,
+          })
+          .returning({
+            $kind: users.$kind,
+            id: users.id,
+            createdAt: users.createdAt,
+            createdById: users.createdById,
+            updatedAt: users.updatedAt,
+            updatedById: users.updatedById,
+            firstName: users.firstName,
+            lastName: users.lastName,
+            email: users.email,
+            phone: users.phone,
+            addressLineOne: users.addressLineOne,
+            addressLineTwo: users.addressLineTwo,
+            city: users.city,
+            region: users.region,
+            postalCode: users.postalCode,
+            country: users.country,
+            sex: users.sex,
+            birthDate: users.birthDate,
+          });
 
-      const user = result[0];
+        const user = result[0];
 
-      return user;
+        return user;
+      } catch (error) {
+        throw createPgException(error);
+      }
     }),
   list: procedure.query(({ ctx }) =>
     ctx.db
@@ -128,9 +132,9 @@ export const userRouter = router({
         throw createPgException(error);
       }
     }),
-  delete: procedure.input(wrap(number())).mutation(({ input, ctx }) => {
+  delete: procedure.input(wrap(number())).mutation(async ({ input, ctx }) => {
     try {
-      return ctx.db.delete(users).where(eq(users.id, input));
+      await ctx.db.delete(users).where(eq(users.id, input));
     } catch (error) {
       throw createPgException(error);
     }

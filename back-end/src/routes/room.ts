@@ -99,9 +99,11 @@ export const roomRouter = router({
         throw createPgException(error);
       }
     }),
-  delete: procedure
-    .input(wrap(number()))
-    .mutation(({ input, ctx }) =>
-      ctx.db.delete(rooms).where(eq(rooms.id, input)),
-    ),
+  delete: procedure.input(wrap(number())).mutation(async ({ input, ctx }) => {
+    try {
+      await ctx.db.delete(rooms).where(eq(rooms.id, input));
+    } catch (error) {
+      throw createPgException(error);
+    }
+  }),
 });

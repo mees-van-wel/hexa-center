@@ -11,6 +11,7 @@ import {
 
 import { UserForm } from "@/components/entities/user/UserForm";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
+import { useException } from "@/hooks/useException";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
 import { UserCreateInputSchema, UserCreateSchema } from "@/schemas/user";
@@ -66,21 +67,33 @@ const SaveButton = () => {
   const createUser = useMutation("user", "create");
   const router = useRouter();
   const t = useTranslation();
+  const { handleJsonResult } = useException();
 
-  const { control, handleSubmit } = useFormContext<UserCreateInputSchema>();
+  const { control, handleSubmit, setError } =
+    useFormContext<UserCreateInputSchema>();
   const { isDirty } = useFormState({ control });
 
   const submitHandler: SubmitHandler<UserCreateInputSchema> = async (
     values,
   ) => {
-    const response = await createUser.mutate(values);
+    try {
+      const response = await createUser.mutate(values);
 
-    notifications.show({
-      message: t("entities.user.createdNotification"),
-      color: "green",
-    });
+      notifications.show({
+        message: t("entities.user.createdNotification"),
+        color: "green",
+      });
 
-    router.push(`/users/${response.id}`);
+      router.push(`/users/${response.id}`);
+    } catch (error) {
+      const errorResult = handleJsonResult(
+        error,
+        t("entities.user.singularName"),
+      );
+
+      if (errorResult?.error)
+        setError(errorResult?.column, { message: errorResult.error });
+    }
   };
 
   return (

@@ -39,6 +39,7 @@ type BusinessPageProps = {
 
 export const BusinessDetail = ({ business }: BusinessPageProps) => {
   const t = useTranslation();
+  const { handleJsonResult } = useException();
   const router = useRouter();
   const deleteBusiness = useMutation("business", "delete");
 
@@ -52,14 +53,18 @@ export const BusinessDetail = ({ business }: BusinessPageProps) => {
       title: t("common.areYouSure"),
       labels: { confirm: t("common.yes"), cancel: t("common.no") },
       onConfirm: async () => {
-        await deleteBusiness.mutate(business.id);
+        try {
+          await deleteBusiness.mutate(business.id);
 
-        notifications.show({
-          message: t("entities.company.deletedNotification"),
-          color: "green",
-        });
+          notifications.show({
+            message: t("entities.company.deletedNotification"),
+            color: "green",
+          });
 
-        router.push("/businesses");
+          router.push("/businesses");
+        } catch (error) {
+          handleJsonResult(error, t("entities.company.singularName"));
+        }
       },
     });
   };

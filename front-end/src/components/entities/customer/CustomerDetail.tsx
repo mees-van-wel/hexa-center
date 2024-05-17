@@ -110,9 +110,9 @@ const SaveBadge = () => {
     useFormContext<CustomerUpdateInputSchema>();
   const { isDirty, errors } = useFormState({ control });
   const isError = useMemo(() => !!Object.keys(errors).length, [errors]);
-  const [badgeError, setBadgeError] = useState(false);
+  const [exceptionError, setExceptionError] = useState(false);
 
-  useMemo(() => setBadgeError(false), [isDirty]);
+  useMemo(() => setExceptionError(false), [isDirty]);
 
   useAutosave(control, async (values) => {
     try {
@@ -129,7 +129,7 @@ const SaveBadge = () => {
       );
 
       if (errorResult?.error) {
-        setBadgeError(true);
+        setExceptionError(true);
         setError(errorResult?.column, { message: errorResult.error });
       } else if (!errorResult?.success) {
         reset();
@@ -137,20 +137,18 @@ const SaveBadge = () => {
     }
   });
 
-  console.log(badgeError);
-
   return (
     <Badge
       size="lg"
       color={
-        isError || (badgeError && isDirty)
+        isError || (exceptionError && isDirty)
           ? "red"
           : isDirty || updateCustomer.loading
             ? "orange"
             : "green"
       }
       leftSection={
-        isError || (badgeError && isDirty) ? (
+        isError || (exceptionError && isDirty) ? (
           <IconAlertTriangle size="1rem" />
         ) : isDirty || updateCustomer.loading ? (
           <Loader color="orange" variant="oval" size="1rem" />
@@ -160,7 +158,7 @@ const SaveBadge = () => {
       }
       variant="light"
     >
-      {isError || (badgeError && isDirty)
+      {isError || (exceptionError && isDirty)
         ? t("common.error")
         : isDirty || updateCustomer.loading
           ? t("common.saving")

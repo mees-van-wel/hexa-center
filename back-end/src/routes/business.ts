@@ -129,9 +129,11 @@ export const businessRouter = router({
         throw createPgException(error);
       }
     }),
-  delete: procedure
-    .input(wrap(number()))
-    .mutation(({ input, ctx }) =>
-      ctx.db.delete(businesses).where(eq(businesses.id, input)),
-    ),
+  delete: procedure.input(wrap(number())).mutation(async ({ input, ctx }) => {
+    try {
+      await ctx.db.delete(businesses).where(eq(businesses.id, input));
+    } catch (error) {
+      throw createPgException(error);
+    }
+  }),
 });

@@ -74,7 +74,7 @@ const SaveButton = () => {
   const t = useTranslation();
   const { handleJsonResult } = useException();
 
-  const { control, handleSubmit, setError, reset } =
+  const { control, handleSubmit, setError } =
     useFormContext<CustomerCreateInputSchema>();
   const { isDirty } = useFormState({ control });
 
@@ -98,7 +98,6 @@ const SaveButton = () => {
 
       if (errorResult?.error)
         setError(errorResult?.column, { message: errorResult.error });
-      else if (!errorResult?.success) reset();
     }
   };
 

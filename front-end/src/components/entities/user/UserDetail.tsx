@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   FormProvider,
@@ -126,9 +126,13 @@ const SaveBadge = () => {
   const t = useTranslation();
   const { handleJsonResult } = useException();
 
-  const { control, getValues, reset } = useFormContext<UserUpdateInputSchema>();
+  const { control, getValues, reset, setError } =
+    useFormContext<UserUpdateInputSchema>();
   const { isDirty, errors } = useFormState({ control });
   const isError = useMemo(() => !!Object.keys(errors).length, [errors]);
+  const [exceptionError, setExceptionError] = useState(false);
+
+  useMemo(() => setExceptionError(false), [isDirty]);
 
   useAutosave(control, async (values) => {
     try {
@@ -139,7 +143,17 @@ const SaveBadge = () => {
 
       reset(updatedUser);
     } catch (error) {
-      handleJsonResult(error, t("entities.user.singularName"));
+      const errorResult = handleJsonResult(
+        error,
+        t("entities.user.singularName"),
+      );
+
+      if (errorResult?.error) {
+        setExceptionError(true);
+        setError(errorResult?.column, { message: errorResult.error });
+      } else if (!errorResult?.success) {
+        reset();
+      }
     }
   });
 
@@ -147,10 +161,14 @@ const SaveBadge = () => {
     <Badge
       size="lg"
       color={
-        isError ? "red" : isDirty || updateUser.loading ? "orange" : "green"
+        isError || (exceptionError && isDirty)
+          ? "red"
+          : isDirty || updateUser.loading
+            ? "orange"
+            : "green"
       }
       leftSection={
-        isError ? (
+        isError || (exceptionError && isDirty) ? (
           <IconAlertTriangle size="1rem" />
         ) : isDirty || updateUser.loading ? (
           <Loader color="orange" variant="oval" size="1rem" />
@@ -160,7 +178,7 @@ const SaveBadge = () => {
       }
       variant="light"
     >
-      {isError
+      {isError || (exceptionError && isDirty)
         ? t("common.error")
         : isDirty || updateUser.loading
           ? t("common.saving")
