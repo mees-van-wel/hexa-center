@@ -1,3 +1,4 @@
+import { convert } from "html-to-text";
 import mjml2html from "mjml";
 import { Attachment, ServerClient } from "postmark";
 
@@ -51,7 +52,7 @@ type SendMailProps<T extends keyof Mails> = {
 
 export const sendMail = async <T extends keyof Mails>({
   title,
-  logo = "https://cdn.mcauto-images-production.sendgrid.net/b2afceaeb16d6ede/8d7c73d8-b2dc-4ec3-b181-b719345cabd4/140x163.png",
+  logo = "https://www.hexa.center/images/icon-dark.svg",
   footer,
   from = {
     name: "Hexa Center",
@@ -90,6 +91,7 @@ export const sendMail = async <T extends keyof Mails>({
     To: `${to.name} <${to.email}>`,
     Subject: title,
     HtmlBody: html,
+    TextBody: convert(html, { wordwrap: 130 }),
     Attachments: attachments,
   });
 };
