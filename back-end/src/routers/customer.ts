@@ -30,6 +30,7 @@ export const customerRouter = router({
           ...input,
           createdById: ctx.user.id,
           updatedById: ctx.user.id,
+          // TODO Make dynamic
           businessId: 1,
         })
         .returning({

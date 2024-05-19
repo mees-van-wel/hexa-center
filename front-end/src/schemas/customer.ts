@@ -59,5 +59,26 @@ export const CustomerUpdateSchema = merge([
   ),
 ]);
 
+export type CustomerDefaultsSchema = {
+  name: "";
+  email: "";
+  phone: "";
+  billingAddressLineOne: "";
+  billingAddressLineTwo: "";
+  billingPostalCode: "";
+  billingCity: "";
+  billingRegion: "";
+  billingCountry: null;
+  cocNumber: "";
+  vatId: "";
+  contactPersonName: "";
+  contactPersonEmail: "";
+  contactPersonPhone: "";
+};
+
 export type CustomerCreateInputSchema = Input<typeof CustomerCreateSchema>;
 export type CustomerUpdateInputSchema = Input<typeof CustomerUpdateSchema>;
+export type CustomerFormShema =
+  | CustomerDefaultsSchema
+  | CustomerCreateInputSchema
+  | CustomerUpdateInputSchema;

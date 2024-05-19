@@ -9,7 +9,7 @@ import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import IsSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import IsSameOrBefore from "dayjs/plugin/isSameOrBefore";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import {
   FormProvider,
   SubmitHandler,

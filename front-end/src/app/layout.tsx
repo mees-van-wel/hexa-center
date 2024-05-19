@@ -15,6 +15,7 @@ import localFont from "next/font/local";
 import { headers } from "next/headers";
 import { redirect, RedirectType } from "next/navigation";
 
+import { LOCALES } from "@/constants/locales";
 import { AuthContextProvider } from "@/contexts/AuthContext";
 import { TranslationInitializer } from "@/initializers/TranslationInitializer";
 import { tRPCError } from "@/types/tRPCError";
@@ -47,7 +48,8 @@ export default async function RootLayout({
   let user: RouterOutput["auth"]["currentUser"] | null = null;
 
   try {
-    const trpc = getTrpcClientOnServer();
+    const trpc = await getTrpcClientOnServer();
+
     user = await trpc.auth.currentUser.query();
   } catch (e) {
     const error = e as tRPCError;
@@ -60,7 +62,7 @@ export default async function RootLayout({
   if (user && pathname === "/login") redirect("/", RedirectType.replace);
 
   return (
-    <html lang="en">
+    <html lang="nl">
       <head>
         <ColorSchemeScript />
       </head>
@@ -70,7 +72,7 @@ export default async function RootLayout({
       >
         <Providers>
           <AuthContextProvider currentUser={user}>
-            <TranslationInitializer>
+            <TranslationInitializer initialLocale={LOCALES.NL_NL}>
               <MantineProvider
                 defaultColorScheme={dark ? "dark" : "light"}
                 theme={{

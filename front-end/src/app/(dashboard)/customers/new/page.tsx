@@ -20,12 +20,13 @@ import { useTranslation } from "@/hooks/useTranslation";
 import {
   CustomerCreateInputSchema,
   CustomerCreateSchema,
+  CustomerDefaultsSchema,
 } from "@/schemas/customer";
 
 export default function Page() {
   const t = useTranslation();
 
-  const formMethods = useForm<CustomerCreateInputSchema>({
+  const formMethods = useForm<CustomerDefaultsSchema>({
     resolver: valibotResolver(CustomerCreateSchema),
     defaultValues: {
       name: "",
