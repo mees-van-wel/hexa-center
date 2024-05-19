@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Flex, Group, Loader, Paper, Stack } from "@mantine/core";
+import { Button, Group, Paper, Stack } from "@mantine/core";
 import { useSessionStorage } from "@mantine/hooks";
 import {
   IconArrowBarLeft,
@@ -15,6 +15,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { CalendarSidebar } from "@/components/common/CalendarSidebar";
+import { Loading } from "@/components/common/Loading";
 import { ReservationCalendar } from "@/components/entities/reservation/ReservationCalendar";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { CALENDAR_VIEWS, type CalendarView } from "@/constants/calendarViews";
@@ -121,17 +122,7 @@ export default function Page() {
       listReservations.loading ||
       !listRooms.data ||
       !listReservations.data ? (
-        <Flex
-          gap="md"
-          justify="center"
-          align="center"
-          direction="row"
-          wrap="wrap"
-          component={Paper}
-          p="md"
-        >
-          <Loader />
-        </Flex>
+        <Loading />
       ) : (
         <Group
           wrap="nowrap"

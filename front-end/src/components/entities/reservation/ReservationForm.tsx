@@ -15,16 +15,33 @@ import { IconCurrencyEuro } from "@tabler/icons-react";
 import { useMemo } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 
+import { Loading } from "@/components/common/Loading";
+import { useQuery } from "@/hooks/useQuery";
 import { useTranslation } from "@/hooks/useTranslation";
 import { ReservationFormSchema } from "@/schemas/reservation";
 import { type RouterOutput } from "@/utils/trpc";
 
-type ReservationForm = {
+export const ReservationForm = () => {
+  const listCustomers = useQuery("customer", "list");
+  const listRooms = useQuery("room", "list");
+
+  if (
+    listCustomers.loading ||
+    listRooms.loading ||
+    !listCustomers.data ||
+    !listRooms.data
+  )
+    return <Loading />;
+
+  return <Form customers={listCustomers.data} rooms={listRooms.data} />;
+};
+
+type FormProps = {
   rooms: RouterOutput["room"]["list"];
   customers: RouterOutput["customer"]["list"];
 };
 
-export const ReservationForm = ({ rooms, customers }: ReservationForm) => {
+const Form = ({ rooms, customers }: FormProps) => {
   const t = useTranslation();
 
   const {

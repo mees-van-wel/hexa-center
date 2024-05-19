@@ -1,11 +1,12 @@
 "use client";
 
-import { Button, Flex, Loader, Paper, Stack } from "@mantine/core";
+import { Button, Stack } from "@mantine/core";
 import { IconBuilding, IconPlus } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useId } from "react";
 
+import { Loading } from "@/components/common/Loading";
 import { Table } from "@/components/common/Table";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { useQuery } from "@/hooks/useQuery";
@@ -35,17 +36,7 @@ export default function Page() {
         <Table.SearchBar id={searchBarId} />
       </DashboardHeader>
       {listBusinesses.loading || !listBusinesses.data ? (
-        <Flex
-          gap="md"
-          justify="center"
-          align="center"
-          direction="row"
-          wrap="wrap"
-          component={Paper}
-          p="md"
-        >
-          <Loader />
-        </Flex>
+        <Loading />
       ) : (
         <Table
           elements={listBusinesses.data}

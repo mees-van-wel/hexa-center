@@ -48,7 +48,6 @@ import { Metadata } from "@/components/common/Metadata";
 import { AddProductModal } from "@/components/entities/reservation/AddProductModal";
 import { EditProductModal } from "@/components/entities/reservation/EditProductModal";
 import { InvoicePeriodModal } from "@/components/entities/reservation/InvoicePeriodModal";
-import { overlapDates } from "@/components/entities/reservation/ReservationCreate";
 import { ReservationForm } from "@/components/entities/reservation/ReservationForm";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { useAutosave } from "@/hooks/useAutosave";
@@ -62,6 +61,8 @@ import {
 } from "@/schemas/reservation";
 import { RouterOutput } from "@/utils/trpc";
 
+import { overlapDates } from "../new/page";
+
 dayjs.extend(isBetween);
 
 type ReservationPageParams = {
@@ -71,8 +72,6 @@ type ReservationPageParams = {
 };
 
 export default function Page({ params }: ReservationPageParams) {
-  const listCustomers = useQuery("customer", "list");
-  const listRooms = useQuery("room", "list");
   const listReservations = useQuery("reservation", "list");
   const listProductTemplates = useQuery("product", "list");
   const listLedgerAccounts = useQuery("ledgerAccount", "list");
@@ -81,14 +80,10 @@ export default function Page({ params }: ReservationPageParams) {
   });
 
   if (
-    listCustomers.loading ||
-    listRooms.loading ||
     listReservations.loading ||
     listProductTemplates.loading ||
     listLedgerAccounts.loading ||
     getReservation.loading ||
-    !listCustomers.data ||
-    !listRooms.data ||
     !listReservations.data ||
     !listProductTemplates.data ||
     !listLedgerAccounts.data ||
@@ -111,8 +106,6 @@ export default function Page({ params }: ReservationPageParams) {
   return (
     <Detail
       reservation={getReservation.data}
-      rooms={listRooms.data}
-      customers={listCustomers.data}
       reservations={listReservations.data}
       productTemplates={listProductTemplates.data}
       ledgerAccounts={listLedgerAccounts.data}
@@ -122,8 +115,6 @@ export default function Page({ params }: ReservationPageParams) {
 
 type DetailProps = {
   reservation: RouterOutput["reservation"]["get"];
-  rooms: RouterOutput["room"]["list"];
-  customers: RouterOutput["customer"]["list"];
   reservations: RouterOutput["reservation"]["list"];
   productTemplates: RouterOutput["product"]["list"];
   ledgerAccounts: RouterOutput["ledgerAccount"]["list"];
@@ -131,8 +122,6 @@ type DetailProps = {
 
 const Detail = ({
   reservation,
-  rooms,
-  customers,
   reservations,
   productTemplates,
   ledgerAccounts,
@@ -346,11 +335,6 @@ const Detail = ({
     [invoices, reservation.endDate],
   );
 
-  const customer = useMemo(
-    () => customers.find((customer) => customer.id === reservation.customerId),
-    [customers, reservation.customerId],
-  );
-
   return (
     <FormProvider {...formMethods}>
       <Stack>
@@ -363,7 +347,7 @@ const Detail = ({
               href: "/reservations",
             },
             {
-              label: customer?.name || "",
+              label: reservation.guestName || "",
             },
           ]}
         >
@@ -386,7 +370,7 @@ const Detail = ({
           </Button>
           <SaveBadge reservation={reservation} reservations={reservations} />
         </DashboardHeader>
-        <ReservationForm rooms={rooms} customers={customers} />
+        <ReservationForm />
         <Paper p="2rem">
           <Band
             title={
