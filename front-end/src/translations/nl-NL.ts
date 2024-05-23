@@ -90,7 +90,7 @@ export default {
       invoicePeriod: {
         name: "Factuurperiode",
         create: "Factuur maken",
-        succes: "Periode succesvol gefactureerd",
+        success: "Periode succesvol gefactureerd",
       },
       calendar: {
         roomName: "Kamer naam",

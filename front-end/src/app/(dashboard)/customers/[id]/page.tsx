@@ -68,6 +68,8 @@ const Detail = ({ customer }: DetailProps) => {
       onConfirm: async () => {
         await deleteCustomer.mutate(customer.id);
 
+        memory.evict(customer);
+
         notifications.show({
           message: t("entities.customer.deletedNotification"),
           color: "green",
@@ -112,6 +114,7 @@ const Detail = ({ customer }: DetailProps) => {
 
 const SaveBadge = () => {
   const updateCustomer = useMutation("customer", "update");
+  const memory = useMemory();
   const t = useTranslation();
 
   const { control, getValues, reset, setError } =
@@ -136,6 +139,7 @@ const SaveBadge = () => {
         id: getValues("id"),
       });
 
+      memory.update(updatedCustomer);
       reset(updatedCustomer);
     } catch (error) {
       // TODO Fix typings

@@ -89,7 +89,7 @@ export default {
       invoicePeriod: {
         name: "Invoice Period",
         create: "Create invoice",
-        succes: "Period successfully Invoiced",
+        success: "Period successfully Invoiced",
       },
       calendar: {
         roomName: "Room name",

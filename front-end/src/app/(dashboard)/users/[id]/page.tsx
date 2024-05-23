@@ -1,15 +1,7 @@
 "use client";
 
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import {
-  Alert,
-  Badge,
-  Button,
-  Flex,
-  Loader,
-  Paper,
-  Stack,
-} from "@mantine/core";
+import { Alert, Badge, Button, Loader, Paper, Stack } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import {
@@ -27,6 +19,7 @@ import {
   useFormState,
 } from "react-hook-form";
 
+import { Loading } from "@/components/common/Loading";
 import { Metadata } from "@/components/common/Metadata";
 import { UserForm } from "@/components/entities/user/UserForm";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
@@ -46,20 +39,7 @@ export default function Page({ params }: PageParams) {
     initialParams: parseInt(params.id),
   });
 
-  if (getUser.loading || !getUser.data)
-    return (
-      <Flex
-        gap="md"
-        justify="center"
-        align="center"
-        direction="row"
-        wrap="wrap"
-        component={Paper}
-        p="md"
-      >
-        <Loader />
-      </Flex>
-    );
+  if (getUser.loading || !getUser.data) return <Loading />;
 
   return <Detail user={getUser.data} />;
 }

@@ -6,7 +6,6 @@ import {
   Button,
   Card,
   Divider,
-  Flex,
   Group,
   Loader,
   Paper,
@@ -44,6 +43,7 @@ import {
 } from "react-hook-form";
 
 import { Band } from "@/components/common/Band";
+import { Loading } from "@/components/common/Loading";
 import { Metadata } from "@/components/common/Metadata";
 import { AddProductModal } from "@/components/entities/reservation/AddProductModal";
 import { EditProductModal } from "@/components/entities/reservation/EditProductModal";
@@ -59,6 +59,7 @@ import {
   ReservationUpdateInputSchema,
   ReservationUpdateSchema,
 } from "@/schemas/reservation";
+import { updateObjectInArray } from "@/utils/array";
 import { RouterOutput } from "@/utils/trpc";
 
 import { overlapDates } from "../new/page";
@@ -77,6 +78,7 @@ export default function Page({ params }: ReservationPageParams) {
   const listLedgerAccounts = useQuery("ledgerAccount", "list");
   const getReservation = useQuery("reservation", "get", {
     initialParams: parseInt(params.id),
+    skipInitial: !listReservations.data,
   });
 
   if (
@@ -89,19 +91,7 @@ export default function Page({ params }: ReservationPageParams) {
     !listLedgerAccounts.data ||
     !getReservation.data
   )
-    return (
-      <Flex
-        gap="md"
-        justify="center"
-        align="center"
-        direction="row"
-        wrap="wrap"
-        component={Paper}
-        p="md"
-      >
-        <Loader />
-      </Flex>
-    );
+    return <Loading />;
 
   return (
     <Detail
@@ -203,16 +193,24 @@ const Detail = ({
               : reservation.startDate
           }
           onConfirm={async (periodStartDate, periodEndDate) => {
-            await invoicePeriod.mutate({
+            const response = await invoicePeriod.mutate({
               reservationId: reservation.id,
               periodStartDate,
               periodEndDate,
             });
 
-            router.refresh();
+            memory.rawUpdate({
+              scope: "reservation",
+              procedure: "get",
+              params: reservation.id,
+              data: (current) => ({
+                ...current,
+                invoicesJunction: [...current.invoicesJunction, response],
+              }),
+            });
 
             notifications.show({
-              message: t("entities.reservation.invoicePeriod.succes"),
+              message: t("entities.reservation.invoicePeriod.success"),
               color: "green",
             });
           }}
@@ -229,13 +227,24 @@ const Detail = ({
           templates={productTemplates}
           ledgerAccounts={ledgerAccounts}
           onConfirm={async (templateId, values) => {
-            await addProduct.mutate({
+            const response = await addProduct.mutate({
               reservationId: reservation.id,
               templateId,
               ...values,
             });
 
-            router.refresh();
+            memory.rawUpdate({
+              scope: "reservation",
+              procedure: "get",
+              params: reservation.id,
+              data: (current) => ({
+                ...current,
+                productInstancesJunction: [
+                  ...current.productInstancesJunction,
+                  response,
+                ],
+              }),
+            });
 
             notifications.show({
               message: t("entities.product.addSucces"),
@@ -269,13 +278,29 @@ const Detail = ({
               productInstanceJunction.productInstance.revenueAccountId,
           }}
           onConfirm={async (values) => {
-            await editProduct.mutate({
+            const response = await editProduct.mutate({
               reservationId: reservation.id,
               instanceId: productInstanceJunction.productInstance.id,
               ...values,
             });
 
-            router.refresh();
+            memory.rawUpdate({
+              scope: "reservation",
+              procedure: "get",
+              params: reservation.id,
+              data: (current) => ({
+                ...current,
+                productInstancesJunction: updateObjectInArray(
+                  current.productInstancesJunction,
+                  current.productInstancesJunction.findIndex(
+                    ({ productInstanceId }) =>
+                      productInstanceId ===
+                      productInstanceJunction.productInstance.id,
+                  ),
+                  response,
+                ),
+              }),
+            });
 
             notifications.show({
               message: t("entities.product.editSucces"),
@@ -287,17 +312,39 @@ const Detail = ({
     });
   };
 
-  const resetProductHandler = (productInstanceId: number) => {
+  const resetProductHandler = (id: number) => {
     modals.openConfirmModal({
       title: t("common.areYouSure"),
       labels: { confirm: t("common.yes"), cancel: t("common.no") },
       onConfirm: async () => {
         await resetProduct.mutate({
           reservationId: reservation.id,
-          productInstanceId,
+          productInstanceId: id,
         });
 
-        router.refresh();
+        memory.rawUpdate({
+          scope: "reservation",
+          procedure: "get",
+          params: reservation.id,
+          data: (current) => {
+            const index = current.productInstancesJunction.findIndex(
+              ({ productInstanceId }) => productInstanceId === id,
+            );
+
+            // TODO Set from back-end reponse
+            return {
+              ...current,
+              productInstancesJunction: updateObjectInArray(
+                current.productInstancesJunction,
+                index,
+                {
+                  ...current.productInstancesJunction[index],
+                  status: "notInvoiced",
+                },
+              ),
+            };
+          },
+        });
 
         notifications.show({
           message: t("entities.product.resetSucces"),
@@ -307,14 +354,24 @@ const Detail = ({
     });
   };
 
-  const deleteProductHandler = (productInstanceId: number) => {
+  const deleteProductHandler = (id: number) => {
     modals.openConfirmModal({
       title: t("common.areYouSure"),
       labels: { confirm: t("common.yes"), cancel: t("common.no") },
       onConfirm: async () => {
-        await deleteProductInstance.mutate(productInstanceId);
+        await deleteProductInstance.mutate(id);
 
-        router.refresh();
+        memory.rawUpdate({
+          scope: "reservation",
+          procedure: "get",
+          params: reservation.id,
+          data: (current) => ({
+            ...current,
+            productInstancesJunction: current.productInstancesJunction.filter(
+              ({ productInstanceId }) => productInstanceId !== id,
+            ),
+          }),
+        });
 
         notifications.show({
           message: t("entities.product.deleted"),

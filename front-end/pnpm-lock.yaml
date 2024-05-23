@@ -102,6 +102,9 @@ importers:
         specifier: ^0.30.0
         version: 0.30.0
     devDependencies:
+      '@simbathesailor/use-what-changed':
+        specifier: ^2.0.0
+        version: 2.0.0(react@18.3.1)
       '@types/node':
         specifier: ^20
         version: 20.12.11
@@ -446,6 +449,11 @@ packages:
 
   '@rushstack/eslint-patch@1.10.2':
     resolution: {integrity: sha512-hw437iINopmQuxWPSUEvqE56NCPsiU8N4AYtfHmJFckclktzK9YQJieD3XkDCDH4OjL+C7zgPUh73R/nrcHrqw==}
+
+  '@simbathesailor/use-what-changed@2.0.0':
+    resolution: {integrity: sha512-ulBNrPSvfho9UN6zS2fii3AsdEcp2fMaKeqUZZeCNPaZbB6aXyTUhpEN9atjMAbu/eyK3AY8L4SYJUG62Ekocw==}
+    peerDependencies:
+      react: '>=16'
 
   '@socket.io/component-emitter@3.1.2':
     resolution: {integrity: sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==}
@@ -2372,6 +2380,10 @@ snapshots:
     optional: true
 
   '@rushstack/eslint-patch@1.10.2': {}
+
+  '@simbathesailor/use-what-changed@2.0.0(react@18.3.1)':
+    dependencies:
+      react: 18.3.1
 
   '@socket.io/component-emitter@3.1.2': {}
 

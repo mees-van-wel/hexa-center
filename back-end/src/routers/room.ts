@@ -39,6 +39,7 @@ export const roomRouter = router({
   list: procedure.query(({ ctx }) =>
     ctx.db
       .select({
+        $kind: rooms.$kind,
         id: rooms.id,
         name: rooms.name,
         price: rooms.price,
@@ -48,6 +49,7 @@ export const roomRouter = router({
   get: procedure.input(wrap(number())).query(async ({ input, ctx }) => {
     const result = await ctx.db
       .select({
+        $kind: rooms.$kind,
         id: rooms.id,
         name: rooms.name,
         price: rooms.price,

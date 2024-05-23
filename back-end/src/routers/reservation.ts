@@ -40,26 +40,84 @@ export const reservationRouter = router({
           updatedById: ctx.user.id,
         })
         .returning({
-          $kind: reservations.$kind,
           id: reservations.id,
-          createdAt: reservations.createdAt,
-          createdById: reservations.createdById,
-          updatedAt: reservations.updatedAt,
-          updatedById: reservations.updatedById,
-          roomId: reservations.roomId,
-          customerId: reservations.customerId,
-          startDate: reservations.startDate,
-          endDate: reservations.endDate,
-          priceOverride: reservations.priceOverride,
-          guestName: reservations.guestName,
-          reservationNotes: reservations.reservationNotes,
-          invoiceNotes: reservations.invoiceNotes,
         });
 
-      const reservation = result[0];
-      if (!reservation) throw new TRPCError({ code: "NOT_FOUND" });
+      const reservationId = result[0].id;
 
-      return reservation;
+      const reservation = (await ctx.db.query.reservations.findFirst({
+        where: eq(reservations.id, reservationId),
+        with: {
+          invoicesJunction: {
+            with: {
+              invoice: {
+                columns: {
+                  $kind: true,
+                  id: true,
+                  createdAt: true,
+                  type: true,
+                  status: true,
+                  number: true,
+                  date: true,
+                  grossAmount: true,
+                },
+              },
+            },
+          },
+          productInstancesJunction: {
+            columns: {
+              productInstanceId: true,
+              quantity: true,
+              cycle: true,
+              status: true,
+            },
+            with: {
+              productInstance: {
+                columns: {
+                  $kind: true,
+                  id: true,
+                  revenueAccountId: true,
+                  name: true,
+                  price: true,
+                  vatRate: true,
+                },
+              },
+            },
+          },
+        },
+        columns: {
+          $kind: true,
+          id: true,
+          createdAt: true,
+          createdById: true,
+          updatedAt: true,
+          updatedById: true,
+          roomId: true,
+          customerId: true,
+          startDate: true,
+          endDate: true,
+          priceOverride: true,
+          guestName: true,
+          reservationNotes: true,
+          invoiceNotes: true,
+        },
+      }))!;
+
+      return {
+        ...reservation,
+        // TODO Check if string conversion is necessary
+        productInstancesJunction: reservation.productInstancesJunction.map(
+          (junction) => ({
+            ...junction,
+            quantity: junction.quantity.toString(),
+            productInstance: {
+              ...junction.productInstance,
+              price: junction.productInstance.price.toString(),
+              vatRate: junction.productInstance.vatRate?.toString(),
+            },
+          }),
+        ),
+      };
     }),
   list: procedure.query(({ ctx }) =>
     ctx.db.query.reservations.findMany({
@@ -102,6 +160,7 @@ export const reservationRouter = router({
         },
         productInstancesJunction: {
           columns: {
+            productInstanceId: true,
             quantity: true,
             cycle: true,
             status: true,
@@ -168,26 +227,84 @@ export const reservationRouter = router({
         })
         .where(eq(reservations.id, input.id))
         .returning({
-          $kind: reservations.$kind,
           id: reservations.id,
-          createdAt: reservations.createdAt,
-          createdById: reservations.createdById,
-          updatedAt: reservations.updatedAt,
-          updatedById: reservations.updatedById,
-          roomId: reservations.roomId,
-          customerId: reservations.customerId,
-          startDate: reservations.startDate,
-          endDate: reservations.endDate,
-          priceOverride: reservations.priceOverride,
-          guestName: reservations.guestName,
-          reservationNotes: reservations.reservationNotes,
-          invoiceNotes: reservations.invoiceNotes,
         });
 
-      const reservation = result[0];
-      if (!reservation) throw new TRPCError({ code: "NOT_FOUND" });
+      const reservationId = result[0].id;
 
-      return reservation;
+      const reservation = (await ctx.db.query.reservations.findFirst({
+        where: eq(reservations.id, reservationId),
+        with: {
+          invoicesJunction: {
+            with: {
+              invoice: {
+                columns: {
+                  $kind: true,
+                  id: true,
+                  createdAt: true,
+                  type: true,
+                  status: true,
+                  number: true,
+                  date: true,
+                  grossAmount: true,
+                },
+              },
+            },
+          },
+          productInstancesJunction: {
+            columns: {
+              productInstanceId: true,
+              quantity: true,
+              cycle: true,
+              status: true,
+            },
+            with: {
+              productInstance: {
+                columns: {
+                  $kind: true,
+                  id: true,
+                  revenueAccountId: true,
+                  name: true,
+                  price: true,
+                  vatRate: true,
+                },
+              },
+            },
+          },
+        },
+        columns: {
+          $kind: true,
+          id: true,
+          createdAt: true,
+          createdById: true,
+          updatedAt: true,
+          updatedById: true,
+          roomId: true,
+          customerId: true,
+          startDate: true,
+          endDate: true,
+          priceOverride: true,
+          guestName: true,
+          reservationNotes: true,
+          invoiceNotes: true,
+        },
+      }))!;
+
+      return {
+        ...reservation,
+        // TODO Check if string conversion is necessary
+        productInstancesJunction: reservation.productInstancesJunction.map(
+          (junction) => ({
+            ...junction,
+            quantity: junction.quantity.toString(),
+            productInstance: {
+              ...junction.productInstance,
+              price: junction.productInstance.price.toString(),
+              vatRate: junction.productInstance.vatRate?.toString(),
+            },
+          }),
+        ),
+      };
     }),
   delete: procedure
     .input(wrap(number()))
@@ -323,7 +440,30 @@ export const reservationRouter = router({
         periodEndDate: input.periodEndDate,
       });
 
-      return invoiceId;
+      const invoiceResult = await ctx.db.query.reservationsToInvoices.findFirst(
+        {
+          where: and(
+            eq(reservationsToInvoices.reservationId, reservation.id),
+            eq(reservationsToInvoices.invoiceId, invoiceId),
+          ),
+          with: {
+            invoice: {
+              columns: {
+                $kind: true,
+                id: true,
+                createdAt: true,
+                type: true,
+                status: true,
+                number: true,
+                date: true,
+                grossAmount: true,
+              },
+            },
+          },
+        },
+      );
+
+      return invoiceResult!;
     }),
   addProduct: procedure
     .input(
@@ -366,6 +506,48 @@ export const reservationRouter = router({
         cycle: input.cycle,
         status: "notInvoiced",
       });
+
+      const productResult =
+        (await ctx.db.query.reservationsToProductInstances.findFirst({
+          where: and(
+            eq(
+              reservationsToProductInstances.reservationId,
+              input.reservationId,
+            ),
+            eq(
+              reservationsToProductInstances.productInstanceId,
+              productInstanceId,
+            ),
+          ),
+          columns: {
+            productInstanceId: true,
+            quantity: true,
+            cycle: true,
+            status: true,
+          },
+          with: {
+            productInstance: {
+              columns: {
+                $kind: true,
+                id: true,
+                revenueAccountId: true,
+                name: true,
+                price: true,
+                vatRate: true,
+              },
+            },
+          },
+        }))!;
+
+      return {
+        ...productResult,
+        quantity: productResult.quantity.toString(),
+        productInstance: {
+          ...productResult.productInstance,
+          price: productResult.productInstance.price.toString(),
+          vatRate: productResult.productInstance.vatRate?.toString(),
+        },
+      };
     }),
   editProduct: procedure
     .input(
@@ -389,8 +571,8 @@ export const reservationRouter = router({
         }),
       ),
     )
-    .mutation(({ input, ctx }) =>
-      Promise.all([
+    .mutation(async ({ input, ctx }) => {
+      await Promise.all([
         ctx.db
           .update(productInstances)
           .set({
@@ -418,8 +600,50 @@ export const reservationRouter = router({
               ),
             ),
           ),
-      ]),
-    ),
+      ]);
+
+      const productResult =
+        (await ctx.db.query.reservationsToProductInstances.findFirst({
+          where: and(
+            eq(
+              reservationsToProductInstances.reservationId,
+              input.reservationId,
+            ),
+            eq(
+              reservationsToProductInstances.productInstanceId,
+              input.instanceId,
+            ),
+          ),
+          columns: {
+            productInstanceId: true,
+            quantity: true,
+            cycle: true,
+            status: true,
+          },
+          with: {
+            productInstance: {
+              columns: {
+                $kind: true,
+                id: true,
+                revenueAccountId: true,
+                name: true,
+                price: true,
+                vatRate: true,
+              },
+            },
+          },
+        }))!;
+
+      return {
+        ...productResult,
+        quantity: productResult.quantity.toString(),
+        productInstance: {
+          ...productResult.productInstance,
+          price: productResult.productInstance.price.toString(),
+          vatRate: productResult.productInstance.vatRate?.toString(),
+        },
+      };
+    }),
   resetProduct: procedure
     .input(
       wrap(

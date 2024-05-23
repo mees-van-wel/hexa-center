@@ -97,7 +97,7 @@ export type Translation = {
       invoicePeriod: {
         name: string;
         create: string;
-        succes: string;
+        success: string;
       };
       calendar: {
         roomName: string;

@@ -20,6 +20,7 @@ import {
 
 import { ReservationForm } from "@/components/entities/reservation/ReservationForm";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
+import { useMemory } from "@/hooks/useMemory";
 import { useMutation } from "@/hooks/useMutation";
 import { useQuery } from "@/hooks/useQuery";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -91,6 +92,7 @@ const SaveButton = () => {
   const createReservation = useMutation("reservation", "create");
   const router = useRouter();
   const t = useTranslation();
+  const memory = useMemory();
 
   const { control, handleSubmit } =
     useFormContext<ReservationCreateInputSchema>();
@@ -137,6 +139,20 @@ const SaveButton = () => {
 
   const createHandler = async (values: ReservationCreateInputSchema) => {
     const response = await createReservation.mutate(values);
+
+    memory.write(response, [
+      {
+        scope: "reservation",
+        procedure: "get",
+        params: response.id,
+      },
+      {
+        scope: "reservation",
+        procedure: "list",
+        as: ({ current, result }) =>
+          current ? [...current, result] : undefined,
+      },
+    ]);
 
     notifications.show({
       message: t("entities.reservation.reservationCreated"),

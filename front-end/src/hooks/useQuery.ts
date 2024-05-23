@@ -79,17 +79,35 @@ export const useQuery = <
     [key, memoryStore, procedure, scope, updateCacheHandler],
   );
 
+  const execute = useCallback(
+    (abortController?: AbortController) => {
+      if (key in memoryStore) {
+        const unflattenedMemoryStore = unflatten(key, memoryStore);
+        console.log("[MEMORY]", "🟢", "Memory hit, key:", key);
+
+        setData(unflattenedMemoryStore);
+        setLoading(false);
+        return;
+      }
+
+      console.log("[MEMORY]", "🔴", "Memory miss, key:", key);
+
+      query(options?.initialParams, abortController);
+    },
+    [key, memoryStore, options?.initialParams, query],
+  );
+
   // TODO React errors to console
-  // const updateDeps = useMemo(
-  //   () => [
-  //     memoryStore[key],
-  //     ...(Array.isArray(memoryStore[key])
-  //       ? memoryStore[key]
-  //       : [memoryStore[key]]
-  //     ).map((ref: string) => memoryStore[ref]),
-  //   ],
-  //   [key, memoryStore],
-  // );
+  const updateDeps = useMemo(
+    () => [
+      memoryStore[key],
+      ...(Array.isArray(memoryStore[key])
+        ? memoryStore[key]
+        : [memoryStore[key]]
+      ).map((ref: string) => memoryStore[ref]),
+    ],
+    [key, memoryStore],
+  );
 
   useDidUpdate(() => {
     if (!data) return;
@@ -98,37 +116,32 @@ export const useQuery = <
     const unflattenedMemoryStore = unflatten(key, memoryStore);
     // TODO Stop inital update and remove this workaround
     if (unflattenedMemoryStore) setData(unflattenedMemoryStore);
-  }, [memoryStore]);
+  }, updateDeps);
 
-  useStrictModeEffect(() => {
+  // TODO Combine with strict mode effect
+  useDidUpdate(() => {
     if (data || options?.skipInitial) return;
-
-    if (key in memoryStore) {
-      const unflattenedMemoryStore = unflatten(key, memoryStore);
-      console.log("[MEMORY]", "🟢", "Memory hit, key:", key);
-
-      setData(unflattenedMemoryStore);
-      setLoading(false);
-      return;
-    }
-
-    console.log("[MEMORY]", "🔴", "Memory miss, key:", key);
 
     const abortController = new AbortController();
 
-    query(options?.initialParams, abortController);
+    execute(abortController);
 
     return () => {
       abortController.abort();
     };
-  }, [
-    data,
-    key,
-    memoryStore,
-    options?.initialParams,
-    options?.skipInitial,
-    query,
-  ]);
+  }, [data, options?.initialParams, options?.skipInitial]);
+
+  useStrictModeEffect(() => {
+    if (data || options?.skipInitial) return;
+
+    const abortController = new AbortController();
+
+    execute(abortController);
+
+    return () => {
+      abortController.abort();
+    };
+  }, [data, options?.skipInitial]);
 
   return { data, loading, query };
 };

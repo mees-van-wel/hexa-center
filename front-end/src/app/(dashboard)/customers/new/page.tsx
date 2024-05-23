@@ -15,6 +15,7 @@ import {
 
 import { CustomerForm } from "@/components/entities/customer/CustomerForm";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
+import { useMemory } from "@/hooks/useMemory";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
 import {
@@ -71,6 +72,7 @@ export default function Page() {
 const SaveButton = () => {
   const createCustomer = useMutation("customer", "create");
   const router = useRouter();
+  const memory = useMemory();
   const t = useTranslation();
 
   const { control, handleSubmit } = useFormContext<CustomerCreateInputSchema>();
@@ -80,6 +82,20 @@ const SaveButton = () => {
     values,
   ) => {
     const response = await createCustomer.mutate(values);
+
+    memory.write(response, [
+      {
+        scope: "customer",
+        procedure: "get",
+        params: response.id,
+      },
+      {
+        scope: "customer",
+        procedure: "list",
+        as: ({ current, result }) =>
+          current ? [...current, result] : undefined,
+      },
+    ]);
 
     notifications.show({
       message: t("entities.customer.createdNotification"),

@@ -38,6 +38,7 @@ import { IssueModal } from "@/components/entities/invoice/IssueModal";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { CountryKey } from "@/constants/countries";
 import { INVOICE_EVENT_TYPE_META } from "@/constants/invoiceEventTypes";
+import { useMemory } from "@/hooks/useMemory";
 import { useMutation } from "@/hooks/useMutation";
 import { useQuery } from "@/hooks/useQuery";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -71,6 +72,7 @@ const Detail = ({ invoice }: DetailProps) => {
   const [downloadLoading, setDownloadLoading] = useState(false);
   const [printLoading, setPrintLoading] = useState(false);
   const router = useRouter();
+  const memory = useMemory();
 
   const issueHandler = async () => {
     const onConfirm = async (issueDate: Date) => {
@@ -204,6 +206,19 @@ const Detail = ({ invoice }: DetailProps) => {
       labels: { confirm: t("common.yes"), cancel: t("common.no") },
       onConfirm: async () => {
         await deleteInvoice.mutate(invoice.id);
+
+        if (invoice.refType === "reservation")
+          memory.rawUpdate({
+            scope: "reservation",
+            procedure: "get",
+            params: invoice.refId,
+            data: (current) => ({
+              ...current,
+              invoicesJunction: current.invoicesJunction.filter(
+                ({ invoiceId }) => invoiceId !== invoice.id,
+              ),
+            }),
+          });
 
         router.back();
 

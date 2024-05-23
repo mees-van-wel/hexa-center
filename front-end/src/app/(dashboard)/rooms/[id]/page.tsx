@@ -24,6 +24,7 @@ import { Metadata } from "@/components/common/Metadata";
 import { RoomForm } from "@/components/entities/room/RoomForm";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { useAutosave } from "@/hooks/useAutosave";
+import { useMemory } from "@/hooks/useMemory";
 import { useMutation } from "@/hooks/useMutation";
 import { useQuery } from "@/hooks/useQuery";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -49,6 +50,7 @@ type DetailProps = {
 const Detail = ({ room }: DetailProps) => {
   const deleteRoom = useMutation("room", "delete");
   const router = useRouter();
+  const memory = useMemory();
   const t = useTranslation();
 
   const formMethods = useForm({
@@ -62,6 +64,8 @@ const Detail = ({ room }: DetailProps) => {
       labels: { confirm: t("common.yes"), cancel: t("common.no") },
       onConfirm: async () => {
         await deleteRoom.mutate(room.id);
+
+        memory.evict(room);
 
         notifications.show({
           message: t("entities.room.deletedNotification"),
@@ -105,6 +109,7 @@ const Detail = ({ room }: DetailProps) => {
 
 const SaveBadge = () => {
   const updateRoom = useMutation("room", "update");
+  const memory = useMemory();
   const t = useTranslation();
 
   const { control, getValues, reset, setError } =
@@ -129,6 +134,7 @@ const SaveBadge = () => {
         id: getValues("id"),
       });
 
+      memory.update(updatedRoom);
       reset(updatedRoom);
     } catch (error) {
       const { success, json } = isJson((error as any).message);
