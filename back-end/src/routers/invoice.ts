@@ -60,9 +60,10 @@ export const invoiceRouter = router({
         }),
       ),
     )
-    .mutation(({ input: { invoiceId, date }, ctx }) =>
-      issueInvoice(invoiceId, date, ctx.user.id),
-    ),
+    .mutation(async ({ input: { invoiceId, date }, ctx }) => {
+      await issueInvoice(invoiceId, date, ctx.user.id);
+      return await getInvoice(invoiceId);
+    }),
   generatePdf: procedure
     .input(wrap(number()))
     .mutation(async ({ input }) => (await generateInvoicePdf(input)).base64),
@@ -141,6 +142,8 @@ export const invoiceRouter = router({
       invoiceId: input,
       type: "mailed",
     });
+
+    return await getInvoice(input);
   }),
   credit: procedure.input(wrap(number())).mutation(async ({ input, ctx }) => {
     const invoicesResult = await ctx.db

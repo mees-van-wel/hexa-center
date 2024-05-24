@@ -48,6 +48,8 @@ export const reservationRouter = router({
       const reservation = (await ctx.db.query.reservations.findFirst({
         where: eq(reservations.id, reservationId),
         with: {
+          customer: true,
+          room: true,
           invoicesJunction: {
             with: {
               invoice: {
@@ -142,6 +144,8 @@ export const reservationRouter = router({
     const reservation = await ctx.db.query.reservations.findFirst({
       where: eq(reservations.id, input),
       with: {
+        customer: true,
+        room: true,
         invoicesJunction: {
           with: {
             invoice: {
@@ -235,6 +239,8 @@ export const reservationRouter = router({
       const reservation = (await ctx.db.query.reservations.findFirst({
         where: eq(reservations.id, reservationId),
         with: {
+          customer: true,
+          room: true,
           invoicesJunction: {
             with: {
               invoice: {

@@ -77,12 +77,17 @@ const Detail = ({ invoice }: DetailProps) => {
   const issueHandler = async () => {
     const onConfirm = async (issueDate: Date) => {
       try {
-        await issueInvoice.mutate({
+        const response = await issueInvoice.mutate({
           invoiceId: invoice.id,
           date: issueDate,
         });
 
-        router.refresh();
+        memory.rawUpdate({
+          scope: "invoice",
+          procedure: "get",
+          params: invoice.id,
+          data: response,
+        });
 
         notifications.show({
           message: t("entities.invoice.issuedSucces"),
@@ -154,9 +159,14 @@ const Detail = ({ invoice }: DetailProps) => {
       labels: { confirm: t("common.yes"), cancel: t("common.no") },
       onConfirm: async () => {
         try {
-          await mailInvoice.mutate(invoice.id);
+          const response = await mailInvoice.mutate(invoice.id);
 
-          router.refresh();
+          memory.rawUpdate({
+            scope: "invoice",
+            procedure: "get",
+            params: invoice.id,
+            data: response,
+          });
 
           notifications.show({
             message: t("entities.invoice.mailedSucces"),

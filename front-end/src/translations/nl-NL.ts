@@ -12,7 +12,7 @@ export default {
     saved: "Opgeslagen",
     number: "Nummer",
     delete: "Verwijderen",
-    name: "Name",
+    name: "Naam",
     areYouSure: "Weet je het zeker?",
     yes: "Ja",
     no: "Nee",

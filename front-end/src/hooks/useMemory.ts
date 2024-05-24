@@ -88,14 +88,19 @@ export const useMemory = () => {
       scope: T;
       procedure: P;
       params?: RouterInput[T][P];
-      data: (current: RouterOutput[T][P]) => RouterOutput[T][P];
+      data:
+        | RouterOutput[T][P]
+        | ((current: RouterOutput[T][P]) => RouterOutput[T][P]);
     }) => {
       const clone: Record<string, any> = {};
 
       const key = getCacheKey(scope, procedure, params);
       const current = memoryStore[key];
 
-      const value = data(unflatten(current, memoryStore));
+      const value =
+        typeof data === "function"
+          ? data(unflatten(current, memoryStore))
+          : data;
 
       if (value !== undefined) {
         const { result, cacheUpdates } = flatten(value, memoryStore);
@@ -113,37 +118,6 @@ export const useMemory = () => {
     },
     [memoryStore, cacheProcessor],
   );
-
-  // const rawUpdate = useCallback(
-  //   <T extends keyof RouterInput, P extends keyof RouterInput[T]>(
-  //     result: any,
-  //     { scope, procedure, params, as }: UpdateKeyFn<T, P>,
-  //   ) => {
-  //     const clone: Record<string, any> = {};
-
-  //     const key = getCacheKey(scope, procedure, params);
-  //     const current = memoryStore[key];
-
-  //     const value = as
-  //       ? as({ current: unflatten(current, memoryStore), result })
-  //       : result;
-
-  //     if (value !== undefined) {
-  //       const { result, cacheUpdates } = flatten(value, memoryStore);
-
-  //       Object.entries(cacheUpdates).forEach(([key, value]) => {
-  //         clone[key] = value;
-  //       });
-
-  //       clone[key] = result;
-  //     }
-
-  //     cacheProcessor(clone);
-
-  //     console.log("[MEMORY]", "🔵", "Manual raw update, ref:", result);
-  //   },
-  //   [memoryStore, cacheProcessor],
-  // );
 
   const evict = useCallback(
     (dataToEvict: AbstractEntity) => {
