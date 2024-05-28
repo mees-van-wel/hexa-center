@@ -1,6 +1,6 @@
 app = "hexa-center-back-end"
 primary_region = "ams"
-swap_size_mb = 256
+swap_size_mb = 1024
 
 [build]
 
@@ -15,5 +15,5 @@ swap_size_mb = 256
 [[vm]]
   cpu_kind = "shared"
   cpus = 1
-  memory_mb = 256
+  memory_mb = 512
 

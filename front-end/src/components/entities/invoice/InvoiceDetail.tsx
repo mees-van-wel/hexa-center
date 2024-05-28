@@ -102,7 +102,9 @@ export const InvoiceDetail = ({ invoice }: InvoiceDetailProps) => {
     const link = document.createElement("a");
 
     link.href = `data:application/pdf;base64,${base64PDF}`;
-    link.download = `${invoice.number}.pdf`;
+    link.download = `${invoice.type === "credit" ? "Creditnote" : "Invoice"} ${
+      invoice.number
+    }.pdf`;
 
     document.body.appendChild(link);
 

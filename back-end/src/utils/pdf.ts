@@ -10,26 +10,35 @@ export const generatePdf = async <T extends PDFTemplate>(
   templateName: T,
   variables: PDFTemplateVariables[T],
 ) => {
-  const browser = await puppeteer.launch({
-    executablePath: isProduction ? "/usr/bin/chromium-browser" : undefined,
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--headless",
-      "--disable-gpu",
-      "--disable-dev-shm-usage",
-    ],
-  });
-  const page = await browser.newPage();
+  try {
+    const browser = await puppeteer.launch({
+      executablePath: isProduction
+        ? "/usr/bin/google-chrome-stable"
+        : undefined,
+      args: [
+        "--no-sandbox",
+        "--disable-gpu",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        // "--no-zygote",
+        // "--single-process",
+      ],
+    });
 
-  let htmlContent = await readFile("pdf", `${templateName}.html.ejs`);
-  htmlContent = await ejs.render(htmlContent, variables, { async: true });
+    const page = await browser.newPage();
 
-  await page.setContent(htmlContent);
+    let htmlContent = await readFile("pdf", `${templateName}.html.ejs`);
+    htmlContent = await ejs.render(htmlContent, variables, { async: true });
 
-  const pdfBuffer = await page.pdf({ format: "A4", printBackground: true });
+    await page.setContent(htmlContent);
 
-  await browser.close();
+    const pdfBuffer = await page.pdf({ format: "A4", printBackground: true });
 
-  return pdfBuffer;
+    await browser.close();
+
+    return pdfBuffer;
+  } catch (error) {
+    console.warn(error);
+    return Buffer.from("");
+  }
 };

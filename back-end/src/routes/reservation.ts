@@ -307,11 +307,13 @@ export const reservationRouter = router({
         lines: [
           {
             revenueAccountId: reservationRevenueAccountId,
-            name: `${reservation.room.name} (${dayjs(
-              input.periodStartDate,
-            ).format("DD-MM-YYYY")} - ${dayjs(input.periodEndDate).format(
-              "DD-MM-YYYY",
-            )})`,
+            name: `${
+              reservation.guestName
+                ? reservation.guestName + " - " + reservation.room.name
+                : reservation.room.name
+            } (${dayjs(input.periodStartDate).format("DD-MM-YYYY")} - ${dayjs(
+              input.periodEndDate,
+            ).format("DD-MM-YYYY")})`,
             unitAmount: reservation.priceOverride || reservation.room.price,
             quantity: periodNights.toString(),
             vatRate: "9",
