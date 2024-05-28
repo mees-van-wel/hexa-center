@@ -1,11 +1,13 @@
 import {
   Input,
+  merge,
   minLength,
   nullable,
   nullish,
   number,
   object,
   optional,
+  partial,
   string,
 } from "valibot";
 
@@ -34,24 +36,49 @@ export const CustomerCreateSchema = object({
   contactPersonPhone: nullable(string([toNull()])),
 });
 
-export const CustomerUpdateSchema = object({
-  id: number(),
-  // businessId: optional(number()),
-  name: optional(string([minLength(2)])),
-  email: nullish(string([toNull(), nullableEmail()])),
-  phone: nullish(string([toNull()])),
-  billingAddressLineOne: optional(string([minLength(2)])),
-  billingAddressLineTwo: nullish(string([toNull()])),
-  billingCity: optional(string([minLength(2)])),
-  billingRegion: nullish(string([toNull()])),
-  billingPostalCode: nullish(string([toNull()])),
-  billingCountry: optional(string([minLength(2)])),
-  cocNumber: nullish(string([toNull()])),
-  vatId: nullish(string([toNull()])),
-  contactPersonName: nullish(string([toNull()])),
-  contactPersonEmail: nullish(string([toNull()])),
-  contactPersonPhone: nullish(string([toNull()])),
-});
+export const CustomerUpdateSchema = merge([
+  object({ id: number() }),
+  partial(
+    object({
+      // businessId: optional(number()),
+      name: optional(string([minLength(2)])),
+      email: nullish(string([toNull(), nullableEmail()])),
+      phone: nullish(string([toNull()])),
+      billingAddressLineOne: optional(string([minLength(2)])),
+      billingAddressLineTwo: nullish(string([toNull()])),
+      billingCity: optional(string([minLength(2)])),
+      billingRegion: nullish(string([toNull()])),
+      billingPostalCode: nullish(string([toNull()])),
+      billingCountry: optional(string([minLength(2)])),
+      cocNumber: nullish(string([toNull()])),
+      vatId: nullish(string([toNull()])),
+      contactPersonName: nullish(string([toNull()])),
+      contactPersonEmail: nullish(string([toNull()])),
+      contactPersonPhone: nullish(string([toNull()])),
+    }),
+  ),
+]);
+
+export type CustomerDefaultsSchema = {
+  name: "";
+  email: "";
+  phone: "";
+  billingAddressLineOne: "";
+  billingAddressLineTwo: "";
+  billingPostalCode: "";
+  billingCity: "";
+  billingRegion: "";
+  billingCountry: null;
+  cocNumber: "";
+  vatId: "";
+  contactPersonName: "";
+  contactPersonEmail: "";
+  contactPersonPhone: "";
+};
 
 export type CustomerCreateInputSchema = Input<typeof CustomerCreateSchema>;
 export type CustomerUpdateInputSchema = Input<typeof CustomerUpdateSchema>;
+export type CustomerFormShema =
+  | CustomerDefaultsSchema
+  | CustomerCreateInputSchema
+  | CustomerUpdateInputSchema;

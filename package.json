@@ -12,12 +12,9 @@
     "lint:front-end": "cd ./front-end && pnpm run lint",
     "lint:back-end": "cd ./back-end && pnpm run lint",
     "format:front-end": "cd ./front-end && pnpm run format",
-    "format:back-end": "cd ./back-end && pnpm run format",
-    "prepare": "husky install"
+    "format:back-end": "cd ./back-end && pnpm run format"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2",
-    "husky": "^8.0.3",
-    "lint-staged": "^15.2.0"
+    "concurrently": "^8.2.2"
   }
 }

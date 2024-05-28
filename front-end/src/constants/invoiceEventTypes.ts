@@ -1,10 +1,13 @@
-import { TranslationPaths } from "@/types/translation";
 import {
+  type Icon,
   IconFileArrowLeft,
   IconFileArrowRight,
   IconMailFast,
-  TablerIconsProps,
+  type IconProps,
 } from "@tabler/icons-react";
+import react from "react";
+
+import { TranslationPaths } from "@/types/translation";
 
 export const INVOICE_EVENT_TYPES = {
   ISSUED: "issued",
@@ -27,7 +30,9 @@ export const INVOICE_EVENT_TYPE_VALUES = Object.values(
 export const INVOICE_EVENT_TYPE_META: Record<
   InvoiceEventType,
   {
-    IconComponent: (props: TablerIconsProps) => JSX.Element;
+    IconComponent: react.ForwardRefExoticComponent<
+      Omit<IconProps, "ref"> & react.RefAttributes<Icon>
+    >;
     title: keyof TranslationPaths;
     message: keyof TranslationPaths;
   }

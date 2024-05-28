@@ -1,15 +1,15 @@
 "use client";
 
-import Link from "next/link";
+import { Button, Group } from "@mantine/core";
+import { IconArrowMoveLeft, IconArrowMoveRight } from "@tabler/icons-react";
 import clsx from "clsx";
 import dayjs, { Dayjs } from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
+import type { Route } from "next";
+import Link from "next/link";
 
 import { useTranslation } from "@/hooks/useTranslation";
-import { Position } from "@/types/Position";
 import { type RouterOutput } from "@/utils/trpc";
-import { Button, Group } from "@mantine/core";
-import { IconArrowMoveLeft, IconArrowMoveRight } from "@tabler/icons-react";
 
 import styles from "./ReservationCalendar.module.scss";
 
@@ -18,6 +18,8 @@ dayjs.extend(isBetween);
 export const compareDates = (firstDate: Dayjs, secondDate: Dayjs) => {
   return firstDate.startOf("day").isSame(secondDate.startOf("day"), "day");
 };
+
+type Position = { id: number; end: Date; top: number };
 
 type ReservationCalendarProps = {
   currentWeek: Dayjs[];
@@ -220,8 +222,7 @@ export const ReservationCalendar = ({
                     <Button
                       key={`${reservation.room.name}-${reservationIndex}`}
                       component={Link}
-                      // @ts-ignore Router
-                      href={`/reservations/${reservation.id}`}
+                      href={`/reservations/${reservation.id}` as Route}
                       title={title}
                       size="xs"
                       classNames={{

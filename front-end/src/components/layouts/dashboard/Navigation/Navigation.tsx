@@ -1,13 +1,7 @@
-import { useMemo } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-
-import { useTranslation } from "@/hooks/useTranslation";
 import { Button, Stack, Title } from "@mantine/core";
 import {
   IconBed,
   IconBuilding,
-  IconCalendarStats,
   IconFileEuro,
   IconHome,
   IconHotelService,
@@ -15,6 +9,11 @@ import {
   IconUserDollar,
   IconUsers,
 } from "@tabler/icons-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useMemo } from "react";
+
+import { useTranslation } from "@/hooks/useTranslation";
 
 import styles from "./Navigation.module.scss";
 
@@ -69,16 +68,6 @@ export const Navigation = () => {
                 justify="left"
               >
                 {t("entities.company.pluralName")}
-              </Button>
-              <Button
-                component={Link}
-                href="/appointmentTypes"
-                variant={pathname === "/appointmentTypes" ? "filled" : "subtle"}
-                leftSection={<IconCalendarStats />}
-                fullWidth
-                justify="left"
-              >
-                {t("entities.appointmentType.name.plural")}
               </Button>
             </Stack>
           </Stack>

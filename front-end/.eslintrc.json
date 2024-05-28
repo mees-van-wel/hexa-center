@@ -1,44 +1,9 @@
 {
   "extends": ["next/core-web-vitals", "prettier"],
-  "plugins": ["@typescript-eslint", "unused-imports", "simple-import-sort"],
-  "parser": "@typescript-eslint/parser",
+  "plugins": ["unused-imports", "simple-import-sort"],
   "rules": {
-    "no-unused-vars": "off",
-    "@typescript-eslint/no-unused-vars": [
-      "error",
-      { "argsIgnorePattern": "^_" }
-    ],
     "unused-imports/no-unused-imports": "error",
     "simple-import-sort/imports": "error",
     "simple-import-sort/exports": "error"
-  },
-  "overrides": [
-    {
-      "files": ["*.ts", "*.tsx"],
-      "rules": {
-        "@typescript-eslint/no-unused-vars": ["error"],
-        "simple-import-sort/imports": [
-          "error",
-          {
-            "groups": [
-              // `react` first, `next` second, then packages starting with a character
-              ["^react$", "^next", "^[a-z]"],
-              // Packages starting with `@`
-              ["^@"],
-              // Packages starting with `~`
-              ["^~"],
-              // Imports starting with `../`
-              ["^\\.\\.(?!/?$)", "^\\.\\./?$"],
-              // Imports starting with `./`
-              ["^\\./(?=.*/)(?!/?$)", "^\\.(?!/?$)", "^\\./?$"],
-              // Style imports
-              ["^.+\\.s?css$"],
-              // Side effect imports
-              ["^\\u0000"]
-            ]
-          }
-        ]
-      }
-    }
-  ]
+  }
 }

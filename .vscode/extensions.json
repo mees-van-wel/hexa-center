@@ -1,12 +1,8 @@
 {
   "recommendations": [
     "dbaeumer.vscode-eslint",
-    "ms-vsliveshare.vsliveshare",
-    "pkief.material-icon-theme",
     "esbenp.prettier-vscode",
-    "redhat.vscode-yaml",
-    "eamodio.gitlens",
     "yoavbls.pretty-ts-errors",
-    "attilabuti.vscode-mjml"
+    "eamodio.gitlens"
   ]
 }

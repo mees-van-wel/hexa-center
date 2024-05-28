@@ -1,14 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
-import { FormProvider, useForm } from "react-hook-form";
-
-import { Address } from "@/components/common/Address";
-import { Sheet } from "@/components/common/Sheet";
-import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
-import { SEX_VALUES, SexKey } from "@/constants/sexes";
-import { useAuthUser } from "@/contexts/AuthContext";
-import { useTranslation } from "@/hooks/useTranslation";
 import {
   Avatar,
   Badge,
@@ -20,6 +11,15 @@ import {
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { IconUser } from "@tabler/icons-react";
+import { useMemo } from "react";
+import { FormProvider, useForm } from "react-hook-form";
+
+import { Address } from "@/components/common/Address";
+import { Sheet } from "@/components/common/Sheet";
+import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
+import { SEX_VALUES, SexKey } from "@/constants/sexes";
+import { useAuthUser } from "@/contexts/AuthContext";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function Profile() {
   const t = useTranslation();

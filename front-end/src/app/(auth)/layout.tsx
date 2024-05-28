@@ -1,14 +1,16 @@
 "use client";
 
+import { Button, Group, Stack, Title } from "@mantine/core";
+import { IconQuestionMark } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 
 import background from "@/assets/images/bg.jpeg";
-import icon from "@/assets/images/icon-black.svg";
+import iconBlack from "@/assets/images/icon-black.svg";
+import iconWhite from "@/assets/images/icon-white.svg";
 import { useCompanyName } from "@/hooks/useCompanyName";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Button, Group, Stack, Title } from "@mantine/core";
-import { IconQuestionMark } from "@tabler/icons-react";
+import { isProduction } from "@/utils/environment";
 
 import styles from "./layout.module.scss";
 
@@ -25,7 +27,12 @@ export default function AuthLayout({
       <aside className={styles.aside}>
         <Stack justify="space-between" gap="xl">
           <Group className={styles.header} wrap="nowrap">
-            <Image alt="Icon" src={icon} width={64} height={64} />
+            <Image
+              alt="Icon"
+              src={isProduction ? iconBlack : iconWhite}
+              width={64}
+              height={64}
+            />
             <Stack gap={0} className={styles.nameWrapper}>
               <Title>Hexa Center</Title>
               {companyName && <Title order={6}>{companyName}</Title>}

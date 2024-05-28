@@ -1,13 +1,13 @@
 "use client";
 
+import { Group, Select, Stack, TextInput } from "@mantine/core";
+import { useDidUpdate } from "@mantine/hooks";
 import { useCallback, useMemo } from "react";
 import { useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 
 import { COUNTRY_VALUES } from "@/constants/countries";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Group, Select, Stack, TextInput } from "@mantine/core";
-import { useDidUpdate } from "@mantine/hooks";
 
 import { Combobox } from "../Combobox";
 
@@ -155,9 +155,8 @@ export const Address = ({ disabled, required, keyOverrides }: AddressProps) => {
 
       const selectedAddress = JSON.parse(option);
 
-      Object.values(AddressKeys).forEach((key) => {
-        // @ts-ignore
-        key = keyOverrides?.[key] || key;
+      Object.values(AddressKeys).forEach((baseKey) => {
+        const key = keyOverrides?.[baseKey] || baseKey;
         let value = selectedAddress[key];
 
         if (key === countryKey)
@@ -168,7 +167,7 @@ export const Address = ({ disabled, required, keyOverrides }: AddressProps) => {
         setValue(key, value || "", { shouldDirty: true, shouldTouch: true });
       });
     },
-    [setValue],
+    [addressLineOneKey, countryKey, keyOverrides, setValue],
   );
 
   const countryOptions = useMemo(

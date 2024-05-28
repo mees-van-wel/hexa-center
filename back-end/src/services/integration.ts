@@ -1,10 +1,10 @@
+import { TRPCError } from "@trpc/server";
 import axios from "axios";
 import dayjs from "dayjs";
 import { eq, sql } from "drizzle-orm";
 
-import { integrationConnections, logs } from "@/db/schema";
-import { getCtx } from "@/utils/context";
-import { TRPCError } from "@trpc/server";
+import { integrationConnections, logs } from "~/db/schema";
+import { getCtx } from "~/utils/context";
 
 type RequestRefreshTokenResponse = {
   refresh_token: string;

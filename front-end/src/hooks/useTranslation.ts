@@ -19,15 +19,14 @@ export const useTranslation = () => {
     (key, ...params) => {
       const value = key
         .split(".")
-        .reduce<Record<string, any>>(
-          (o, x) => (o === undefined ? undefined : o[x]),
-          translation,
-        );
+        .reduce<
+          Record<string, any>
+        >((o, x) => (o === undefined ? undefined : o[x]), translation);
 
       return value
         ? typeof value === "string"
           ? value
-          : // @ts-ignore
+          : // @ts-ignore TODO Fix typings
             value(params)
         : key;
     },

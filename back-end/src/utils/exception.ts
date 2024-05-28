@@ -1,5 +1,6 @@
-import type { Exception } from "@/constants/exceptions";
 import { TRPCError } from "@trpc/server";
+
+import type { Exception } from "~/constants/exceptions";
 
 const PG_EXCEPTION_MAP: Record<string, Exception> = {
   "23503": "DB_KEY_CONSTRAINT",

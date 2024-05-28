@@ -12,7 +12,7 @@ export default {
     saved: "Opgeslagen",
     number: "Nummer",
     delete: "Verwijderen",
-    name: "Name",
+    name: "Naam",
     areYouSure: "Weet je het zeker?",
     yes: "Ja",
     no: "Nee",
@@ -69,25 +69,6 @@ export default {
       createdNotification: "Bedrijf succesvol aangemaakt",
       deletedNotification: "Bedrijf succesvol verwijderd",
     },
-    appointmentType: {
-      name: {
-        singular: "Afspraaktype",
-        plural: "Afspraaktypes",
-      },
-      keys: {
-        name: "Naam",
-        start: "Start",
-        end: "Einde",
-        color: "Kleur",
-        number: "Nummer",
-      },
-      duration: "Tijdsduur",
-      hours: "Uren",
-      minutes: "Minuten",
-      appointmentDescription: "Afspraakbeschrijving",
-      createdNotification: "Afspraaktype succesvol aangemaakt",
-      deletedNotification: "Afsrpaaktype succesvol verwijderd",
-    },
     room: {
       singularName: "Kamer",
       pluralName: "Kamers",
@@ -109,7 +90,7 @@ export default {
       invoicePeriod: {
         name: "Factuurperiode",
         create: "Factuur maken",
-        succes: "Periode succesvol gefactureerd",
+        success: "Periode succesvol gefactureerd",
       },
       calendar: {
         roomName: "Kamer naam",

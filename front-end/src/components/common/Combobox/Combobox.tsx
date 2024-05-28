@@ -1,7 +1,5 @@
 "use client";
 
-import React, { forwardRef, ReactNode, useEffect, useMemo } from "react";
-
 import {
   Combobox as ComboboxComponent,
   getOptionsLockup,
@@ -12,6 +10,7 @@ import {
   useCombobox,
 } from "@mantine/core";
 import { useUncontrolled } from "@mantine/hooks";
+import React, { forwardRef, ReactNode, useEffect, useMemo } from "react";
 
 type ComboboxItem = {
   label: string;
@@ -104,7 +103,7 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
 
     useEffect(() => {
       if (typeof value === "string" && selectedOption) {
-        // TODO Fix this, sometimes it overwrites search input
+        // TODO Sometimes it overwrites search input
         setSearch(selectedOption.label);
       }
     }, [value, selectedOption, setSearch]);

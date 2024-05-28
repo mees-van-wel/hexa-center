@@ -1,6 +1,7 @@
-import { AuthProgress } from "@/components/layouts/auth/AuthProgress";
 import { Stack } from "@mantine/core";
 import { IconCircleCheck } from "@tabler/icons-react";
+
+import { AuthProgress } from "@/components/layouts/auth/AuthProgress";
 
 import { EmailInput } from "./EmailInput";
 import { EmailOtpInput } from "./EmailOtpInput";

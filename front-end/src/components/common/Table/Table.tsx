@@ -1,13 +1,12 @@
 "use client";
 
+import { Paper, Table as TableComponent } from "@mantine/core";
 import { useMemo } from "react";
 import { useRecoilValue } from "recoil";
 
 import { searchState } from "@/states/searchState";
-import { Paper, Table as TableComponent } from "@mantine/core";
 
 import { SearchBar } from "./SearchBar";
-
 import styles from "./Table.module.scss";
 
 type TableProps<T extends Record<string, any>> = {
@@ -38,8 +37,8 @@ export const Table = <T extends Record<string, any>>({
 
     const searchLower = val.toLowerCase();
     return elements.filter((element) =>
-      Object.values(element).some(
-        (value) => value?.toString().toLowerCase().includes(searchLower),
+      Object.values(element).some((value) =>
+        value?.toString().toLowerCase().includes(searchLower),
       ),
     );
   }, [searchBarId, search, elements]);

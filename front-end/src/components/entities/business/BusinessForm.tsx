@@ -1,15 +1,12 @@
 "use client";
 
+import { Group, Paper, Stack, TextInput } from "@mantine/core";
 import { Controller, useFormContext } from "react-hook-form";
 
 import { Address } from "@/components/common/Address";
 import { PhoneInput } from "@/components/common/PhoneInput";
 import { useTranslation } from "@/hooks/useTranslation";
-import {
-  BusinessCreateInputSchema,
-  BusinessUpdateInputSchema,
-} from "@/schemas/business";
-import { Group, Paper, Stack, TextInput } from "@mantine/core";
+import { BusinessFormSchema } from "@/schemas/business";
 
 type BusinessFormProps = {
   disabled?: boolean;
@@ -17,9 +14,7 @@ type BusinessFormProps = {
 
 export const BusinessForm = ({ disabled }: BusinessFormProps) => {
   const t = useTranslation();
-  const { register, control, formState } = useFormContext<
-    BusinessCreateInputSchema | BusinessUpdateInputSchema
-  >();
+  const { register, control, formState } = useFormContext<BusinessFormSchema>();
 
   return (
     <Paper p="md">

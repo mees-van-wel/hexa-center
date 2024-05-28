@@ -1,14 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
-import { Controller, useFormContext } from "react-hook-form";
-
-import { useTranslation } from "@/hooks/useTranslation";
-import {
-  ReservationInputCreateSchema,
-  ReservationInputUpdateSchema,
-} from "@/schemas/reservation";
-import { type RouterOutput } from "@/utils/trpc";
 import {
   Group,
   NumberInput,
@@ -21,13 +12,36 @@ import {
 import { DateInput } from "@mantine/dates";
 import { useDidUpdate } from "@mantine/hooks";
 import { IconCurrencyEuro } from "@tabler/icons-react";
+import { useMemo } from "react";
+import { Controller, useFormContext } from "react-hook-form";
 
-type ReservationForm = {
+import { Loading } from "@/components/common/Loading";
+import { useQuery } from "@/hooks/useQuery";
+import { useTranslation } from "@/hooks/useTranslation";
+import { ReservationFormSchema } from "@/schemas/reservation";
+import { type RouterOutput } from "@/utils/trpc";
+
+export const ReservationForm = () => {
+  const listCustomers = useQuery("customer", "list");
+  const listRooms = useQuery("room", "list");
+
+  if (
+    listCustomers.loading ||
+    listRooms.loading ||
+    !listCustomers.data ||
+    !listRooms.data
+  )
+    return <Loading />;
+
+  return <Form customers={listCustomers.data} rooms={listRooms.data} />;
+};
+
+type FormProps = {
   rooms: RouterOutput["room"]["list"];
   customers: RouterOutput["customer"]["list"];
 };
 
-export const ReservationForm = ({ rooms, customers }: ReservationForm) => {
+const Form = ({ rooms, customers }: FormProps) => {
   const t = useTranslation();
 
   const {
@@ -37,9 +51,7 @@ export const ReservationForm = ({ rooms, customers }: ReservationForm) => {
     watch,
     getFieldState,
     setValue,
-  } = useFormContext<
-    ReservationInputCreateSchema | ReservationInputUpdateSchema
-  >();
+  } = useFormContext<ReservationFormSchema>();
 
   const customerOptions = useMemo(
     () =>
@@ -142,16 +154,10 @@ export const ReservationForm = ({ rooms, customers }: ReservationForm) => {
           />
         </Group>
         <Group>
-          <Controller
-            name="guestName"
-            control={control}
-            render={({ field, fieldState: { error } }) => (
-              <TextInput
-                {...field}
-                error={error?.message}
-                label={t("entities.reservation.guestName")}
-              />
-            )}
+          <TextInput
+            {...register("guestName")}
+            label={t("entities.reservation.guestName")}
+            error={errors.guestName?.message}
           />
           <Controller
             name="priceOverride"

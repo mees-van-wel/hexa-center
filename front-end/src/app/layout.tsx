@@ -1,27 +1,29 @@
 // export const runtime = "edge";
 
-import type { Metadata } from "next";
-import localFont from "next/font/local";
-import { headers } from "next/headers";
-import { redirect, RedirectType } from "next/navigation";
-
-import { AuthContextProvider } from "@/contexts/AuthContext";
-import { TranslationInitializer } from "@/initializers/TranslationInitializer";
-import { AppRouter, type RouterOutput } from "@/utils/trpc";
-import { getTrpcClientOnServer } from "@/utils/trpcForServer";
-import { ColorSchemeScript, MantineProvider } from "@mantine/core";
-import { ModalsProvider } from "@mantine/modals";
-import { Notifications } from "@mantine/notifications";
-import { TRPCClientError } from "@trpc/client";
-
-import Providers from "./providers";
-
 import "modern-normalize/modern-normalize.css";
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
 import "@mantine/dates/styles.css";
 import "@mantine/charts/styles.css";
 import "./globals.scss";
+
+import { ColorSchemeScript, MantineProvider } from "@mantine/core";
+import { ModalsProvider } from "@mantine/modals";
+import { Notifications } from "@mantine/notifications";
+import type { Metadata } from "next";
+import localFont from "next/font/local";
+import { headers } from "next/headers";
+import { redirect, RedirectType } from "next/navigation";
+
+import { LOCALES } from "@/constants/locales";
+import { AuthContextProvider } from "@/contexts/AuthContext";
+import { TranslationInitializer } from "@/initializers/TranslationInitializer";
+import { tRPCError } from "@/types/tRPCError";
+import { isProduction } from "@/utils/environment";
+import { type RouterOutput } from "@/utils/trpc";
+import { getTrpcClientOnServer } from "@/utils/trpcForServer";
+
+import Providers from "./providers";
 
 const eurostile = localFont({
   src: "../assets/fonts/eurostile.woff2",
@@ -33,7 +35,7 @@ export const metadata: Metadata = {
 };
 
 // TODO variable light dark theme
-const dark = false;
+const dark = !isProduction;
 
 export default async function RootLayout({
   children,
@@ -46,10 +48,11 @@ export default async function RootLayout({
   let user: RouterOutput["auth"]["currentUser"] | null = null;
 
   try {
-    const trpc = getTrpcClientOnServer();
+    const trpc = await getTrpcClientOnServer();
+
     user = await trpc.auth.currentUser.query();
   } catch (e) {
-    const error = e as TRPCClientError<AppRouter>;
+    const error = e as tRPCError;
     const code = error.meta?.response?.status as number | undefined;
     if (code === 418)
       redirect("https://www.hexa.center/", RedirectType.replace);
@@ -59,7 +62,7 @@ export default async function RootLayout({
   if (user && pathname === "/login") redirect("/", RedirectType.replace);
 
   return (
-    <html lang="en">
+    <html lang="nl">
       <head>
         <ColorSchemeScript />
       </head>
@@ -69,7 +72,7 @@ export default async function RootLayout({
       >
         <Providers>
           <AuthContextProvider currentUser={user}>
-            <TranslationInitializer>
+            <TranslationInitializer initialLocale={LOCALES.NL_NL}>
               <MantineProvider
                 defaultColorScheme={dark ? "dark" : "light"}
                 theme={{

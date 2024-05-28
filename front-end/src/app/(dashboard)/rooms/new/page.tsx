@@ -1,5 +1,9 @@
 "use client";
 
+import { valibotResolver } from "@hookform/resolvers/valibot";
+import { Button, Stack } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import { IconDeviceFloppy } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import {
   FormProvider,
@@ -11,13 +15,10 @@ import {
 
 import { RoomForm } from "@/components/entities/room/RoomForm";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
+import { useMemory } from "@/hooks/useMemory";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
 import { RoomCreateSchema, RoomInputCreateSchema } from "@/schemas/room";
-import { valibotResolver } from "@hookform/resolvers/valibot";
-import { Button, Stack } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
-import { IconDeviceFloppy } from "@tabler/icons-react";
 
 export default function Page() {
   const t = useTranslation();
@@ -49,6 +50,7 @@ export default function Page() {
 
 const SaveButton = () => {
   const createRoom = useMutation("room", "create");
+  const memory = useMemory();
   const router = useRouter();
   const t = useTranslation();
 
@@ -59,6 +61,20 @@ const SaveButton = () => {
     values,
   ) => {
     const response = await createRoom.mutate(values);
+
+    memory.write(response, [
+      {
+        scope: "room",
+        procedure: "get",
+        params: response.id,
+      },
+      {
+        scope: "room",
+        procedure: "list",
+        as: ({ current, result }) =>
+          current ? [...current, result] : undefined,
+      },
+    ]);
 
     notifications.show({
       message: t("entities.room.createdNotification"),

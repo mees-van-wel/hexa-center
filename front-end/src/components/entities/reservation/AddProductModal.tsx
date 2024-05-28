@@ -1,7 +1,3 @@
-import { useMemo, useState } from "react";
-
-import { useTranslation } from "@/hooks/useTranslation";
-import { RouterOutput } from "@/utils/trpc";
 import {
   Button,
   ButtonGroup,
@@ -14,6 +10,10 @@ import {
 } from "@mantine/core";
 import { useDidUpdate } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
+import { useMemo, useState } from "react";
+
+import { useTranslation } from "@/hooks/useTranslation";
+import { RouterOutput } from "@/utils/trpc";
 
 export type Cycle =
   | "oneTimeOnNext"
@@ -28,6 +28,15 @@ export type ReservationProductValues = {
   quantity: string;
   cycle: Cycle;
   revenueAccountId: number;
+};
+
+export type ReservationProductDefaultValues = {
+  name: string;
+  price: string;
+  vatRate: string | null;
+  quantity: string;
+  cycle: Cycle | null;
+  revenueAccountId: number | null;
 };
 
 type AddProductModalProps = {
@@ -53,7 +62,9 @@ export const AddProductModal = ({
     [templateId, templates],
   );
 
-  const [values, setValues] = useState<ReservationProductValues>({
+  const [values, setValues] = useState<
+    ReservationProductValues | ReservationProductDefaultValues
+  >({
     name: "",
     price: "",
     vatRate: "21",
@@ -79,7 +90,8 @@ export const AddProductModal = ({
   };
 
   const confirmHandler = () => {
-    onConfirm(templateId, values);
+    if (!values.revenueAccountId || !values.cycle) return;
+    onConfirm(templateId, values as ReservationProductValues);
     modals.closeAll();
   };
 

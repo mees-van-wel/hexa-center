@@ -1,9 +1,9 @@
-import { useState } from "react";
-
-import { useTranslation } from "@/hooks/useTranslation";
 import { Button, Group, Stack } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { modals } from "@mantine/modals";
+import { useState } from "react";
+
+import { useTranslation } from "@/hooks/useTranslation";
 
 type IssueModalProps = {
   onCancel?: () => void;

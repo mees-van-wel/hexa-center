@@ -1,7 +1,3 @@
-import { useState } from "react";
-
-import { useTranslation } from "@/hooks/useTranslation";
-import { type RouterOutput } from "@/utils/trpc";
 import {
   Button,
   ButtonGroup,
@@ -12,6 +8,10 @@ import {
   TextInput,
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
+import { useState } from "react";
+
+import { useTranslation } from "@/hooks/useTranslation";
+import { type RouterOutput } from "@/utils/trpc";
 
 import { Cycle, ReservationProductValues } from "./AddProductModal";
 

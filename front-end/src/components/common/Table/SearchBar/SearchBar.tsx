@@ -1,9 +1,9 @@
+import { TextInput } from "@mantine/core";
+import { IconX } from "@tabler/icons-react";
 import { useRecoilState } from "recoil";
 
 import { useTranslation } from "@/hooks/useTranslation";
 import { searchState } from "@/states/searchState";
-import { TextInput } from "@mantine/core";
-import { IconX } from "@tabler/icons-react";
 
 import styles from "./SearchBar.module.scss";
 

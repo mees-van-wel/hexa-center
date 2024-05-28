@@ -1,3 +1,6 @@
+import { valibotResolver } from "@hookform/resolvers/valibot";
+import { Button, Stack } from "@mantine/core";
+import { IconDeviceMobileMessage } from "@tabler/icons-react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { Input } from "valibot";
 
@@ -5,9 +8,6 @@ import { PhoneInput as PhoneInputComponent } from "@/components/common/PhoneInpu
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
 import { SendPhoneOtpSchema } from "@/schemas/auth";
-import { valibotResolver } from "@hookform/resolvers/valibot";
-import { Button, Stack } from "@mantine/core";
-import { IconDeviceMobileMessage } from "@tabler/icons-react";
 
 import { useLoginContext } from "./LoginContext";
 

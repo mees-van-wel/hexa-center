@@ -1,11 +1,14 @@
-import { useRef } from "react";
-import { useFormContext, useFormState, useWatch } from "react-hook-form";
-
 import { useDidUpdate } from "@mantine/hooks";
+import { useRef } from "react";
+import {
+  type Control,
+  useFormContext,
+  useFormState,
+  useWatch,
+} from "react-hook-form";
 
-// TODO Fix typings
 // TODO Fix dirty fields only
-export const useAutosave = <T>(
+export const useAutosave = <T extends Control<any>>(
   control: T,
   callback: (values: T["_defaultValues"]) => any,
   delay = 700,

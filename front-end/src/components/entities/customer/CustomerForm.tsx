@@ -1,15 +1,12 @@
 "use client";
 
+import { Avatar, Group, Paper, Stack, TextInput } from "@mantine/core";
 import { Controller, useFormContext } from "react-hook-form";
 
 import { Address } from "@/components/common/Address";
 import { PhoneInput } from "@/components/common/PhoneInput";
 import { useTranslation } from "@/hooks/useTranslation";
-import {
-  CustomerCreateInputSchema,
-  CustomerUpdateInputSchema,
-} from "@/schemas/customer";
-import { Avatar, Group, Paper, Stack, TextInput } from "@mantine/core";
+import { CustomerFormShema } from "@/schemas/customer";
 
 type CustomerFormProps = {
   disabled?: boolean;
@@ -22,7 +19,7 @@ export const CustomerForm = ({ disabled }: CustomerFormProps) => {
     register,
     control,
     formState: { errors },
-  } = useFormContext<CustomerCreateInputSchema | CustomerUpdateInputSchema>();
+  } = useFormContext<CustomerFormShema>();
 
   return (
     <Paper p="md">

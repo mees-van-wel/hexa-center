@@ -6,6 +6,7 @@ esbuild
     entryPoints: ["./src/server.ts"],
     bundle: true,
     platform: "node",
+    target: "es2022",
     outdir: "dist",
     format: "esm",
     minify: !process.argv.includes("--dev"),

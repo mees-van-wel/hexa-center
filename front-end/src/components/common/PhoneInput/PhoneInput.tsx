@@ -1,7 +1,10 @@
 "use client";
 
-import { forwardRef, useMemo, useRef, useState } from "react";
+import { Group } from "@mantine/core";
+import { Input } from "@mantine/core";
+import { useDidUpdate, useId, useLocalStorage } from "@mantine/hooks";
 import { parsePhoneNumber } from "awesome-phonenumber";
+import { forwardRef, useMemo, useRef, useState } from "react";
 import { mergeRefs } from "react-merge-refs";
 
 import {
@@ -11,12 +14,8 @@ import {
   DEFAULT_COUNTRY,
 } from "@/constants/countries";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Group } from "@mantine/core";
-import { Input } from "@mantine/core";
-import { useDidUpdate, useId, useLocalStorage } from "@mantine/hooks";
 
 import { Combobox } from "../Combobox";
-
 import styles from "./PhoneInput.module.scss";
 
 type PhoneInputProps = {

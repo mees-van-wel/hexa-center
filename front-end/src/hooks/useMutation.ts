@@ -1,7 +1,10 @@
 import { useState } from "react";
 
-import { type RouterInput, type RouterOutput } from "@/utils/trpc";
-import { getTrpcClientOnClient } from "@/utils/trpcForClient";
+import {
+  getTrpcClient,
+  type RouterInput,
+  type RouterOutput,
+} from "@/utils/trpc";
 
 // TODO Error handling
 // TODO Caching
@@ -20,9 +23,9 @@ export const useMutation = <
   ) => {
     setLoading(true);
 
-    const trpc = getTrpcClientOnClient();
+    const trpc = getTrpcClient();
 
-    // @ts-ignore
+    // @ts-ignore Too complex typings
     const result: RouterOutput[T][P] = await trpc[scope][procedure]
       .mutate(params, { signal: options?.signal })
       .finally(() => {

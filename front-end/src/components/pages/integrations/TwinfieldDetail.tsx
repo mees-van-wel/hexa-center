@@ -1,14 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Button, Paper, Stack, Title } from "@mantine/core";
+import { IconCheck, IconPlugConnected } from "@tabler/icons-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
 import { type RouterOutput } from "@/utils/trpc";
-import { Button, Paper, Stack, Title } from "@mantine/core";
-import { IconCheck, IconPlugConnected } from "@tabler/icons-react";
 
 type Step = "authorize" | "sync";
 

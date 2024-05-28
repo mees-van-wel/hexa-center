@@ -1,9 +1,10 @@
+import { TRPCError } from "@trpc/server";
 import dayjs from "dayjs";
 import Decimal from "decimal.js";
 import { and, desc, eq, or, sql } from "drizzle-orm";
 import ejs from "ejs";
 
-import { Settings } from "@/constants/settings";
+import { Settings } from "~/constants/settings";
 import {
   businesses,
   customers,
@@ -14,12 +15,11 @@ import {
   invoices,
   logs,
   reservationsToInvoices,
-} from "@/db/schema";
-import { getCtx } from "@/utils/context";
-import { readFile } from "@/utils/fileSystem";
-import { generatePdf } from "@/utils/pdf";
-import { sendSoapRequest } from "@/utils/soap";
-import { TRPCError } from "@trpc/server";
+} from "~/db/schema";
+import { getCtx } from "~/utils/context";
+import { readFile } from "~/utils/fileSystem";
+import { generatePdf } from "~/utils/pdf";
+import { sendSoapRequest } from "~/utils/soap";
 
 import {
   getTwinfieldAccessToken,
@@ -728,8 +728,9 @@ export const issueInvoice = async (
         ),
       );
 
-    // @ts-ignore
-    const externalCustomerCode = customerMappingResult[0]?.data?.code;
+    const customerMapping = customerMappingResult[0];
+    const externalCustomerCode =
+      "code" in customerMapping ? (customerMapping.code as string) : null;
 
     if (!externalCustomerCode) {
       console.warn(`Missing integration mapping for user: ${customer.id}`);
@@ -767,8 +768,11 @@ export const issueInvoice = async (
           ),
         );
 
-      // @ts-ignore
-      const revenueAccountCode = revenueAccountMappingResult[0]?.data?.code;
+      const revenueAccountMapping = revenueAccountMappingResult[0];
+      const revenueAccountCode =
+        "code" in revenueAccountMapping
+          ? (revenueAccountMapping.code as string)
+          : null;
 
       if (!revenueAccountCode) {
         console.warn(
@@ -805,9 +809,11 @@ export const issueInvoice = async (
         ),
       );
 
+    const balanceAccountMapping = balanceAccountMappingResult[0];
     const externalBalanceAccountCode =
-      // @ts-ignore
-      balanceAccountMappingResult[0]?.data?.code;
+      "code" in balanceAccountMapping
+        ? (balanceAccountMapping.code as string)
+        : null;
 
     if (!externalBalanceAccountCode) {
       console.warn(
@@ -826,9 +832,11 @@ export const issueInvoice = async (
         ),
       );
 
+    const transactionTypeMapping = transactionTypeMappingResult[0];
     const externalTransactionTypeCode =
-      // @ts-ignore
-      transactionTypeMappingResult[0]?.data?.code;
+      "code" in transactionTypeMapping
+        ? (transactionTypeMapping.code as string)
+        : null;
 
     if (!externalTransactionTypeCode) {
       console.warn(
@@ -919,9 +927,11 @@ export const issueInvoice = async (
             ),
           );
 
+        const balanceAccountMapping = balanceAccountMappingResult[0];
         const externalBalanceAccountCode =
-          // @ts-ignore
-          balanceAccountMappingResult[0]?.data?.code;
+          "code" in balanceAccountMapping
+            ? (balanceAccountMapping.code as string)
+            : null;
 
         if (!externalBalanceAccountCode) {
           console.warn(
@@ -940,9 +950,11 @@ export const issueInvoice = async (
             ),
           );
 
+        const transactionTypeMapping = transactionTypeMappingResult[0];
         const externalTransactionTypeCode =
-          // @ts-ignore
-          transactionTypeMappingResult[0]?.data?.code;
+          "code" in transactionTypeMapping
+            ? (transactionTypeMapping.code as string)
+            : null;
 
         if (!externalTransactionTypeCode) {
           console.warn(

@@ -1,14 +1,14 @@
 "use client";
 
-import { useMemo } from "react";
-import clsx from "clsx";
-import dayjs, { Dayjs } from "dayjs";
-
-import { CALENDAR_VIEWS, CalendarView } from "@/constants/calendarViews";
-import { useTranslation } from "@/hooks/useTranslation";
 import { Button, Paper, SegmentedControl, Stack } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import { IconArrowBack, IconArrowForward } from "@tabler/icons-react";
+import clsx from "clsx";
+import dayjs, { Dayjs } from "dayjs";
+import { useMemo } from "react";
+
+import { CALENDAR_VIEWS, CalendarView } from "@/constants/calendarViews";
+import { useTranslation } from "@/hooks/useTranslation";
 
 import styles from "./CalendarSidebar.module.scss";
 

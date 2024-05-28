@@ -1,5 +1,7 @@
 "use client";
 
+import { Button, Indicator, Paper, Stack, Text } from "@mantine/core";
+import { IconPlugConnected } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -7,8 +9,6 @@ import twinfieldLogo from "@/assets/images/twinfield-logo.png";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
 import { useTranslation } from "@/hooks/useTranslation";
 import { type RouterOutput } from "@/utils/trpc";
-import { Button, Indicator, Paper, Stack, Text } from "@mantine/core";
-import { IconPlugConnected } from "@tabler/icons-react";
 
 import styles from "./Overview.module.scss";
 
@@ -41,7 +41,7 @@ export const Overview = ({ integrations }: OverviewProps) => {
           }
           styles={{
             indicator: {
-              border: "solid 0.3rem black",
+              border: "solid 0.3rem rgb(var(--color-foreground))",
             },
           }}
         >

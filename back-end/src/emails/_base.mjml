@@ -1,7 +1,10 @@
 <mjml>
   <mj-head>
     <mj-title>{{title}}</mj-title>
-    <mj-font name="Eurostile" href="https://hexa.center/fonts/eurostile.css" />
+    <mj-font
+      name="Eurostile"
+      href="https://eu2.contabostorage.com/2d8d450408ba43cfa0d043a910469aa5:hc-assets/eurostile.css"
+    />
     <mj-attributes>
       <mj-all font-family="Eurostile, Arial, sans-serif" />
       <mj-text
