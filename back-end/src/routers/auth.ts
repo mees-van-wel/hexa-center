@@ -1,4 +1,3 @@
-import { SendEmailOtpSchema, SendPhoneOtpSchema } from "@shared/schemas/auth";
 import { TRPCError } from "@trpc/server";
 import { wrap } from "@typeschema/valibot";
 import crypto from "crypto";
@@ -10,6 +9,7 @@ import {
   type SessionDuration,
 } from "~/constants/sessionDurations";
 import { users, userSessions } from "~/db/schema";
+import { SendEmailOtpSchema, SendPhoneOtpSchema } from "~/schemas/auth";
 import { procedure, router } from "~/trpc";
 import { decrypt, encrypt } from "~/utils/encryption";
 import { isProduction } from "~/utils/environment";

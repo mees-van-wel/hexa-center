@@ -11,7 +11,7 @@ import { Weekday, WEEKDAY_VALUES, WEEKDAYS } from "@/constants/weekdays";
 import { useTranslation } from "@/hooks/useTranslation";
 import { RouterOutput } from "@/utils/trpc";
 
-import { Sheet } from "../Sheet";
+import { Sheet } from "../../../common/Sheet";
 import styles from "./WorkingHours.module.scss";
 
 type workingHoursProps = {

@@ -11,6 +11,7 @@
     "lint": "eslint --fix **/*.ts",
     "format": "prettier --write **/*.ts",
     "deploy": "fly deploy",
+    "docker": "docker build -t hexa-center-back-end .",
     "gen-migration": "drizzle-kit generate"
   },
   "dependencies": {

@@ -7,10 +7,7 @@
     "**/tmp/*": true
   },
   "files.exclude": {
-    "**/node_modules/*": true,
-    "**/build": true,
-    "**/dist": true,
-    "**/.next": true
+    "**/node_modules/*": true
   },
   "search.exclude": {
     "**/node_modules": true,

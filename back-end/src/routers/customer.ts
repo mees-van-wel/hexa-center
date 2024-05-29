@@ -1,7 +1,3 @@
-import {
-  CustomerCreateSchema,
-  CustomerUpdateSchema,
-} from "@shared/schemas/customer";
 import { TRPCError } from "@trpc/server";
 import { wrap } from "@typeschema/valibot";
 import { and, eq, sql } from "drizzle-orm";
@@ -14,6 +10,7 @@ import {
   integrationMappings,
   logs,
 } from "~/db/schema";
+import { CustomerCreateSchema, CustomerUpdateSchema } from "~/schemas/customer";
 import {
   getTwinfieldAccessToken,
   getTwinfieldWsdlUrl,

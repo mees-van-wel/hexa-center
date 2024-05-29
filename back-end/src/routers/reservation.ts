@@ -1,7 +1,3 @@
-import {
-  ReservationCreateSchema,
-  ReservationUpdateSchema,
-} from "@shared/schemas/reservation";
 import { TRPCError } from "@trpc/server";
 import { wrap } from "@typeschema/valibot";
 import dayjs from "dayjs";
@@ -24,6 +20,10 @@ import {
   reservationsToInvoices,
   reservationsToProductInstances,
 } from "~/db/schema";
+import {
+  ReservationCreateSchema,
+  ReservationUpdateSchema,
+} from "~/schemas/reservation";
 import { createInvoice } from "~/services/invoice";
 import { getSetting } from "~/services/setting";
 import { procedure, router } from "~/trpc";

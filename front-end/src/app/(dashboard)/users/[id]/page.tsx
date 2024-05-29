@@ -4,7 +4,6 @@ import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Alert, Badge, Button, Loader, Paper, Stack } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { UserUpdateInputSchema, UserUpdateSchema } from "@shared/schemas/user";
 import {
   IconAlertTriangle,
   IconCheck,
@@ -30,6 +29,7 @@ import { useMemory } from "@/hooks/useMemory";
 import { useMutation } from "@/hooks/useMutation";
 import { useQuery } from "@/hooks/useQuery";
 import { useTranslation } from "@/hooks/useTranslation";
+import { UserUpdateInputSchema, UserUpdateSchema } from "@/schemas/user";
 import { RouterOutput } from "@/utils/trpc";
 
 type PageParams = { params: { id: string } };

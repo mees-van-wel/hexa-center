@@ -1,13 +1,13 @@
-import {
-  AppointmentTypeCreateSchema,
-  AppointmentTypeUpdateSchema,
-} from "@shared/schemas/appointmentType";
 import { TRPCError } from "@trpc/server";
 import { wrap } from "@typeschema/valibot";
 import { eq } from "drizzle-orm";
 import { number } from "valibot";
 
 import { appointmentTypes } from "~/db/schema";
+import {
+  AppointmentTypeCreateSchema,
+  AppointmentTypeUpdateSchema,
+} from "~/schemas/appointmentType";
 import { procedure, router } from "~/trpc";
 
 export const appointmentTypeRouter = router({

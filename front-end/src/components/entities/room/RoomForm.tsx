@@ -1,14 +1,11 @@
 "use client";
 
 import { NumberInput, Paper, Stack, TextInput } from "@mantine/core";
-import {
-  RoomInputCreateSchema,
-  RoomInputUpdateSchema,
-} from "@shared/schemas/room";
 import { IconCurrencyEuro } from "@tabler/icons-react";
 import { Controller, useFormContext } from "react-hook-form";
 
 import { useTranslation } from "@/hooks/useTranslation";
+import { RoomInputCreateSchema, RoomInputUpdateSchema } from "@/schemas/room";
 
 export const RoomForm = () => {
   const t = useTranslation();

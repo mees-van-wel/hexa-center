@@ -18,10 +18,6 @@ import {
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import {
-  ReservationUpdateInputSchema,
-  ReservationUpdateSchema,
-} from "@shared/schemas/reservation";
-import {
   IconAlertTriangle,
   IconCheck,
   IconEdit,
@@ -59,6 +55,10 @@ import { useMemory } from "@/hooks/useMemory";
 import { useMutation } from "@/hooks/useMutation";
 import { useQuery } from "@/hooks/useQuery";
 import { useTranslation } from "@/hooks/useTranslation";
+import {
+  ReservationUpdateInputSchema,
+  ReservationUpdateSchema,
+} from "@/schemas/reservation";
 import { updateObjectInArray } from "@/utils/array";
 import { RouterOutput } from "@/utils/trpc";
 

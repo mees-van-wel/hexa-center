@@ -11,7 +11,6 @@ import {
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { useDidUpdate } from "@mantine/hooks";
-import { ReservationFormSchema } from "@shared/schemas/reservation";
 import { IconCurrencyEuro } from "@tabler/icons-react";
 import { useMemo } from "react";
 import { Controller, useFormContext } from "react-hook-form";
@@ -19,6 +18,7 @@ import { Controller, useFormContext } from "react-hook-form";
 import { Loading } from "@/components/common/Loading";
 import { useQuery } from "@/hooks/useQuery";
 import { useTranslation } from "@/hooks/useTranslation";
+import { ReservationFormSchema } from "@/schemas/reservation";
 import { type RouterOutput } from "@/utils/trpc";
 
 export const ReservationForm = () => {

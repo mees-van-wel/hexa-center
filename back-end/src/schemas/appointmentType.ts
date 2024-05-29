@@ -1,4 +1,3 @@
-import { toNull } from "@shared/valibotPipes/toNull";
 import {
   Input,
   merge,
@@ -11,6 +10,8 @@ import {
   partial,
   string,
 } from "valibot";
+
+import { toNull } from "~/valibotPipes/toNull";
 
 export const AppointmentTypeCreateSchema = object({
   name: string([minLength(2)]),

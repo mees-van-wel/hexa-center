@@ -4,11 +4,6 @@ import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Button, Stack } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import {
-  ReservationCreateInputSchema,
-  ReservationCreateSchema,
-  ReservationDefaultsSchema,
-} from "@shared/schemas/reservation";
 import { IconDeviceFloppy, IconHotelService } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
@@ -29,6 +24,11 @@ import { useMemory } from "@/hooks/useMemory";
 import { useMutation } from "@/hooks/useMutation";
 import { useQuery } from "@/hooks/useQuery";
 import { useTranslation } from "@/hooks/useTranslation";
+import {
+  ReservationCreateInputSchema,
+  ReservationCreateSchema,
+  ReservationDefaultsSchema,
+} from "@/schemas/reservation";
 
 dayjs.extend(IsSameOrAfter);
 dayjs.extend(IsSameOrBefore);

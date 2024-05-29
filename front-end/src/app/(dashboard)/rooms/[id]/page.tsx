@@ -4,7 +4,6 @@ import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Badge, Button, Loader, Stack } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { RoomInputUpdateSchema, RoomUpdateSchema } from "@shared/schemas/room";
 import {
   IconAlertTriangle,
   IconBed,
@@ -29,6 +28,7 @@ import { useMemory } from "@/hooks/useMemory";
 import { useMutation } from "@/hooks/useMutation";
 import { useQuery } from "@/hooks/useQuery";
 import { useTranslation } from "@/hooks/useTranslation";
+import { RoomInputUpdateSchema, RoomUpdateSchema } from "@/schemas/room";
 import { RouterOutput } from "@/utils/trpc";
 
 type RoomPageParams = { params: { id: string } };

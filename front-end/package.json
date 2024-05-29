@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint --fix",
     "format": "prettier --write **/*.{ts,tsx}",
-    "deploy": "fly deploy"
+    "deploy": "fly deploy",
+    "docker": "docker build -t hexa-center-front-end ."
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",

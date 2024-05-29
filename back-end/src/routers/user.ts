@@ -1,10 +1,10 @@
-import { UserCreateSchema, UserUpdateSchema } from "@shared/schemas/user";
 import { TRPCError } from "@trpc/server";
 import { wrap } from "@typeschema/valibot";
 import { eq } from "drizzle-orm";
 import { number } from "valibot";
 
 import { users } from "~/db/schema";
+import { UserCreateSchema, UserUpdateSchema } from "~/schemas/user";
 import { procedure, router } from "~/trpc";
 import { createPgException } from "~/utils/exception";
 
