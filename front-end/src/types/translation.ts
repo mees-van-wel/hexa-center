@@ -49,6 +49,7 @@ export type Translation = {
   modules: {
     essentials: string;
     sales: string;
+    scheduling: string;
     bookings: string;
     system: string;
   };
@@ -77,10 +78,8 @@ export type Translation = {
       deletedNotification: string;
     };
     appointmentType: {
-      name: {
-        singular: string;
-        plural: string;
-      };
+      singularName: string;
+      pluralName: string;
       keys: {
         name: string;
         start: string;

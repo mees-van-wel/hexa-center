@@ -41,6 +41,7 @@ export default {
   modules: {
     essentials: "Essentials",
     sales: "Sales",
+    scheduling: "Scheduling",
     bookings: "Bookings",
     system: "System",
   },
@@ -69,10 +70,8 @@ export default {
       deletedNotification: "Business successfully deleted",
     },
     appointmentType: {
-      name: {
-        singular: "Appointment type",
-        plural: "Appointment types",
-      },
+      singularName: "Appointment type",
+      pluralName: "Appointment types",
       keys: {
         name: "Name",
         start: "Start",

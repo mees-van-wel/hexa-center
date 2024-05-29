@@ -41,6 +41,7 @@ export default {
   modules: {
     essentials: "Essentieel",
     sales: "Verkoop",
+    scheduling: "Planning",
     bookings: "Bookingen",
     system: "Systeem",
   },
@@ -70,10 +71,8 @@ export default {
       deletedNotification: "Bedrijf succesvol verwijderd",
     },
     appointmentType: {
-      name: {
-        singular: "Afspraaktype",
-        plural: "Afspraaktypes",
-      },
+      singularName: "Afspraaktype",
+      pluralName: "Afspraaktypes",
       keys: {
         name: "Naam",
         start: "Start",

@@ -53,6 +53,7 @@ export default async function RootLayout({
     user = await trpc.auth.currentUser.query();
   } catch (e) {
     const error = e as tRPCError;
+    console.log(error);
     const code = error.meta?.response?.status as number | undefined;
     if (code === 418)
       redirect("https://www.hexa.center/", RedirectType.replace);

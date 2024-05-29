@@ -2,6 +2,7 @@ import { Button, Stack, Title } from "@mantine/core";
 import {
   IconBed,
   IconBuilding,
+  IconCalendarStats,
   IconFileEuro,
   IconHome,
   IconHotelService,
@@ -68,6 +69,21 @@ export const Navigation = () => {
                 justify="left"
               >
                 {t("entities.company.pluralName")}
+              </Button>
+            </Stack>
+          </Stack>
+          <Stack gap="xs">
+            <Title order={4}>{t("modules.scheduling")}</Title>
+            <Stack gap={0}>
+              <Button
+                component={Link}
+                href="/appointment-types"
+                variant={pathname === "/appointmentTypes" ? "filled" : "subtle"}
+                leftSection={<IconCalendarStats />}
+                fullWidth
+                justify="left"
+              >
+                {t("entities.appointmentType.pluralName")}
               </Button>
             </Stack>
           </Stack>
