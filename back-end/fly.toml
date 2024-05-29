@@ -1,6 +1,6 @@
 app = "hexa-center-back-end"
 primary_region = "ams"
-swap_size_mb = 256
+swap_size_mb = 1024
 
 [build]
 

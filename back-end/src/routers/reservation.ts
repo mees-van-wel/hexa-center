@@ -428,7 +428,9 @@ export const reservationRouter = router({
         lines: [
           {
             revenueAccountId: reservationRevenueAccountId,
-            name: `Nights (${dayjs(input.periodStartDate).format(
+            name: `${reservation.guestName ? reservation.guestName + " - " + reservation.room.name : reservation.room.name} (${dayjs(
+              input.periodStartDate,
+            ).format(
               "DD-MM-YYYY",
             )} - ${dayjs(input.periodEndDate).format("DD-MM-YYYY")})`,
             unitAmount: reservation.priceOverride || reservation.room.price,
