@@ -2,7 +2,6 @@ import { Button, Stack, Title } from "@mantine/core";
 import {
   IconBed,
   IconBuilding,
-  IconCalendarStats,
   IconFileEuro,
   IconHome,
   IconHotelService,
@@ -72,7 +71,7 @@ export const Navigation = () => {
               </Button>
             </Stack>
           </Stack>
-          <Stack gap="xs">
+          {/* <Stack gap="xs">
             <Title order={4}>{t("modules.scheduling")}</Title>
             <Stack gap={0}>
               <Button
@@ -86,7 +85,7 @@ export const Navigation = () => {
                 {t("entities.appointmentType.pluralName")}
               </Button>
             </Stack>
-          </Stack>
+          </Stack> */}
           <Stack gap="xs">
             <Title order={4}>{t("modules.bookings")}</Title>
             <Stack gap={0}>

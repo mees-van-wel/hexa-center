@@ -394,7 +394,7 @@ const Detail = ({
 
   return (
     <FormProvider {...formMethods}>
-      <Stack>
+      <Stack pb="md">
         <DashboardHeader
           backRouteFallback="/reservations"
           title={[

@@ -695,7 +695,13 @@ const Detail = ({ invoice }: DetailProps) => {
                   grossAmount,
                 }) => (
                   <Table.Tr key={id}>
-                    <Table.Td>{name}</Table.Td>
+                    <Table.Td
+                      style={{
+                        textWrap: "balance",
+                      }}
+                    >
+                      {name}
+                    </Table.Td>
                     <Table.Td>
                       {Intl.NumberFormat("nl-NL", {
                         style: "currency",
