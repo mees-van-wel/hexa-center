@@ -3,6 +3,7 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Button, Stack } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
+import { UserCreateInputSchema, UserCreateSchema } from "@shared/schemas/user";
 import { IconDeviceFloppy, IconUsers } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import {
@@ -18,7 +19,6 @@ import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader"
 import { useMemory } from "@/hooks/useMemory";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
-import { UserCreateInputSchema, UserCreateSchema } from "@/schemas/user";
 
 export default function Page() {
   const t = useTranslation();

@@ -1,12 +1,12 @@
 "use client";
 
 import { Group, Paper, Stack, TextInput } from "@mantine/core";
+import { BusinessFormSchema } from "@shared/schemas/business";
 import { Controller, useFormContext } from "react-hook-form";
 
 import { Address } from "@/components/common/Address";
 import { PhoneInput } from "@/components/common/PhoneInput";
 import { useTranslation } from "@/hooks/useTranslation";
-import { BusinessFormSchema } from "@/schemas/business";
 
 type BusinessFormProps = {
   disabled?: boolean;

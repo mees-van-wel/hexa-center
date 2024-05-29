@@ -2,6 +2,10 @@
 
 import { Avatar, Group, Paper, Stack, TextInput } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
+import {
+  UserCreateInputSchema,
+  UserUpdateInputSchema,
+} from "@shared/schemas/user";
 import { Controller, useFormContext } from "react-hook-form";
 
 import { Address } from "@/components/common/Address";
@@ -9,7 +13,6 @@ import { Combobox } from "@/components/common/Combobox";
 import { PhoneInput } from "@/components/common/PhoneInput";
 import { SEX_VALUES } from "@/constants/sexes";
 import { useTranslation } from "@/hooks/useTranslation";
-import { UserCreateInputSchema, UserUpdateInputSchema } from "@/schemas/user";
 
 type UserFormProps = {
   disabled?: boolean;

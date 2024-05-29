@@ -17,7 +17,8 @@
     // TODO Depend on environment (production false, dev true)
     "sourceMap": true,
     "paths": {
-      "~/*": ["./src/*"]
+      "~/*": ["./src/*"],
+      "@shared/*": ["../front-end/shared/*"]
     }
   },
   "include": ["src/**/*"],

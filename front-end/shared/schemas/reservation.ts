@@ -1,3 +1,4 @@
+import { toNull } from "@shared/valibotPipes/toNull";
 import {
   date,
   Input,
@@ -10,8 +11,6 @@ import {
   partial,
   string,
 } from "valibot";
-
-import { toNull } from "@/valibotPipes/toNull";
 
 export const ReservationCreateSchema = object({
   customerId: number(),

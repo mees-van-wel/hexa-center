@@ -1,10 +1,13 @@
+import {
+  BusinessCreateSchema,
+  BusinessUpdateSchema,
+} from "@shared/schemas/business";
 import { TRPCError } from "@trpc/server";
 import { wrap } from "@typeschema/valibot";
 import { eq } from "drizzle-orm";
 import { number } from "valibot";
 
 import { businesses } from "~/db/schema";
-import { BusinessCreateSchema, BusinessUpdateSchema } from "~/schemas/business";
 import { procedure, router } from "~/trpc";
 
 export const businessRouter = router({

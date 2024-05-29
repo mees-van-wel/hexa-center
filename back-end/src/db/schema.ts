@@ -3,6 +3,7 @@ import {
   AnyPgColumn,
   date,
   integer,
+  interval,
   jsonb,
   numeric,
   pgEnum,
@@ -243,6 +244,48 @@ export const workingHoursRelations = relations(
     account: one(userAccountDetails, {
       fields: [userAccountDetailsWorkingHours.accountId],
       references: [userAccountDetails.id],
+    }),
+  }),
+);
+
+export const appointmentTypes = pgTable("appointmentTypes", {
+  $kind: text("$kind").default("appointmentType").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  createdById: integer("created_by_id").references(
+    (): AnyPgColumn => users.id,
+    {
+      onDelete: "set null",
+    },
+  ),
+  updatedById: integer("updated_by_id").references(
+    (): AnyPgColumn => users.id,
+    {
+      onDelete: "set null",
+    },
+  ),
+  name: text("name").unique().notNull(),
+  color: text("color").notNull(),
+  appointmentDescription: text("appointmentDescription"),
+  appointmentDuration: interval("appointmentDuration"),
+});
+
+export const appointmentTypesRelations = relations(
+  appointmentTypes,
+  ({ one }) => ({
+    createdBy: one(users, {
+      fields: [appointmentTypes.createdById],
+      references: [users.id],
+    }),
+    updatedBy: one(users, {
+      fields: [appointmentTypes.updatedById],
+      references: [users.id],
     }),
   }),
 );

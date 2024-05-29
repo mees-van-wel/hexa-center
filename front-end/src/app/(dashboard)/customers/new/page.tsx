@@ -3,6 +3,11 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Button, Stack } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
+import {
+  CustomerCreateInputSchema,
+  CustomerCreateSchema,
+  CustomerDefaultsSchema,
+} from "@shared/schemas/customer";
 import { IconDeviceFloppy, IconUserDollar } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import {
@@ -18,11 +23,6 @@ import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader"
 import { useMemory } from "@/hooks/useMemory";
 import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
-import {
-  CustomerCreateInputSchema,
-  CustomerCreateSchema,
-  CustomerDefaultsSchema,
-} from "@/schemas/customer";
 
 export default function Page() {
   const t = useTranslation();

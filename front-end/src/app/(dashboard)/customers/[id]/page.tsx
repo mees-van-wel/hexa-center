@@ -5,6 +5,10 @@ import { Badge, Button, Loader, Stack } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import {
+  CustomerCreateSchema,
+  CustomerUpdateInputSchema,
+} from "@shared/schemas/customer";
+import {
   IconAlertTriangle,
   IconCheck,
   IconTrash,
@@ -28,10 +32,6 @@ import { useMemory } from "@/hooks/useMemory";
 import { useMutation } from "@/hooks/useMutation";
 import { useQuery } from "@/hooks/useQuery";
 import { useTranslation } from "@/hooks/useTranslation";
-import {
-  CustomerCreateSchema,
-  CustomerUpdateInputSchema,
-} from "@/schemas/customer";
 import { RouterOutput } from "@/utils/trpc";
 
 type PageParams = { params: { id: string } };

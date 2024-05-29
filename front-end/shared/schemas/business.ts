@@ -1,3 +1,4 @@
+import { toNull } from "@shared/valibotPipes/toNull";
 import {
   email,
   Input,
@@ -11,8 +12,6 @@ import {
   partial,
   string,
 } from "valibot";
-
-import { toNull } from "@/valibotPipes/toNull";
 
 export const BusinessCreateSchema = object({
   name: string([minLength(2)]),

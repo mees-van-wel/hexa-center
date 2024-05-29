@@ -1,12 +1,12 @@
 "use client";
 
 import { Avatar, Group, Paper, Stack, TextInput } from "@mantine/core";
+import { CustomerFormShema } from "@shared/schemas/customer";
 import { Controller, useFormContext } from "react-hook-form";
 
 import { Address } from "@/components/common/Address";
 import { PhoneInput } from "@/components/common/PhoneInput";
 import { useTranslation } from "@/hooks/useTranslation";
-import { CustomerFormShema } from "@/schemas/customer";
 
 type CustomerFormProps = {
   disabled?: boolean;
