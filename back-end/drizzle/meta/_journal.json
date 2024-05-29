@@ -4,23 +4,30 @@
   "entries": [
     {
       "idx": 0,
-      "version": "5",
+      "version": "6",
       "when": 1710865234819,
       "tag": "0000_lethal_doctor_doom",
       "breakpoints": true
     },
     {
       "idx": 1,
-      "version": "5",
+      "version": "6",
       "when": 1714473902993,
       "tag": "0001_mysterious_chamber",
       "breakpoints": true
     },
     {
       "idx": 2,
-      "version": "5",
+      "version": "6",
       "when": 1714475888326,
       "tag": "0002_overconfident_iron_patriot",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1716972834184,
+      "tag": "0003_optimal_kylun",
       "breakpoints": true
     }
   ]
