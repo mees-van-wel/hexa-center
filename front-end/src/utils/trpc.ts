@@ -4,24 +4,26 @@ import superjson from "superjson";
 
 import type { AppRouter as AR } from "~/routers/_app";
 
+import { isProduction } from "./environment";
+
 export type AppRouter = AR;
 export type RouterInput = inferRouterInputs<AR>;
 export type RouterOutput = inferRouterOutputs<AR>;
 
 export const getTrpcClient = () => {
-  // const subdomain = window.location.hostname.split(".")[0];
-  // if (isProduction && !subdomain) throw new Error("Missing subdomain");
+  const subdomain = window.location.hostname.split(".")[0];
+  if (isProduction && !subdomain) throw new Error("Missing subdomain");
 
   return createTRPCProxyClient<AppRouter>({
     transformer: superjson,
     links: [
       httpBatchLink({
-        url: "http://localhost:4000/trpc",
-        // headers: isProduction
-        //   ? () => ({
-        //       "X-Subdomain": subdomain,
-        //     })
-        //   : undefined,
+        url: `${process.env.NEXT_PUBLIC_API_URL}/trpc`,
+        headers: isProduction
+          ? () => ({
+              "X-Subdomain": subdomain,
+            })
+          : undefined,
         fetch: (url, options) =>
           fetch(url, {
             ...options,
@@ -31,9 +33,3 @@ export const getTrpcClient = () => {
     ],
   });
 };
-
-// const client = getTrpcClient();
-
-// (async () => {
-//   const a = await client.business.create.mutate();
-// })();
