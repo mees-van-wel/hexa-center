@@ -15,7 +15,6 @@ import localFont from "next/font/local";
 import { headers } from "next/headers";
 import { redirect, RedirectType } from "next/navigation";
 
-import { LOCALES } from "@/constants/locales";
 import { AuthContextProvider } from "@/contexts/AuthContext";
 import { TranslationInitializer } from "@/initializers/TranslationInitializer";
 import { tRPCError } from "@/types/tRPCError";
@@ -73,7 +72,7 @@ export default async function RootLayout({
       >
         <Providers>
           <AuthContextProvider currentUser={user}>
-            <TranslationInitializer initialLocale={LOCALES.NL_NL}>
+            <TranslationInitializer>
               <MantineProvider
                 defaultColorScheme={dark ? "dark" : "light"}
                 theme={{

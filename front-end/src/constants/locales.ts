@@ -10,4 +10,4 @@ export type Locale = Locales[LocaleKey];
 export const LOCALE_KEYS = Object.keys(LOCALES) as LocaleKey[];
 export const LOCALE_VALUES = Object.values(LOCALES) as Locale[];
 
-export const DEFAULT_LOCALE = LOCALES.EN_US;
+export const DEFAULT_LOCALE = LOCALES.NL_NL;

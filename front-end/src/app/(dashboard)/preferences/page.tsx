@@ -23,6 +23,7 @@ import {
   FirstDayOfTheWeek,
 } from "@/constants/firstDayOfTheWeek";
 import { Locale, LOCALE_VALUES, LOCALES } from "@/constants/locales";
+import { DEFAULT_LOCALE } from "@/constants/locales";
 import { THEME_VALUES, ThemeKey } from "@/constants/themes";
 import {
   TIME_FORMAT_VALUES,
@@ -38,7 +39,7 @@ export default function Preferences() {
   const { accountDetails } = useAuthUser();
 
   const currentAccountDetails = accountDetails || {
-    locale: "en-US",
+    locale: DEFAULT_LOCALE,
     theme: "DARK",
     color: "BLUE",
     timezone: "CET",
