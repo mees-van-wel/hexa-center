@@ -43,65 +43,69 @@ export default function HomePage({ newsItems }: { newsItems: NewsItem[] }) {
             {greeting} {authUser.firstName}
           </Title>
         </Sheet>
-        <Sheet title={t("homePage.news")} glass>
-          <ScrollArea
-            className={styles.wrapper}
-            h="calc(100vh - 70px - 8.5rem)"
-          >
-            <Stack gap="xl">
-              {newsItems.map(({ slug, html, data: { title, date, image } }) => (
-                <Card key={slug} shadow="sm" p={0} className={styles.news}>
-                  {image && (
-                    <Card.Section m={0}>
-                      <Image
-                        src={`https://www.hexa.center${image}`}
-                        width={350}
-                        height={150}
-                        alt={title}
+        {newsItems.length && (
+          <Sheet title={t("homePage.news")} glass>
+            <ScrollArea
+              className={styles.wrapper}
+              h="calc(100vh - 70px - 8.5rem)"
+            >
+              <Stack gap="xl">
+                {newsItems.map(
+                  ({ slug, html, data: { title, date, image } }) => (
+                    <Card key={slug} shadow="sm" p={0} className={styles.news}>
+                      {image && (
+                        <Card.Section m={0}>
+                          <Image
+                            src={`https://www.hexa.center${image}`}
+                            width={350}
+                            height={150}
+                            alt={title}
+                            style={{
+                              objectFit: "cover",
+                              width: "100%",
+                            }}
+                          />
+                        </Card.Section>
+                      )}
+                      <Stack p={16}>
+                        <Group wrap="nowrap">
+                          <Title
+                            style={{
+                              flex: 1,
+                            }}
+                            mt={-4}
+                            order={3}
+                          >
+                            {title}
+                          </Title>
+                          <Badge variant="light" className={styles.newsDate}>
+                            {new Date(date).toLocaleDateString("nl-NL")}
+                          </Badge>
+                        </Group>
+                        <div className={styles.newsText}>
+                          {parse(`${html.substring(0, 100)}...`)}
+                        </div>
+                      </Stack>
+                      <Button
                         style={{
-                          objectFit: "cover",
-                          width: "100%",
+                          borderTopLeftRadius: 0,
+                          borderTopRightRadius: 0,
                         }}
-                      />
-                    </Card.Section>
-                  )}
-                  <Stack p={16}>
-                    <Group wrap="nowrap">
-                      <Title
-                        style={{
-                          flex: 1,
-                        }}
-                        mt={-4}
-                        order={3}
+                        target="_blank"
+                        href={`https://hexa.center/news/${slug}`}
+                        fullWidth
+                        component="a"
+                        variant="light"
                       >
-                        {title}
-                      </Title>
-                      <Badge variant="light" className={styles.newsDate}>
-                        {new Date(date).toLocaleDateString("nl-NL")}
-                      </Badge>
-                    </Group>
-                    <div className={styles.newsText}>
-                      {parse(`${html.substring(0, 100)}...`)}
-                    </div>
-                  </Stack>
-                  <Button
-                    style={{
-                      borderTopLeftRadius: 0,
-                      borderTopRightRadius: 0,
-                    }}
-                    target="_blank"
-                    href={`https://hexa.center/news/${slug}`}
-                    fullWidth
-                    component="a"
-                    variant="light"
-                  >
-                    {t("homePage.read")}
-                  </Button>
-                </Card>
-              ))}
-            </Stack>
-          </ScrollArea>
-        </Sheet>
+                        {t("homePage.read")}
+                      </Button>
+                    </Card>
+                  ),
+                )}
+              </Stack>
+            </ScrollArea>
+          </Sheet>
+        )}
       </Group>
     </>
   );
