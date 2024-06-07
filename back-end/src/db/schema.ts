@@ -1,6 +1,7 @@
 import { relations, sql } from "drizzle-orm";
 import {
   AnyPgColumn,
+  customType,
   date,
   integer,
   interval,
@@ -15,6 +16,8 @@ import {
   timestamp,
   uuid,
 } from "drizzle-orm/pg-core";
+
+import { PaymentTerms } from "~/types/paymentTerms";
 
 export const businesses = pgTable("companies", {
   $kind: text("$kind").default("company").notNull(),
@@ -34,6 +37,9 @@ export const businesses = pgTable("companies", {
     (): AnyPgColumn => users.id,
     { onDelete: "set null" },
   ),
+  paymentTermId: integer("payment_term_id").references(() => paymentTerms.id, {
+    onDelete: "restrict",
+  }),
   name: text("name").unique().notNull(),
   email: text("email").notNull(),
   phone: text("phone").notNull(),
@@ -485,6 +491,9 @@ export const customers = pgTable("customers", {
   businessId: integer("company_id")
     .references(() => businesses.id, { onDelete: "restrict" })
     .notNull(),
+  paymentTermId: integer("payment_term_id").references(() => paymentTerms.id, {
+    onDelete: "restrict",
+  }),
   name: text("name").unique().notNull(),
   email: text("email"),
   phone: text("phone"),
@@ -675,6 +684,55 @@ export const invoiceEventsRelations = relations(invoiceEvents, ({ one }) => ({
   }),
 }));
 
+const paymentTermsColumn = customType<{
+  data: PaymentTerms;
+  driverData: string;
+}>({
+  dataType() {
+    return "jsonb";
+  },
+  toDriver(value: PaymentTerms): string {
+    return JSON.stringify(value);
+  },
+  fromDriver(value: string): PaymentTerms {
+    return JSON.parse(value);
+  },
+});
+
+export const paymentTerms = pgTable("payment_terms", {
+  $kind: text("$kind").default("paymentTerm").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .default(sql`now()`)
+    .notNull(),
+  createdById: integer("created_by_id").references(
+    (): AnyPgColumn => users.id,
+    { onDelete: "set null" },
+  ),
+  updatedById: integer("updated_by_id").references(
+    (): AnyPgColumn => users.id,
+    { onDelete: "set null" },
+  ),
+  name: text("name").notNull(),
+  terms: paymentTermsColumn("terms").notNull(),
+  text: text("text"),
+});
+
+export const paymentTermsRelations = relations(paymentTerms, ({ one }) => ({
+  createdBy: one(users, {
+    fields: [paymentTerms.createdById],
+    references: [users.id],
+  }),
+  updatedBy: one(users, {
+    fields: [paymentTerms.updatedById],
+    references: [users.id],
+  }),
+}));
+
 // TODO Inventory
 // TODO COGS account
 export const productTemplates = pgTable("product_templates", {
@@ -857,7 +915,6 @@ export const ledgerAccountsRelations = relations(ledgerAccounts, ({ one }) => ({
 }));
 
 export const settingNameEnum = pgEnum("setting_name", [
-  "companyPaymentTerms",
   "companyLogoSrc",
   "invoiceEmailTitle",
   "invoiceEmailContent",

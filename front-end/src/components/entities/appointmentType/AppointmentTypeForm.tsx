@@ -2,14 +2,10 @@
 
 import { ColorInput, Group, Paper, Stack, TextInput } from "@mantine/core";
 import { TimeInput } from "@mantine/dates";
-import dayjs from "dayjs";
-import duration from "dayjs/plugin/duration";
 import { Controller, useFormContext } from "react-hook-form";
 
 import { useTranslation } from "@/hooks/useTranslation";
 import { AppointmentTypeFormSchema } from "@/schemas/appointmentType";
-
-dayjs.extend(duration);
 
 export const AppointmentTypeForm = () => {
   const t = useTranslation();

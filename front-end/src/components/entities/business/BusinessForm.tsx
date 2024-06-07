@@ -1,6 +1,8 @@
 "use client";
 
 import { Group, Paper, Stack, TextInput } from "@mantine/core";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration.js";
 import { Controller, useFormContext } from "react-hook-form";
 
 import { Address } from "@/components/common/Address";
@@ -11,6 +13,8 @@ import { BusinessFormSchema } from "@/schemas/business";
 type BusinessFormProps = {
   disabled?: boolean;
 };
+
+dayjs.extend(duration);
 
 export const BusinessForm = ({ disabled }: BusinessFormProps) => {
   const t = useTranslation();
@@ -65,6 +69,8 @@ export const BusinessForm = ({ disabled }: BusinessFormProps) => {
             disabled={disabled}
             withAsterisk
           />
+        </Group>
+        <Group>
           <TextInput
             {...register("iban")}
             label={t("entities.company.iban")}

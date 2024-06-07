@@ -1,7 +1,5 @@
 import { TRPCError } from "@trpc/server";
 import { wrap } from "@typeschema/valibot";
-import dayjs from "dayjs";
-import duration from "dayjs/plugin/duration.js";
 import { and, desc, eq } from "drizzle-orm";
 import { date, number, object } from "valibot";
 
@@ -20,8 +18,6 @@ import {
 import { getSettings } from "~/services/setting";
 import { procedure, router } from "~/trpc";
 import { sendMail } from "~/utils/mail";
-
-dayjs.extend(duration);
 
 export const invoiceRouter = router({
   list: procedure.query(({ ctx }) =>
