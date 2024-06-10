@@ -7,6 +7,7 @@ import { customerRouter } from "./customer";
 import { integrationRouter } from "./integration";
 import { invoiceRouter } from "./invoice";
 import { ledgerAccountRouter } from "./ledgerAccount";
+import { paymentTermRouter } from "./paymentTerm";
 import { productRouter } from "./product";
 import { reservationRouter } from "./reservation";
 import { roomRouter } from "./room";
@@ -24,6 +25,7 @@ export const appRouter = router({
   product: productRouter,
   ledgerAccount: ledgerAccountRouter,
   integration: integrationRouter,
+  paymentTerm: paymentTermRouter,
 });
 
 export type AppRouter = typeof appRouter;

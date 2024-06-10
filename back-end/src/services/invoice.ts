@@ -1,5 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration.js";
 import Decimal from "decimal.js";
 import { and, desc, eq, or, sql } from "drizzle-orm";
 import ejs from "ejs";
@@ -14,6 +15,7 @@ import {
   invoiceLines,
   invoices,
   logs,
+  paymentTerms,
   reservationsToInvoices,
 } from "~/db/schema";
 import { getCtx } from "~/utils/context";
@@ -27,6 +29,8 @@ import {
   TwinfieldIntegrationData,
 } from "./integration";
 import { getSetting, getSettings } from "./setting";
+
+dayjs.extend(duration);
 
 export const getInvoice = async (invoiceId: number) => {
   const { db } = getCtx();
@@ -590,41 +594,35 @@ export const issueInvoice = async (
       message: "Missing company id",
     });
 
-  const [
-    customerResult,
-    businessesResult,
-    companyPaymentTerms,
-    countResult,
-    highestNumber,
-  ] = await Promise.all([
-    db.select().from(customers).where(eq(customers.id, invoice.customerId)),
-    db.select().from(businesses).where(eq(businesses.id, invoice.companyId)),
-    getSetting("companyPaymentTerms"),
-    db
-      .select({
-        count: sql<number>`CAST(COUNT(*) AS INT)`,
-      })
-      .from(invoices)
-      .where(
-        and(
-          sql`EXTRACT(YEAR FROM ${invoices.date}) = ${date.getFullYear()}`,
-          or(eq(invoices.type, "standard"), eq(invoices.type, "credit")),
+  const [customerResult, businessesResult, countResult, highestNumber] =
+    await Promise.all([
+      db.select().from(customers).where(eq(customers.id, invoice.customerId)),
+      db.select().from(businesses).where(eq(businesses.id, invoice.companyId)),
+      db
+        .select({
+          count: sql<number>`CAST(COUNT(*) AS INT)`,
+        })
+        .from(invoices)
+        .where(
+          and(
+            sql`EXTRACT(YEAR FROM ${invoices.date}) = ${date.getFullYear()}`,
+            or(eq(invoices.type, "standard"), eq(invoices.type, "credit")),
+          ),
         ),
-      ),
-    db
-      .select({
-        number: invoices.number,
-      })
-      .from(invoices)
-      .where(
-        and(
-          sql`EXTRACT(YEAR FROM ${invoices.date}) = ${date.getFullYear()}`,
-          or(eq(invoices.type, "standard"), eq(invoices.type, "credit")),
-        ),
-      )
-      .orderBy(desc(invoices.number))
-      .limit(1),
-  ]);
+      db
+        .select({
+          number: invoices.number,
+        })
+        .from(invoices)
+        .where(
+          and(
+            sql`EXTRACT(YEAR FROM ${invoices.date}) = ${date.getFullYear()}`,
+            or(eq(invoices.type, "standard"), eq(invoices.type, "credit")),
+          ),
+        )
+        .orderBy(desc(invoices.number))
+        .limit(1),
+    ]);
 
   const customer = customerResult[0];
   if (!customer)
@@ -640,9 +638,31 @@ export const issueInvoice = async (
       message: `company ${invoice.companyId} not found`,
     });
 
+  let paymentTerm: string | undefined = undefined;
+
+  if (customer.paymentTermId) {
+    const paymentTermResult = await db
+      .select()
+      .from(paymentTerms)
+      .where(eq(paymentTerms.id, customer.paymentTermId));
+
+    const terms = paymentTermResult[0].terms;
+    if (terms.type === "netDuration") paymentTerm = terms.value;
+  } else if (company.paymentTermId) {
+    const paymentTermResult = await db
+      .select()
+      .from(paymentTerms)
+      .where(eq(paymentTerms.id, company.paymentTermId));
+
+    const terms = paymentTermResult[0].terms;
+    if (terms.type === "netDuration") paymentTerm = terms.value;
+  }
+
   const { count } = countResult[0];
 
-  const dueDate = dayjs(date).add(dayjs.duration(companyPaymentTerms));
+  const dueDate = paymentTerm
+    ? dayjs(date).add(dayjs.duration(paymentTerm))
+    : undefined;
 
   let invoiceNumber: string = (count + 1).toString().padStart(4, "0");
   const highestInvoiceNumber = highestNumber[0]?.number?.split("-")[0].slice(4);
@@ -668,7 +688,7 @@ export const issueInvoice = async (
       date,
       dueDate:
         invoice.type !== "credit" && invoice.type !== "quotation"
-          ? dueDate.toDate()
+          ? dueDate?.toDate()
           : undefined,
       number: invoice.number || invoiceNumber,
       customerName: customer.name,
@@ -860,7 +880,7 @@ export const issueInvoice = async (
         transactionTypeCode: externalTransactionTypeCode,
         date: dayjs(date).format("YYYYMMDD"),
         invoiceNumber,
-        dueDate: dueDate.format("YYYYMMDD"),
+        // dueDate: dueDate.format("YYYYMMDD"),
         balanceAccountCode: externalBalanceAccountCode,
         customerCode: externalCustomerCode,
         totalAmount: invoice.grossAmount,

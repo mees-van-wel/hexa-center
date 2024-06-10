@@ -42,6 +42,7 @@ export default function Page() {
       cocNumber: "",
       vatId: "",
       iban: "",
+      paymentTermId: null,
       swiftBic: "",
     },
   });

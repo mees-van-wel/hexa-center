@@ -30,6 +30,7 @@ export default function Page() {
   const formMethods = useForm<CustomerDefaultsSchema>({
     resolver: valibotResolver(CustomerCreateSchema),
     defaultValues: {
+      businessId: 1,
       name: "",
       email: "",
       phone: "",
@@ -41,6 +42,7 @@ export default function Page() {
       billingCountry: null,
       cocNumber: "",
       vatId: "",
+      paymentTermId: null,
       contactPersonName: "",
       contactPersonEmail: "",
       contactPersonPhone: "",

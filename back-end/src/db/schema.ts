@@ -694,9 +694,7 @@ const paymentTermsColumn = customType<{
   toDriver(value: PaymentTerms): string {
     return JSON.stringify(value);
   },
-  fromDriver(value: string): PaymentTerms {
-    return JSON.parse(value);
-  },
+  fromDriver: (value) => value as never as PaymentTerms,
 });
 
 export const paymentTerms = pgTable("payment_terms", {

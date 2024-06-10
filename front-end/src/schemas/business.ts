@@ -26,7 +26,7 @@ export const BusinessCreateSchema = object({
   country: string([minLength(2)]),
   cocNumber: string([minLength(2)]),
   vatId: string([minLength(2)]),
-  paymentTerms: nullable(string([toNull()])),
+  paymentTermId: nullable(number()),
   iban: string([minLength(2)]),
   swiftBic: string([minLength(2)]),
 });
@@ -46,7 +46,7 @@ export const BusinessUpdateSchema = merge([
       country: optional(string([minLength(2)])),
       cocNumber: optional(string([minLength(2)])),
       vatId: optional(string([minLength(2)])),
-      paymentTerms: nullish(string([toNull()])),
+      paymentTermId: nullish(number()),
       iban: optional(string([minLength(2)])),
       swiftBic: optional(string([minLength(2)])),
     }),
@@ -66,6 +66,7 @@ export type BusinessDefaultsSchema = {
   cocNumber: "";
   vatId: "";
   iban: "";
+  paymentTermId: null;
   swiftBic: "";
 };
 

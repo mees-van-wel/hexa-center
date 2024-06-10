@@ -36,6 +36,7 @@ export const businessRouter = router({
           country: businesses.country,
           cocNumber: businesses.cocNumber,
           vatId: businesses.vatId,
+          paymentTermId: businesses.paymentTermId,
           iban: businesses.iban,
           swiftBic: businesses.swiftBic,
         });
@@ -73,6 +74,7 @@ export const businessRouter = router({
         country: businesses.country,
         cocNumber: businesses.cocNumber,
         vatId: businesses.vatId,
+        paymentTermId: businesses.paymentTermId,
         iban: businesses.iban,
         swiftBic: businesses.swiftBic,
       })
@@ -114,6 +116,7 @@ export const businessRouter = router({
           country: businesses.country,
           cocNumber: businesses.cocNumber,
           vatId: businesses.vatId,
+          paymentTermId: businesses.paymentTermId,
           iban: businesses.iban,
           swiftBic: businesses.swiftBic,
         });

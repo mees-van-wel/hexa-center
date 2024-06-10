@@ -1,18 +1,48 @@
 "use client";
 
-import { Avatar, Group, Paper, Stack, TextInput } from "@mantine/core";
+import { Avatar, Group, Paper, Select, Stack, TextInput } from "@mantine/core";
+import { useMemo } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 
 import { Address } from "@/components/common/Address";
+import { Loading } from "@/components/common/Loading";
 import { PhoneInput } from "@/components/common/PhoneInput";
+import { useAuthUser } from "@/contexts/AuthContext";
+import { useQuery } from "@/hooks/useQuery";
 import { useTranslation } from "@/hooks/useTranslation";
 import { CustomerFormShema } from "@/schemas/customer";
+import { RouterOutput } from "@/utils/trpc";
 
-type CustomerFormProps = {
-  disabled?: boolean;
+export const CustomerForm = () => {
+  const authUser = useAuthUser();
+  const { getValues } = useFormContext<CustomerFormShema>();
+
+  const businessId = useMemo(() => getValues().businessId, [getValues]);
+
+  const listPaymentTerms = useQuery("paymentTerm", "list");
+  const getBusiness = useQuery("business", "get", {
+    initialParams: businessId || authUser.businessId,
+  });
+
+  if (
+    listPaymentTerms.loading ||
+    getBusiness.loading ||
+    !listPaymentTerms.data ||
+    !getBusiness.data
+  )
+    return <Loading />;
+
+  return (
+    <Form paymentTerms={listPaymentTerms.data} business={getBusiness.data} />
+  );
 };
 
-export const CustomerForm = ({ disabled }: CustomerFormProps) => {
+type FormProps = {
+  paymentTerms: RouterOutput["paymentTerm"]["list"];
+  business: RouterOutput["business"]["get"];
+};
+
+const Form = ({ paymentTerms, business }: FormProps) => {
   const t = useTranslation();
 
   const {
@@ -20,6 +50,21 @@ export const CustomerForm = ({ disabled }: CustomerFormProps) => {
     control,
     formState: { errors },
   } = useFormContext<CustomerFormShema>();
+
+  const defaultPaymentTerm = useMemo(
+    () => paymentTerms.find(({ id }) => id === business.paymentTermId),
+    [business.paymentTermId, paymentTerms],
+  );
+
+  const paymentTermOptions = useMemo(
+    () =>
+      paymentTerms.map(({ id, name }) => ({
+        label: name,
+        value: id.toString(),
+        disabled: id === defaultPaymentTerm?.id,
+      })),
+    [defaultPaymentTerm?.id, paymentTerms],
+  );
 
   return (
     <Paper p="md">
@@ -30,14 +75,12 @@ export const CustomerForm = ({ disabled }: CustomerFormProps) => {
             {...register("name")}
             label={t("common.name")}
             error={errors.name?.message}
-            disabled={disabled}
             withAsterisk
           />
           <TextInput
             {...register("email")}
             label={t("common.email")}
             error={errors.email?.message}
-            disabled={disabled}
             type="email"
           />
           <Controller
@@ -48,7 +91,6 @@ export const CustomerForm = ({ disabled }: CustomerFormProps) => {
                 {...field}
                 label={t("common.phone")}
                 error={error?.message}
-                disabled={disabled}
               />
             )}
           />
@@ -62,7 +104,6 @@ export const CustomerForm = ({ disabled }: CustomerFormProps) => {
             region: "billingRegion",
             country: "billingCountry",
           }}
-          disabled={disabled}
           required
         />
         <Group>
@@ -70,13 +111,34 @@ export const CustomerForm = ({ disabled }: CustomerFormProps) => {
             {...register("vatId")}
             label={t("entities.customer.vatId")}
             error={errors.vatId?.message}
-            disabled={disabled}
           />
           <TextInput
             {...register("cocNumber")}
             label={t("entities.customer.cocNumber")}
             error={errors.cocNumber?.message}
-            disabled={disabled}
+          />
+          <Controller
+            name="paymentTermId"
+            control={control}
+            render={({ field, fieldState: { error } }) => (
+              <Select
+                {...field}
+                value={field.value?.toString() || ""}
+                error={error?.message}
+                label={t("entities.customer.paymentTermId")}
+                description={
+                  defaultPaymentTerm
+                    ? `(Standaard: ${defaultPaymentTerm.name})`
+                    : undefined
+                }
+                data={paymentTermOptions}
+                onChange={(value) => {
+                  field.onChange(value ? parseInt(value) : null);
+                }}
+                searchable
+                clearable
+              />
+            )}
           />
         </Group>
         <Group>
@@ -84,13 +146,11 @@ export const CustomerForm = ({ disabled }: CustomerFormProps) => {
             {...register("contactPersonName")}
             label={t("entities.customer.contactPersonName")}
             error={errors.contactPersonName?.message}
-            disabled={disabled}
           />
           <TextInput
             {...register("contactPersonEmail")}
             label={t("entities.customer.contactPersonEmail")}
             error={errors.contactPersonEmail?.message}
-            disabled={disabled}
           />
           <Controller
             name="contactPersonPhone"
@@ -100,7 +160,6 @@ export const CustomerForm = ({ disabled }: CustomerFormProps) => {
                 {...field}
                 label={t("entities.customer.contactPersonPhone")}
                 error={error?.message}
-                disabled={disabled}
               />
             )}
           />

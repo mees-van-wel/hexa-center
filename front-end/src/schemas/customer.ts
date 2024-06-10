@@ -19,7 +19,7 @@ import { toNull } from "@/valibotPipes/toNull";
 // TODO country picklist
 // TODO sex picklist
 export const CustomerCreateSchema = object({
-  // businessId: number(),
+  businessId: number(),
   name: string([minLength(2)]),
   email: nullable(string([toNull(), nullableEmail()])),
   phone: nullable(string([toNull()])),
@@ -31,6 +31,7 @@ export const CustomerCreateSchema = object({
   billingCountry: string([minLength(2)]),
   cocNumber: nullable(string([toNull()])),
   vatId: nullable(string([toNull()])),
+  paymentTermId: nullable(number()),
   contactPersonName: nullable(string([toNull()])),
   contactPersonEmail: nullable(string([toNull()])),
   contactPersonPhone: nullable(string([toNull()])),
@@ -40,7 +41,7 @@ export const CustomerUpdateSchema = merge([
   object({ id: number() }),
   partial(
     object({
-      // businessId: optional(number()),
+      businessId: optional(number()),
       name: optional(string([minLength(2)])),
       email: nullish(string([toNull(), nullableEmail()])),
       phone: nullish(string([toNull()])),
@@ -52,6 +53,7 @@ export const CustomerUpdateSchema = merge([
       billingCountry: optional(string([minLength(2)])),
       cocNumber: nullish(string([toNull()])),
       vatId: nullish(string([toNull()])),
+      paymentTermId: nullish(number()),
       contactPersonName: nullish(string([toNull()])),
       contactPersonEmail: nullish(string([toNull()])),
       contactPersonPhone: nullish(string([toNull()])),
@@ -60,6 +62,7 @@ export const CustomerUpdateSchema = merge([
 ]);
 
 export type CustomerDefaultsSchema = {
+  businessId: 1;
   name: "";
   email: "";
   phone: "";
@@ -71,6 +74,7 @@ export type CustomerDefaultsSchema = {
   billingCountry: null;
   cocNumber: "";
   vatId: "";
+  paymentTermId: null;
   contactPersonName: "";
   contactPersonEmail: "";
   contactPersonPhone: "";

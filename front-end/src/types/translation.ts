@@ -72,6 +72,7 @@ export type Translation = {
       pluralName: string;
       cocNumber: string;
       vatId: string;
+      paymentTermId: string;
       iban: string;
       swiftBic: string;
       createdNotification: string;
@@ -161,6 +162,7 @@ export type Translation = {
       pluralName: string;
       cocNumber: string;
       vatId: string;
+      paymentTermId: string;
       contactPersonName: string;
       contactPersonEmail: string;
       contactPersonPhone: string;

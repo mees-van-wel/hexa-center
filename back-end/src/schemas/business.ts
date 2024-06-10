@@ -1,4 +1,3 @@
-import { toNull } from "~/valibotPipes/toNull";
 import {
   email,
   Input,
@@ -13,6 +12,8 @@ import {
   string,
 } from "valibot";
 
+import { toNull } from "~/valibotPipes/toNull";
+
 export const BusinessCreateSchema = object({
   name: string([minLength(2)]),
   email: string([email()]),
@@ -25,6 +26,7 @@ export const BusinessCreateSchema = object({
   country: string([minLength(2)]),
   cocNumber: string([minLength(2)]),
   vatId: string([minLength(2)]),
+  paymentTermId: nullable(number()),
   iban: string([minLength(2)]),
   swiftBic: string([minLength(2)]),
 });
@@ -44,6 +46,7 @@ export const BusinessUpdateSchema = merge([
       country: optional(string([minLength(2)])),
       cocNumber: optional(string([minLength(2)])),
       vatId: optional(string([minLength(2)])),
+      paymentTermId: nullish(number()),
       iban: optional(string([minLength(2)])),
       swiftBic: optional(string([minLength(2)])),
     }),
@@ -62,6 +65,7 @@ export type BusinessDefaultsSchema = {
   country: null;
   cocNumber: "";
   vatId: "";
+  paymentTermId: "";
   iban: "";
   swiftBic: "";
 };
