@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import dayjs from "dayjs";
+import { Controller, useForm } from "react-hook-form";
 
 import { Sheet } from "@/components/common/Sheet/Sheet";
 import { DashboardHeader } from "@/components/layouts/dashboard/DashboardHeader";
@@ -29,13 +30,20 @@ import {
 } from "@/constants/timeFormats";
 import { TIMEZONES } from "@/constants/timezones";
 import { useAuthUser } from "@/contexts/AuthContext";
+import { useMutation } from "@/hooks/useMutation";
 import { useTranslation } from "@/hooks/useTranslation";
+import {
+  PreferencesUpdateInputSchema,
+  PreferencesUpdateSchema,
+} from "@/schemas/preferences";
+import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Group, Select, Stack } from "@mantine/core";
 import { IconSettings } from "@tabler/icons-react";
 
 export default function Preferences() {
   const t = useTranslation();
   const { accountDetails } = useAuthUser();
+  const updatePreferences = useMutation("auth", "updatePreference");
 
   const currentAccountDetails = accountDetails || {
     locale: "en-US",
@@ -46,6 +54,18 @@ export default function Preferences() {
     decimalSeparator: "AUTO",
     timeFormat: "AUTO",
     firstDayOfWeek: "AUTO",
+  };
+
+  const { control } = useForm<PreferencesUpdateInputSchema>({
+    resolver: valibotResolver(PreferencesUpdateSchema),
+    defaultValues: accountDetails,
+  });
+
+  const onSubmit = async (
+    preferenceType: string,
+    value: PreferencesUpdateInputSchema,
+  ) => {
+    await updatePreferences.mutate({ [preferenceType]: value });
   };
 
   const datePreview = useMemo(
@@ -107,97 +127,166 @@ export default function Preferences() {
       <Sheet title={t("preferencesPage.system")}>
         <Stack>
           <Group grow>
-            <Select
-              label={t("preferencesPage.language")}
-              value={currentAccountDetails.locale || "en-US"}
-              data={LOCALE_VALUES.map((locale: Locale) => ({
-                label: t(`constants.locales.${locale}`),
-                value: locale,
-              }))}
-              allowDeselect={false}
-              withAsterisk
-              disabled
+            <Controller
+              name="locale"
+              control={control}
+              defaultValue={control._defaultValues.locale}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  label={t("preferencesPage.language")}
+                  data={LOCALE_VALUES.map((locale: Locale) => ({
+                    label: t(`constants.locales.${locale}`),
+                    value: locale,
+                  }))}
+                  onChange={(value) => {
+                    field.onChange(onSubmit("locale", value));
+                  }}
+                  allowDeselect={false}
+                  withAsterisk
+                />
+              )}
             />
-            <Select
-              label={t("preferencesPage.theme")}
-              value={currentAccountDetails.theme}
-              data={THEME_VALUES.map((theme: ThemeKey) => ({
-                label: t(`constants.themes.${theme}`),
-                value: theme,
-              }))}
-              allowDeselect={false}
-              withAsterisk
-              disabled
+            <Controller
+              name="theme"
+              control={control}
+              defaultValue={control._defaultValues.theme}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  label={t("preferencesPage.theme")}
+                  data={THEME_VALUES.map((theme: ThemeKey) => ({
+                    label: t(`constants.themes.${theme}`),
+                    value: theme,
+                  }))}
+                  onChange={(value) => {
+                    field.onChange(onSubmit("theme", value));
+                  }}
+                  allowDeselect={false}
+                  withAsterisk
+                />
+              )}
             />
-            <Select
-              label={t("preferencesPage.timezone")}
-              value={currentAccountDetails.timezone}
-              data={TIMEZONES}
-              allowDeselect={false}
-              searchable
-              withAsterisk
-              disabled
+            <Controller
+              name="timezone"
+              control={control}
+              defaultValue={control._defaultValues.timezone}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  label={t("preferencesPage.timezone")}
+                  data={TIMEZONES}
+                  onChange={(value) => {
+                    field.onChange(onSubmit("timezone", value));
+                  }}
+                  allowDeselect={false}
+                  searchable
+                  withAsterisk
+                />
+              )}
             />
           </Group>
           <Group grow>
             <Stack>
-              <Select
-                label={t("preferencesPage.dateFormat")}
-                value={currentAccountDetails.dateFormat}
-                data={DATE_FORMAT_VALUES.map((dateformat: DateFormatKey) => ({
-                  label: t(`constants.dateFormats.${dateformat}`),
-                  value: dateformat,
-                }))}
-                allowDeselect={false}
-                withAsterisk
-                description={datePreview}
-                disabled
-              />
-            </Stack>
-            <Stack>
-              <Select
-                label={t("preferencesPage.decimalSeparator")}
-                value={currentAccountDetails.decimalSeparator}
-                data={DECIMAL_SEPARATOR_VALUES.map(
-                  (separator: DecimalSeparatorKey) => ({
-                    label: t(`constants.separators.${separator}`),
-                    value: separator,
-                  }),
+              <Controller
+                name="dateformat"
+                control={control}
+                defaultValue={control._defaultValues.dateFormat}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    label={t("preferencesPage.dateFormat")}
+                    value={currentAccountDetails.dateFormat}
+                    data={DATE_FORMAT_VALUES.map(
+                      (dateformat: DateFormatKey) => ({
+                        label: t(`constants.dateFormats.${dateformat}`),
+                        value: dateformat,
+                      }),
+                    )}
+                    onChange={(value) => {
+                      field.onChange(onSubmit("dateFormat", value));
+                    }}
+                    allowDeselect={false}
+                    withAsterisk
+                    description={datePreview}
+                  />
                 )}
-                allowDeselect={false}
-                withAsterisk
-                description={separatorPreview}
-                disabled
               />
             </Stack>
             <Stack>
-              <Select
-                label={t("preferencesPage.timeNotation")}
-                value={currentAccountDetails.timeFormat}
-                data={TIME_FORMAT_VALUES.map((timeformat: TimeFormat) => ({
-                  label: t(`constants.timeFormats.${timeformat}`),
-                  value: timeformat,
-                }))}
-                allowDeselect={false}
-                withAsterisk
-                description={timePreview}
-                disabled
-              />
-            </Stack>
-            <Stack>
-              <Select
-                label={t("preferencesPage.firstDayOfWeek")}
-                value={currentAccountDetails.firstDayOfWeek}
-                data={FIRST_DAY_OF_THE_WEEK_VALUES.map(
-                  (firstDayOfWeek: FirstDayOfTheWeek) => ({
-                    label: t(`constants.firstDaysOfTheWeek.${firstDayOfWeek}`),
-                    value: firstDayOfWeek,
-                  }),
+              <Controller
+                name="decimalSeparator"
+                control={control}
+                defaultValue={control._defaultValues.decimalSeparator}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    label={t("preferencesPage.decimalSeparator")}
+                    value={currentAccountDetails.decimalSeparator}
+                    data={DECIMAL_SEPARATOR_VALUES.map(
+                      (separator: DecimalSeparatorKey) => ({
+                        label: t(`constants.separators.${separator}`),
+                        value: separator,
+                      }),
+                    )}
+                    onChange={(value) => {
+                      field.onChange(onSubmit("decimalSeparator", value));
+                    }}
+                    allowDeselect={false}
+                    withAsterisk
+                    description={separatorPreview}
+                  />
                 )}
-                allowDeselect={false}
-                withAsterisk
-                description={firstDayOfTheWeekPreview}
-                disabled
+              />
+            </Stack>
+            <Stack>
+              <Controller
+                name="timeFormat"
+                control={control}
+                defaultValue={control._defaultValues.timeFormat}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    label={t("preferencesPage.timeNotation")}
+                    data={TIME_FORMAT_VALUES.map((timeformat: TimeFormat) => ({
+                      label: t(`constants.timeFormats.${timeformat}`),
+                      value: timeformat,
+                    }))}
+                    onChange={(value) => {
+                      field.onChange(onSubmit("timeFormat", value));
+                    }}
+                    allowDeselect={false}
+                    withAsterisk
+                    description={timePreview}
+                  />
+                )}
+              />
+            </Stack>
+            <Stack>
+              <Controller
+                name="firstDayOfWeek"
+                control={control}
+                defaultValue={control._defaultValues.firstDayOfWeek}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    label={t("preferencesPage.firstDayOfWeek")}
+                    data={FIRST_DAY_OF_THE_WEEK_VALUES.map(
+                      (firstDayOfWeek: FirstDayOfTheWeek) => ({
+                        label: t(
+                          `constants.firstDaysOfTheWeek.${firstDayOfWeek}`,
+                        ),
+                        value: firstDayOfWeek,
+                      }),
+                    )}
+                    onChange={(value) => {
+                      field.onChange(onSubmit("firstDaysOfTheWeek", value));
+                    }}
+                    allowDeselect={false}
+                    withAsterisk
+                    description={firstDayOfTheWeekPreview}
+                  />
+                )}
               />
             </Stack>
           </Group>

@@ -6,8 +6,9 @@ import {
   SESSION_DURATIONS,
   type SessionDuration,
 } from "@/constants/sessionDurations";
-import { users, userSessions } from "@/db/schema";
+import { userAccountDetails, users, userSessions } from "@/db/schema";
 import { SendEmailOtpSchema, SendPhoneOtpSchema } from "@/schemas/auth";
+import { PreferencesUpdateSchema } from "@/schemas/preferences";
 import { procedure, router } from "@/trpc";
 import { decrypt, encrypt } from "@/utils/encryption";
 import { isProduction } from "@/utils/environment";
@@ -284,4 +285,24 @@ export const authRouter = router({
     return;
   }),
   read: procedure.query(({ ctx }) => ctx.db.select().from(userSessions)),
+  updatePreference: procedure
+    .input(wrap(PreferencesUpdateSchema))
+    .mutation(async ({ input, ctx }) => {
+      const result = await ctx.db
+        .update(userAccountDetails)
+        .set(input)
+        .where(eq(userAccountDetails.userId, ctx.user.id))
+        .returning({
+          userId: userAccountDetails.userId,
+          locale: userAccountDetails.locale,
+          theme: userAccountDetails.theme,
+          color: userAccountDetails.color,
+          timezone: userAccountDetails.timezone,
+          dateFormat: userAccountDetails.dateFormat,
+          decimalSeparator: userAccountDetails.decimalSeparator,
+          timeFormat: userAccountDetails.timeFormat,
+          firstDayOfWeek: userAccountDetails.firstDayOfWeek,
+        });
+      return result[0];
+    }),
 });
