@@ -11,6 +11,7 @@ import { paymentTermRouter } from "./paymentTerm";
 import { productRouter } from "./product";
 import { reservationRouter } from "./reservation";
 import { roomRouter } from "./room";
+import { settingRouter } from "./setting";
 import { userRouter } from "./user";
 
 export const appRouter = router({
@@ -26,6 +27,7 @@ export const appRouter = router({
   ledgerAccount: ledgerAccountRouter,
   integration: integrationRouter,
   paymentTerm: paymentTermRouter,
+  setting: settingRouter,
 });
 
 export type AppRouter = typeof appRouter;

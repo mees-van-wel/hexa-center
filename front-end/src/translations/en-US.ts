@@ -352,9 +352,29 @@ export default {
     roomCreated: "Room successfully created",
   },
   screens: {
-    integrationsPage: {
+    integrations: {
       singleName: "Integration",
       pluralName: "Integrations",
+    },
+    settings: {
+      singleName: "Setting",
+      pluralName: "Settings",
+      visual: "Visual",
+      companyLogoSrc: "Company logo (url)",
+      invoiceHeaderImageSrc: "Invoice header image (url)",
+      invoiceFooterImageSrc: "Invoice footer image (url)",
+      email: "Emails",
+      invoiceEmailTitle: "Invoice email title",
+      invoiceEmailContent: "Invoice email content",
+      financial: "Financial",
+      priceEntryMode: {
+        name: "Price entry mode",
+        net: "Net",
+        gross: "Gross",
+      },
+      reservationRevenueAccountId: "Revervation revenue account",
+      customer: "Customers",
+      defaultCustomerCustomFields: "Default customer custom fields",
     },
   },
   components: {

@@ -24,7 +24,7 @@ export const Overview = ({ integrations }: OverviewProps) => {
       <DashboardHeader
         title={[
           {
-            label: t("screens.integrationsPage.pluralName"),
+            label: t("screens.integrations.pluralName"),
             icon: <IconPlugConnected />,
           },
         ]}

@@ -57,7 +57,7 @@ export const TwinfieldDetail = ({ integration }: TwinfieldDetailProps) => {
         title={[
           {
             href: "/integrations",
-            label: t("screens.integrationsPage.pluralName"),
+            label: t("screens.integrations.pluralName"),
             icon: <IconPlugConnected />,
           },
           { label: "Twinfield" },

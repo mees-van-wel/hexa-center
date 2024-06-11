@@ -1,6 +1,7 @@
 import { relations, sql } from "drizzle-orm";
 import {
   AnyPgColumn,
+  boolean,
   customType,
   date,
   integer,
@@ -920,6 +921,7 @@ export const settingNameEnum = pgEnum("setting_name", [
   "invoiceFooterImageSrc",
   "priceEntryMode",
   "reservationRevenueAccountId",
+  "defaultCustomerCustomFields",
 ]);
 
 export const settings = pgTable("settings", {
@@ -1017,3 +1019,136 @@ export const integrationEntitiesRelations = relations(
     }),
   }),
 );
+
+export const formRefTypeEnum = pgEnum("form_ref_type", ["setting", "customer"]);
+
+export const forms = pgTable("forms", {
+  $kind: text("$kind").default("form").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  refType: formRefTypeEnum("ref_type").notNull(),
+  refId: integer("ref_id").notNull(),
+});
+
+export const formsRelations = relations(forms, ({ many }) => ({
+  sections: many(formSections),
+}));
+
+export const formSections = pgTable("form_sections", {
+  $kind: text("$kind").default("formSection").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  formId: integer("form_id")
+    .references(() => forms.id, { onDelete: "cascade" })
+    .notNull(),
+  position: integer("position").notNull(),
+  title: text("title"),
+  description: text("description"),
+});
+
+export const formSectionsRelations = relations(
+  formSections,
+  ({ one, many }) => ({
+    form: one(forms, {
+      fields: [formSections.formId],
+      references: [forms.id],
+    }),
+    items: many(formItems),
+  }),
+);
+
+export const formItemTypeEnum = pgEnum("form_item_type", [
+  "info",
+  "link",
+  "textSmall",
+  "textLarge",
+  "textEditor",
+  "number",
+  "date",
+  "checkbox",
+  "multipleChoice",
+  "singleChoice",
+  "multipleDropdown",
+  "singleDropdown",
+]);
+
+export const formItems = pgTable("form_items", {
+  $kind: text("$kind").default("formItem").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  sectionId: integer("item_id")
+    .references(() => formSections.id, { onDelete: "cascade" })
+    .notNull(),
+  type: formItemTypeEnum("type").notNull(),
+  optional: boolean("optional").notNull(),
+  position: integer("position").notNull(),
+  label: text("name"),
+  description: text("description"),
+});
+
+export const formItemsRelations = relations(formItems, ({ one, many }) => ({
+  section: one(formSections, {
+    fields: [formItems.sectionId],
+    references: [formSections.id],
+  }),
+  options: many(formOptions),
+  values: many(formValues),
+}));
+
+export const formOptions = pgTable("form_options", {
+  $kind: text("$kind").default("formOption").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  itemId: integer("item_id")
+    .references(() => formItems.id, { onDelete: "cascade" })
+    .notNull(),
+  position: integer("position").notNull(),
+  label: text("name").notNull(),
+  description: text("description"),
+});
+
+export const formOptionsRelations = relations(formOptions, ({ one }) => ({
+  item: one(formItems, {
+    fields: [formOptions.itemId],
+    references: [formItems.id],
+  }),
+}));
+
+export const formValues = pgTable("form_values", {
+  $kind: text("$kind").default("formOption").notNull(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .$onUpdate(() => new Date())
+    .notNull(),
+  createdById: integer("created_by_id").references(
+    (): AnyPgColumn => users.id,
+    { onDelete: "set null" },
+  ),
+  updatedById: integer("updated_by_id").references(
+    (): AnyPgColumn => users.id,
+    { onDelete: "set null" },
+  ),
+  itemId: integer("item_id")
+    .references(() => formItems.id, { onDelete: "cascade" })
+    .notNull(),
+  value: jsonb("value"),
+});
+
+export const formValuesRelations = relations(formValues, ({ one }) => ({
+  createdBy: one(users, {
+    fields: [formValues.createdById],
+    references: [users.id],
+  }),
+  updatedBy: one(users, {
+    fields: [formValues.updatedById],
+    references: [users.id],
+  }),
+  item: one(formItems, {
+    fields: [formValues.itemId],
+    references: [formItems.id],
+  }),
+}));

@@ -355,9 +355,29 @@ export default {
     roomCreated: "Kamer succesvol aangemaakt",
   },
   screens: {
-    integrationsPage: {
+    integrations: {
       singleName: "Integratie",
       pluralName: "Integraties",
+    },
+    settings: {
+      singleName: "Instelling",
+      pluralName: "Instellingen",
+      visual: "Visueel",
+      companyLogoSrc: "Bedrijfslogo (url)",
+      invoiceHeaderImageSrc: "Factuurkop afbeelding (url)",
+      invoiceFooterImageSrc: "Factuurvoet afbeelding (url)",
+      email: "E-mails",
+      invoiceEmailTitle: "Titel factuur mail",
+      invoiceEmailContent: "Inhoud factuur mail",
+      financial: "Financieel",
+      priceEntryMode: {
+        name: "Prijs invoermodus",
+        net: "Netto",
+        gross: "Bruto",
+      },
+      reservationRevenueAccountId: "Omzetrekening reserveringen",
+      customer: "Klanten",
+      defaultCustomerCustomFields: "Standaard extra velden van klanten",
     },
   },
   components: {

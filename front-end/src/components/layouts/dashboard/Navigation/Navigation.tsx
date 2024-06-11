@@ -6,6 +6,7 @@ import {
   IconHome,
   IconHotelService,
   IconPlugConnected,
+  IconSettings,
   IconUserDollar,
   IconUsers,
 } from "@tabler/icons-react";
@@ -147,7 +148,17 @@ export const Navigation = () => {
                 fullWidth
                 justify="left"
               >
-                {t("screens.integrationsPage.pluralName")}
+                {t("screens.integrations.pluralName")}
+              </Button>
+              <Button
+                component={Link}
+                href="/settings"
+                variant={pathname === "/settings" ? "filled" : "subtle"}
+                leftSection={<IconSettings />}
+                fullWidth
+                justify="left"
+              >
+                {t("screens.settings.pluralName")}
               </Button>
             </Stack>
           </Stack>

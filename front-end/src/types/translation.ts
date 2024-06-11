@@ -358,9 +358,29 @@ export type Translation = {
     roomCreated: string;
   };
   screens: {
-    integrationsPage: {
+    integrations: {
       singleName: string;
       pluralName: string;
+    };
+    settings: {
+      singleName: string;
+      pluralName: string;
+      visual: string;
+      companyLogoSrc: string;
+      invoiceHeaderImageSrc: string;
+      invoiceFooterImageSrc: string;
+      email: string;
+      invoiceEmailTitle: string;
+      invoiceEmailContent: string;
+      financial: string;
+      priceEntryMode: {
+        name: string;
+        net: string;
+        gross: string;
+      };
+      reservationRevenueAccountId: string;
+      customer: string;
+      defaultCustomerCustomFields: string;
     };
   };
   components: {
