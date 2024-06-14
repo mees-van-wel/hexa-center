@@ -1,33 +1,46 @@
 import { Paper } from "@mantine/core";
 import clsx from "clsx";
-import { nanoid } from "nanoid";
-import { type DragEvent, useMemo, useRef } from "react";
+import { type DragEvent, Fragment, useMemo, useRef, useState } from "react";
 
 import { FormElements } from "../elements";
 import { useFormBuilderContext } from "../FormBuilderContext";
-import { Element } from "../types";
+import { FormElementType } from "../types";
 import styles from "./Canvas.module.scss";
 
-export const Canvas = () => {
-  const { form, setCurrentElementId } = useFormBuilderContext();
+type CanvasItem = {
+  id: number;
+  type: FormElementType;
+  position: number;
+};
 
-  const elements = useMemo<Element[]>(
-    () =>
-      form.sections.reduce((acc, current) => [...acc, ...current.elements], []),
-    [form.sections],
+export const Canvas = () => {
+  const { form, elements, currentElementId, setCurrentElementId } =
+    useFormBuilderContext();
+
+  const [canvasItems, setCanvasItems] = useState<CanvasItem[]>(
+    elements.map(({ id, config, sectionId, position }) => ({
+      id,
+      type: config.type,
+      sectionId,
+      position,
+    })),
   );
 
   const dropHandler =
     (newPosition?: number) => (e: DragEvent<HTMLDivElement>) => {
       e.preventDefault();
 
-      let id = e.dataTransfer.getData("id");
-      const type = e.dataTransfer.getData("type");
-      const clone = [...elements];
+      const rawId = e.dataTransfer.getData("id");
+      let id: number | null = rawId ? parseInt(rawId) : null;
+
+      const type =
+        (e.dataTransfer.getData("type") as FormElementType | "") || null;
+
+      const clone = [...canvasItems];
 
       if (id) {
-        const element = elements.find((element) => element.id === id);
-        if (!element) return elements;
+        const element = canvasItems.find((element) => element.id === id);
+        if (!element) return canvasItems;
 
         clone.splice(element.position, 1);
         clone.splice(
@@ -35,67 +48,68 @@ export const Canvas = () => {
             ? newPosition > element.position
               ? newPosition - 1
               : newPosition
-            : elements.length,
+            : canvasItems.length,
           0,
           element,
         );
 
-        // TODO Optimistic update
-        // setItems(
-        //   clone.map((element, index) => ({
-        //     ...element,
-        //     position: index,
-        //   })),
-        // );
+        // TODO update db
+        setCanvasItems(
+          clone.map((element, index) => ({
+            ...element,
+            position: index,
+          })),
+        );
+
+        setCurrentElementId(id);
       }
 
       if (type) {
-        id = nanoid();
+        id = Date.now();
 
-        clone.splice(newPosition ?? elements.length, 0, {
+        clone.splice(newPosition ?? canvasItems.length, 0, {
           id,
           type,
-          position: newPosition ?? elements.length,
+          position: newPosition ?? canvasItems.length,
         });
 
-        // TODO Optimistic update
-        // setItems(
-        //   clone.map((element, index) => ({
-        //     ...element,
-        //     position: index,
-        //   })),
-        // );
-      }
+        // TODO update db
+        setCanvasItems(
+          clone.map((element, index) => ({
+            ...element,
+            position: index,
+          })),
+        );
 
-      setCurrentElementId(id);
+        setCurrentElementId(id);
+      }
     };
 
-  const itemClickHandler = (id: string) => {
+  const itemClickHandler = (id: number) => {
     setCurrentElementId(id);
   };
 
   return (
     <Paper className={styles.canvas}>
-      {elements
+      {canvasItems
         .sort((a, b) => a.position - b.position)
         .map(({ id, type }, index) => (
-          <>
+          <Fragment key={id}>
             <Spacer
               onDrop={(position, e) => dropHandler(position)(e)}
               position={index}
-              previousItemId={elements[index - 1]?.id}
+              previousItemId={canvasItems[index - 1]?.id}
               nextItemId={id}
             />
             <CanvasItem
-              key={id}
               id={id}
               type={type}
-              active={current === id}
+              active={currentElementId === id}
               onClick={() => {
                 itemClickHandler(id);
               }}
             />
-          </>
+          </Fragment>
         ))}
       <CanvasBottom onDrop={dropHandler()} />
     </Paper>
@@ -103,46 +117,58 @@ export const Canvas = () => {
 };
 
 type CanvasItemProps = {
-  id: string;
-  type: string;
+  id: number;
+  type: FormElementType;
   active: boolean;
   onClick: () => void;
 };
 
 const CanvasItem = ({ id, type, active, onClick }: CanvasItemProps) => {
+  const { elements, currentElementId } = useFormBuilderContext();
+
+  const element = useMemo(
+    () => elements.find(({ id }) => id === currentElementId) || null,
+    [elements, currentElementId],
+  );
+
   const dragStartHandler = (e: DragEvent<HTMLDivElement>) => {
     e.dataTransfer.effectAllowed = "move";
-    e.dataTransfer.setData("id", id);
+    e.dataTransfer.setData("id", id.toString());
   };
 
   const dragHandler = (e: DragEvent<HTMLDivElement>) => {
-    e.currentTarget.classList.add(styles.canvasItemClosed);
+    e.currentTarget.classList.add(styles.itemClosed);
   };
 
   const dragEndHandler = (e: DragEvent<HTMLDivElement>) => {
-    e.currentTarget.classList.remove(styles.canvasItemClosed);
+    e.currentTarget.classList.remove(styles.itemClosed);
   };
 
   const Component = FormElements[type as keyof typeof FormElements].component;
 
   return (
     <div
-      className={clsx(styles.canvasItem, { [styles.canvasItemActive]: active })}
+      className={styles.item}
       draggable
       onDragStart={dragStartHandler}
       onDrag={dragHandler}
       onDragEnd={dragEndHandler}
       onClick={onClick}
     >
-      {Component ? <Component label="Yeaa" description="lollxzz" /> : type}
+      {Component ? <Component formMode="manage" element={element} /> : type}
+      <div
+        className={clsx(styles.itemOverlay, {
+          [styles.itemOverlayActive]: active,
+        })}
+      />
     </div>
   );
 };
 
 type SpacerProps = {
   position: number;
-  previousItemId: string | undefined;
-  nextItemId: string | undefined;
+  previousItemId: number | undefined;
+  nextItemId: number | undefined;
   onDrop: (position: number, e: DragEvent<HTMLDivElement>) => void;
 };
 
@@ -187,7 +213,9 @@ const Spacer = ({
       innerRef.current.style.transition = "";
     }, 100);
 
-    const id = e.dataTransfer.getData("id");
+    const rawId = e.dataTransfer.getData("id") || null;
+    const id = rawId ? parseInt(rawId) : null;
+
     if (id === previousItemId || id === nextItemId) return;
 
     onDrop(position, e);

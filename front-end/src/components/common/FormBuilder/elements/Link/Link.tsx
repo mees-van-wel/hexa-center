@@ -6,9 +6,10 @@ import type { ElementConfig } from "../../types";
 export const Link: ElementConfig = {
   icon: IconExternalLink,
   component: ({ formMode, element }) => {
+    if (formMode === "manage" || !element) return <Button>Link text</Button>;
+
     return (
       <Button
-        disabled={formMode === "manage"}
         component="a"
         href={element.config.url}
         target={element.config.newPage ? "_blank" : undefined}

@@ -1078,7 +1078,7 @@ export const formElements = pgTable("form_elements", {
     .references(() => formSections.id, { onDelete: "cascade" })
     .notNull(),
   position: integer("position").notNull(),
-  config: formElementConfigColumn("config"),
+  config: formElementConfigColumn("config").notNull(),
 });
 
 export const formElementsRelations = relations(

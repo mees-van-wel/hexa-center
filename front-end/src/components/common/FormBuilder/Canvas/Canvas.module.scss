@@ -10,42 +10,56 @@
   width: 500px;
   height: 80vh;
 
-  &Item {
-    height: 48px;
+  &Bottom {
+    flex: 1;
+  }
+}
+
+.item {
+  position: relative;
+  transition:
+    height 400ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    padding 400ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 400ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    margin 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  padding: 1rem;
+  display: grid;
+  place-content: center;
+  overflow: hidden;
+  cursor: grab;
+  user-select: none;
+  background-color: rgb(var(--color-foreground));
+
+  &:hover {
+    border-color: rgb(var(--color-foreground-inverted) / 20%);
+  }
+
+  &Closed {
+    height: 0;
+    padding: 0;
+    opacity: 0;
+    margin: -1rem 0;
+    cursor: grabbing !important;
+  }
+
+  &Overlay {
+    position: absolute;
+    inset: 0;
     transition:
-      height 400ms cubic-bezier(0.34, 1.56, 0.64, 1),
-      padding 400ms cubic-bezier(0.34, 1.56, 0.64, 1),
-      opacity 400ms cubic-bezier(0.34, 1.56, 0.64, 1),
-      border-color 400ms cubic-bezier(0.34, 1.56, 0.64, 1),
-      margin 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
-    padding: 0.5rem;
+      border-color 200ms ease-in-out,
+      background-color 200ms ease-in-out;
     border-radius: 0.25rem;
     border: 1px solid transparent;
-    display: grid;
-    place-content: center;
-    overflow: hidden;
-    cursor: grab;
-    user-select: none;
 
     &:hover {
       border-color: rgb(var(--color-foreground-inverted) / 20%);
-    }
-
-    &Closed {
-      height: 0;
-      padding: 0;
-      opacity: 0;
-      margin: -1rem 0;
-      cursor: grabbing !important;
+      background-color: rgb(var(--color-foreground-inverted) / 10%);
     }
 
     &Active {
-      border-color: rgb(var(--color-foreground-inverted) / 80%) !important;
+      border-color: rgb(var(--color-foreground-inverted) / 30%) !important;
+      background-color: rgb(var(--color-foreground-inverted) / 20%) !important;
     }
-  }
-
-  &Bottom {
-    flex: 1;
   }
 }
 

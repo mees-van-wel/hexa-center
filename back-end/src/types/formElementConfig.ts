@@ -25,8 +25,8 @@ type TextAreaConfig = {
   value: BaseConfig;
 };
 
-type TextEditorConfig = {
-  type: "textEditor";
+type RichTextEditorConfig = {
+  type: "richTextEditor";
   value: BaseConfig;
 };
 
@@ -59,7 +59,7 @@ export type FormElementConfig =
   | LinkConfig
   | TextInputConfig
   | TextAreaConfig
-  | TextEditorConfig
+  | RichTextEditorConfig
   | NumberInputConfig
   | DatePickerConfig
   | CheckboxConfig

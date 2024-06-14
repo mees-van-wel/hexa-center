@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS "form_elements" (
 	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"item_id" integer NOT NULL,
 	"position" integer NOT NULL,
-	"config" jsonb
+	"config" jsonb NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "form_sections" (

@@ -1,7 +1,7 @@
 "use client";
 
 import { Group, Paper } from "@mantine/core";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import graphPaper from "@/assets/images/graph-paper.svg";
 import { useQuery } from "@/hooks/useQuery";
@@ -12,7 +12,7 @@ import styles from "./FormBuilder.module.scss";
 import { FormBuilderContext } from "./FormBuilderContext";
 import { Properties } from "./Properties";
 import { Sidebar } from "./Sidebar";
-import { Form } from "./types";
+import type { Element, Form } from "./types";
 
 type FormBuilderProps = {
   formId: number;
@@ -35,9 +35,15 @@ const Component = ({ form }: ComponentProps) => {
     form.sections[0]?.elements[0]?.id,
   );
 
+  const elements = useMemo<Element[]>(
+    () =>
+      form.sections.reduce((acc, current) => [...acc, ...current.elements], []),
+    [form],
+  );
+
   return (
     <FormBuilderContext.Provider
-      value={{ form, currentElementId, setCurrentElementId }}
+      value={{ form, elements, currentElementId, setCurrentElementId }}
     >
       <Paper className={styles.root}>
         <div

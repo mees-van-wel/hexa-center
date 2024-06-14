@@ -1,9 +1,10 @@
 import { createContext, useContext } from "react";
 
-import { Form } from "./types";
+import type { Element, Form } from "./types";
 
 export const FormBuilderContext = createContext<{
   form: Form;
+  elements: Element[];
   currentElementId: number;
   setCurrentElementId: (id: number) => void;
 } | null>(null);

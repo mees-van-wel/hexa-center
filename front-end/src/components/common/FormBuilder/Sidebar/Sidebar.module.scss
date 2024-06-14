@@ -1,6 +1,9 @@
 .root {
   position: relative;
   width: 200px;
+  overflow: auto;
+  max-height: 80vh;
+  border: 1px solid rgb(var(--color-foreground-inverted));
 }
 
 .item {
@@ -8,18 +11,20 @@
   align-items: center;
   padding: 1rem;
   gap: 1rem;
-  border: 1px solid rgb(var(--color-foreground-inverted));
+  border: 1px solid #7f7f7f7f;
   user-select: none;
   cursor: grab;
-  margin: -1px 0;
+  margin: -1px;
 
   &:first-child {
-    border-top-left-radius: 0.25rem;
-    border-top-right-radius: 0.25rem;
+    border-top-left-radius: 0.6rem;
+    border-top-right-radius: 0.6rem;
+    // margin: 0 0 -1px;
   }
 
   &:last-child {
-    border-bottom-left-radius: 0.25rem;
-    border-bottom-right-radius: 0.25rem;
+    border-bottom-left-radius: 0.6rem;
+    border-bottom-right-radius: 0.6rem;
+    // margin: -1px 0 0;
   }
 }

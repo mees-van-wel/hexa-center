@@ -2,36 +2,32 @@ import {
   IconArrowAutofitHeight,
   IconCalendar,
   IconCheckbox,
-  IconCircle,
-  IconExternalLink,
   IconForms,
   IconNumbers,
-  IconSelector,
   IconSquare,
   IconTextWrap,
 } from "@tabler/icons-react";
 
 import type { ElementConfig, FormElementType } from "../types";
+import { Link } from "./Link";
 import { TextDisplay } from "./TextDisplay";
 
 export const FormElements: Record<FormElementType, ElementConfig> = {
   textDisplay: TextDisplay,
-  link: {
-    icon: IconExternalLink,
-  },
-  textSmall: {
+  link: Link,
+  textInput: {
     icon: IconForms,
   },
-  textLarge: {
+  textArea: {
     icon: IconArrowAutofitHeight,
   },
-  textEditor: {
+  richTextEditor: {
     icon: IconTextWrap,
   },
-  number: {
+  numberInput: {
     icon: IconNumbers,
   },
-  date: {
+  datePicker: {
     icon: IconCalendar,
   },
   checkbox: {
@@ -39,11 +35,5 @@ export const FormElements: Record<FormElementType, ElementConfig> = {
   },
   multipleChoice: {
     icon: IconSquare,
-  },
-  singleChoice: {
-    icon: IconCircle,
-  },
-  dropdown: {
-    icon: IconSelector,
   },
 };

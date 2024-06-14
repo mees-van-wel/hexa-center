@@ -560,7 +560,7 @@
           "name": "config",
           "type": "jsonb",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         }
       },
       "indexes": {},

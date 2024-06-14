@@ -22,7 +22,7 @@ export type FormElementType =
 export type FormMode = "read" | "preview" | "answer" | "manage";
 
 type ElementComponentProps = {
-  element: Element;
+  element: Element | null;
   formMode: FormMode;
 };
 
