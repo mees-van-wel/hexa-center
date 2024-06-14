@@ -10,12 +10,13 @@ import "./globals.scss";
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
 import { Notifications } from "@mantine/notifications";
+import axios from "axios";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { headers } from "next/headers";
 import { redirect, RedirectType } from "next/navigation";
 
-import { AuthContextProvider } from "@/contexts/AuthContext";
+import { AuthContextProvider, Iotd } from "@/contexts/AuthContext";
 import { TranslationInitializer } from "@/initializers/TranslationInitializer";
 import { tRPCError } from "@/types/tRPCError";
 import { isProduction } from "@/utils/environment";
@@ -61,6 +62,30 @@ export default async function RootLayout({
   if (!user && pathname !== "/login") redirect("/login", RedirectType.replace);
   if (user && pathname === "/login") redirect("/", RedirectType.replace);
 
+  const today = new Date();
+  let iotd: Iotd | null = null;
+  const isSpecial =
+    (today.getMonth() + 1 === 9 && today.getDate() === 5) ||
+    (today.getMonth() + 1 === 10 && today.getDate() === 27);
+
+  if (!isSpecial) {
+    try {
+      const { data } = await axios.get(
+        "https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1",
+      );
+
+      const image = data?.images?.[0];
+      if (image)
+        iotd = {
+          copyright: image.copyright,
+          copyrightlink: image.copyrightlink,
+          url: `https://www.bing.com${image.url}`,
+        };
+    } catch (e) {
+      console.warn("Unable to fetch image of the day", e);
+    }
+  }
+
   return (
     <html lang="nl">
       <head>
@@ -71,7 +96,7 @@ export default async function RootLayout({
         data-theme={dark ? "dark" : "light"}
       >
         <Providers>
-          <AuthContextProvider currentUser={user}>
+          <AuthContextProvider currentUser={user} iotd={iotd}>
             <TranslationInitializer>
               <MantineProvider
                 defaultColorScheme={dark ? "dark" : "light"}

@@ -1,7 +1,6 @@
 import { relations, sql } from "drizzle-orm";
 import {
   AnyPgColumn,
-  boolean,
   customType,
   date,
   integer,
@@ -18,6 +17,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
+import { FormElementConfig } from "~/types/formElementConfig";
 import { PaymentTerms } from "~/types/paymentTerms";
 
 export const businesses = pgTable("companies", {
@@ -1053,66 +1053,44 @@ export const formSectionsRelations = relations(
       fields: [formSections.formId],
       references: [forms.id],
     }),
-    items: many(formItems),
+    elements: many(formElements),
   }),
 );
 
-export const formItemTypeEnum = pgEnum("form_item_type", [
-  "info",
-  "link",
-  "textSmall",
-  "textLarge",
-  "textEditor",
-  "number",
-  "date",
-  "checkbox",
-  "multipleChoice",
-  "singleChoice",
-  "multipleDropdown",
-  "singleDropdown",
-]);
+const formElementConfigColumn = customType<{
+  data: FormElementConfig;
+  driverData: string;
+}>({
+  dataType() {
+    return "jsonb";
+  },
+  toDriver(value: FormElementConfig): string {
+    return JSON.stringify(value);
+  },
+  fromDriver: (value) => value as never as FormElementConfig,
+});
 
-export const formItems = pgTable("form_items", {
-  $kind: text("$kind").default("formItem").notNull(),
+export const formElements = pgTable("form_elements", {
+  $kind: text("$kind").default("formElement").notNull(),
   id: serial("id").primaryKey(),
   uuid: uuid("uuid").defaultRandom().notNull(),
   sectionId: integer("item_id")
     .references(() => formSections.id, { onDelete: "cascade" })
     .notNull(),
-  type: formItemTypeEnum("type").notNull(),
-  optional: boolean("optional").notNull(),
   position: integer("position").notNull(),
-  label: text("name"),
-  description: text("description"),
+  config: formElementConfigColumn("config"),
 });
 
-export const formItemsRelations = relations(formItems, ({ one, many }) => ({
-  section: one(formSections, {
-    fields: [formItems.sectionId],
-    references: [formSections.id],
+export const formElementsRelations = relations(
+  formElements,
+  ({ one, many }) => ({
+    section: one(formSections, {
+      fields: [formElements.sectionId],
+      references: [formSections.id],
+    }),
+    values: many(formValues),
   }),
-  options: many(formOptions),
-  values: many(formValues),
-}));
-
-export const formOptions = pgTable("form_options", {
-  $kind: text("$kind").default("formOption").notNull(),
-  id: serial("id").primaryKey(),
-  uuid: uuid("uuid").defaultRandom().notNull(),
-  itemId: integer("item_id")
-    .references(() => formItems.id, { onDelete: "cascade" })
-    .notNull(),
-  position: integer("position").notNull(),
-  label: text("name").notNull(),
-  description: text("description"),
-});
-
-export const formOptionsRelations = relations(formOptions, ({ one }) => ({
-  item: one(formItems, {
-    fields: [formOptions.itemId],
-    references: [formItems.id],
-  }),
-}));
+);
 
 export const formValues = pgTable("form_values", {
   $kind: text("$kind").default("formOption").notNull(),
@@ -1133,7 +1111,7 @@ export const formValues = pgTable("form_values", {
     { onDelete: "set null" },
   ),
   itemId: integer("item_id")
-    .references(() => formItems.id, { onDelete: "cascade" })
+    .references(() => formElements.id, { onDelete: "cascade" })
     .notNull(),
   value: jsonb("value"),
 });
@@ -1147,8 +1125,8 @@ export const formValuesRelations = relations(formValues, ({ one }) => ({
     fields: [formValues.updatedById],
     references: [users.id],
   }),
-  item: one(formItems, {
+  item: one(formElements, {
     fields: [formValues.itemId],
-    references: [formItems.id],
+    references: [formElements.id],
   }),
 }));

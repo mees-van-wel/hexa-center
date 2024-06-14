@@ -1,36 +1,17 @@
 DO $$ BEGIN
- CREATE TYPE "public"."form_item_type" AS ENUM('info', 'link', 'textSmall', 'textLarge', 'textEditor', 'number', 'date', 'checkbox', 'multipleChoice', 'singleChoice', 'multipleDropdown', 'singleDropdown');
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
  CREATE TYPE "public"."form_ref_type" AS ENUM('setting', 'customer');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 ALTER TYPE "setting_name" ADD VALUE 'defaultCustomerCustomFields';--> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "form_items" (
-	"$kind" text DEFAULT 'formItem' NOT NULL,
-	"id" serial PRIMARY KEY NOT NULL,
-	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
-	"item_id" integer NOT NULL,
-	"type" "form_item_type" NOT NULL,
-	"optional" boolean NOT NULL,
-	"position" integer NOT NULL,
-	"name" text,
-	"description" text
-);
---> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "form_options" (
-	"$kind" text DEFAULT 'formOption' NOT NULL,
+CREATE TABLE IF NOT EXISTS "form_elements" (
+	"$kind" text DEFAULT 'formElement' NOT NULL,
 	"id" serial PRIMARY KEY NOT NULL,
 	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"item_id" integer NOT NULL,
 	"position" integer NOT NULL,
-	"name" text NOT NULL,
-	"description" text
+	"config" jsonb
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "form_sections" (
@@ -64,13 +45,7 @@ CREATE TABLE IF NOT EXISTS "forms" (
 );
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "form_items" ADD CONSTRAINT "form_items_item_id_form_sections_id_fk" FOREIGN KEY ("item_id") REFERENCES "public"."form_sections"("id") ON DELETE cascade ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "form_options" ADD CONSTRAINT "form_options_item_id_form_items_id_fk" FOREIGN KEY ("item_id") REFERENCES "public"."form_items"("id") ON DELETE cascade ON UPDATE no action;
+ ALTER TABLE "form_elements" ADD CONSTRAINT "form_elements_item_id_form_sections_id_fk" FOREIGN KEY ("item_id") REFERENCES "public"."form_sections"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -94,7 +69,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "form_values" ADD CONSTRAINT "form_values_item_id_form_items_id_fk" FOREIGN KEY ("item_id") REFERENCES "public"."form_items"("id") ON DELETE cascade ON UPDATE no action;
+ ALTER TABLE "form_values" ADD CONSTRAINT "form_values_item_id_form_elements_id_fk" FOREIGN KEY ("item_id") REFERENCES "public"."form_elements"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

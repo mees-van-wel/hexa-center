@@ -1,5 +1,5 @@
 {
-  "id": "fbac1b41-c8b8-4785-a10a-b1841c5ca386",
+  "id": "513681c5-b4a2-402a-be26-6cf0dc5987ff",
   "prevId": "34c01824-c99d-4b3a-94d4-314daeba6e9b",
   "version": "6",
   "dialect": "postgresql",
@@ -520,8 +520,8 @@
         }
       }
     },
-    "public.form_items": {
-      "name": "form_items",
+    "public.form_elements": {
+      "name": "form_elements",
       "schema": "",
       "columns": {
         "$kind": {
@@ -529,7 +529,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'formItem'"
+          "default": "'formElement'"
         },
         "id": {
           "name": "id",
@@ -550,112 +550,25 @@
           "primaryKey": false,
           "notNull": true
         },
-        "type": {
-          "name": "type",
-          "type": "form_item_type",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "optional": {
-          "name": "optional",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true
-        },
         "position": {
           "name": "position",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
+        "config": {
+          "name": "config",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "form_items_item_id_form_sections_id_fk": {
-          "name": "form_items_item_id_form_sections_id_fk",
-          "tableFrom": "form_items",
+        "form_elements_item_id_form_sections_id_fk": {
+          "name": "form_elements_item_id_form_sections_id_fk",
+          "tableFrom": "form_elements",
           "tableTo": "form_sections",
-          "columnsFrom": [
-            "item_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "public.form_options": {
-      "name": "form_options",
-      "schema": "",
-      "columns": {
-        "$kind": {
-          "name": "$kind",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'formOption'"
-        },
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "uuid": {
-          "name": "uuid",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "item_id": {
-          "name": "item_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "position": {
-          "name": "position",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "form_options_item_id_form_items_id_fk": {
-          "name": "form_options_item_id_form_items_id_fk",
-          "tableFrom": "form_options",
-          "tableTo": "form_items",
           "columnsFrom": [
             "item_id"
           ],
@@ -827,10 +740,10 @@
           "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "form_values_item_id_form_items_id_fk": {
-          "name": "form_values_item_id_form_items_id_fk",
+        "form_values_item_id_form_elements_id_fk": {
+          "name": "form_values_item_id_form_elements_id_fk",
           "tableFrom": "form_values",
-          "tableTo": "form_items",
+          "tableTo": "form_elements",
           "columnsFrom": [
             "item_id"
           ],
@@ -3324,24 +3237,6 @@
     }
   },
   "enums": {
-    "public.form_item_type": {
-      "name": "form_item_type",
-      "schema": "public",
-      "values": [
-        "info",
-        "link",
-        "textSmall",
-        "textLarge",
-        "textEditor",
-        "number",
-        "date",
-        "checkbox",
-        "multipleChoice",
-        "singleChoice",
-        "multipleDropdown",
-        "singleDropdown"
-      ]
-    },
     "public.form_ref_type": {
       "name": "form_ref_type",
       "schema": "public",

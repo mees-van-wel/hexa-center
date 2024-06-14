@@ -15,6 +15,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "www.hexa.center",
       },
+      {
+        protocol: "https",
+        hostname: "www.bing.com",
+      },
     ],
   },
   poweredByHeader: false,

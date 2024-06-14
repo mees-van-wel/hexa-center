@@ -14,11 +14,18 @@
 }
 
 .background {
-  opacity: 0.2;
-  filter: blur(8px);
+  opacity: 0.3;
   object-fit: cover;
   scale: -1 1;
   position: fixed !important;
+  transition:
+    filter 1s ease,
+    opacity 1s ease;
+
+  &Blur {
+    filter: blur(6px);
+    opacity: 0.2;
+  }
 }
 
 .main {
@@ -54,4 +61,11 @@
     border-bottom-right-radius: 100%;
     border: solid 1px rgb(var(--color-text));
   }
+}
+
+.copyright {
+  position: absolute;
+  bottom: 0.25rem;
+  right: 0.25rem;
+  z-index: -1;
 }

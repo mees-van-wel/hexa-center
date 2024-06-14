@@ -2,14 +2,16 @@
 
 import { Drawer, Group, Paper, Stack } from "@mantine/core";
 import { IconDotsVertical } from "@tabler/icons-react";
+import clsx from "clsx";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRecoilState } from "recoil";
 
 import background from "@/assets/images/bg.jpeg";
 import { CompanyTitle } from "@/components/layouts/dashboard/CompanyTitle";
 import { Navigation } from "@/components/layouts/dashboard/Navigation";
+import { useAuthContext } from "@/contexts/AuthContext";
 import { routeHistoryState } from "@/states/routeHistoryState";
 
 import styles from "./layout.module.scss";
@@ -22,6 +24,9 @@ export default function DashboardLayout({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const [routeHistory, setRouteHistory] = useRecoilState(routeHistoryState);
+  const {
+    auth: { iotd },
+  } = useAuthContext();
 
   useEffect(() => {
     setRouteHistory([...routeHistory, pathname]);
@@ -39,14 +44,21 @@ export default function DashboardLayout({
     };
   }, []);
 
+  const isOnHome = useMemo(
+    () => `/${pathname.split("/")[1]}` === "/",
+    [pathname],
+  );
+
   return (
     <>
       <Image
         suppressHydrationWarning
-        className={styles.background}
-        placeholder="blur"
+        className={clsx(styles.background, {
+          [styles.backgroundBlur]: !isOnHome,
+        })}
+        placeholder={iotd ? undefined : "blur"}
         alt="Background"
-        src={background}
+        src={iotd?.url || background}
         quality={100}
         sizes="100vw"
         fill
@@ -98,6 +110,11 @@ export default function DashboardLayout({
             <Navigation />
           </Paper>
           <main className={styles.main}>{children}</main>
+          {isOnHome && (
+            <p className={styles.copyright}>
+              {iotd?.copyright || "Jan van Keulen"}
+            </p>
+          )}
         </Group>
       </div>
     </>

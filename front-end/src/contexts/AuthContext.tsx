@@ -6,9 +6,16 @@ import { getTrpcClient, type RouterOutput } from "@/utils/trpc";
 
 type CurrentUser = RouterOutput["auth"]["currentUser"];
 
+export type Iotd = {
+  copyright: string;
+  copyrightlink: string;
+  url: string;
+};
+
 type AuthState = {
   user: CurrentUser | null;
   accessToken: string | null;
+  iotd: Iotd | null;
 };
 
 type AuthContext = {
@@ -19,6 +26,7 @@ type AuthContext = {
 type AuthContextProps = {
   children: React.ReactNode;
   currentUser: CurrentUser | null;
+  iotd: Iotd | null;
 };
 
 const AuthContext = createContext<AuthContext>(null);
@@ -26,10 +34,12 @@ const AuthContext = createContext<AuthContext>(null);
 export const AuthContextProvider = ({
   children,
   currentUser,
+  iotd,
 }: AuthContextProps) => {
   const [auth, setAuth] = useState<AuthState>({
     user: currentUser,
     accessToken: null,
+    iotd,
   });
 
   useEffect(() => {
