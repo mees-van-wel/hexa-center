@@ -56,6 +56,13 @@ export const useMemory = () => {
           const current = memoryStore[key];
           const value = as ? as({ current, result }) : result;
 
+          consoleLog(
+            "[MEMORY]",
+            "🔵",
+            "Update triggered via manual write, ref:",
+            key,
+          );
+
           if (value !== undefined) {
             clone[key] = value;
           }

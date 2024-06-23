@@ -31,7 +31,7 @@ type ComponentProps = {
 };
 
 const Component = ({ form }: ComponentProps) => {
-  const [currentElementId, setCurrentElementId] = useState(
+  const [currentElementId, setCurrentElementId] = useState<number | "loading">(
     form.sections[0]?.elements[0]?.id,
   );
 

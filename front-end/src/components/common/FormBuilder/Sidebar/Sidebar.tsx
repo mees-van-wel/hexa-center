@@ -1,12 +1,12 @@
 import { Paper } from "@mantine/core";
 
-import { FormElements } from "../elements";
+import { formElements } from "../elements";
 import styles from "./Sidebar.module.scss";
 
 export const Sidebar = () => (
   <Paper className={styles.root}>
-    {Object.keys(FormElements).map((key) => {
-      const Icon = FormElements[key as keyof typeof FormElements].icon;
+    {Object.keys(formElements).map((key) => {
+      const Icon = formElements[key as keyof typeof formElements].icon;
 
       return (
         <div

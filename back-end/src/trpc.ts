@@ -18,7 +18,10 @@ export const createContext = async ({
   if (authHeader && authHeader.startsWith("Bearer "))
     refreshToken = authHeader.substring(7, authHeader.length);
 
-  if (!refreshToken) return { req, res, db, user: null };
+  if (!refreshToken) {
+    console.warn("Missing refresh token");
+    return { req, res, db, user: null };
+  }
 
   const now = new Date();
 
@@ -47,6 +50,8 @@ export const createContext = async ({
       path: "/",
       maxAge: 0,
     });
+
+    console.log("Session not found or outdated", { now, refreshToken });
 
     return { req, res, db, user: null };
   }

@@ -2,7 +2,10 @@ import { Paper } from "@mantine/core";
 import clsx from "clsx";
 import { type DragEvent, Fragment, useMemo, useRef, useState } from "react";
 
-import { FormElements } from "../elements";
+import { useMemory } from "@/hooks/useMemory";
+import { useMutation } from "@/hooks/useMutation";
+
+import { formElements } from "../elements";
 import { useFormBuilderContext } from "../FormBuilderContext";
 import { FormElementType } from "../types";
 import styles from "./Canvas.module.scss";
@@ -14,6 +17,9 @@ type CanvasItem = {
 };
 
 export const Canvas = () => {
+  const createElement = useMutation("form", "createElement");
+  const memory = useMemory();
+  // const updateFormElement = useMutation("form", "updateElement");
   const { form, elements, currentElementId, setCurrentElementId } =
     useFormBuilderContext();
 
@@ -27,7 +33,7 @@ export const Canvas = () => {
   );
 
   const dropHandler =
-    (newPosition?: number) => (e: DragEvent<HTMLDivElement>) => {
+    (newPosition?: number) => async (e: DragEvent<HTMLDivElement>) => {
       e.preventDefault();
 
       const rawId = e.dataTransfer.getData("id");
@@ -65,15 +71,19 @@ export const Canvas = () => {
       }
 
       if (type) {
+        setCurrentElementId("loading");
+
         id = Date.now();
 
-        clone.splice(newPosition ?? canvasItems.length, 0, {
+        newPosition = newPosition ?? canvasItems.length;
+
+        clone.splice(newPosition, 0, {
           id,
           type,
-          position: newPosition ?? canvasItems.length,
+          position: newPosition,
         });
 
-        // TODO update db
+        // TODO update position in db and cache
         setCanvasItems(
           clone.map((element, index) => ({
             ...element,
@@ -81,7 +91,30 @@ export const Canvas = () => {
           })),
         );
 
-        setCurrentElementId(id);
+        const response = await createElement.mutate({
+          formId: form.id,
+          sectionId: form.sections[0]?.id,
+          position: newPosition,
+          type,
+        });
+
+        memory.write(response.element, [
+          {
+            scope: "form",
+            procedure: "get",
+            params: form.id,
+            as: () => response.form,
+          },
+        ]);
+
+        clone[newPosition] = {
+          ...clone[newPosition],
+          id: response.element.id,
+        };
+
+        setCanvasItems(clone);
+
+        setCurrentElementId(response.element.id);
       }
     };
 
@@ -144,7 +177,7 @@ const CanvasItem = ({ id, type, active, onClick }: CanvasItemProps) => {
     e.currentTarget.classList.remove(styles.itemClosed);
   };
 
-  const Component = FormElements[type as keyof typeof FormElements].component;
+  const Component = formElements[type as keyof typeof formElements].component;
 
   return (
     <div

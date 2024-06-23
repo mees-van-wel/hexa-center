@@ -1,39 +1,25 @@
-import {
-  IconArrowAutofitHeight,
-  IconCalendar,
-  IconCheckbox,
-  IconForms,
-  IconNumbers,
-  IconSquare,
-  IconTextWrap,
-} from "@tabler/icons-react";
+import { IconListDetails } from "@tabler/icons-react";
 
-import type { ElementConfig, FormElementType } from "../types";
-import { Link } from "./Link";
-import { TextDisplay } from "./TextDisplay";
+import type { FormElementConfig, FormElementType } from "../types";
+import { checkbox } from "./checkbox";
+import { dateInput } from "./dateInput";
+import { link } from "./link";
+import { numberInput } from "./numberInput";
+import { richTextEditor } from "./richTextEditor";
+import { textArea } from "./textArea";
+import { textDisplay } from "./textDisplay";
+import { textInput } from "./textInput";
 
-export const FormElements: Record<FormElementType, ElementConfig> = {
-  textDisplay: TextDisplay,
-  link: Link,
-  textInput: {
-    icon: IconForms,
-  },
-  textArea: {
-    icon: IconArrowAutofitHeight,
-  },
-  richTextEditor: {
-    icon: IconTextWrap,
-  },
-  numberInput: {
-    icon: IconNumbers,
-  },
-  datePicker: {
-    icon: IconCalendar,
-  },
-  checkbox: {
-    icon: IconCheckbox,
-  },
+export const formElements: Record<FormElementType, FormElementConfig> = {
+  textDisplay,
+  link,
+  textInput,
+  textArea,
+  richTextEditor,
+  numberInput,
+  dateInput,
+  checkbox,
   multipleChoice: {
-    icon: IconSquare,
+    icon: IconListDetails,
   },
 };

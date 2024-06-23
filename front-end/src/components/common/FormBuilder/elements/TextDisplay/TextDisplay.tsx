@@ -1,9 +1,23 @@
 import { IconLetterCase } from "@tabler/icons-react";
 
-import { ElementConfig } from "../../types";
+import { RichTextEditor } from "@/components/common/RichTextEditor";
 
-export const TextDisplay: ElementConfig = {
+import { FormElementConfig } from "../../types";
+
+export const textDisplay: FormElementConfig = {
   icon: IconLetterCase,
+  properties: ({ config, updateConfig }) => {
+    return (
+      <RichTextEditor
+        value={config.content}
+        onChange={(value) => {
+          updateConfig({
+            content: value,
+          });
+        }}
+      />
+    );
+  },
   component: ({ formMode, element }) => {
     if (formMode === "manage" || !element)
       return (
@@ -16,8 +30,6 @@ export const TextDisplay: ElementConfig = {
         </div>
       );
 
-    return (
-      <div dangerouslySetInnerHTML={{ __html: element.config.value.content }} />
-    );
+    return <div dangerouslySetInnerHTML={{ __html: element.config.content }} />;
   },
 };

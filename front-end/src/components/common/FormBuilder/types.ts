@@ -15,7 +15,7 @@ export type FormElementType =
   | "textArea"
   | "richTextEditor"
   | "numberInput"
-  | "datePicker"
+  | "dateinput"
   | "checkbox"
   | "multipleChoice";
 
@@ -26,7 +26,14 @@ type ElementComponentProps = {
   formMode: FormMode;
 };
 
-export type ElementConfig = {
+type ElementPropertiesProps = {
+  // TODO Typings
+  config: any;
+  updateConfig: (config: any) => void;
+};
+
+export type FormElementConfig = {
   icon: ForwardRefExoticComponent<IconProps & RefAttributes<Icon>>;
+  properties: FC<ElementPropertiesProps>;
   component: FC<ElementComponentProps>;
 };

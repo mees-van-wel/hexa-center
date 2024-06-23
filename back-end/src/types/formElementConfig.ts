@@ -1,57 +1,70 @@
-type BaseConfig = {
-  label: string;
-  description: string;
-};
-
 type TextDisplayConfig = {
   type: "textDisplay";
-  value: {
-    content: string;
-  };
+  content: string;
 };
 
 type LinkConfig = {
   type: "link";
-  value: { label: string; url: string; newPage: boolean };
+  label: string;
+  url: string;
+  newPage: boolean;
 };
 
 type TextInputConfig = {
   type: "textInput";
-  value: BaseConfig;
+  label: string;
+  description: string;
+  optional: boolean;
 };
 
 type TextAreaConfig = {
   type: "textArea";
-  value: BaseConfig;
+  label: string;
+  description: string;
+  optional: boolean;
 };
 
 type RichTextEditorConfig = {
   type: "richTextEditor";
-  value: BaseConfig;
+  label: string;
+  description: string;
+  optional: boolean;
 };
 
 type NumberInputConfig = {
   type: "numberInput";
-  value: BaseConfig;
+  label: string;
+  description: string;
+  optional: boolean;
 };
 
-type DatePickerConfig = {
-  type: "datePicker";
-  value: BaseConfig;
+type DateInputConfig = {
+  type: "dateInput";
+  label: string;
+  description: string;
+  optional: boolean;
 };
 
 type CheckboxConfig = {
   type: "checkbox";
-  value: BaseConfig;
+  label: string;
+  description: string;
+  optional: boolean;
 };
 
 type MultipleChoiceConfig = {
   type: "multipleChoice";
-  value: BaseConfig & {
-    options: BaseConfig & { id: string; position: number }[];
-    mulitple: boolean;
-    variant: "list" | "dropdown";
-  };
+  label: string;
+  description: string;
+  optional: boolean;
+  options: {
+    label: string;
+    description: string;
+    id: string;
+    position: number;
+  }[];
+  mulitple: boolean;
+  variant: "list" | "dropdown";
 };
 
 export type FormElementConfig =
@@ -61,6 +74,6 @@ export type FormElementConfig =
   | TextAreaConfig
   | RichTextEditorConfig
   | NumberInputConfig
-  | DatePickerConfig
+  | DateInputConfig
   | CheckboxConfig
   | MultipleChoiceConfig;

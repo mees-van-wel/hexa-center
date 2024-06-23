@@ -17,7 +17,6 @@ import {
   IconPalette,
   IconUser,
 } from "@tabler/icons-react";
-import clsx from "clsx";
 import type { Route } from "next";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -62,38 +61,21 @@ export const DashboardHeader = ({
   };
 
   return (
-    <Group w="100%" align="stretch">
-      {(children || showBackButton) && (
-        <Paper
-          component={Group}
-          p="md"
-          wrap="nowrap"
-          className={styles.changeOrderExtra}
+    <Paper component={Group} p="md" justify="space-between" gap="2rem">
+      {showBackButton && (
+        <Button
+          variant="light"
+          leftSection={<IconArrowLeft />}
+          onClick={() => {
+            previousRoute
+              ? router.back()
+              : backRouteFallback && router.push(backRouteFallback);
+          }}
         >
-          {showBackButton && (
-            <Button
-              variant="light"
-              leftSection={<IconArrowLeft />}
-              onClick={() => {
-                previousRoute
-                  ? router.back()
-                  : backRouteFallback && router.push(backRouteFallback);
-              }}
-            >
-              {t("common.back")}
-            </Button>
-          )}
-          {children}
-        </Paper>
+          {t("common.back")}
+        </Button>
       )}
-      <Paper
-        className={clsx([styles.titleContainer, styles.changeOrderTitle])}
-        component={Group}
-        wrap="nowrap"
-        justify="center"
-        gap="xs"
-        p="md"
-      >
+      <Group>
         {title.map(({ icon, label, href }, index) => {
           const isLast = title.length - 1 === index;
           const labelComponent = (
@@ -125,14 +107,9 @@ export const DashboardHeader = ({
             </Fragment>
           );
         })}
-      </Paper>
-      <Paper
-        component={Menu}
-        trigger="hover"
-        position="bottom-end"
-        p="md"
-        className={styles.changeOrderAccount}
-      >
+      </Group>
+      <Group flex="1">{children}</Group>
+      <Menu trigger="hover" position="bottom-end">
         <Menu.Target>
           <Group wrap="nowrap">
             <Stack ta="right" visibleFrom="md" gap={0}>
@@ -176,7 +153,126 @@ export const DashboardHeader = ({
             {t("dashboardLayout.avatar.logout")}
           </Menu.Item>
         </Menu.Dropdown>
-      </Paper>
-    </Group>
+      </Menu>
+    </Paper>
   );
+
+  // return (
+  //   <Group w="100%" align="stretch">
+  // {(children || showBackButton) && (
+  //   <Paper
+  //     component={Group}
+  //     p="md"
+  //     wrap="nowrap"
+  //     className={styles.changeOrderExtra}
+  //   >
+  //     {showBackButton && (
+  //       <Button
+  //         variant="light"
+  //         leftSection={<IconArrowLeft />}
+  //         onClick={() => {
+  //           previousRoute
+  //             ? router.back()
+  //             : backRouteFallback && router.push(backRouteFallback);
+  //         }}
+  //       >
+  //         {t("common.back")}
+  //       </Button>
+  //     )}
+  //     {children}
+  //   </Paper>
+  // )}
+  //     <Paper
+  //       className={clsx([styles.titleContainer, styles.changeOrderTitle])}
+  //       component={Group}
+  //       wrap="nowrap"
+  //       justify="center"
+  //       gap="xs"
+  //       p="md"
+  //     >
+  // {title.map(({ icon, label, href }, index) => {
+  //   const isLast = title.length - 1 === index;
+  //   const labelComponent = (
+  //     <Title
+  //       style={{
+  //         whiteSpace: "nowrap",
+  //         overflow: "hidden",
+  //         textOverflow: "ellipsis",
+  //       }}
+  //       order={3}
+  //     >
+  //       {label}
+  //     </Title>
+  //   );
+
+  //   return (
+  //     <Fragment key={index}>
+  //       <Group gap="xs" wrap="nowrap" maw="44vw">
+  //         {icon}
+  //         {href ? (
+  //           <Link className={styles.dashboardHeaderLink} href={href}>
+  //             {labelComponent}
+  //           </Link>
+  //         ) : (
+  //           labelComponent
+  //         )}
+  //       </Group>
+  //       {!isLast && <IconChevronRight />}
+  //     </Fragment>
+  //   );
+  // })}
+  //     </Paper>
+  //     <Paper
+  //       component={Menu}
+  // trigger="hover"
+  // position="bottom-end"
+  //       p="md"
+  //       className={styles.changeOrderAccount}
+  //     >
+  // <Menu.Target>
+  //   <Group wrap="nowrap">
+  //     <Stack ta="right" visibleFrom="md" gap={0}>
+  //       <Text
+  //         size="xs"
+  //         fw={700}
+  //         style={{
+  //           whiteSpace: "nowrap",
+  //         }}
+  //       >
+  //         {authUser.firstName} {authUser.lastName}
+  //       </Text>
+  //       <Text
+  //         size="xs"
+  //         style={{
+  //           whiteSpace: "nowrap",
+  //         }}
+  //       >
+  //         {authUser.email}
+  //       </Text>
+  //     </Stack>
+  //     <Avatar />
+  //   </Group>
+  // </Menu.Target>
+  // <Menu.Dropdown>
+  //   <Menu.Item
+  //     leftSection={<IconUser />}
+  //     component={Link}
+  //     href="/profile"
+  //   >
+  //     {t("dashboardLayout.avatar.profile")}
+  //   </Menu.Item>
+  //   <Menu.Item
+  //     leftSection={<IconPalette />}
+  //     component={Link}
+  //     href="/preferences"
+  //   >
+  //     {t("dashboardLayout.avatar.preferences")}
+  //   </Menu.Item>
+  //   <Menu.Item leftSection={<IconLogout />} onClick={logoutHandler}>
+  //     {t("dashboardLayout.avatar.logout")}
+  //   </Menu.Item>
+  // </Menu.Dropdown>
+  //     </Paper>
+  //   </Group>
+  // );
 };

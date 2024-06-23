@@ -1,12 +1,12 @@
 import { Button } from "@mantine/core";
 import { IconExternalLink } from "@tabler/icons-react";
 
-import type { ElementConfig } from "../../types";
+import type { FormElementConfig } from "../../types";
 
-export const Link: ElementConfig = {
+export const link: FormElementConfig = {
   icon: IconExternalLink,
-  component: ({ formMode, element }) => {
-    if (formMode === "manage" || !element) return <Button>Link text</Button>;
+  component: ({ element }) => {
+    if (!element) return <Button>Link text</Button>;
 
     return (
       <Button

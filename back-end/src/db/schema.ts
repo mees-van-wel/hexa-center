@@ -1067,7 +1067,7 @@ const formElementConfigColumn = customType<{
   toDriver(value: FormElementConfig): string {
     return JSON.stringify(value);
   },
-  fromDriver: (value) => value as never as FormElementConfig,
+  fromDriver: (value) => JSON.parse(value) as FormElementConfig,
 });
 
 export const formElements = pgTable("form_elements", {
