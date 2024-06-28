@@ -1,0 +1,29 @@
+<soap:Envelope
+  xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:twinfield="http://www.twinfield.com/"
+>
+  <soap:Header>
+    <twinfield:Header>
+      <twinfield:AccessToken><%= accessToken %></twinfield:AccessToken>
+      <twinfield:CompanyCode><%= companyCode %></twinfield:CompanyCode>
+    </twinfield:Header>
+  </soap:Header>
+  <soap:Body>
+    <twinfield:ProcessXmlDocument>
+      <twinfield:xmlRequest>
+        <spread action="postprovisional">
+          <original>
+            <office><%= companyCode %></office>
+            <code><%= transactionTypeCode %></code>
+            <number><%= transactionNumber %></number>
+          </original>
+          <settings>
+            <dim1><%= balanceAccountCode %></dim1>
+            <startperiod><%= startPeriod %></startperiod>
+            <endperiod><%= endPeriod %></endperiod>
+          </settings>
+        </spread>
+      </twinfield:xmlRequest>
+    </twinfield:ProcessXmlDocument>
+  </soap:Body>
+</soap:Envelope>

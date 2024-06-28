@@ -1,0 +1,24 @@
+<soap:Envelope
+  xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:twinfield="http://www.twinfield.com/"
+>
+  <soap:Header>
+    <twinfield:Header>
+      <twinfield:AccessToken><%= accessToken %></twinfield:AccessToken>
+      <twinfield:CompanyCode><%= companyCode %></twinfield:CompanyCode>
+    </twinfield:Header>
+  </soap:Header>
+  <soap:Body>
+    <twinfield:ProcessXmlDocument>
+      <twinfield:xmlRequest>
+        <dimensions>
+          <dimension status="deleted">
+            <office><%= companyCode %></office>
+            <code><%= code %></code>
+            <type>DEB</type>
+          </dimension>
+        </dimensions>
+      </twinfield:xmlRequest>
+    </twinfield:ProcessXmlDocument>
+  </soap:Body>
+</soap:Envelope>

@@ -1,7 +1,0 @@
-{
-  "watch": ["src"],
-  "ext": "ts",
-  "execMap": {
-    "ts": "node --env-file=.env.local --loader ts-node/esm src/app.ts"
-  }
-}

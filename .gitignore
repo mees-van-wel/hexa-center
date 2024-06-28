@@ -13,15 +13,6 @@ pnpm-debug.log
 *.pid
 *.gz
 
-# IDEs and Editors
-.vscode/
-.idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.swp
-
 # Operating System
 .DS_Store
 Thumbs.db
@@ -92,5 +83,3 @@ bower_components
 
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
-
-# Dependency

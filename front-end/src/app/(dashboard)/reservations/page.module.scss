@@ -1,0 +1,40 @@
+.calendarOverview {
+  transition: gap 0.2s ease-in;
+}
+
+.calendarContainer {
+  position: relative;
+  flex-grow: 1;
+
+  .roomName {
+    width: 150px;
+    flex-grow: 0;
+    max-width: none;
+  }
+
+  .weekDays {
+    display: flex;
+    max-width: none;
+    justify-content: center;
+
+    .currentDay {
+      background-color: var(--mantine-primary-color-light);
+      border-radius: 0.5rem;
+      width: 100%;
+    }
+  }
+}
+
+.sideBarIcon {
+  position: absolute;
+  right: -0.5rem;
+  top: -0.5rem;
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(var(--color-midground));
+  border: solid 1px rgb(var(--color-background));
+  border-radius: 100%;
+  padding: 0.25rem;
+}

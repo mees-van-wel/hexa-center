@@ -1,0 +1,57 @@
+.fade {
+  opacity: 0;
+  animation: fadeinbg 1s forwards;
+}
+
+@keyframes fadeinbg {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.background {
+  opacity: 0.2;
+  filter: blur(8px);
+  object-fit: cover;
+  scale: -1 1;
+  position: fixed !important;
+}
+
+.main {
+  flex: 1;
+  align-items: stretch;
+}
+
+.layoutContainer {
+  position: absolute;
+  inset: 0;
+  padding: 1rem;
+}
+
+.mobileMenuContainer {
+  display: none;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  left: -5px;
+  bottom: 0;
+  cursor: pointer;
+
+  @media (max-width: 62em) {
+    display: flex;
+  }
+
+  .mobileMenu {
+    display: flex;
+    justify-content: center;
+    padding: 1rem 0;
+    background: rgb(var(--color-foreground));
+    border-top-right-radius: 100%;
+    border-bottom-right-radius: 100%;
+    border: solid 1px rgb(var(--color-text));
+  }
+}

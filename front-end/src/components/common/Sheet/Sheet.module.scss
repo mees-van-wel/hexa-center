@@ -1,0 +1,32 @@
+.headerOpen {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+
+  .button {
+    border-bottom-right-radius: 0px;
+  }
+}
+
+.title {
+  padding: 0.25rem 1rem;
+}
+
+.button {
+  height: unset;
+  border-top-left-radius: 0;
+  border-top-right-radius: 8px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 8px;
+}
+
+.content {
+  border-top-left-radius: 0;
+  padding: 1rem;
+  width: 100%;
+}
+
+.glass {
+  box-shadow: 0 4px 30px rgb(0 0 0 / 50%);
+  backdrop-filter: saturate(1.5), blur(8px);
+  background-color: rgb(var(--color-foreground) / 50%);
+}

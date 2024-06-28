@@ -1,0 +1,51 @@
+FROM node:20-alpine AS base
+
+ENV PNPM_HOME="/pnpm" \
+    PATH="$PNPM_HOME:$PATH"
+
+# Necessary dependencies for Puppeteer
+RUN apk add --no-cache \
+      nss \
+      freetype \
+      freetype-dev \
+      harfbuzz \
+      ca-certificates \
+      ttf-freefont \
+      chromium
+
+RUN corepack enable
+
+FROM base AS deps
+WORKDIR /app
+
+COPY package.json pnpm-lock.yaml ./
+
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+
+FROM base AS builder
+WORKDIR /app
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+RUN pnpm run build
+
+FROM base AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+COPY --from=builder /app/dist ./
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/src/emails ./emails
+COPY --from=builder /app/src/pdfs ./pdfs
+COPY --from=builder /app/src/soapEnvelopes ./soapEnvelopes
+COPY --from=builder /app/drizzle ./drizzle
+
+EXPOSE 4000
+
+ENV PORT 4000 \
+    HOSTNAME "0.0.0.0"
+
+CMD ["node", "server.js"]
